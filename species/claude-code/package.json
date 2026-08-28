@@ -1,9 +1,0 @@
-{
-  "name": "claude-code",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "pack-agent": "node ./scripts/pack-agent.mjs"
-  }
-}

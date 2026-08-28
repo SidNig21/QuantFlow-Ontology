@@ -74,7 +74,7 @@ so up front is the point — a flat-looking ladder is how month three starts fee
 | **R1** | Medium | A Dock seat can call generated ontology tools through an app-owned gateway | enables all |
 | **R2** | Medium | The Kernel decides which tools a role receives, and seats have operating instructions | enables 1–2 |
 | **R3** | Medium | An orchestrator reads the real Dock and spawns a real seat; the tile appears because the Kernel says so | **1–2** |
-| **R4** | Medium | A second harness (Claude Code) works through the identical contract | 1–2 |
+| **R4** | Medium | **Future:** a second external CLI adapter works through the identical contract | 1–2 |
 | **R5** | Medium | Delegation is durable objects, not messages — the work survives the transcript | **3** |
 | **R6** | Medium | A real agent answers a real market question with cited Kernel lineage | **4** |
 | **R7** | Small | Nothing approves on the founder's behalf; the legacy file surface is closed | safety |
@@ -307,24 +307,25 @@ prompting, not plumbing. Task assignment, which is R5.
 
 **Founder review — queued, does not block.** You should see a tile appear that you did not click.
 
-### R4 — a second species
+### R4 — a future second species
 
-**Proves.** Claude Code CLI works through the identical contract as Hermes, with no Hermes-shaped
-special case anywhere in the path.
+**Proves when reopened.** A user-owned external CLI works through the identical contract as Hermes,
+with no Hermes-shaped special case anywhere in the path. This is future adapter work, not a current
+built-in Dock capability.
 
-**Deliverables.** An adapter package and `agent_definition` rows for a Claude Code profile. The same
-launch path, the same R1 gateway, the same R2 capability grants. Claude Code speaks MCP natively, so
-the gateway should need no new transport.
+**Deliverables when reopened.** An adapter package and `agent_definition` rows for the selected
+external CLI profile. The same launch path, the same R1 gateway, the same R2 capability grants. The
+external CLI must speak the existing transport, so the gateway should need no new transport.
 
-**Acceptance.** Spawn a Claude Code seat from the normal Dock. It calls the same generated read tool
-a Hermes seat calls and receives the same result shape. Both sessions appear as distinct Kernel rows
-with correct `spawned_from` links.
+**Acceptance when reopened.** Spawn the external CLI seat from the normal Dock. It calls the same
+generated read tool a Hermes seat calls and receives the same result shape. Both sessions appear as
+distinct Kernel rows with correct `spawned_from` links.
 
-**Falsify.** Hardcode a `"hermes"` literal into the shared launch path — the existing species-literal
-scan in `dock-registry` goes red. Point the Claude Code seat at the gateway with no capability grant
-— refused.
+**Falsify when reopened.** Hardcode a `"hermes"` literal into the shared launch path — the existing
+species-literal scan in `dock-registry` goes red. Point the external CLI seat at the gateway with no
+capability grant — refused.
 
-**Out of scope.** Claude Code doing research. Tool-for-tool parity between species.
+**Out of scope.** The external CLI doing research. Tool-for-tool parity between species.
 
 ### R5 — delegation is durable objects
 

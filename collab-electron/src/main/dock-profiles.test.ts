@@ -24,8 +24,8 @@ afterEach(() => {
 
 function seedAdapter(
   root: string,
-  base: "species/hermes" | "species/claude-code" | "tools/qf-proof-agent",
-  adapterId: "hermes" | "claude-code" | "qf-proof-agent",
+  base: "species/hermes" | "tools/qf-proof-agent",
+  adapterId: "hermes" | "qf-proof-agent",
   profiles: Array<{
     id: string;
     role: string;
@@ -38,8 +38,6 @@ function seedAdapter(
 ): void {
   const packageName = adapterId === "hermes"
     ? "hermes.aospkg"
-    : adapterId === "claude-code"
-      ? "claude-code.aospkg"
     : "qf-proof-agent.aospkg";
   const packed = join(root, base, "packed");
   mkdirSync(packed, { recursive: true });
@@ -55,13 +53,6 @@ function seedAdapter(
             argv: ["--tui"],
             profile_argv: ["-p", "{runtime_profile}", "--tui"],
           }
-        : adapterId === "claude-code"
-          ? {
-              command: "node",
-              entrypoint: "claude-code.mjs",
-              profile_argv: ["--profile", "{runtime_profile}"],
-              argv: ["--profile", "default"],
-            }
         : adapterId === "qf-proof-agent"
           ? {
               command: "node",
@@ -114,39 +105,19 @@ function seedRequired(root: string): void {
       system_prompt_ref: "prompts/worker.md",
       capability_groups: ["market.read"],
     },
+    {
+      id: "hermes-critic",
+      role: "critic",
+      display_name: "Critic",
+      runtime_profile: "qf-critic",
+      system_prompt_ref: "prompts/critic.md",
+      capability_groups: ["research.evaluate"],
+    },
   ]);
   mkdirSync(join(root, "species/hermes/prompts"), { recursive: true });
   writeFileSync(join(root, "species/hermes/prompts/research-director.md"), "director");
-  const claudeProfiles = [
-    {
-      id: "claude-code-orchestrator",
-      role: "claude-orchestrator",
-      runtime_profile: "claude-code-orchestrator",
-      system_prompt_ref: "prompts/orchestrator.md",
-      capability_groups: ["desk.orchestrate"],
-    },
-    {
-      id: "claude-code-worker",
-      role: "claude-worker",
-      runtime_profile: "claude-code-worker",
-      system_prompt_ref: "prompts/worker.md",
-      capability_groups: ["market.read"],
-    },
-  ];
-  seedAdapter(root, "species/claude-code", "claude-code", claudeProfiles);
-  seedAdapter(
-    root,
-    "species/claude-code",
-    "claude-code",
-    [{
-      id: "claude-code-ungranted",
-      role: "claude-ungranted",
-      runtime_profile: "claude-code-ungranted",
-      system_prompt_ref: "prompts/worker.md",
-      capability_groups: [],
-    }],
-    "qa-dock-profiles.json",
-  );
+  writeFileSync(join(root, "species/hermes/prompts/worker.md"), "worker");
+  writeFileSync(join(root, "species/hermes/prompts/critic.md"), "critic");
 }
 
 function seedQaFixtures(root: string): void {
@@ -166,7 +137,9 @@ function seedQaFixtures(root: string): void {
       capability_groups: ["market.read"],
     },
   ]);
-
+  mkdirSync(join(root, "tools/qf-proof-agent/prompts"), { recursive: true });
+  writeFileSync(join(root, "tools/qf-proof-agent/prompts/orchestrator.md"), "orchestrator");
+  writeFileSync(join(root, "tools/qf-proof-agent/prompts/worker.md"), "worker");
 }
 
 function freshRoot(): string {
@@ -197,8 +170,7 @@ describe("Dock profile manifests", () => {
     const manifests = discoverDockProfileManifests(freshRoot());
     const profiles = manifests.flatMap((manifest) => manifest.profiles);
     expect(profiles.map((profile) => profile.name).sort()).toEqual([
-      "claude-code-orchestrator",
-      "claude-code-worker",
+      "hermes-critic",
       "hermes-research-director",
       "hermes-worker",
       "hermes-worker-2",
@@ -242,18 +214,17 @@ describe("Dock profile manifests", () => {
   test("QA discovery explicitly includes proof fixtures", () => {
     const manifests = discoverDockProfileManifests(freshQaRoot(), { qaMode: true });
     expect(manifests.flatMap((manifest) => manifest.profiles).map((profile) => profile.name).sort()).toEqual([
-      "claude-code-orchestrator",
-      "claude-code-ungranted",
-      "claude-code-worker",
+      "hermes-critic",
       "hermes-research-director",
       "hermes-worker",
       "hermes-worker-2",
       "qf-proof-orchestrator",
       "qf-proof-worker",
     ]);
-    expect(manifests.map((manifest) => manifest.manifestRef)).toContain(
-      "species/claude-code/qa-dock-profiles.json",
-    );
+    expect(manifests.map((manifest) => manifest.manifestRef)).toEqual([
+      "species/hermes/dock-profiles.json",
+      "tools/qf-proof-agent/dock-profiles.json",
+    ]);
   });
 
   test("QA discovery still fails when a required fixture package is missing", () => {
@@ -293,14 +264,14 @@ describe("Dock profile manifests", () => {
     };
     const root = freshRoot();
     const first = bootstrapDockProfiles(root, deps);
-    expect(first.registered).toHaveLength(5);
+    expect(first.registered).toHaveLength(4);
     expect(first.conflicts).toHaveLength(0);
-    expect(writes).toHaveLength(5);
+    expect(writes).toHaveLength(4);
 
     const second = bootstrapDockProfiles(root, deps);
     expect(second.registered).toHaveLength(0);
-    expect(second.skipped).toHaveLength(5);
-    expect(writes).toHaveLength(5);
+    expect(second.skipped).toHaveLength(4);
+    expect(writes).toHaveLength(4);
 
     rows.set("hermes-worker", {
       ...rows.get("hermes-worker"),
@@ -311,7 +282,7 @@ describe("Dock profile manifests", () => {
       "hermes-worker",
     ]);
     expect(rows.get("hermes-worker")?.role).toBe("operator-custom-role");
-    expect(writes).toHaveLength(5);
+    expect(writes).toHaveLength(4);
 
     const qaRows = new Map<string, Record<string, unknown>>();
     const qaWrites: DockProfileRegistration[] = [];
@@ -322,8 +293,8 @@ describe("Dock profile manifests", () => {
         qaRows.set(input.name, { id: input.name, ...input });
       },
     }, { qaMode: true });
-    expect(qa.registered).toHaveLength(9);
-    expect(qaWrites).toHaveLength(9);
+    expect(qa.registered).toHaveLength(6);
+    expect(qaWrites).toHaveLength(6);
   });
 
   test("validates every manifest before making a Kernel call", () => {

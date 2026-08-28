@@ -2,8 +2,7 @@
  * App-owned runtime admission and lifecycle boundary.
  * Species come from agent_definition rows (package_ref); no in-code registry map.
  *
- * Production packaging stages the genuine Hermes and Claude species.
-
+ * Production packaging stages the genuine Hermes species.
  */
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";

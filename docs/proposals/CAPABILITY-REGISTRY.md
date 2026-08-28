@@ -64,12 +64,12 @@ REJECTED       named as a trap by the doctrine
 | System | Owns | QuantFlow retains | Cert |
 |---|---|---|---|
 | Hermes (`NousResearch/hermes-agent`) | Agent runtime, native TUI seat | Identity, capability scope, task, evidence | L0–L3; L4 blocked by first-action stall |
-| Claude Code | Agent runtime, second species | Same contract as Hermes | L0–L3 via R4 |
+| User-owned external CLIs | Optional CLI/status and canvas-skill integration | Generic integration seam; no built-in Dock identity | Current integration tests; adapter work is future |
 | MCP (`@modelcontextprotocol/sdk`) | Tool transport | Tool surface generated from schema; Kernel validates | in use |
 | Electron · Bun · SQLite · Monaco · xterm | Implementation substrate | — | not Dock items |
 
 **Rule:** a CLI receives a production Dock card only at L3 or above.
-`claude-code-ungranted` fails this today and belongs in the QA inventory.
+The deterministic `qf-proof` participant is QA-only and never receives a production Dock card.
 
 ## 5. CANDIDATE — researched, trigger named
 

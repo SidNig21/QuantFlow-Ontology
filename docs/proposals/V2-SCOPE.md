@@ -74,7 +74,7 @@ acceptance of anything built after 2026-08-04 is possible until this is fixed.
 | No way to create or assign a Task from the canvas | C · new capability | VERIFIED TODAY (tile menu opened nothing; right-click produced no menu) |
 | Dock shows machine IDs (`hermes-worker-2`) not roles | B + metadata gap | VERIFIED TODAY |
 | No readiness state, description, or capability summary per Dock item | B + metadata gap | VERIFIED TODAY |
-| `claude-code-ungranted` — a negative test fixture — offered as a normal card | A · bug | VERIFIED TODAY |
+| Generic deterministic qf-proof QA participant could leak into production as a normal card | A · bug | VERIFIED TODAY |
 | Zero research objects on the canvas | B · missing projection | VERIFIED TODAY |
 | Kernel Activity prints table names (`connection.deleted`) | B · missing projection | VERIFIED TODAY |
 | Stale build hands Hermes **31 tools · 82 skills** | A · bug (fixed in source, unshipped) | VERIFIED TODAY, read off the TUI |
@@ -91,17 +91,17 @@ All require a build that does not yet exist. This is why packaging is rung 1.
 
 ### 3.5 Adapter certification matrix
 
-| Level | Hermes | Claude Code |
+| Level | Hermes | User-owned external CLI |
 |---|---|---|
-| L0 · visible | VERIFIED TODAY | VERIFIED (R4 gate) |
-| L1 · lifecycle managed | VERIFIED TODAY (clean shutdown) | VERIFIED (R4 gate) |
-| L2 · addressable | PARTIAL — mission path only; no compose-path instruction | MODEL-BACKED BUT UNVERIFIED |
-| L3 · governed | VERIFIED (`actor_session_id`, capability groups) | VERIFIED (R4 gate) |
-| L4 · collaborative | **BLOCKED** — first-action stall | UNVERIFIED |
-| L5 · recoverable/observable | NOT STARTED (no `parent_span`, no usage accounting) | NOT STARTED |
+| L0 · visible | VERIFIED TODAY | External integration only; no built-in Dock card |
+| L1 · lifecycle managed | VERIFIED TODAY (clean shutdown) | Future adapter work |
+| L2 · addressable | PARTIAL — mission path only; no compose-path instruction | Future adapter work |
+| L3 · governed | VERIFIED (`actor_session_id`, capability groups) | Future adapter work |
+| L4 · collaborative | **BLOCKED** — first-action stall | Future adapter work |
+| L5 · recoverable/observable | NOT STARTED (no `parent_span`, no usage accounting) | Future adapter work |
 
 **Rule going forward:** a CLI gets a production Dock card only at L3 or above.
-`claude-code-ungranted` fails this rule today and must move to the QA inventory.
+The deterministic qf-proof participant is QA-only and must stay out of the production inventory.
 
 ---
 
@@ -161,7 +161,7 @@ R12 inside it. No terminal, no `bun run dev`, no developer steps.
 1. Founder double-clicks the desktop shortcut.
 2. QuantFlow opens without a console window.
 3. The masthead or About shows the build's commit and date.
-4. The Dock lists production profiles only. `claude-code-ungranted` is absent.
+4. The Dock lists production profiles only. The deterministic qf-proof participant is absent.
 5. `hermes-critic` is present and launchable.
 6. Founder spawns `hermes-critic`. The TUI reports `3 tools · 0 skills`.
 7. Founder closes the app. No orphan processes remain.
@@ -180,7 +180,7 @@ R12 inside it. No terminal, no `bun run dev`, no developer steps.
 | Class | Item |
 |---|---|
 | Bug | Electron Builder stalls traversing the Bun dependency tree |
-| Bug | `claude-code-ungranted` ships in the production Dock inventory |
+| Bug | The deterministic qf-proof participant leaks into the production Dock inventory |
 | Bug | Four gates fail with `EPERM` on the founder's machine, so the gate board cannot be read |
 | Bug | `kernel-sole-writer-app` red — a check harness lives in the app source tree |
 | Metadata gap | No build identity (commit/date) surfaced in the UI |
@@ -189,7 +189,6 @@ R12 inside it. No terminal, no `bun run dev`, no developer steps.
 ### 5.6 Expected file touch surface
 
 `collab-electron/scripts/package.mjs` · `collab-electron/package.json` ·
-`species/claude-code/dock-profiles.json` · a QA-only profile inventory ·
 `qa/gates/` for the packaging and Dock-inventory gates ·
 `collab-electron/src/main/r13-consumer-workflow.check.ts` (relocate to
 `collab-electron/qa/`). Codex must verify each before editing.
@@ -245,7 +244,7 @@ orchestrator surface is `5 tools · 0 skills`.
 
 Each gate must be shown red on purpose before it is trusted:
 
-- Restore `claude-code-ungranted` to the production inventory → Dock-inventory gate red.
+- Restore the deterministic qf-proof participant to the production inventory → Dock-inventory gate red.
 - Point a seat at a foreign kernel database → `windows-dock-collaboration` refuses.
 - Move the check harness back into `src/main/` → `kernel-sole-writer-app` red.
 - Add a raw hex value to any window stylesheet → `one-skin` red.
@@ -414,7 +413,7 @@ with a visible result, not a UI-only affordance.
 > into Participants / Resources / Recipes. Every row is **role first, runtime
 > second** — `Market Researcher` over `Hermes · native CLI`, never
 > `hermes-worker-2`. Each carries a readiness dot **with its reason** ("Sign in
-> to Claude Code in Ubuntu, then retry"), not one global footnote. Active rows
+> to an external CLI in Ubuntu, then retry"), not one global footnote. Active rows
 > show what a seat *owns*, not merely `RUNNING`, and selecting one focuses its
 > tile.
 >

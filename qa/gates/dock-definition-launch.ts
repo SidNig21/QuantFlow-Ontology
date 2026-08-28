@@ -32,6 +32,9 @@ async function run(): Promise<number> {
     env: {
       HOME: join(CWD, ".gate-home"),
       PATH: process.env.PATH ?? "/usr/bin:/bin",
+      ...(process.env.QF_G6_FALSIFY === undefined
+        ? {}
+        : { QF_G6_FALSIFY: process.env.QF_G6_FALSIFY }),
     },
   });
   return await child.exited;

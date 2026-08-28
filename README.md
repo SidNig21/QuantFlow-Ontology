@@ -2,7 +2,7 @@
 
 **A Windows-first, ontology-centered quantitative research and learning environment led by a custom Hermes Research Director.**
 
-QuantFlow doesn't compete with agent frameworks — it's the surface they land on. Claude Code, Codex, Hermes, a scraper, an RL worker: any controllable CLI can become a Dock runtime through an adapter package, then appear as one or more founder-visible profiles on the canvas. Profiles keep their own identity while sharing reusable runtime code, collaborate over an MCP bus, and act on a shared, governed world model (the Kernel). New agent tools shipping across the ecosystem aren't competition here — they're inventory.
+QuantFlow doesn't compete with agent frameworks — it's the surface they land on. External CLIs such as Claude Code, Codex, a scraper, or an RL worker can be user-owned integrations or future adapter candidates; the current built-in Dock runtime is Hermes, while deterministic qf-proof participation is QA-only. Profiles keep their own identity while sharing reusable runtime code, collaborate over an MCP bus, and act on a shared, governed world model (the Kernel). New agent tools shipping across the ecosystem aren't competition here — they're inventory.
 
 > **It plugs into your world; it doesn't become your world.**
 

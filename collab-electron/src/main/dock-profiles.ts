@@ -25,15 +25,12 @@ export type DockAdapterDiagnostic = {
 /** Product inventory: only real, launchable species are bootstrapped by default. */
 export const PRODUCTION_DOCK_PROFILE_MANIFESTS = [
   HERMES_DOCK_MANIFEST_REF,
-  "species/claude-code/dock-profiles.json",
 ] as const;
 
 /** QA-only inventory used by deterministic collaboration/runtime gates. */
 export const QA_DOCK_PROFILE_MANIFESTS = [
   ...PRODUCTION_DOCK_PROFILE_MANIFESTS,
-  "species/claude-code/qa-dock-profiles.json",
   "tools/qf-proof-agent/dock-profiles.json",
-
 ] as const;
 
 /** Backward-compatible name for the normal product contract. */

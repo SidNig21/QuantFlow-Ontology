@@ -18,34 +18,41 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { discoverDockProfileManifests } from "../../src/main/dock-profiles.ts";
 
-export const PRODUCTION_RUNTIME_FILES = [
-  "species/hermes/packed/hermes.aospkg",
-  "species/hermes/packed/hermes.meta.json",
-  "species/hermes/launch.json",
+export const PRODUCTION_RUNTIME_CONTROL_FILES = [
   "species/hermes/dock-profiles.json",
+  "species/hermes/launch.json",
+  "species/hermes/packed/hermes.meta.json",
   "species/hermes/tools-allowlist.json",
+] as const;
+
+export const PRODUCTION_RUNTIME_RESOURCES = [
+  "species/hermes/packed/hermes.aospkg",
   "species/hermes/prompts/research-director.md",
   "species/hermes/prompts/worker.md",
   "species/hermes/prompts/critic.md",
-  "species/claude-code/packed/claude-code.aospkg",
-  "species/claude-code/packed/claude-code.meta.json",
-  "species/claude-code/packed/claude-code.mjs",
-  "species/claude-code/launch.json",
-  "species/claude-code/dock-profiles.json",
+] as const;
+
+export const PRODUCTION_RUNTIME_FILES = [
+  ...PRODUCTION_RUNTIME_CONTROL_FILES,
+  ...PRODUCTION_RUNTIME_RESOURCES,
+] as const;
+
+export const QA_RUNTIME_CONTROL_FILES = [
+  "tools/qf-proof-agent/dock-profiles.json",
+  "tools/qf-proof-agent/launch.json",
+  "tools/qf-proof-agent/packed/qf-proof-agent.meta.json",
+  ...PRODUCTION_RUNTIME_CONTROL_FILES,
+] as const;
+
+export const QA_RUNTIME_RESOURCES = [
+  "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+  "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+  ...PRODUCTION_RUNTIME_RESOURCES,
 ] as const;
 
 export const QA_RUNTIME_FILES = [
-  "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
-  "tools/qf-proof-agent/packed/qf-proof-agent.meta.json",
-  "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
-  "tools/qf-proof-agent/launch.json",
-  "tools/qf-proof-agent/dock-profiles.json",
-
-
-
-
-  ...PRODUCTION_RUNTIME_FILES,
-  "species/claude-code/qa-dock-profiles.json",
+  ...QA_RUNTIME_CONTROL_FILES,
+  ...QA_RUNTIME_RESOURCES,
 ] as const;
 
 /** Normal packaging inventory. QA must opt into QA_RUNTIME_FILES explicitly. */
@@ -112,22 +119,17 @@ export function prepareRuntimeStaging(
   const stagingWorkspace = mkdtempSync(join(tmpdir(), "qf-runtime-staging-"));
   const stagingRepo = join(stagingWorkspace, "repo");
   const hermesDir = join(stagingRepo, "species/hermes");
-  const claudeCodeDir = join(stagingRepo, "species/claude-code");
-
   const proofAgentDir = join(stagingRepo, "tools/qf-proof-agent");
   try {
     copySourceTree(join(repoRoot, "species/hermes"), hermesDir);
-    copySourceTree(join(repoRoot, "species/claude-code"), claudeCodeDir);
     if (qaMode) {
       copySourceTree(join(repoRoot, "tools/qf-proof-agent"), proofAgentDir);
-
     }
 
     if (qaMode) {
       runOrThrow("node", ["./scripts/pack-agent.mjs"], proofAgentDir);
     }
     runOrThrow("node", ["./scripts/pack-agent.mjs"], hermesDir);
-    runOrThrow("node", ["./scripts/pack-agent.mjs"], claudeCodeDir);
     const stagedRepo = stagingRepo;
     discoverDockProfileManifests(stagedRepo, { qaMode });
     for (const rel of runtimeFiles) {

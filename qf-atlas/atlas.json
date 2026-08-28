@@ -1,39 +1,39 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "2f7ea77",
-    "generatedAt": "2026-08-26",
-    "filesScanned": 417,
+    "commit": "929de18c",
+    "generatedAt": "2026-08-28",
+    "filesScanned": 403,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "2587a58b6d5ce389"
+    "fingerprint": "cf7358d406a4a138"
   },
   "stats": {
-    "live": 113,
-    "unreached": 0,
-    "unused": 13,
-    "dead": 0,
-    "channels": 126,
+    "live": 104,
+    "unreached": 4,
+    "unused": 11,
+    "dead": 5,
+    "channels": 124,
     "bridges": [
       "shellApi",
       "__QF_UI_PROOF__",
       "api"
     ],
-    "bridgeMethods": 130,
-    "bridgeMethodsUsed": 116,
-    "brokenBridgeCalls": 1,
-    "bridgeBlindSpots": 43,
+    "bridgeMethods": 124,
+    "bridgeMethodsUsed": 106,
+    "brokenBridgeCalls": 5,
+    "bridgeBlindSpots": 33,
     "pushChannels": {
-      "channels": 47,
-      "tunnelled": 14,
-      "live": 34,
+      "channels": 44,
+      "tunnelled": 12,
+      "live": 26,
       "rendererTerminated": 2,
       "noListener": 0,
-      "noSender": 2,
-      "dynamicSites": 7
+      "noSender": 1,
+      "dynamicSites": 6
     },
     "hop4": {
-      "handlers": 126,
-      "indexed": 1130,
+      "handlers": 119,
+      "indexed": 1113,
       "downgradedFromCheats": 21,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 15,
@@ -307,9 +307,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 536
+      "files": 522
     },
-    "coverageFiles": 536,
+    "coverageFiles": 522,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -318,11 +318,11 @@
     },
     "northStar": {
       "loops": 11,
-      "staticConnected": 9,
-      "staticDegraded": 2,
+      "staticConnected": 7,
+      "staticDegraded": 4,
       "staticBroken": 0,
-      "gateCovered": 11,
-      "gatePartial": 0,
+      "gateCovered": 10,
+      "gatePartial": 1,
       "gateUncovered": 0,
       "runtimeProven": 0,
       "founderProven": 0,
@@ -339,32 +339,33 @@
       "divergent": 8
     },
     "unexplainedCoverage": 0,
-    "stripCandidates": 13,
+    "stripCandidates": 20,
     "violations": 10,
     "governanceUnknown": 2,
     "legacyLeads": 9,
-    "nodes": 101,
-    "loopsBroken": 2,
+    "nodes": 99,
+    "loopsBroken": 3,
     "loopsTotal": 8,
-    "unreaped": 3,
+    "unreaped": 2,
     "conditionalReap": 0,
-    "undecided": 39,
+    "undecided": 49,
     "allClear": false,
     "decisions": {
-      "total": 40,
-      "undecided": 39,
+      "total": 49,
+      "undecided": 49,
       "keep": 0,
-      "repair": 1,
+      "repair": 0,
       "remove": 0,
       "accepted": 0,
-      "incomplete": 1,
+      "incomplete": 0,
       "allClear": false
     },
     "unexplainedUndecided": 0,
     "blockers": {
-      "founder-decision": 20,
+      "founder-decision": 19,
       "ast-coverage": 2,
-      "package-proof": 17
+      "package-proof": 23,
+      "product-defect": 5
     }
   },
   "layers": [
@@ -438,9 +439,9 @@
       "id": "2:collab-electron/cli::qf",
       "layer": 2,
       "name": "qf*",
-      "kb": 36.2,
-      "x": 0.23,
-      "z": -1.3,
+      "kb": 40.5,
+      "x": -1.01,
+      "z": -0.85,
       "status": "ok",
       "spawns": 1,
       "writes": 0,
@@ -449,7 +450,7 @@
       "files": [
         {
           "path": "collab-electron/cli/qf-hermes-synthetic-responder.mjs",
-          "kb": 24.2,
+          "kb": 28.5,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -487,8 +488,8 @@
       "layer": 4,
       "name": "CodeEditorView.tsx",
       "kb": 14.3,
-      "x": 2.48,
-      "z": 0.91,
+      "x": 2.6,
+      "z": -0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -515,8 +516,8 @@
       "layer": 4,
       "name": "monaco-react-shim.d.ts",
       "kb": 10,
-      "x": -1.27,
-      "z": -3.75,
+      "x": -0.39,
+      "z": -3.94,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -571,8 +572,8 @@
       "layer": 4,
       "name": "ItemDetailView.tsx",
       "kb": 9.7,
-      "x": 0.96,
-      "z": -3.84,
+      "x": 2,
+      "z": -3.42,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -599,8 +600,8 @@
       "layer": 4,
       "name": "TerminalTab.tsx",
       "kb": 11.7,
-      "x": -3.94,
-      "z": -0.4,
+      "x": -3.63,
+      "z": 1.59,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -655,8 +656,8 @@
       "layer": 4,
       "name": "useWorkspaceFileTree.ts",
       "kb": 9,
-      "x": 3.89,
-      "z": -0.73,
+      "x": 3.87,
+      "z": 0.85,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -683,8 +684,8 @@
       "layer": 4,
       "name": "WorkspaceTree.tsx",
       "kb": 11.1,
-      "x": -3.1,
-      "z": -2.47,
+      "x": -2.63,
+      "z": -2.96,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -739,8 +740,8 @@
       "layer": 4,
       "name": "ReplayTimeline.tsx",
       "kb": 15,
-      "x": 2.03,
-      "z": -1.69,
+      "x": 0.91,
+      "z": -2.48,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -767,8 +768,8 @@
       "layer": 4,
       "name": "useReplayEngine.ts",
       "kb": 12.1,
-      "x": -3.53,
-      "z": 1.79,
+      "x": -2,
+      "z": 3.42,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -795,8 +796,8 @@
       "layer": 4,
       "name": "WorkspaceGraph.tsx",
       "kb": 12.6,
-      "x": -2,
-      "z": 3.42,
+      "x": 1.69,
+      "z": 2.03,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -822,9 +823,9 @@
       "id": "4:collab-electron/packages/shared/src::window",
       "layer": 4,
       "name": "window-api.d.ts",
-      "kb": 13.1,
-      "x": 1.69,
-      "z": 2.03,
+      "kb": 11.4,
+      "x": -3.87,
+      "z": -0.85,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -833,7 +834,7 @@
       "files": [
         {
           "path": "collab-electron/packages/shared/src/window-api.d.ts",
-          "kb": 13.1,
+          "kb": 11.4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -850,7 +851,7 @@
       "id": "2:collab-electron/scripts/package-lib::package",
       "layer": 2,
       "name": "package-lib/package*",
-      "kb": 27,
+      "kb": 26.7,
       "x": -2.6,
       "z": 0.45,
       "status": "ok",
@@ -861,7 +862,7 @@
       "files": [
         {
           "path": "collab-electron/scripts/package-lib/package-inspect.ts",
-          "kb": 23.1,
+          "kb": 22.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -947,8 +948,8 @@
       "layer": 2,
       "name": "upload-to-github.cjs",
       "kb": 10,
-      "x": -2.89,
-      "z": -2.71,
+      "x": -2.49,
+      "z": -3.08,
       "status": "ok",
       "spawns": 1,
       "writes": 3,
@@ -971,54 +972,10 @@
       "wires": []
     },
     {
-      "id": "2:collab-electron/src/main::acp",
-      "layer": 2,
-      "name": "acp*",
-      "kb": 12.9,
-      "x": 2.48,
-      "z": 0.91,
-      "status": "ok",
-      "spawns": 1,
-      "writes": 3,
-      "dml": 0,
-      "executes": 0,
-      "files": [
-        {
-          "path": "collab-electron/src/main/acp-agent.ts",
-          "kb": 10.3,
-          "spawns": 1,
-          "spawnsLive": 1,
-          "writes": 3,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/main/acp-fs-root.ts",
-          "kb": 2.6,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        }
-      ],
-      "strip": [],
-      "breaches": [],
-      "wires": [
-        "agent:cancel",
-        "agent:kill",
-        "agent:prompt",
-        "agent:save-messages",
-        "agent:spawn"
-      ]
-    },
-    {
       "id": "2:collab-electron/src/main::agent",
       "layer": 2,
       "name": "agent*",
-      "kb": 29.3,
+      "kb": 30.8,
       "x": -0.91,
       "z": 2.48,
       "status": "ok",
@@ -1029,7 +986,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/agent-host.ts",
-          "kb": 24.8,
+          "kb": 26.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1067,8 +1024,8 @@
       "layer": 2,
       "name": "app*",
       "kb": 9.4,
-      "x": 2,
-      "z": -3.42,
+      "x": 1.12,
+      "z": -3.8,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1105,8 +1062,8 @@
       "layer": 2,
       "name": "bovada-capture-rpc.ts",
       "kb": 12.7,
-      "x": 1.69,
-      "z": 2.03,
+      "x": 2.48,
+      "z": 0.91,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1133,8 +1090,8 @@
       "layer": 2,
       "name": "main/canvas*",
       "kb": 9,
-      "x": 3.28,
-      "z": -2.21,
+      "x": 2.76,
+      "z": -2.84,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
@@ -1173,8 +1130,8 @@
       "layer": 2,
       "name": "collaboration-gateway.ts",
       "kb": 12.2,
-      "x": -2,
-      "z": 3.42,
+      "x": 1.69,
+      "z": 2.03,
       "status": "ice",
       "spawns": 0,
       "writes": 0,
@@ -1200,7 +1157,7 @@
       "id": "2:collab-electron/src/main::dock",
       "layer": 2,
       "name": "dock-profiles.ts",
-      "kb": 14.1,
+      "kb": 14,
       "x": 2.03,
       "z": -1.69,
       "status": "ok",
@@ -1211,7 +1168,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/dock-profiles.ts",
-          "kb": 14.1,
+          "kb": 14,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1337,8 +1294,8 @@
       "layer": 2,
       "name": "image*",
       "kb": 11.5,
-      "x": -3.78,
-      "z": -1.19,
+      "x": -3.95,
+      "z": 0.3,
       "status": "ok",
       "spawns": 0,
       "writes": 2,
@@ -1374,7 +1331,7 @@
       "id": "2:collab-electron/src/main::index",
       "layer": 2,
       "name": "main/index.ts",
-      "kb": 57.1,
+      "kb": 57,
       "x": -1.24,
       "z": 0.45,
       "status": "warn",
@@ -1385,7 +1342,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/index.ts",
-          "kb": 57.1,
+          "kb": 57,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 1,
@@ -1424,10 +1381,10 @@
       "id": "2:collab-electron/src/main::ipc",
       "layer": 2,
       "name": "ipc*",
-      "kb": 77.6,
+      "kb": 77.1,
       "x": 1.01,
       "z": 0.85,
-      "status": "ok",
+      "status": "warn",
       "spawns": 0,
       "writes": 1,
       "dml": 0,
@@ -1465,7 +1422,7 @@
         },
         {
           "path": "collab-electron/src/main/ipc-misc.ts",
-          "kb": 7.3,
+          "kb": 6.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1524,10 +1481,42 @@
           "executes": 0
         }
       ],
-      "strip": [],
+      "strip": [
+        {
+          "kind": "unreached-ipc",
+          "bucket": "safe-leftover",
+          "advice": "REMOVAL-CANDIDATE. Nothing can reach it today, but static non-reachability is not permission: rule out a packaged or dynamically-loaded caller first.",
+          "what": "browser:evaluate",
+          "where": "collab-electron/src/main/ipc-browser.ts:198",
+          "why": "Registered in main; nothing in preload calls it. The renderer cannot reach this handler."
+        },
+        {
+          "kind": "unreached-ipc",
+          "bucket": "safe-leftover",
+          "advice": "REMOVAL-CANDIDATE. Nothing can reach it today, but static non-reachability is not permission: rule out a packaged or dynamically-loaded caller first.",
+          "what": "browser:info",
+          "where": "collab-electron/src/main/ipc-browser.ts:182",
+          "why": "Registered in main; nothing in preload calls it. The renderer cannot reach this handler."
+        },
+        {
+          "kind": "unreached-ipc",
+          "bucket": "safe-leftover",
+          "advice": "REMOVAL-CANDIDATE. Nothing can reach it today, but static non-reachability is not permission: rule out a packaged or dynamically-loaded caller first.",
+          "what": "browser:scroll",
+          "where": "collab-electron/src/main/ipc-browser.ts:133",
+          "why": "Registered in main; nothing in preload calls it. The renderer cannot reach this handler."
+        },
+        {
+          "kind": "unreached-ipc",
+          "bucket": "safe-leftover",
+          "advice": "REMOVAL-CANDIDATE. Nothing can reach it today, but static non-reachability is not permission: rule out a packaged or dynamically-loaded caller first.",
+          "what": "browser:wait",
+          "where": "collab-electron/src/main/ipc-browser.ts:147",
+          "why": "Registered in main; nothing in preload calls it. The renderer cannot reach this handler."
+        }
+      ],
       "breaches": [],
       "wires": [
-        "agent:focus-session",
         "app:build-identity",
         "app:version",
         "browser:click",
@@ -1601,7 +1590,6 @@
         "replay:start",
         "replay:stop",
         "shell:open-external",
-        "viewer:run-in-terminal",
         "wikilink:backlinks",
         "wikilink:resolve",
         "wikilink:suggest",
@@ -1620,7 +1608,7 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 58.7,
+      "kb": 59.1,
       "x": -0.23,
       "z": 1.3,
       "status": "alert",
@@ -1631,7 +1619,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 58.7,
+          "kb": 59.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 7,
@@ -1672,8 +1660,8 @@
       "layer": 2,
       "name": "live*",
       "kb": 3.1,
-      "x": 1.43,
-      "z": 3.69,
+      "x": 1.68,
+      "z": 3.59,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1710,8 +1698,8 @@
       "layer": 2,
       "name": "logger*",
       "kb": 2.4,
-      "x": -0.32,
-      "z": 3.95,
+      "x": -0.18,
+      "z": 3.96,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1748,8 +1736,8 @@
       "layer": 2,
       "name": "mission*",
       "kb": 3.9,
-      "x": 2.89,
-      "z": 2.71,
+      "x": 3.15,
+      "z": 2.4,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1786,8 +1774,8 @@
       "layer": 2,
       "name": "ontology*",
       "kb": 12,
-      "x": -3.28,
-      "z": 2.21,
+      "x": -2,
+      "z": 3.42,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
@@ -1843,9 +1831,9 @@
       "id": "2:collab-electron/src/main::peer",
       "layer": 2,
       "name": "peer*",
-      "kb": 9.9,
-      "x": -1.43,
-      "z": -3.69,
+      "kb": 11.2,
+      "x": -3.63,
+      "z": -1.57,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1854,14 +1842,14 @@
       "files": [
         {
           "path": "collab-electron/src/main/peer-delivery.ts",
-          "kb": 6.9,
+          "kb": 8.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
           "dml": 2,
           "dmlLines": [
-            122,
-            136
+            170,
+            184
           ],
           "executes": 0
         },
@@ -1894,8 +1882,8 @@
           "what": "2 SQL statements outside execute()",
           "where": "collab-electron/src/main/peer-delivery.ts",
           "lines": [
-            122,
-            136
+            170,
+            184
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -1907,8 +1895,8 @@
       "layer": 2,
       "name": "pty*",
       "kb": 36.6,
-      "x": -1.01,
-      "z": -0.85,
+      "x": 0.23,
+      "z": -1.3,
       "status": "ok",
       "spawns": 2,
       "writes": 4,
@@ -2109,8 +2097,8 @@
       "layer": 2,
       "name": "terminal-target.ts",
       "kb": 11.6,
-      "x": -3.92,
-      "z": 0.57,
+      "x": -3.36,
+      "z": 2.1,
       "status": "ok",
       "spawns": 3,
       "writes": 0,
@@ -2137,8 +2125,8 @@
       "layer": 2,
       "name": "updater/",
       "kb": 8.1,
-      "x": 3.92,
-      "z": -0.57,
+      "x": 3.76,
+      "z": -1.23,
       "status": "alert",
       "spawns": 0,
       "writes": 0,
@@ -2180,8 +2168,8 @@
       "layer": 2,
       "name": "watcher*",
       "kb": 5.3,
-      "x": 3.78,
-      "z": 1.19,
+      "x": 3.91,
+      "z": 0.66,
       "status": "ok",
       "spawns": 1,
       "writes": 0,
@@ -2218,8 +2206,8 @@
       "layer": 2,
       "name": "wikilink-index.ts",
       "kb": 9.5,
-      "x": 0.32,
-      "z": -3.95,
+      "x": -0.77,
+      "z": -3.88,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
@@ -2293,9 +2281,9 @@
       "id": "4:collab-electron/src/preload::shell",
       "layer": 4,
       "name": "shell.ts",
-      "kb": 16.3,
-      "x": 0.91,
-      "z": -2.48,
+      "kb": 13.9,
+      "x": 2.48,
+      "z": 0.91,
       "status": "warn",
       "spawns": 0,
       "writes": 0,
@@ -2304,7 +2292,7 @@
       "files": [
         {
           "path": "collab-electron/src/preload/shell.ts",
-          "kb": 16.3,
+          "kb": 13.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2370,9 +2358,9 @@
       "id": "4:collab-electron/src/preload::universal",
       "layer": 4,
       "name": "universal.ts",
-      "kb": 23.3,
-      "x": -0.91,
-      "z": 2.48,
+      "kb": 22,
+      "x": -2.03,
+      "z": 1.69,
       "status": "warn",
       "spawns": 0,
       "writes": 0,
@@ -2381,7 +2369,7 @@
       "files": [
         {
           "path": "collab-electron/src/preload/universal.ts",
-          "kb": 23.3,
+          "kb": 22,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2395,16 +2383,8 @@
           "kind": "unused-bridge",
           "bucket": "maybe-later",
           "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
-          "what": "agentKill() → agent:kill",
-          "where": "collab-electron/src/preload/universal.ts:695",
-          "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
-        },
-        {
-          "kind": "unused-bridge",
-          "bucket": "maybe-later",
-          "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
           "what": "openFolder() → dialog:open-folder",
-          "where": "collab-electron/src/preload/universal.ts:454",
+          "where": "collab-electron/src/preload/universal.ts:429",
           "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
         },
         {
@@ -2412,7 +2392,7 @@
           "bucket": "maybe-later",
           "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
           "what": "openImageDialog() → dialog:open-image",
-          "where": "collab-electron/src/preload/universal.ts:317",
+          "where": "collab-electron/src/preload/universal.ts:305",
           "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
         },
         {
@@ -2420,7 +2400,7 @@
           "bucket": "maybe-later",
           "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
           "what": "countFiles() → fs:count-files",
-          "where": "collab-electron/src/preload/universal.ts:270",
+          "where": "collab-electron/src/preload/universal.ts:260",
           "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
         },
         {
@@ -2428,15 +2408,7 @@
           "bucket": "maybe-later",
           "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
           "what": "permissionDecision() → qf:sessions:permissionDecision",
-          "where": "collab-electron/src/preload/universal.ts:167",
-          "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
-        },
-        {
-          "kind": "unused-bridge",
-          "bucket": "maybe-later",
-          "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
-          "what": "runInTerminal() → viewer:run-in-terminal",
-          "where": "collab-electron/src/preload/universal.ts:290",
+          "where": "collab-electron/src/preload/universal.ts:157",
           "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
         },
         {
@@ -2444,12 +2416,58 @@
           "bucket": "maybe-later",
           "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
           "what": "updateFrontmatter() → workspace:update-frontmatter",
-          "where": "collab-electron/src/preload/universal.ts:326",
+          "where": "collab-electron/src/preload/universal.ts:314",
           "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
+        },
+        {
+          "kind": "dead-wire",
+          "bucket": "broken-now",
+          "advice": "Fix or remove. This call fails at runtime today.",
+          "what": "agent:cancel",
+          "where": "collab-electron/src/preload/universal.ts:656",
+          "why": "Preload calls this channel and no main handler registers it. This call fails at runtime."
+        },
+        {
+          "kind": "dead-wire",
+          "bucket": "broken-now",
+          "advice": "Fix or remove. This call fails at runtime today.",
+          "what": "agent:kill",
+          "where": "collab-electron/src/preload/universal.ts:661",
+          "why": "Preload calls this channel and no main handler registers it. This call fails at runtime."
+        },
+        {
+          "kind": "dead-wire",
+          "bucket": "broken-now",
+          "advice": "Fix or remove. This call fails at runtime today.",
+          "what": "agent:prompt",
+          "where": "collab-electron/src/preload/universal.ts:651",
+          "why": "Preload calls this channel and no main handler registers it. This call fails at runtime."
+        },
+        {
+          "kind": "dead-wire",
+          "bucket": "broken-now",
+          "advice": "Fix or remove. This call fails at runtime today.",
+          "what": "agent:save-messages",
+          "where": "collab-electron/src/preload/universal.ts:666",
+          "why": "Preload calls this channel and no main handler registers it. This call fails at runtime."
+        },
+        {
+          "kind": "dead-wire",
+          "bucket": "broken-now",
+          "advice": "Fix or remove. This call fails at runtime today.",
+          "what": "agent:spawn",
+          "where": "collab-electron/src/preload/universal.ts:646",
+          "why": "Preload calls this channel and no main handler registers it. This call fails at runtime."
         }
       ],
       "breaches": [],
-      "wires": []
+      "wires": [
+        "agent:cancel",
+        "agent:kill",
+        "agent:prompt",
+        "agent:save-messages",
+        "agent:spawn"
+      ]
     },
     {
       "id": "4:collab-electron/src/windows/nav/src::App",
@@ -2512,8 +2530,8 @@
       "layer": 4,
       "name": "flow-cube-watermark.js",
       "kb": 9.6,
-      "x": 2.88,
-      "z": -2.72,
+      "x": 3.63,
+      "z": -1.59,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2675,9 +2693,9 @@
       "id": "4:collab-electron/src/windows/shell/src::dock",
       "layer": 4,
       "name": "dock.js",
-      "kb": 22.6,
-      "x": -2.03,
-      "z": 1.69,
+      "kb": 22.5,
+      "x": -0.91,
+      "z": 2.48,
       "status": "ok",
       "spawns": 2,
       "writes": 0,
@@ -2686,7 +2704,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/dock.js",
-          "kb": 22.6,
+          "kb": 22.5,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 0,
@@ -2704,8 +2722,8 @@
       "layer": 4,
       "name": "edge-indicators.js",
       "kb": 7.9,
-      "x": 2.28,
-      "z": 3.24,
+      "x": 2.63,
+      "z": 2.96,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2732,8 +2750,8 @@
       "layer": 4,
       "name": "panel-manager.js",
       "kb": 7,
-      "x": 0.17,
-      "z": 3.96,
+      "x": 0.39,
+      "z": 3.94,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2759,7 +2777,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 59.1,
+      "kb": 58.8,
       "x": -1.24,
       "z": 0.45,
       "status": "ice",
@@ -2770,7 +2788,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 59.1,
+          "kb": 58.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2816,8 +2834,8 @@
       "layer": 4,
       "name": "task-composition.js",
       "kb": 14.9,
-      "x": 2.6,
-      "z": -0.45,
+      "x": 2.03,
+      "z": -1.69,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2875,34 +2893,6 @@
         {
           "path": "collab-electron/src/windows/shell/src/tile-interactions.js",
           "kb": 11.4,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        }
-      ],
-      "strip": [],
-      "breaches": [],
-      "wires": []
-    },
-    {
-      "id": "4:collab-electron/src/windows/terminal/src::App",
-      "layer": 4,
-      "name": "terminal/src/App.tsx",
-      "kb": 8.3,
-      "x": 3.67,
-      "z": 1.49,
-      "status": "ok",
-      "spawns": 0,
-      "writes": 0,
-      "dml": 0,
-      "executes": 0,
-      "files": [
-        {
-          "path": "collab-electron/src/windows/terminal/src/App.tsx",
-          "kb": 8.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3368,12 +3358,12 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 809.6,
+      "kb": 834.3,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 80,
-      "writes": 34,
+      "spawns": 79,
+      "writes": 37,
       "dml": 19,
       "executes": 49,
       "files": [
@@ -3389,10 +3379,10 @@
         },
         {
           "path": "qa/gates/hermes-research.ts",
-          "kb": 66.6,
+          "kb": 80.4,
           "spawns": 4,
           "spawnsLive": 2,
-          "writes": 0,
+          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -3409,10 +3399,10 @@
         },
         {
           "path": "qa/gates/research-director-front-door.ts",
-          "kb": 50.5,
+          "kb": 52.7,
           "spawns": 3,
           "spawnsLive": 2,
-          "writes": 4,
+          "writes": 5,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -3478,6 +3468,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/dev-dock-readiness.ts",
+          "kb": 19.3,
+          "spawns": 4,
+          "spawnsLive": 2,
+          "writes": 2,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/kernel-task-delegation.ts",
           "kb": 18.7,
           "spawns": 0,
@@ -3512,16 +3512,6 @@
             42,
             44
           ],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/dev-dock-readiness.ts",
-          "kb": 17.5,
-          "spawns": 4,
-          "spawnsLive": 2,
-          "writes": 1,
-          "dml": 0,
-          "dmlLines": [],
           "executes": 0
         },
         {
@@ -3587,16 +3577,6 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/windows-dock-species.ts",
-          "kb": 9.4,
-          "spawns": 1,
-          "spawnsLive": 1,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "qa/gates/windows-dock-ontology.ts",
           "kb": 9.1,
           "spawns": 1,
@@ -3635,7 +3615,7 @@
         },
         {
           "path": "qa/gates/kernel-one-path.ts",
-          "kb": 8.9,
+          "kb": 8.5,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 1,
@@ -3674,6 +3654,26 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/golden-g5-consumer-census.ts",
+          "kb": 7.6,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/kernel-sole-writer-app.ts",
+          "kb": 7.6,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/golden-g4-retired-route.ts",
           "kb": 7.5,
           "spawns": 0,
@@ -3684,18 +3684,18 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/schema-bundle-aliases.ts",
-          "kb": 7.1,
+          "path": "qa/gates/golden-g5-saved-state.ts",
+          "kb": 7.5,
           "spawns": 0,
           "spawnsLive": 0,
-          "writes": 0,
+          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
         },
         {
-          "path": "qa/gates/kernel-sole-writer-app.ts",
-          "kb": 6.3,
+          "path": "qa/gates/schema-bundle-aliases.ts",
+          "kb": 7.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3719,6 +3719,16 @@
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/dock-production-inventory.ts",
+          "kb": 6,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -3824,18 +3834,8 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/acp-fs-confine.ts",
-          "kb": 3.2,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 3,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/dock-production-inventory.ts",
-          "kb": 2.6,
+          "path": "qa/gates/doc-action-surface.ts",
+          "kb": 2.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3844,10 +3844,10 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/doc-action-surface.ts",
-          "kb": 2.2,
-          "spawns": 0,
-          "spawnsLive": 0,
+          "path": "qa/gates/dock-definition-launch.ts",
+          "kb": 1.5,
+          "spawns": 2,
+          "spawnsLive": 2,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
@@ -3862,16 +3862,6 @@
           "dml": 0,
           "dmlLines": [],
           "executes": 3
-        },
-        {
-          "path": "qa/gates/dock-definition-launch.ts",
-          "kb": 1.4,
-          "spawns": 2,
-          "spawnsLive": 2,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
         },
         {
           "path": "qa/gates/market-ingest.ts",
@@ -4117,24 +4107,24 @@
       "id": "5:qa/gates/dock-definition-launch::run",
       "layer": 5,
       "name": "dock-definition-launch/run.ts",
-      "kb": 38.7,
-      "x": -1.24,
-      "z": 0.45,
+      "kb": 45.5,
+      "x": -0.23,
+      "z": 1.3,
       "status": "ice",
       "spawns": 1,
       "writes": 4,
       "dml": 0,
-      "executes": 6,
+      "executes": 7,
       "files": [
         {
           "path": "qa/gates/dock-definition-launch/run.ts",
-          "kb": 38.7,
+          "kb": 45.5,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 4,
           "dml": 0,
           "dmlLines": [],
-          "executes": 6
+          "executes": 7
         }
       ],
       "strip": [],
@@ -4146,8 +4136,8 @@
       "layer": 5,
       "name": "dock-profile-identity/run.ts",
       "kb": 39.4,
-      "x": -0.23,
-      "z": 1.3,
+      "x": -1.24,
+      "z": 0.45,
       "status": "ice",
       "spawns": 2,
       "writes": 0,
@@ -4322,7 +4312,7 @@
       "id": "5:qa::run",
       "layer": 5,
       "name": "qa/run.ts",
-      "kb": 36.1,
+      "kb": 36.4,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -4333,7 +4323,7 @@
       "files": [
         {
           "path": "qa/run.ts",
-          "kb": 36.1,
+          "kb": 36.4,
           "spawns": 3,
           "spawnsLive": 2,
           "writes": 0,
@@ -4735,8 +4725,8 @@
       "layer": 3,
       "name": "a2a*",
       "kb": 21.7,
-      "x": 1.01,
-      "z": 0.85,
+      "x": 0,
+      "z": 0,
       "status": "ice",
       "spawns": 3,
       "writes": 7,
@@ -4783,8 +4773,8 @@
       "layer": 3,
       "name": "hermes/host*",
       "kb": 19.6,
-      "x": -1.01,
-      "z": -0.85,
+      "x": 1.01,
+      "z": 0.85,
       "status": "ice",
       "spawns": 3,
       "writes": 0,
@@ -5103,8 +5093,8 @@
     {
       "id": "4:residue",
       "layer": 4,
-      "name": "76 small modules*",
-      "kb": 164.1,
+      "name": "68 small modules*",
+      "kb": 145.3,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -5113,16 +5103,6 @@
       "dml": 0,
       "executes": 0,
       "files": [
-        {
-          "path": "collab-electron/src/windows/agent-chat/src/use-acp-runtime.ts",
-          "kb": 6.9,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
         {
           "path": "collab-electron/src/windows/tile-list/src/App.tsx",
           "kb": 6.7,
@@ -5284,16 +5264,6 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/src/windows/agent-chat/src/dev-shim.ts",
-          "kb": 3.8,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "collab-electron/src/windows/shell/src/glacier-feel.js",
           "kb": 3.8,
           "spawns": 0,
@@ -5376,26 +5346,6 @@
         {
           "path": "collab-electron/src/windows/shell/src/kernel-ledger.js",
           "kb": 2.9,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/agent-chat/src/AgentThread.tsx",
-          "kb": 2.6,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/agent-chat/src/ToolCallCard.tsx",
-          "kb": 2.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5496,16 +5446,6 @@
         {
           "path": "collab-electron/packages/components/src/ConceptList/ConceptList.tsx",
           "kb": 1.8,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/agent-chat/src/App.tsx",
-          "kb": 1.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5634,26 +5574,6 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/src/windows/agent-chat/src/main.tsx",
-          "kb": 0.5,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/terminal/src/main.tsx",
-          "kb": 0.5,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "collab-electron/packages/components/src/vite-env.d.ts",
           "kb": 0.4,
           "spawns": 0,
@@ -5755,16 +5675,6 @@
         },
         {
           "path": "collab-electron/packages/shared/src/pdf.ts",
-          "kb": 0.2,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/agent-chat/src/MarkdownText.tsx",
           "kb": 0.2,
           "spawns": 0,
           "spawnsLive": 0,
@@ -5882,7 +5792,7 @@
       "id": "2:residue",
       "layer": 2,
       "name": "41 small modules*",
-      "kb": 108.3,
+      "kb": 108.1,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -5963,7 +5873,7 @@
         },
         {
           "path": "collab-electron/scripts/package-lib/runtime-staging.ts",
-          "kb": 4.5,
+          "kb": 4.3,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 0,
@@ -6935,13 +6845,13 @@
     {
       "id": "3:residue",
       "layer": 3,
-      "name": "8 small modules*",
-      "kb": 22.5,
-      "x": 0,
-      "z": 0,
+      "name": "5 small modules*",
+      "kb": 16.6,
+      "x": -1.01,
+      "z": -0.85,
       "status": "ice",
       "spawns": 5,
-      "writes": 5,
+      "writes": 3,
       "dml": 0,
       "executes": 1,
       "files": [
@@ -6986,26 +6896,6 @@
           "executes": 0
         },
         {
-          "path": "species/claude-code/packed/claude-code.mjs",
-          "kb": 2.5,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "species/claude-code/src/claude-code.mjs",
-          "kb": 2.5,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "species/hermes/register.ts",
           "kb": 1.6,
           "spawns": 0,
@@ -7014,16 +6904,6 @@
           "dml": 0,
           "dmlLines": [],
           "executes": 1
-        },
-        {
-          "path": "species/claude-code/scripts/pack-agent.mjs",
-          "kb": 0.9,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 2,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
         }
       ],
       "strip": [],
@@ -7215,10 +7095,10 @@
         },
         {
           "channel": "agent:spawn",
-          "status": "live",
-          "hop4": "read-only",
+          "status": "dead",
+          "hop4": "unknown",
           "backedBy": null,
-          "why": null
+          "why": "breaks at main"
         },
         {
           "channel": "qf:sessions:spawn",
@@ -7244,14 +7124,22 @@
       ],
       "evidence": {
         "static": {
-          "state": "connected",
-          "detail": "5/5 channels live",
-          "broken": []
+          "state": "degraded",
+          "detail": "4/5 channels live",
+          "broken": [
+            {
+              "channel": "agent:spawn",
+              "status": "dead",
+              "why": "breaks at main"
+            }
+          ]
         },
         "gate": {
-          "state": "covered",
-          "detail": "2/2 nominated gate(s) present: observe-door, windows-dock-species",
-          "missing": [],
+          "state": "partial",
+          "detail": "1/2 nominated gate(s) present: observe-door",
+          "missing": [
+            "windows-dock-species"
+          ],
           "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
         },
         "runtime": {
@@ -7263,7 +7151,7 @@
           "detail": "no founder confirmation is recorded for this loop"
         }
       },
-      "badge": "SG",
+      "badge": "-",
       "unreaped": []
     },
     {
@@ -7287,10 +7175,10 @@
         },
         {
           "channel": "agent:cancel",
-          "status": "live",
-          "hop4": "read-only",
+          "status": "dead",
+          "hop4": "unknown",
           "backedBy": null,
-          "why": null
+          "why": "breaks at main"
         },
         {
           "channel": "qf:sessions:cancel",
@@ -7302,9 +7190,15 @@
       ],
       "evidence": {
         "static": {
-          "state": "connected",
-          "detail": "4/4 channels live",
-          "broken": []
+          "state": "degraded",
+          "detail": "3/4 channels live",
+          "broken": [
+            {
+              "channel": "agent:cancel",
+              "status": "dead",
+              "why": "breaks at main"
+            }
+          ]
         },
         "gate": {
           "state": "covered",
@@ -7321,7 +7215,7 @@
           "detail": "no founder confirmation is recorded for this loop"
         }
       },
-      "badge": "SG",
+      "badge": "G",
       "unreaped": []
     },
     {
@@ -7527,10 +7421,10 @@
         },
         {
           "channel": "agent:kill",
-          "status": "unused",
-          "hop4": "read-only",
+          "status": "dead",
+          "hop4": "unknown",
           "backedBy": null,
-          "why": "breaks at renderer"
+          "why": "breaks at main"
         }
       ],
       "evidence": {
@@ -7540,8 +7434,8 @@
           "broken": [
             {
               "channel": "agent:kill",
-              "status": "unused",
-              "why": "breaks at renderer"
+              "status": "dead",
+              "why": "breaks at main"
             }
           ]
         },
@@ -7562,10 +7456,6 @@
       },
       "badge": "G",
       "unreaped": [
-        {
-          "module": "collab-electron/src/main/acp-agent.ts",
-          "status": "unreaped"
-        },
         {
           "module": "collab-electron/src/main/sidecar/server.ts",
           "status": "unreaped"
@@ -7760,7 +7650,7 @@
             {
               "layer": "preload",
               "present": true,
-              "detail": "collab-electron/src/preload/universal.ts:352"
+              "detail": "collab-electron/src/preload/universal.ts:340"
             },
             {
               "layer": "main",
@@ -7777,31 +7667,26 @@
         },
         {
           "channel": "agent:spawn",
-          "status": "live",
-          "hop4": "read-only",
+          "status": "dead",
+          "hop4": "unknown",
           "hops": [
             {
               "layer": "renderer",
-              "present": true,
+              "present": false,
               "detail": "agentSpawn()"
             },
             {
               "layer": "preload",
               "present": true,
-              "detail": "collab-electron/src/preload/universal.ts:680"
+              "detail": "collab-electron/src/preload/universal.ts:646"
             },
             {
               "layer": "main",
-              "present": true,
-              "detail": "collab-electron/src/main/acp-agent.ts:385"
-            },
-            {
-              "layer": "kernel",
-              "present": true,
-              "detail": "read-only — mutates nothing"
+              "present": false,
+              "detail": "no handler"
             }
           ],
-          "breakAt": null
+          "breakAt": "main"
         },
         {
           "channel": "qf:sessions:runTurn",
@@ -7832,9 +7717,9 @@
           "breakAt": null
         }
       ],
-      "worst": "live",
-      "health": "ok",
-      "brokenCount": 0,
+      "worst": "dead",
+      "health": "degraded",
+      "brokenCount": 1,
       "total": 3
     },
     {
@@ -8261,25 +8146,6 @@
       "lifetime": true,
       "members": [
         {
-          "channel": "acp-agent.ts",
-          "status": "unreaped",
-          "hop4": "lifetime",
-          "hops": [
-            {
-              "layer": "spawn",
-              "present": true,
-              "detail": "collab-electron/src/main/acp-agent.ts · 1 spawn site"
-            },
-            {
-              "layer": "quit",
-              "present": false,
-              "detail": "collab-electron/src/main/index.ts never stops it"
-            }
-          ],
-          "breakAt": "quit",
-          "why": "This module starts 1 process and the quit path never stops it. A closed seat can outlive the app."
-        },
-        {
           "channel": "sidecar/server.ts",
           "status": "unreaped",
           "hop4": "lifetime",
@@ -8377,8 +8243,8 @@
       ],
       "worst": "unreaped",
       "health": "degraded",
-      "brokenCount": 4,
-      "total": 6
+      "brokenCount": 3,
+      "total": 5
     }
   ],
   "coverage": [
@@ -8538,22 +8404,6 @@
       "sqlUnrecognised": 0
     },
     {
-      "path": "collab-electron/src/main/acp-agent.ts",
-      "status": "indexed",
-      "indexedFns": 21,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "collab-electron/src/main/acp-fs-root.ts",
-      "status": "indexed",
-      "indexedFns": 4,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
       "path": "collab-electron/src/main/agent-activity.ts",
       "status": "indexed",
       "indexedFns": 8,
@@ -8572,7 +8422,7 @@
     {
       "path": "collab-electron/src/main/agent-host.ts",
       "status": "indexed",
-      "indexedFns": 37,
+      "indexedFns": 39,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9004,7 +8854,7 @@
     {
       "path": "collab-electron/src/main/peer-delivery.ts",
       "status": "indexed",
-      "indexedFns": 9,
+      "indexedFns": 11,
       "sqlInText": 2,
       "sqlIndexed": 2,
       "sqlUnrecognised": 0
@@ -9958,34 +9808,6 @@
       "status": "out-of-scope"
     },
     {
-      "path": "collab-electron/src/windows/agent-chat/src/AgentThread.tsx",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/App.tsx",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/dev-shim.ts",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/main.tsx",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/MarkdownText.tsx",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/ToolCallCard.tsx",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/use-acp-runtime.ts",
-      "status": "out-of-scope"
-    },
-    {
       "path": "collab-electron/src/windows/artifact-tile/src/App.tsx",
       "status": "out-of-scope"
     },
@@ -10154,14 +9976,6 @@
       "status": "out-of-scope"
     },
     {
-      "path": "collab-electron/src/windows/terminal/src/App.tsx",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "collab-electron/src/windows/terminal/src/main.tsx",
-      "status": "out-of-scope"
-    },
-    {
       "path": "collab-electron/src/windows/tile-list/src/App.tsx",
       "status": "out-of-scope"
     },
@@ -10183,10 +9997,6 @@
     },
     {
       "path": "qa/fixtures/lifecycle-command/src/empty.ts",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "qa/gates/acp-fs-confine.ts",
       "status": "out-of-scope"
     },
     {
@@ -10263,6 +10073,14 @@
     },
     {
       "path": "qa/gates/golden-g4-retired-route.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/golden-g5-consumer-census.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/golden-g5-saved-state.ts",
       "status": "out-of-scope"
     },
     {
@@ -10458,10 +10276,6 @@
       "status": "out-of-scope"
     },
     {
-      "path": "qa/gates/windows-dock-species.ts",
-      "status": "out-of-scope"
-    },
-    {
       "path": "qa/gates/windows-golden-run.ts",
       "status": "out-of-scope"
     },
@@ -10607,18 +10421,6 @@
     },
     {
       "path": "qf-kernel-schema/src/validate.ts",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "species/claude-code/packed/claude-code.mjs",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "species/claude-code/scripts/pack-agent.mjs",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "species/claude-code/src/claude-code.mjs",
       "status": "out-of-scope"
     },
     {
@@ -11029,9 +10831,9 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports startPrecreatedNativeTuiSession() at line 491",
-            "exports cancelAgentSession() at line 718",
-            "exports closeAgentSessionRow() at line 765"
+            "exports startPrecreatedNativeTuiSession() at line 507",
+            "exports cancelAgentSession() at line 734",
+            "exports closeAgentSessionRow() at line 792"
           ],
           "strong": [],
           "weight": "weak"
@@ -11070,7 +10872,7 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports admitAndStartSession() at line 423"
+            "exports admitAndStartSession() at line 435"
           ],
           "strong": [],
           "weight": "weak"
@@ -11180,14 +10982,6 @@
       "evidenceLevel": "S",
       "owners": [
         {
-          "file": "collab-electron/src/main/acp-agent.ts",
-          "weak": [
-            "exports killAllAgents() at line 370"
-          ],
-          "strong": [],
-          "weight": "weak"
-        },
-        {
           "file": "collab-electron/src/main/git-replay.ts",
           "weak": [
             "exports stopWorker() at line 75"
@@ -11214,9 +11008,9 @@
           "weight": "weak"
         }
       ],
-      "ownerCount": 4,
+      "ownerCount": 3,
       "strongOwnerCount": 0,
-      "why": "4 files export names matching this responsibility, but on NAME evidence only; the contract forbids name matching alone from producing a confirmed defect, so this needs a human read",
+      "why": "3 files export names matching this responsibility, but on NAME evidence only; the contract forbids name matching alone from producing a confirmed defect, so this needs a human read",
       "note": null
     },
     {
@@ -13847,100 +13641,6 @@
       "unexplained": []
     },
     {
-      "path": "collab-electron/src/main/acp-agent.test.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "ownership": "scope-boundary"
-      },
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "not-applicable",
-      "ownership": "unsupported",
-      "reasons": {
-        "reach": "no reach row was produced for this path",
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "test or QA code does not ship",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/main/acp-agent.ts",
-      "worst": "dynamic",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "dynamic",
-      "blockers": {
-        "ipcRequest": "runtime-proof",
-        "ipcPush": "runtime-proof"
-      },
-      "ipcPush": "dynamic",
-      "persistence": "not-applicable",
-      "lifetime": "indexed",
-      "packaging": "indexed",
-      "ownership": "indexed",
-      "reasons": {
-        "ipcRequest": "1 channel name(s) built from a variable or template (line 84)",
-        "ipcPush": "1 push channel name(s) built from a variable or template",
-        "persistence": "no SQL DML or DDL in this file"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/main/acp-fs-root.test.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "ownership": "scope-boundary"
-      },
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "not-applicable",
-      "ownership": "unsupported",
-      "reasons": {
-        "reach": "no reach row was produced for this path",
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "test or QA code does not ship",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/main/acp-fs-root.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
       "path": "collab-electron/src/main/agent-activity.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -13977,6 +13677,31 @@
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "collab-electron/src/main/agent-host-lifecycle.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "unsupported",
+      "reasons": {
+        "reach": "no reach row was produced for this path",
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
       },
       "unexplained": []
     },
@@ -15770,6 +15495,31 @@
       "unexplained": []
     },
     {
+      "path": "collab-electron/src/main/peer-delivery.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "unsupported",
+      "reasons": {
+        "reach": "no reach row was produced for this path",
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
       "path": "collab-electron/src/main/peer-delivery.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -16942,162 +16692,8 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "ipcRequest": "2 channel name(s) built from a variable or template (line 663, 668)",
+        "ipcRequest": "2 channel name(s) built from a variable or template (line 629, 634)",
         "ipcPush": "1 push channel name(s) built from a variable or template",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/AgentThread.tsx",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/App.tsx",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/dev-shim.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/main.tsx",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/MarkdownText.tsx",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/ToolCallCard.tsx",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/use-acp-runtime.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
         "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
@@ -18537,50 +18133,6 @@
       "unexplained": []
     },
     {
-      "path": "collab-electron/src/windows/terminal/src/App.tsx",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/windows/terminal/src/main.tsx",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
       "path": "collab-electron/src/windows/terminal-tile/src/App.tsx",
       "worst": "unsupported",
       "imports": "indexed",
@@ -19920,31 +19472,6 @@
       "unexplained": []
     },
     {
-      "path": "qa/gates/acp-fs-confine.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "not-applicable",
-      "ownership": "not-applicable",
-      "reasons": {
-        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "test or QA code does not ship",
-        "ownership": "responsibility ownership is evaluated for product code only"
-      },
-      "unexplained": []
-    },
-    {
       "path": "qa/gates/action-transport.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -20430,6 +19957,56 @@
     },
     {
       "path": "qa/gates/golden-g4-retired-route.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "qa/gates/golden-g5-consumer-census.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "qa/gates/golden-g5-saved-state.ts",
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
@@ -21825,32 +21402,6 @@
       "unexplained": []
     },
     {
-      "path": "qa/gates/windows-dock-species.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "lifetime": "ast-coverage"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "partial",
-      "packaging": "not-applicable",
-      "ownership": "not-applicable",
-      "reasons": {
-        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
-        "packaging": "test or QA code does not ship",
-        "ownership": "responsibility ownership is evaluated for product code only"
-      },
-      "unexplained": []
-    },
-    {
       "path": "qa/gates/windows-golden-run.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -22923,84 +22474,6 @@
     },
     {
       "path": "qf-kernel-schema/src/validate.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "packaging": "package-proof"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "ownership": "not-applicable",
-      "reasons": {
-        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "responsibility ownership is evaluated for product code only"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "species/claude-code/packed/claude-code.mjs",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "packaging": "package-proof"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "ownership": "not-applicable",
-      "reasons": {
-        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "responsibility ownership is evaluated for product code only"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "species/claude-code/scripts/pack-agent.mjs",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "packaging": "package-proof"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "ownership": "not-applicable",
-      "reasons": {
-        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "responsibility ownership is evaluated for product code only"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "species/claude-code/src/claude-code.mjs",
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
@@ -24295,42 +23768,42 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 532,
+      "indexed": 518,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 255,
-      "indexed": 277,
-      "dynamic": 4
+      "not-applicable": 252,
+      "indexed": 267,
+      "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 525,
-      "dynamic": 4,
-      "indexed": 7
+      "not-applicable": 512,
+      "indexed": 7,
+      "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 487,
+      "not-applicable": 473,
       "partial": 26,
       "indexed": 23
     },
     "lifetime": {
-      "not-applicable": 473,
-      "partial": 57,
-      "indexed": 6
+      "not-applicable": 461,
+      "partial": 56,
+      "indexed": 5
     },
     "packaging": {
       "not-applicable": 199,
-      "unsupported": 105,
-      "indexed": 232
+      "unsupported": 102,
+      "indexed": 221
     },
     "ownership": {
-      "not-applicable": 172,
-      "unsupported": 344,
-      "indexed": 20
+      "not-applicable": 169,
+      "unsupported": 334,
+      "indexed": 19
     },
     "reach": {
-      "unsupported": 302,
-      "indexed": 231,
+      "unsupported": 299,
+      "indexed": 220,
       "partial": 3
     }
   },
@@ -24603,10 +24076,9 @@
       "path": "collab-electron/packages/components/src/Terminal/index.ts",
       "reach": "reachable",
       "importers": [
-        "collab-electron/src/windows/terminal/src/App.tsx",
         "collab-electron/src/windows/terminal-tile/src/App.tsx"
       ],
-      "importerCount": 2,
+      "importerCount": 1,
       "imports": [
         "collab-electron/packages/components/src/Terminal/TerminalTab.tsx",
         "collab-electron/packages/components/src/Terminal/theme.ts"
@@ -24964,12 +24436,12 @@
       "importers": [
         "collab-electron/src/windows/nav/src/main.tsx",
         "collab-electron/src/windows/viewer/src/main.tsx",
-        "collab-electron/src/windows/terminal/src/main.tsx",
         "collab-electron/src/windows/settings/src/main.tsx",
         "collab-electron/src/windows/graph-tile/src/main.tsx",
-        "collab-electron/src/windows/artifact-tile/src/main.tsx"
+        "collab-electron/src/windows/artifact-tile/src/main.tsx",
+        "collab-electron/src/windows/tile-list/src/main.tsx"
       ],
-      "importerCount": 8,
+      "importerCount": 6,
       "imports": [],
       "importCount": 0
     },
@@ -25022,7 +24494,7 @@
         "collab-electron/src/main/sidecar/server.ts",
         "collab-electron/src/windows/nav/src/App.tsx"
       ],
-      "importerCount": 19,
+      "importerCount": 18,
       "imports": [],
       "importCount": 0
     },
@@ -25082,32 +24554,6 @@
       "importCount": 1
     },
     {
-      "path": "collab-electron/src/main/acp-agent.ts",
-      "reach": "reachable",
-      "importers": [
-        "collab-electron/src/main/index.ts"
-      ],
-      "importerCount": 1,
-      "imports": [
-        "collab-electron/src/main/config.ts",
-        "collab-electron/src/main/host-acp-bridge.ts",
-        "collab-electron/src/main/acp-fs-root.ts",
-        "collab-electron/src/main/paths.ts"
-      ],
-      "importCount": 4
-    },
-    {
-      "path": "collab-electron/src/main/acp-fs-root.ts",
-      "reach": "reachable",
-      "importers": [
-        "qa/gates/acp-fs-confine.ts",
-        "collab-electron/src/main/acp-agent.ts"
-      ],
-      "importerCount": 2,
-      "imports": [],
-      "importCount": 0
-    },
-    {
       "path": "collab-electron/src/main/agent-activity.ts",
       "reach": "reachable",
       "importers": [
@@ -25147,13 +24593,13 @@
         "collab-electron/src/main/host-mounts.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/kernel.ts",
+        "collab-electron/src/main/peer-delivery.ts",
         "collab-electron/src/main/agent-artifact-writer.ts",
         "collab-electron/src/main/dock-profiles.ts",
         "collab-electron/src/main/definition-runtime.ts",
-        "collab-electron/src/main/runtime-adapter.ts",
-        "collab-electron/src/main/runtime-route-dispatch.ts"
+        "collab-electron/src/main/runtime-adapter.ts"
       ],
-      "importCount": 17
+      "importCount": 18
     },
     {
       "path": "collab-electron/src/main/analytics.ts",
@@ -25281,9 +24727,9 @@
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/pty.ts",
         "collab-electron/src/main/terminal-target.ts",
-        "collab-electron/src/main/acp-agent.ts"
+        "collab-electron/src/main/runtime-adapter.ts"
       ],
-      "importerCount": 8,
+      "importerCount": 7,
       "imports": [
         "collab-electron/src/main/paths.ts",
         "collab-electron/src/main/files.ts"
@@ -25421,12 +24867,11 @@
       "reach": "reachable",
       "importers": [
         "collab-electron/src/main/host-native-tui.ts",
-        "collab-electron/src/main/acp-agent.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/host-acp-permission.ts",
         "collab-electron/src/main/host-acp-turn.ts"
       ],
-      "importerCount": 5,
+      "importerCount": 4,
       "imports": [
         "species/hermes/host-acp-client.ts"
       ],
@@ -25558,7 +25003,7 @@
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/live-seat-capability.ts"
       ],
-      "importCount": 36
+      "importCount": 35
     },
     {
       "path": "collab-electron/src/main/integrations.ts",
@@ -25930,7 +25375,7 @@
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/json-rpc-server.ts"
       ],
-      "importerCount": 15,
+      "importerCount": 14,
       "imports": [],
       "importCount": 0
     },
@@ -25939,9 +25384,10 @@
       "reach": "reachable",
       "importers": [
         "collab-electron/src/main/index.ts",
-        "collab-electron/src/main/host-native-tui.ts"
+        "collab-electron/src/main/host-native-tui.ts",
+        "collab-electron/src/main/agent-host.ts"
       ],
-      "importerCount": 2,
+      "importerCount": 3,
       "imports": [
         "collab-electron/src/main/pty.ts",
         "collab-electron/src/main/pty.ts",
@@ -26354,88 +25800,6 @@
       "importCount": 1
     },
     {
-      "path": "collab-electron/src/windows/agent-chat/src/AgentThread.tsx",
-      "reach": "reachable",
-      "importers": [
-        "collab-electron/src/windows/agent-chat/src/App.tsx"
-      ],
-      "importerCount": 1,
-      "imports": [
-        "collab-electron/src/windows/agent-chat/src/MarkdownText.tsx",
-        "collab-electron/src/windows/agent-chat/src/ToolCallCard.tsx"
-      ],
-      "importCount": 2
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/App.tsx",
-      "reach": "reachable",
-      "importers": [
-        "collab-electron/src/windows/agent-chat/src/main.tsx"
-      ],
-      "importerCount": 1,
-      "imports": [
-        "collab-electron/src/windows/agent-chat/src/AgentThread.tsx",
-        "collab-electron/src/windows/agent-chat/src/use-acp-runtime.ts"
-      ],
-      "importCount": 2
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/dev-shim.ts",
-      "reach": "reachable",
-      "importers": [
-        "collab-electron/src/windows/agent-chat/src/main.tsx"
-      ],
-      "importerCount": 1,
-      "imports": [],
-      "importCount": 0
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/main.tsx",
-      "reach": "entrypoint",
-      "importers": [],
-      "importerCount": 0,
-      "imports": [
-        "collab-electron/packages/shared/src/dark-mode.ts",
-        "collab-electron/src/windows/agent-chat/src/dev-shim.ts",
-        "collab-electron/src/windows/agent-chat/src/App.tsx",
-        "collab-electron/src/windows/shared/qf-tokens.css",
-        "collab-electron/src/windows/shared/qf-base.css",
-        "collab-electron/packages/theme/src/styles.css",
-        "collab-electron/src/windows/agent-chat/src/styles.css"
-      ],
-      "importCount": 7
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/MarkdownText.tsx",
-      "reach": "reachable",
-      "importers": [
-        "collab-electron/src/windows/agent-chat/src/AgentThread.tsx"
-      ],
-      "importerCount": 1,
-      "imports": [],
-      "importCount": 0
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/ToolCallCard.tsx",
-      "reach": "reachable",
-      "importers": [
-        "collab-electron/src/windows/agent-chat/src/AgentThread.tsx"
-      ],
-      "importerCount": 1,
-      "imports": [],
-      "importCount": 0
-    },
-    {
-      "path": "collab-electron/src/windows/agent-chat/src/use-acp-runtime.ts",
-      "reach": "reachable",
-      "importers": [
-        "collab-electron/src/windows/agent-chat/src/App.tsx"
-      ],
-      "importerCount": 1,
-      "imports": [],
-      "importCount": 0
-    },
-    {
       "path": "collab-electron/src/windows/artifact-tile/src/App.tsx",
       "reach": "reachable",
       "importers": [
@@ -26598,10 +25962,9 @@
       "importers": [
         "collab-electron/src/windows/nav/src/main.tsx",
         "collab-electron/src/windows/viewer/src/main.tsx",
-        "collab-electron/src/windows/terminal/src/main.tsx",
         "collab-electron/src/windows/settings/src/main.tsx"
       ],
-      "importerCount": 4,
+      "importerCount": 3,
       "imports": [],
       "importCount": 0
     },
@@ -26945,35 +26308,6 @@
       "importerCount": 1,
       "imports": [],
       "importCount": 0
-    },
-    {
-      "path": "collab-electron/src/windows/terminal/src/App.tsx",
-      "reach": "reachable",
-      "importers": [
-        "collab-electron/src/windows/terminal/src/main.tsx"
-      ],
-      "importerCount": 1,
-      "imports": [
-        "collab-electron/packages/components/src/Terminal/index.ts",
-        "collab-electron/packages/shared/src/path-utils.ts",
-        "collab-electron/src/windows/terminal/src/styles/App.css"
-      ],
-      "importCount": 3
-    },
-    {
-      "path": "collab-electron/src/windows/terminal/src/main.tsx",
-      "reach": "entrypoint",
-      "importers": [],
-      "importerCount": 0,
-      "imports": [
-        "collab-electron/packages/shared/src/dark-mode.ts",
-        "collab-electron/src/windows/terminal/src/App.tsx",
-        "collab-electron/src/windows/shared/PostHogProvider.tsx",
-        "collab-electron/src/windows/shared/qf-tokens.css",
-        "collab-electron/src/windows/shared/qf-base.css",
-        "collab-electron/packages/shared/src/styles/Theme.css"
-      ],
-      "importCount": 6
     },
     {
       "path": "collab-electron/src/windows/terminal-tile/src/App.tsx",
@@ -27596,15 +26930,13 @@
     "collab-electron/src/preload/shell.ts",
     "collab-electron/src/windows/nav/src/main.tsx",
     "collab-electron/src/windows/viewer/src/main.tsx",
-    "collab-electron/src/windows/terminal/src/main.tsx",
     "collab-electron/src/windows/settings/src/main.tsx",
     "collab-electron/src/windows/shell/src/renderer.js",
     "collab-electron/src/windows/terminal-tile/src/main.tsx",
     "collab-electron/src/windows/graph-tile/src/main.tsx",
     "collab-electron/src/windows/artifact-tile/src/main.tsx",
     "collab-electron/src/windows/session-tile/src/main.tsx",
-    "collab-electron/src/windows/tile-list/src/main.tsx",
-    "collab-electron/src/windows/agent-chat/src/main.tsx"
+    "collab-electron/src/windows/tile-list/src/main.tsx"
   ],
   "unbuiltWindows": [],
   "blastRadius": {
@@ -28031,11 +27363,9 @@
     "collab-electron/packages/components/src/Terminal/index.ts": {
       "reach": "reachable",
       "directDependents": [
-        "collab-electron/src/windows/terminal/src/App.tsx",
         "collab-electron/src/windows/terminal-tile/src/App.tsx"
       ],
       "transitiveDependents": [
-        "collab-electron/src/windows/terminal/src/main.tsx",
         "collab-electron/src/windows/terminal-tile/src/main.tsx"
       ],
       "transitiveTruncated": false,
@@ -28054,9 +27384,7 @@
         "collab-electron/packages/components/src/Terminal/index.ts"
       ],
       "transitiveDependents": [
-        "collab-electron/src/windows/terminal/src/App.tsx",
         "collab-electron/src/windows/terminal-tile/src/App.tsx",
-        "collab-electron/src/windows/terminal/src/main.tsx",
         "collab-electron/src/windows/terminal-tile/src/main.tsx"
       ],
       "transitiveTruncated": false,
@@ -28076,9 +27404,7 @@
         "collab-electron/packages/components/src/Terminal/TerminalTab.tsx"
       ],
       "transitiveDependents": [
-        "collab-electron/src/windows/terminal/src/App.tsx",
         "collab-electron/src/windows/terminal-tile/src/App.tsx",
-        "collab-electron/src/windows/terminal/src/main.tsx",
         "collab-electron/src/windows/terminal-tile/src/main.tsx"
       ],
       "transitiveTruncated": false,
@@ -28579,12 +27905,10 @@
       "directDependents": [
         "collab-electron/src/windows/nav/src/main.tsx",
         "collab-electron/src/windows/viewer/src/main.tsx",
-        "collab-electron/src/windows/terminal/src/main.tsx",
         "collab-electron/src/windows/settings/src/main.tsx",
         "collab-electron/src/windows/graph-tile/src/main.tsx",
         "collab-electron/src/windows/artifact-tile/src/main.tsx",
-        "collab-electron/src/windows/tile-list/src/main.tsx",
-        "collab-electron/src/windows/agent-chat/src/main.tsx"
+        "collab-electron/src/windows/tile-list/src/main.tsx"
       ],
       "transitiveDependents": [],
       "transitiveTruncated": false,
@@ -28661,7 +27985,6 @@
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/pty.ts",
         "collab-electron/src/main/terminal-target.ts",
-        "collab-electron/src/main/acp-agent.ts",
         "collab-electron/src/main/runtime-adapter.ts",
         "collab-electron/src/windows/graph-tile/src/main.tsx",
         "collab-electron/src/windows/nav/src/App.tsx",
@@ -28673,7 +27996,8 @@
         "qa/gates/golden-g4-retired-route.ts",
         "collab-electron/src/main/dock-profiles.ts",
         "collab-electron/src/main/definition-runtime.ts",
-        "collab-electron/src/windows/nav/src/main.tsx"
+        "collab-electron/src/windows/nav/src/main.tsx",
+        "collab-electron/src/main/ipc-kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -28691,7 +28015,6 @@
         "collab-electron/src/main/terminal-target.ts",
         "collab-electron/src/main/sidecar/server.ts",
         "collab-electron/src/windows/nav/src/App.tsx",
-        "collab-electron/src/windows/terminal/src/App.tsx",
         "collab-electron/src/windows/shell/src/tile-manager.js",
         "collab-electron/src/windows/shell/src/tile-renderer.js",
         "collab-electron/src/main/files.ts",
@@ -28713,7 +28036,6 @@
         "collab-electron/src/main/ipc-workspace.ts",
         "collab-electron/src/main/sidecar/entry.ts",
         "collab-electron/src/windows/nav/src/main.tsx",
-        "collab-electron/src/windows/terminal/src/main.tsx",
         "collab-electron/src/windows/shell/src/renderer.js",
         "collab-electron/src/windows/shell/src/edge-indicators.js",
         "collab-electron/src/main/config.ts",
@@ -28726,7 +28048,9 @@
         "collab-electron/src/main/ipc-misc.ts",
         "collab-electron/packages/components/src/FolderTableView/index.ts",
         "collab-electron/src/main/ipc-kernel.ts",
-        "collab-electron/src/main/ipc-knowledge.ts"
+        "collab-electron/src/main/ipc-knowledge.ts",
+        "collab-electron/src/main/runtime-adapter.ts",
+        "collab-electron/src/main/workspace-graph-python.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -28760,7 +28084,6 @@
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/pty.ts",
         "collab-electron/src/main/terminal-target.ts",
-        "collab-electron/src/main/acp-agent.ts",
         "collab-electron/src/main/runtime-adapter.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/peer-delivery.ts",
@@ -28904,54 +28227,6 @@
       "affectedProcesses": [],
       "packaged": "bundled-via-import"
     },
-    "collab-electron/src/main/acp-agent.ts": {
-      "reach": "reachable",
-      "directDependents": [
-        "collab-electron/src/main/index.ts"
-      ],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "collab-electron/src/main/config.ts",
-        "collab-electron/src/main/host-acp-bridge.ts",
-        "collab-electron/src/main/acp-fs-root.ts",
-        "collab-electron/src/main/paths.ts"
-      ],
-      "affectedWires": [
-        "agent:cancel",
-        "agent:kill",
-        "agent:prompt",
-        "agent:save-messages",
-        "agent:spawn"
-      ],
-      "affectedLoops": [
-        "Spawn a seat"
-      ],
-      "affectedProcesses": [
-        {
-          "spawns": 1,
-          "reaped": "unreaped"
-        }
-      ],
-      "packaged": "bundled-via-import"
-    },
-    "collab-electron/src/main/acp-fs-root.ts": {
-      "reach": "reachable",
-      "directDependents": [
-        "qa/gates/acp-fs-confine.ts",
-        "collab-electron/src/main/acp-agent.ts"
-      ],
-      "transitiveDependents": [
-        "qa/run.ts",
-        "collab-electron/src/main/index.ts"
-      ],
-      "transitiveTruncated": false,
-      "directDependencies": [],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "bundled-via-import"
-    },
     "collab-electron/src/main/agent-activity.ts": {
       "reach": "reachable",
       "directDependents": [
@@ -29008,6 +28283,7 @@
         "collab-electron/src/main/host-mounts.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/kernel.ts",
+        "collab-electron/src/main/peer-delivery.ts",
         "collab-electron/src/main/agent-artifact-writer.ts",
         "collab-electron/src/main/dock-profiles.ts",
         "collab-electron/src/main/definition-runtime.ts",
@@ -29210,7 +28486,6 @@
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/pty.ts",
         "collab-electron/src/main/terminal-target.ts",
-        "collab-electron/src/main/acp-agent.ts",
         "collab-electron/src/main/runtime-adapter.ts",
         "collab-electron/src/main/ipc-workspace.ts"
       ],
@@ -29249,7 +28524,6 @@
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
         "qa/gates/windows-dock-ontology.ts",
-        "qa/gates/windows-dock-species.ts",
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts"
       ],
@@ -29359,7 +28633,6 @@
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
         "qa/gates/windows-dock-ontology.ts",
-        "qa/gates/windows-dock-species.ts",
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts",
         "collab-electron/src/main/index.ts",
@@ -29399,7 +28672,6 @@
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/pty.ts",
         "collab-electron/src/main/terminal-target.ts",
-        "collab-electron/src/main/acp-agent.ts",
         "collab-electron/src/main/runtime-adapter.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/peer-delivery.ts",
@@ -29421,7 +28693,19 @@
         "qa/gates/windows-cold-boot.ts",
         "qa/gates/windows-installer.ts",
         "qa/gates/package-closure/executors.ts",
-        "qa/gates/research-director-delegation.ts"
+        "qa/gates/research-director-delegation.ts",
+        "qa/gates/founder-steering.ts",
+        "qa/gates/hermes-research.ts",
+        "qa/gates/pre-r18-coherence.ts",
+        "qa/gates/r17-guided-technique-consumer.ts",
+        "qa/gates/research-world-visible.ts",
+        "qa/gates/technique-outcome-loop.ts",
+        "qa/gates/windows-dock-capability.ts",
+        "qa/gates/windows-dock-collaboration.ts",
+        "qa/gates/windows-dock-hire.ts",
+        "qa/gates/windows-dock-ontology.ts",
+        "qa/gates/windows-golden-run.ts",
+        "qa/gates/windows-research-question.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -29449,7 +28733,6 @@
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/pty.ts",
         "collab-electron/src/main/terminal-target.ts",
-        "collab-electron/src/main/acp-agent.ts",
         "collab-electron/src/main/runtime-adapter.ts",
         "collab-electron/src/main/ipc-knowledge.ts",
         "collab-electron/src/main/ipc-misc.ts",
@@ -29485,7 +28768,6 @@
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
         "qa/gates/windows-dock-ontology.ts",
-        "qa/gates/windows-dock-species.ts",
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts"
       ],
@@ -29555,7 +28837,6 @@
       "reach": "reachable",
       "directDependents": [
         "collab-electron/src/main/host-native-tui.ts",
-        "collab-electron/src/main/acp-agent.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/host-acp-permission.ts",
         "collab-electron/src/main/host-acp-turn.ts"
@@ -29764,7 +29045,6 @@
         "collab-electron/src/main/terminal-target.ts",
         "collab-electron/src/main/tmux.ts",
         "collab-electron/src/main/ipc-browser.ts",
-        "collab-electron/src/main/acp-agent.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/governed-critic-completion.ts",
         "collab-electron/src/main/runtime-kernel-admission.ts",
@@ -30047,7 +29327,6 @@
         "collab-electron/src/main/ipc-workspace.ts"
       ],
       "affectedWires": [
-        "agent:focus-session",
         "context-menu:show",
         "dialog:confirm",
         "dialog:open-file",
@@ -30056,8 +29335,7 @@
         "import:web-article",
         "replay:start",
         "replay:stop",
-        "shell:open-external",
-        "viewer:run-in-terminal"
+        "shell:open-external"
       ],
       "affectedLoops": [],
       "affectedProcesses": [],
@@ -30420,7 +29698,6 @@
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
         "qa/gates/windows-dock-ontology.ts",
-        "qa/gates/windows-dock-species.ts",
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts",
         "qa/gates/package-closure.ts"
@@ -30445,7 +29722,6 @@
         "collab-electron/src/main/app-migration.ts",
         "collab-electron/src/main/logger.ts",
         "collab-electron/src/main/tmux.ts",
-        "collab-electron/src/main/acp-agent.ts",
         "collab-electron/src/main/sidecar/protocol.ts",
         "collab-electron/src/main/ipc-endpoint.ts",
         "collab-electron/src/main/host-mounts.ts",
@@ -30491,10 +29767,10 @@
       "reach": "reachable",
       "directDependents": [
         "collab-electron/src/main/index.ts",
-        "collab-electron/src/main/host-native-tui.ts"
+        "collab-electron/src/main/host-native-tui.ts",
+        "collab-electron/src/main/agent-host.ts"
       ],
       "transitiveDependents": [
-        "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -30714,7 +29990,6 @@
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
         "qa/gates/windows-dock-ontology.ts",
-        "qa/gates/windows-dock-species.ts",
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts",
         "qa/gates/package-closure.ts"
@@ -31162,14 +30437,10 @@
         "analytics:track-event",
         "app:build-identity",
         "browser:click",
-        "browser:evaluate",
-        "browser:info",
         "browser:navigate",
         "browser:screenshot",
-        "browser:scroll",
         "browser:snapshot",
         "browser:type",
-        "browser:wait",
         "canvas:load-state",
         "canvas:rpc-response",
         "canvas:save-state",
@@ -31252,7 +30523,6 @@
       ],
       "affectedWires": [
         "agent:cancel",
-        "agent:focus-session",
         "agent:kill",
         "agent:prompt",
         "agent:save-messages",
@@ -31297,7 +30567,6 @@
         "replay:stop",
         "terminal:list-targets",
         "theme:set",
-        "viewer:run-in-terminal",
         "wikilink:backlinks",
         "wikilink:resolve",
         "wikilink:suggest",
@@ -31313,119 +30582,6 @@
       ],
       "affectedProcesses": [],
       "packaged": "build-declared"
-    },
-    "collab-electron/src/windows/agent-chat/src/AgentThread.tsx": {
-      "reach": "reachable",
-      "directDependents": [
-        "collab-electron/src/windows/agent-chat/src/App.tsx"
-      ],
-      "transitiveDependents": [
-        "collab-electron/src/windows/agent-chat/src/main.tsx"
-      ],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "collab-electron/src/windows/agent-chat/src/MarkdownText.tsx",
-        "collab-electron/src/windows/agent-chat/src/ToolCallCard.tsx"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "bundled-via-import"
-    },
-    "collab-electron/src/windows/agent-chat/src/App.tsx": {
-      "reach": "reachable",
-      "directDependents": [
-        "collab-electron/src/windows/agent-chat/src/main.tsx"
-      ],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "collab-electron/src/windows/agent-chat/src/AgentThread.tsx",
-        "collab-electron/src/windows/agent-chat/src/use-acp-runtime.ts"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "bundled-via-import"
-    },
-    "collab-electron/src/windows/agent-chat/src/dev-shim.ts": {
-      "reach": "reachable",
-      "directDependents": [
-        "collab-electron/src/windows/agent-chat/src/main.tsx"
-      ],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "bundled-via-import"
-    },
-    "collab-electron/src/windows/agent-chat/src/main.tsx": {
-      "reach": "entrypoint",
-      "directDependents": [],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "collab-electron/packages/shared/src/dark-mode.ts",
-        "collab-electron/src/windows/agent-chat/src/dev-shim.ts",
-        "collab-electron/src/windows/agent-chat/src/App.tsx",
-        "collab-electron/src/windows/shared/qf-tokens.css",
-        "collab-electron/src/windows/shared/qf-base.css",
-        "collab-electron/packages/theme/src/styles.css",
-        "collab-electron/src/windows/agent-chat/src/styles.css"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "build-declared"
-    },
-    "collab-electron/src/windows/agent-chat/src/MarkdownText.tsx": {
-      "reach": "reachable",
-      "directDependents": [
-        "collab-electron/src/windows/agent-chat/src/AgentThread.tsx"
-      ],
-      "transitiveDependents": [
-        "collab-electron/src/windows/agent-chat/src/App.tsx",
-        "collab-electron/src/windows/agent-chat/src/main.tsx"
-      ],
-      "transitiveTruncated": false,
-      "directDependencies": [],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "bundled-via-import"
-    },
-    "collab-electron/src/windows/agent-chat/src/ToolCallCard.tsx": {
-      "reach": "reachable",
-      "directDependents": [
-        "collab-electron/src/windows/agent-chat/src/AgentThread.tsx"
-      ],
-      "transitiveDependents": [
-        "collab-electron/src/windows/agent-chat/src/App.tsx",
-        "collab-electron/src/windows/agent-chat/src/main.tsx"
-      ],
-      "transitiveTruncated": false,
-      "directDependencies": [],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "bundled-via-import"
-    },
-    "collab-electron/src/windows/agent-chat/src/use-acp-runtime.ts": {
-      "reach": "reachable",
-      "directDependents": [
-        "collab-electron/src/windows/agent-chat/src/App.tsx"
-      ],
-      "transitiveDependents": [
-        "collab-electron/src/windows/agent-chat/src/main.tsx"
-      ],
-      "transitiveTruncated": false,
-      "directDependencies": [],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "bundled-via-import"
     },
     "collab-electron/src/windows/artifact-tile/src/App.tsx": {
       "reach": "reachable",
@@ -31627,7 +30783,6 @@
       "directDependents": [
         "collab-electron/src/windows/nav/src/main.tsx",
         "collab-electron/src/windows/viewer/src/main.tsx",
-        "collab-electron/src/windows/terminal/src/main.tsx",
         "collab-electron/src/windows/settings/src/main.tsx"
       ],
       "transitiveDependents": [],
@@ -32088,41 +31243,6 @@
       "affectedLoops": [],
       "affectedProcesses": [],
       "packaged": "bundled-via-import"
-    },
-    "collab-electron/src/windows/terminal/src/App.tsx": {
-      "reach": "reachable",
-      "directDependents": [
-        "collab-electron/src/windows/terminal/src/main.tsx"
-      ],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "collab-electron/packages/components/src/Terminal/index.ts",
-        "collab-electron/packages/shared/src/path-utils.ts",
-        "collab-electron/src/windows/terminal/src/styles/App.css"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "bundled-via-import"
-    },
-    "collab-electron/src/windows/terminal/src/main.tsx": {
-      "reach": "entrypoint",
-      "directDependents": [],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "collab-electron/packages/shared/src/dark-mode.ts",
-        "collab-electron/src/windows/terminal/src/App.tsx",
-        "collab-electron/src/windows/shared/PostHogProvider.tsx",
-        "collab-electron/src/windows/shared/qf-tokens.css",
-        "collab-electron/src/windows/shared/qf-base.css",
-        "collab-electron/packages/shared/src/styles/Theme.css"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "build-declared"
     },
     "collab-electron/src/windows/terminal-tile/src/App.tsx": {
       "reach": "reachable",
@@ -33934,163 +33054,40 @@
     {
       "channel": "agent:cancel",
       "method": "agentCancel",
-      "status": "live",
-      "breakAt": null,
+      "status": "dead",
+      "breakAt": "main",
       "hops": [
         {
           "layer": "renderer",
-          "present": true,
+          "present": false,
           "detail": "agentCancel()"
         },
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:690"
+          "detail": "collab-electron/src/preload/universal.ts:656"
         },
         {
           "layer": "main",
-          "present": true,
-          "detail": "collab-electron/src/main/acp-agent.ts:408"
-        },
-        {
-          "layer": "kernel",
-          "present": true,
-          "detail": "read-only — mutates nothing"
+          "present": false,
+          "detail": "no handler"
         }
       ],
-      "registeredAt": {
-        "file": "collab-electron/src/main/acp-agent.ts",
-        "line": 408,
-        "kind": "handle"
-      },
+      "registeredAt": null,
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 690,
+        "line": 656,
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
-        "viaDml": null,
-        "dmlFile": null,
-        "viaDisk": null,
-        "diskFile": null,
-        "dmlAll": [],
-        "handlerFile": "collab-electron/src/main/acp-agent.ts",
-        "seedCalls": [
-          "cancelAgent"
-        ],
-        "inlineDml": false,
-        "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "get",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "cancel",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/bovada-capture-rpc.ts",
-              "collab-electron/src/main/launcher-readiness.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
-        "backedBy": null,
-        "reachPath": null,
-        "ungoverned": [],
-        "why": "no AST-backed call path from this handler reaches SQL outside the write door"
-      }
-    },
-    {
-      "channel": "agent:focus-session",
-      "method": "onAgentEvent",
-      "status": "live",
-      "breakAt": null,
-      "hops": [
-        {
-          "layer": "renderer",
-          "present": true,
-          "detail": "onAgentEvent()"
-        },
-        {
-          "layer": "preload",
-          "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:614"
-        },
-        {
-          "layer": "main",
-          "present": true,
-          "detail": "collab-electron/src/main/ipc-misc.ts:213"
-        },
-        {
-          "layer": "kernel",
-          "present": true,
-          "detail": "read-only — mutates nothing"
-        }
-      ],
-      "registeredAt": {
-        "file": "collab-electron/src/main/ipc-misc.ts",
-        "line": 213,
-        "kind": "handle"
-      },
-      "calledAt": {
-        "file": "collab-electron/src/preload/universal.ts",
-        "line": 614,
-        "kind": "invoke"
-      },
-      "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
-        "viaDml": null,
-        "dmlFile": null,
-        "viaDisk": null,
-        "diskFile": null,
-        "dmlAll": [],
-        "handlerFile": "collab-electron/src/main/ipc-misc.ts",
-        "seedCalls": [
-          "forwardToWebview",
-          "getPtySessionId",
-          "if"
-        ],
-        "inlineDml": false,
-        "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "forwardToWebview",
-            "from": "collab-electron/src/main/ipc-misc.ts",
-            "candidates": [
-              "collab-electron/src/main/ipc.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "collab-electron/src/main/agent-activity.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
-        "backedBy": null,
-        "reachPath": null,
-        "ungoverned": [],
-        "why": "no AST-backed call path from this handler reaches SQL outside the write door"
+        "kind": "unknown"
       }
     },
     {
       "channel": "agent:kill",
       "method": "agentKill",
-      "status": "unused",
-      "breakAt": "renderer",
+      "status": "dead",
+      "breakAt": "main",
       "hops": [
         {
           "layer": "renderer",
@@ -34100,317 +33097,118 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:695"
+          "detail": "collab-electron/src/preload/universal.ts:661"
         },
         {
           "layer": "main",
-          "present": true,
-          "detail": "collab-electron/src/main/acp-agent.ts:419"
-        },
-        {
-          "layer": "kernel",
-          "present": true,
-          "detail": "read-only — mutates nothing"
+          "present": false,
+          "detail": "no handler"
         }
       ],
-      "registeredAt": {
-        "file": "collab-electron/src/main/acp-agent.ts",
-        "line": 419,
-        "kind": "handle"
-      },
+      "registeredAt": null,
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 695,
+        "line": 661,
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
-        "viaDml": null,
-        "dmlFile": null,
-        "viaDisk": null,
-        "diskFile": null,
-        "dmlAll": [],
-        "handlerFile": "collab-electron/src/main/acp-agent.ts",
-        "seedCalls": [
-          "killAgent"
-        ],
-        "inlineDml": false,
-        "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "get",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
-        "backedBy": null,
-        "reachPath": null,
-        "ungoverned": [],
-        "why": "no AST-backed call path from this handler reaches SQL outside the write door"
+        "kind": "unknown"
       }
     },
     {
       "channel": "agent:prompt",
       "method": "agentPrompt",
-      "status": "live",
-      "breakAt": null,
+      "status": "dead",
+      "breakAt": "main",
       "hops": [
         {
           "layer": "renderer",
-          "present": true,
+          "present": false,
           "detail": "agentPrompt()"
         },
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:685"
+          "detail": "collab-electron/src/preload/universal.ts:651"
         },
         {
           "layer": "main",
-          "present": true,
-          "detail": "collab-electron/src/main/acp-agent.ts:395"
-        },
-        {
-          "layer": "kernel",
-          "present": true,
-          "detail": "read-only — mutates nothing"
+          "present": false,
+          "detail": "no handler"
         }
       ],
-      "registeredAt": {
-        "file": "collab-electron/src/main/acp-agent.ts",
-        "line": 395,
-        "kind": "handle"
-      },
+      "registeredAt": null,
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 685,
+        "line": 651,
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
-        "viaDml": null,
-        "dmlFile": null,
-        "viaDisk": null,
-        "diskFile": null,
-        "dmlAll": [],
-        "handlerFile": "collab-electron/src/main/acp-agent.ts",
-        "seedCalls": [
-          "promptAgent"
-        ],
-        "inlineDml": false,
-        "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "get",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
-        "backedBy": null,
-        "reachPath": null,
-        "ungoverned": [],
-        "why": "no AST-backed call path from this handler reaches SQL outside the write door"
+        "kind": "unknown"
       }
     },
     {
       "channel": "agent:save-messages",
       "method": "agentSaveMessages",
-      "status": "live",
-      "breakAt": null,
+      "status": "dead",
+      "breakAt": "main",
       "hops": [
         {
           "layer": "renderer",
-          "present": true,
+          "present": false,
           "detail": "agentSaveMessages()"
         },
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:700"
+          "detail": "collab-electron/src/preload/universal.ts:666"
         },
         {
           "layer": "main",
-          "present": true,
-          "detail": "collab-electron/src/main/acp-agent.ts:430"
-        },
-        {
-          "layer": "kernel",
-          "present": true,
-          "detail": "writes a file via saveCachedMessages — never reaches the Kernel"
+          "present": false,
+          "detail": "no handler"
         }
       ],
-      "registeredAt": {
-        "file": "collab-electron/src/main/acp-agent.ts",
-        "line": 430,
-        "kind": "handle"
-      },
+      "registeredAt": null,
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 700,
+        "line": 666,
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "writes-disk",
-        "viaDoor": null,
-        "viaDml": null,
-        "dmlFile": null,
-        "viaDisk": "saveCachedMessages",
-        "diskFile": "collab-electron/src/main/acp-agent.ts",
-        "dmlAll": [],
-        "handlerFile": "collab-electron/src/main/acp-agent.ts",
-        "seedCalls": [
-          "saveCachedMessages"
-        ],
-        "inlineDml": false,
-        "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "mkdir",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/app-migration.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "resolve",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/sidecar/client.ts",
-              "collab-electron/src/main/wikilink-index.ts",
-              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
-              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
-        "backedBy": null,
-        "reachPath": null,
-        "ungoverned": [],
-        "why": "no AST-backed call path from this handler reaches SQL outside the write door"
+        "kind": "unknown"
       }
     },
     {
       "channel": "agent:spawn",
       "method": "agentSpawn",
-      "status": "live",
-      "breakAt": null,
+      "status": "dead",
+      "breakAt": "main",
       "hops": [
         {
           "layer": "renderer",
-          "present": true,
+          "present": false,
           "detail": "agentSpawn()"
         },
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:680"
+          "detail": "collab-electron/src/preload/universal.ts:646"
         },
         {
           "layer": "main",
-          "present": true,
-          "detail": "collab-electron/src/main/acp-agent.ts:385"
-        },
-        {
-          "layer": "kernel",
-          "present": true,
-          "detail": "read-only — mutates nothing"
+          "present": false,
+          "detail": "no handler"
         }
       ],
-      "registeredAt": {
-        "file": "collab-electron/src/main/acp-agent.ts",
-        "line": 385,
-        "kind": "handle"
-      },
+      "registeredAt": null,
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 680,
+        "line": 646,
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
-        "viaDml": null,
-        "dmlFile": null,
-        "viaDisk": null,
-        "diskFile": null,
-        "dmlAll": [],
-        "handlerFile": "collab-electron/src/main/acp-agent.ts",
-        "seedCalls": [
-          "spawnAgent"
-        ],
-        "inlineDml": false,
-        "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "all",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "log",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/index.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "log",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/index.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "parse",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "resolve",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/sidecar/client.ts",
-              "collab-electron/src/main/wikilink-index.ts",
-              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
-              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "resolve",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "collab-electron/src/main/sidecar/client.ts",
-              "collab-electron/src/main/wikilink-index.ts",
-              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
-              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
-        "backedBy": null,
-        "reachPath": null,
-        "ungoverned": [],
-        "why": "no AST-backed call path from this handler reaches SQL outside the write door"
+        "kind": "unknown"
       }
     },
     {
@@ -34427,7 +33225,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:251"
+          "detail": "collab-electron/src/preload/universal.ts:241"
         },
         {
           "layer": "main",
@@ -34447,7 +33245,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 251,
+        "line": 241,
         "kind": "invoke"
       },
       "hop4": {
@@ -34606,7 +33404,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:249"
+          "detail": "collab-electron/src/preload/universal.ts:239"
         },
         {
           "layer": "main",
@@ -34626,7 +33424,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 249,
+        "line": 239,
         "kind": "invoke"
       },
       "hop4": {
@@ -34710,19 +33508,19 @@
     },
     {
       "channel": "browser:evaluate",
-      "method": "browserEvaluate",
-      "status": "live",
-      "breakAt": null,
+      "method": null,
+      "status": "unreached",
+      "breakAt": "preload",
       "hops": [
         {
           "layer": "renderer",
           "present": true,
-          "detail": "browserEvaluate()"
+          "detail": "—"
         },
         {
           "layer": "preload",
-          "present": true,
-          "detail": "collab-electron/src/preload/shell.ts:444"
+          "present": false,
+          "detail": "no caller"
         },
         {
           "layer": "main",
@@ -34740,11 +33538,7 @@
         "line": 198,
         "kind": "handle"
       },
-      "calledAt": {
-        "file": "collab-electron/src/preload/shell.ts",
-        "line": 444,
-        "kind": "invoke"
-      },
+      "calledAt": null,
       "hop4": {
         "kind": "read-only",
         "viaDoor": null,
@@ -34767,19 +33561,19 @@
     },
     {
       "channel": "browser:info",
-      "method": "browserInfo",
-      "status": "live",
-      "breakAt": null,
+      "method": null,
+      "status": "unreached",
+      "breakAt": "preload",
       "hops": [
         {
           "layer": "renderer",
           "present": true,
-          "detail": "browserInfo()"
+          "detail": "—"
         },
         {
           "layer": "preload",
-          "present": true,
-          "detail": "collab-electron/src/preload/shell.ts:461"
+          "present": false,
+          "detail": "no caller"
         },
         {
           "layer": "main",
@@ -34797,11 +33591,7 @@
         "line": 182,
         "kind": "handle"
       },
-      "calledAt": {
-        "file": "collab-electron/src/preload/shell.ts",
-        "line": 461,
-        "kind": "invoke"
-      },
+      "calledAt": null,
       "hop4": {
         "kind": "read-only",
         "viaDoor": null,
@@ -34948,19 +33738,19 @@
     },
     {
       "channel": "browser:scroll",
-      "method": "browserScroll",
-      "status": "live",
-      "breakAt": null,
+      "method": null,
+      "status": "unreached",
+      "breakAt": "preload",
       "hops": [
         {
           "layer": "renderer",
           "present": true,
-          "detail": "browserScroll()"
+          "detail": "—"
         },
         {
           "layer": "preload",
-          "present": true,
-          "detail": "collab-electron/src/preload/shell.ts:439"
+          "present": false,
+          "detail": "no caller"
         },
         {
           "layer": "main",
@@ -34978,11 +33768,7 @@
         "line": 133,
         "kind": "handle"
       },
-      "calledAt": {
-        "file": "collab-electron/src/preload/shell.ts",
-        "line": 439,
-        "kind": "invoke"
-      },
+      "calledAt": null,
       "hop4": {
         "kind": "read-only",
         "viaDoor": null,
@@ -35121,19 +33907,19 @@
     },
     {
       "channel": "browser:wait",
-      "method": "browserWait",
-      "status": "live",
-      "breakAt": null,
+      "method": null,
+      "status": "unreached",
+      "breakAt": "preload",
       "hops": [
         {
           "layer": "renderer",
           "present": true,
-          "detail": "browserWait()"
+          "detail": "—"
         },
         {
           "layer": "preload",
-          "present": true,
-          "detail": "collab-electron/src/preload/shell.ts:451"
+          "present": false,
+          "detail": "no caller"
         },
         {
           "layer": "main",
@@ -35151,11 +33937,7 @@
         "line": 147,
         "kind": "handle"
       },
-      "calledAt": {
-        "file": "collab-electron/src/preload/shell.ts",
-        "line": 451,
-        "kind": "invoke"
-      },
+      "calledAt": null,
       "hop4": {
         "kind": "read-only",
         "viaDoor": null,
@@ -35239,7 +34021,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:643"
+          "detail": "collab-electron/src/preload/universal.ts:609"
         },
         {
           "layer": "main",
@@ -35259,7 +34041,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 643,
+        "line": 609,
         "kind": "send"
       },
       "hop4": {
@@ -35534,7 +34316,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:248"
+          "detail": "collab-electron/src/preload/universal.ts:238"
         },
         {
           "layer": "main",
@@ -35554,7 +34336,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 248,
+        "line": 238,
         "kind": "invoke"
       },
       "hop4": {
@@ -35782,7 +34564,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:454"
+          "detail": "collab-electron/src/preload/universal.ts:429"
         },
         {
           "layer": "main",
@@ -35802,7 +34584,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 454,
+        "line": 429,
         "kind": "invoke"
       },
       "hop4": {
@@ -35841,7 +34623,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:317"
+          "detail": "collab-electron/src/preload/universal.ts:305"
         },
         {
           "layer": "main",
@@ -35861,7 +34643,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 317,
+        "line": 305,
         "kind": "invoke"
       },
       "hop4": {
@@ -35900,7 +34682,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:434"
+          "detail": "collab-electron/src/preload/universal.ts:409"
         },
         {
           "layer": "main",
@@ -35920,7 +34702,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 434,
+        "line": 409,
         "kind": "send"
       },
       "hop4": {
@@ -36022,7 +34804,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:432"
+          "detail": "collab-electron/src/preload/universal.ts:407"
         },
         {
           "layer": "main",
@@ -36042,7 +34824,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 432,
+        "line": 407,
         "kind": "send"
       },
       "hop4": {
@@ -36089,7 +34871,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:270"
+          "detail": "collab-electron/src/preload/universal.ts:260"
         },
         {
           "layer": "main",
@@ -36109,7 +34891,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 270,
+        "line": 260,
         "kind": "invoke"
       },
       "hop4": {
@@ -36235,7 +35017,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:274"
+          "detail": "collab-electron/src/preload/universal.ts:264"
         },
         {
           "layer": "main",
@@ -36255,7 +35037,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 274,
+        "line": 264,
         "kind": "invoke"
       },
       "hop4": {
@@ -36321,7 +35103,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:276"
+          "detail": "collab-electron/src/preload/universal.ts:266"
         },
         {
           "layer": "main",
@@ -36341,7 +35123,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 276,
+        "line": 266,
         "kind": "invoke"
       },
       "hop4": {
@@ -36426,7 +35208,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:280"
+          "detail": "collab-electron/src/preload/universal.ts:270"
         },
         {
           "layer": "main",
@@ -36446,7 +35228,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 280,
+        "line": 270,
         "kind": "invoke"
       },
       "hop4": {
@@ -36521,7 +35303,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:268"
+          "detail": "collab-electron/src/preload/universal.ts:258"
         },
         {
           "layer": "main",
@@ -36541,7 +35323,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 268,
+        "line": 258,
         "kind": "invoke"
       },
       "hop4": {
@@ -36635,7 +35417,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:294"
+          "detail": "collab-electron/src/preload/universal.ts:282"
         },
         {
           "layer": "main",
@@ -36655,7 +35437,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 294,
+        "line": 282,
         "kind": "invoke"
       },
       "hop4": {
@@ -36692,7 +35474,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:296"
+          "detail": "collab-electron/src/preload/universal.ts:284"
         },
         {
           "layer": "main",
@@ -36712,7 +35494,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 296,
+        "line": 284,
         "kind": "invoke"
       },
       "hop4": {
@@ -37020,7 +35802,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:298"
+          "detail": "collab-electron/src/preload/universal.ts:286"
         },
         {
           "layer": "main",
@@ -37040,7 +35822,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 298,
+        "line": 286,
         "kind": "invoke"
       },
       "hop4": {
@@ -37078,7 +35860,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:272"
+          "detail": "collab-electron/src/preload/universal.ts:262"
         },
         {
           "layer": "main",
@@ -37098,7 +35880,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 272,
+        "line": 262,
         "kind": "invoke"
       },
       "hop4": {
@@ -37156,7 +35938,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:341"
+          "detail": "collab-electron/src/preload/universal.ts:329"
         },
         {
           "layer": "main",
@@ -37176,7 +35958,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 341,
+        "line": 329,
         "kind": "invoke"
       },
       "hop4": {
@@ -37303,7 +36085,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:302"
+          "detail": "collab-electron/src/preload/universal.ts:290"
         },
         {
           "layer": "main",
@@ -37323,7 +36105,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 302,
+        "line": 290,
         "kind": "invoke"
       },
       "hop4": {
@@ -37420,7 +36202,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:304"
+          "detail": "collab-electron/src/preload/universal.ts:292"
         },
         {
           "layer": "main",
@@ -37440,7 +36222,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 304,
+        "line": 292,
         "kind": "invoke"
       },
       "hop4": {
@@ -37501,7 +36283,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:310"
+          "detail": "collab-electron/src/preload/universal.ts:298"
         },
         {
           "layer": "main",
@@ -37521,7 +36303,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 310,
+        "line": 298,
         "kind": "invoke"
       },
       "hop4": {
@@ -37564,7 +36346,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:300"
+          "detail": "collab-electron/src/preload/universal.ts:288"
         },
         {
           "layer": "main",
@@ -37584,7 +36366,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 300,
+        "line": 288,
         "kind": "invoke"
       },
       "hop4": {
@@ -37681,7 +36463,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:282"
+          "detail": "collab-electron/src/preload/universal.ts:272"
         },
         {
           "layer": "main",
@@ -37701,7 +36483,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 282,
+        "line": 272,
         "kind": "invoke"
       },
       "hop4": {
@@ -37771,7 +36553,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:466"
+          "detail": "collab-electron/src/preload/universal.ts:441"
         },
         {
           "layer": "main",
@@ -37791,7 +36573,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 466,
+        "line": 441,
         "kind": "invoke"
       },
       "hop4": {
@@ -37828,7 +36610,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:468"
+          "detail": "collab-electron/src/preload/universal.ts:443"
         },
         {
           "layer": "main",
@@ -37848,7 +36630,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 468,
+        "line": 443,
         "kind": "invoke"
       },
       "hop4": {
@@ -37900,7 +36682,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:470"
+          "detail": "collab-electron/src/preload/universal.ts:445"
         },
         {
           "layer": "main",
@@ -37920,7 +36702,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 470,
+        "line": 445,
         "kind": "invoke"
       },
       "hop4": {
@@ -37972,7 +36754,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:288"
+          "detail": "collab-electron/src/preload/universal.ts:278"
         },
         {
           "layer": "main",
@@ -37992,7 +36774,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 288,
+        "line": 278,
         "kind": "send"
       },
       "hop4": {
@@ -38039,7 +36821,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:284"
+          "detail": "collab-electron/src/preload/universal.ts:274"
         },
         {
           "layer": "main",
@@ -38059,7 +36841,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 284,
+        "line": 274,
         "kind": "send"
       },
       "hop4": {
@@ -38115,7 +36897,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:286"
+          "detail": "collab-electron/src/preload/universal.ts:276"
         },
         {
           "layer": "main",
@@ -38135,7 +36917,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 286,
+        "line": 276,
         "kind": "send"
       },
       "hop4": {
@@ -38264,7 +37046,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:278"
+          "detail": "collab-electron/src/preload/universal.ts:268"
         },
         {
           "layer": "main",
@@ -38284,7 +37066,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 278,
+        "line": 268,
         "kind": "send"
       },
       "hop4": {
@@ -38548,7 +37330,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:352"
+          "detail": "collab-electron/src/preload/universal.ts:340"
         },
         {
           "layer": "main",
@@ -38568,7 +37350,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 352,
+        "line": 340,
         "kind": "invoke"
       },
       "hop4": {
@@ -39274,7 +38056,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:385"
+          "detail": "collab-electron/src/preload/universal.ts:373"
         },
         {
           "layer": "main",
@@ -39294,7 +38076,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 385,
+        "line": 373,
         "kind": "invoke"
       },
       "hop4": {
@@ -39341,7 +38123,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:378"
+          "detail": "collab-electron/src/preload/universal.ts:366"
         },
         {
           "layer": "main",
@@ -39361,7 +38143,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 378,
+        "line": 366,
         "kind": "invoke"
       },
       "hop4": {
@@ -39672,7 +38454,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:367"
+          "detail": "collab-electron/src/preload/universal.ts:355"
         },
         {
           "layer": "main",
@@ -39692,7 +38474,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 367,
+        "line": 355,
         "kind": "invoke"
       },
       "hop4": {
@@ -39862,7 +38644,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:360"
+          "detail": "collab-electron/src/preload/universal.ts:348"
         },
         {
           "layer": "main",
@@ -39882,7 +38664,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 360,
+        "line": 348,
         "kind": "send"
       },
       "hop4": {
@@ -44613,6 +43395,15 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "close",
+            "from": "collab-electron/src/main/peer-delivery.ts",
+            "candidates": [
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "destroy",
             "from": "collab-electron/src/main/pty.ts",
             "candidates": [
@@ -44958,6 +43749,15 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "close",
+            "from": "collab-electron/src/main/peer-delivery.ts",
+            "candidates": [
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "requireTrace",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -45043,106 +43843,6 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "executeGovernedReviewTask",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "assertDurableOntologyReadReceipt",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/ontology-read-receipt.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           }
@@ -45265,7 +43965,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:167"
+          "detail": "collab-electron/src/preload/universal.ts:157"
         },
         {
           "layer": "main",
@@ -45285,7 +43985,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 167,
+        "line": 157,
         "kind": "invoke"
       },
       "hop4": {
@@ -46087,6 +44787,15 @@
             "from": "packages/qf-kernel/src/read.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "close",
+            "from": "collab-electron/src/main/peer-delivery.ts",
+            "candidates": [
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -49067,19 +47776,19 @@
     },
     {
       "channel": "replay:start",
-      "method": "startReplay",
+      "method": "onAgentEvent",
       "status": "live",
       "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
           "present": true,
-          "detail": "startReplay()"
+          "detail": "onAgentEvent()"
         },
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:618"
+          "detail": "collab-electron/src/preload/universal.ts:592"
         },
         {
           "layer": "main",
@@ -49099,7 +47808,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 618,
+        "line": 592,
         "kind": "invoke"
       },
       "hop4": {
@@ -49174,7 +47883,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:620"
+          "detail": "collab-electron/src/preload/universal.ts:594"
         },
         {
           "layer": "main",
@@ -49194,7 +47903,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 620,
+        "line": 594,
         "kind": "invoke"
       },
       "hop4": {
@@ -49521,7 +48230,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:256"
+          "detail": "collab-electron/src/preload/universal.ts:246"
         },
         {
           "layer": "main",
@@ -49541,7 +48250,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 256,
+        "line": 246,
         "kind": "invoke"
       },
       "hop4": {
@@ -49590,7 +48299,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:450"
+          "detail": "collab-electron/src/preload/universal.ts:425"
         },
         {
           "layer": "main",
@@ -49610,7 +48319,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 450,
+        "line": 425,
         "kind": "invoke"
       },
       "hop4": {
@@ -49918,73 +48627,6 @@
       }
     },
     {
-      "channel": "viewer:run-in-terminal",
-      "method": "runInTerminal",
-      "status": "unused",
-      "breakAt": "renderer",
-      "hops": [
-        {
-          "layer": "renderer",
-          "present": false,
-          "detail": "runInTerminal()"
-        },
-        {
-          "layer": "preload",
-          "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:290"
-        },
-        {
-          "layer": "main",
-          "present": true,
-          "detail": "collab-electron/src/main/ipc-misc.ts:229"
-        },
-        {
-          "layer": "kernel",
-          "present": true,
-          "detail": "read-only — mutates nothing"
-        }
-      ],
-      "registeredAt": {
-        "file": "collab-electron/src/main/ipc-misc.ts",
-        "line": 229,
-        "kind": "on"
-      },
-      "calledAt": {
-        "file": "collab-electron/src/preload/universal.ts",
-        "line": 290,
-        "kind": "send"
-      },
-      "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
-        "viaDml": null,
-        "dmlFile": null,
-        "viaDisk": null,
-        "diskFile": null,
-        "dmlAll": [],
-        "handlerFile": "collab-electron/src/main/ipc-misc.ts",
-        "seedCalls": [
-          "forwardToWebview"
-        ],
-        "inlineDml": false,
-        "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "forwardToWebview",
-            "from": "collab-electron/src/main/ipc-misc.ts",
-            "candidates": [
-              "collab-electron/src/main/ipc.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
-        "backedBy": null,
-        "reachPath": null,
-        "ungoverned": [],
-        "why": "no AST-backed call path from this handler reaches SQL outside the write door"
-      }
-    },
-    {
       "channel": "webview:console",
       "method": "logFromWebview",
       "status": "live",
@@ -50055,7 +48697,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:337"
+          "detail": "collab-electron/src/preload/universal.ts:325"
         },
         {
           "layer": "main",
@@ -50075,7 +48717,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 337,
+        "line": 325,
         "kind": "invoke"
       },
       "hop4": {
@@ -50141,7 +48783,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:333"
+          "detail": "collab-electron/src/preload/universal.ts:321"
         },
         {
           "layer": "main",
@@ -50161,7 +48803,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 333,
+        "line": 321,
         "kind": "invoke"
       },
       "hop4": {
@@ -50209,7 +48851,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:335"
+          "detail": "collab-electron/src/preload/universal.ts:323"
         },
         {
           "layer": "main",
@@ -50229,7 +48871,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 335,
+        "line": 323,
         "kind": "invoke"
       },
       "hop4": {
@@ -50278,7 +48920,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:258"
+          "detail": "collab-electron/src/preload/universal.ts:248"
         },
         {
           "layer": "main",
@@ -50298,7 +48940,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 258,
+        "line": 248,
         "kind": "invoke"
       },
       "hop4": {
@@ -50374,7 +49016,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:260"
+          "detail": "collab-electron/src/preload/universal.ts:250"
         },
         {
           "layer": "main",
@@ -50394,7 +49036,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 260,
+        "line": 250,
         "kind": "invoke"
       },
       "hop4": {
@@ -50668,7 +49310,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:320"
+          "detail": "collab-electron/src/preload/universal.ts:308"
         },
         {
           "layer": "main",
@@ -50688,7 +49330,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 320,
+        "line": 308,
         "kind": "invoke"
       },
       "hop4": {
@@ -50941,7 +49583,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:343"
+          "detail": "collab-electron/src/preload/universal.ts:331"
         },
         {
           "layer": "main",
@@ -50961,7 +49603,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 343,
+        "line": 331,
         "kind": "invoke"
       },
       "hop4": {
@@ -51108,7 +49750,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:446"
+          "detail": "collab-electron/src/preload/universal.ts:421"
         },
         {
           "layer": "main",
@@ -51128,7 +49770,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 446,
+        "line": 421,
         "kind": "invoke"
       },
       "hop4": {
@@ -51189,7 +49831,7 @@
         {
           "layer": "preload",
           "present": true,
-          "detail": "collab-electron/src/preload/universal.ts:326"
+          "detail": "collab-electron/src/preload/universal.ts:314"
         },
         {
           "layer": "main",
@@ -51209,7 +49851,7 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 326,
+        "line": 314,
         "kind": "invoke"
       },
       "hop4": {
@@ -51246,28 +49888,17 @@
     {
       "id": "push:agent:exit",
       "channel": "agent:exit",
-      "status": "live",
-      "disposition": "KEEP",
-      "why": "1 send site(s), 2 listener(s)",
+      "status": "dynamic-sender",
+      "disposition": "INVESTIGATE",
+      "why": "no literal send site, but a template-literal channel in main shares this prefix, so the sender is probably this listener's — unresolvable from text",
       "confidence": "medium",
       "evidenceLevel": "S",
       "tunnelled": false,
-      "senders": [
-        {
-          "file": "collab-electron/src/main/acp-agent.ts",
-          "line": 250,
-          "kind": "helper"
-        }
-      ],
+      "senders": [],
       "listeners": [
         {
-          "file": "collab-electron/src/preload/shell.ts",
-          "line": 413,
-          "mode": "on"
-        },
-        {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 755,
+          "line": 721,
           "mode": "on"
         }
       ],
@@ -51286,7 +49917,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 109,
+          "line": 102,
           "mode": "on"
         }
       ],
@@ -51295,28 +49926,17 @@
     {
       "id": "push:agent:prompt-complete",
       "channel": "agent:prompt-complete",
-      "status": "live",
-      "disposition": "KEEP",
-      "why": "1 send site(s), 2 listener(s)",
+      "status": "dynamic-sender",
+      "disposition": "INVESTIGATE",
+      "why": "no literal send site, but a template-literal channel in main shares this prefix, so the sender is probably this listener's — unresolvable from text",
       "confidence": "medium",
       "evidenceLevel": "S",
       "tunnelled": false,
-      "senders": [
-        {
-          "file": "collab-electron/src/main/acp-agent.ts",
-          "line": 340,
-          "kind": "helper"
-        }
-      ],
+      "senders": [],
       "listeners": [
         {
-          "file": "collab-electron/src/preload/shell.ts",
-          "line": 395,
-          "mode": "on"
-        },
-        {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 725,
+          "line": 691,
           "mode": "on"
         }
       ],
@@ -51325,33 +49945,17 @@
     {
       "id": "push:agent:prompt-error",
       "channel": "agent:prompt-error",
-      "status": "live",
-      "disposition": "KEEP",
-      "why": "2 send site(s), 2 listener(s)",
+      "status": "dynamic-sender",
+      "disposition": "INVESTIGATE",
+      "why": "no literal send site, but a template-literal channel in main shares this prefix, so the sender is probably this listener's — unresolvable from text",
       "confidence": "medium",
       "evidenceLevel": "S",
       "tunnelled": false,
-      "senders": [
-        {
-          "file": "collab-electron/src/main/acp-agent.ts",
-          "line": 99,
-          "kind": "helper"
-        },
-        {
-          "file": "collab-electron/src/main/acp-agent.ts",
-          "line": 348,
-          "kind": "helper"
-        }
-      ],
+      "senders": [],
       "listeners": [
         {
-          "file": "collab-electron/src/preload/shell.ts",
-          "line": 404,
-          "mode": "on"
-        },
-        {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 741,
+          "line": 707,
           "mode": "on"
         }
       ],
@@ -51370,7 +49974,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 112,
+          "line": 105,
           "mode": "on"
         }
       ],
@@ -51379,28 +49983,17 @@
     {
       "id": "push:agent:session-failed",
       "channel": "agent:session-failed",
-      "status": "live",
-      "disposition": "KEEP",
-      "why": "1 send site(s), 2 listener(s)",
+      "status": "dynamic-sender",
+      "disposition": "INVESTIGATE",
+      "why": "no literal send site, but a template-literal channel in main shares this prefix, so the sender is probably this listener's — unresolvable from text",
       "confidence": "medium",
       "evidenceLevel": "S",
       "tunnelled": false,
-      "senders": [
-        {
-          "file": "collab-electron/src/main/acp-agent.ts",
-          "line": 295,
-          "kind": "helper"
-        }
-      ],
+      "senders": [],
       "listeners": [
         {
-          "file": "collab-electron/src/preload/shell.ts",
-          "line": 429,
-          "mode": "on"
-        },
-        {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 781,
+          "line": 747,
           "mode": "on"
         }
       ],
@@ -51409,28 +50002,17 @@
     {
       "id": "push:agent:session-ready",
       "channel": "agent:session-ready",
-      "status": "live",
-      "disposition": "KEEP",
-      "why": "1 send site(s), 2 listener(s)",
+      "status": "dynamic-sender",
+      "disposition": "INVESTIGATE",
+      "why": "no literal send site, but a template-literal channel in main shares this prefix, so the sender is probably this listener's — unresolvable from text",
       "confidence": "medium",
       "evidenceLevel": "S",
       "tunnelled": false,
-      "senders": [
-        {
-          "file": "collab-electron/src/main/acp-agent.ts",
-          "line": 289,
-          "kind": "helper"
-        }
-      ],
+      "senders": [],
       "listeners": [
         {
-          "file": "collab-electron/src/preload/shell.ts",
-          "line": 420,
-          "mode": "on"
-        },
-        {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 767,
+          "line": 733,
           "mode": "on"
         }
       ],
@@ -51449,7 +50031,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 106,
+          "line": 99,
           "mode": "on"
         }
       ],
@@ -51458,28 +50040,17 @@
     {
       "id": "push:agent:update",
       "channel": "agent:update",
-      "status": "live",
-      "disposition": "KEEP",
-      "why": "1 send site(s), 2 listener(s)",
+      "status": "dynamic-sender",
+      "disposition": "INVESTIGATE",
+      "why": "no literal send site, but a template-literal channel in main shares this prefix, so the sender is probably this listener's — unresolvable from text",
       "confidence": "medium",
       "evidenceLevel": "S",
       "tunnelled": false,
-      "senders": [
-        {
-          "file": "collab-electron/src/main/acp-agent.ts",
-          "line": 93,
-          "kind": "helper"
-        }
-      ],
+      "senders": [],
       "listeners": [
         {
-          "file": "collab-electron/src/preload/shell.ts",
-          "line": 386,
-          "mode": "on"
-        },
-        {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 710,
+          "line": 676,
           "mode": "on"
         }
       ],
@@ -51523,7 +50094,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 128,
+          "line": 118,
           "mode": "on"
         }
       ],
@@ -51574,25 +50145,6 @@
         {
           "file": "collab-electron/src/preload/shell.ts",
           "line": 291,
-          "mode": "on"
-        }
-      ],
-      "rendererConsumed": false
-    },
-    {
-      "id": "push:cd-to",
-      "channel": "cd-to",
-      "status": "no-sender",
-      "disposition": "INVESTIGATE",
-      "why": "a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing",
-      "confidence": "medium",
-      "evidenceLevel": "S",
-      "tunnelled": false,
-      "senders": [],
-      "listeners": [
-        {
-          "file": "collab-electron/src/preload/universal.ts",
-          "line": 98,
           "mode": "on"
         }
       ],
@@ -51661,7 +50213,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 505,
+          "line": 480,
           "mode": "on"
         }
       ],
@@ -51695,7 +50247,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 484,
+          "line": 459,
           "mode": "on"
         }
       ],
@@ -51729,7 +50281,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 514,
+          "line": 489,
           "mode": "on"
         }
       ],
@@ -51748,38 +50300,11 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 475,
+          "line": 450,
           "mode": "on"
         }
       ],
       "rendererConsumed": true
-    },
-    {
-      "id": "push:focus-tab",
-      "channel": "focus-tab",
-      "status": "live",
-      "disposition": "KEEP",
-      "why": "1 send site(s), 1 listener(s)",
-      "confidence": "medium",
-      "evidenceLevel": "S",
-      "tunnelled": true,
-      "senders": [
-        {
-          "file": "collab-electron/src/main/ipc-misc.ts",
-          "line": 219,
-          "kind": "tunnel",
-          "target": "terminal",
-          "targetResolved": true
-        }
-      ],
-      "listeners": [
-        {
-          "file": "collab-electron/src/preload/universal.ts",
-          "line": 115,
-          "mode": "on"
-        }
-      ],
-      "rendererConsumed": false
     },
     {
       "id": "push:folder-selected",
@@ -51802,7 +50327,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 493,
+          "line": 468,
           "mode": "on"
         }
       ],
@@ -51864,7 +50389,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 533,
+          "line": 508,
           "mode": "on"
         }
       ],
@@ -51898,7 +50423,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 439,
+          "line": 414,
           "mode": "on"
         }
       ],
@@ -51917,12 +50442,12 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 143,
+          "line": 133,
           "mode": "on"
         },
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 574,
+          "line": 549,
           "mode": "on"
         }
       ],
@@ -52111,7 +50636,7 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1445,
+          "line": 1446,
           "kind": "direct"
         }
       ],
@@ -52146,7 +50671,7 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1472,
+          "line": 1473,
           "kind": "direct"
         },
         {
@@ -52183,7 +50708,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 208,
+          "line": 198,
           "mode": "on"
         }
       ],
@@ -52208,7 +50733,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 232,
+          "line": 222,
           "mode": "on"
         }
       ],
@@ -52233,7 +50758,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 197,
+          "line": 187,
           "mode": "on"
         }
       ],
@@ -52260,38 +50785,11 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 122,
+          "line": 112,
           "mode": "on"
         }
       ],
       "rendererConsumed": true
-    },
-    {
-      "id": "push:run-in-terminal",
-      "channel": "run-in-terminal",
-      "status": "live",
-      "disposition": "KEEP",
-      "why": "1 send site(s), 1 listener(s)",
-      "confidence": "medium",
-      "evidenceLevel": "S",
-      "tunnelled": true,
-      "senders": [
-        {
-          "file": "collab-electron/src/main/ipc-misc.ts",
-          "line": 232,
-          "kind": "tunnel",
-          "target": "terminal",
-          "targetResolved": true
-        }
-      ],
-      "listeners": [
-        {
-          "file": "collab-electron/src/preload/universal.ts",
-          "line": 102,
-          "mode": "on"
-        }
-      ],
-      "rendererConsumed": false
     },
     {
       "id": "push:scope-changed",
@@ -52306,7 +50804,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 584,
+          "line": 559,
           "mode": "on"
         }
       ],
@@ -52325,7 +50823,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 118,
+          "line": 108,
           "mode": "on"
         }
       ],
@@ -52478,7 +50976,7 @@
         },
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 601,
+          "line": 576,
           "mode": "on"
         }
       ],
@@ -52505,7 +51003,7 @@
       "listeners": [
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 560,
+          "line": 535,
           "mode": "on"
         }
       ],
@@ -52537,7 +51035,7 @@
         },
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 542,
+          "line": 517,
           "mode": "on"
         }
       ],
@@ -52576,7 +51074,7 @@
         },
         {
           "file": "collab-electron/src/preload/universal.ts",
-          "line": 551,
+          "line": 526,
           "mode": "on"
         }
       ],
@@ -52584,12 +51082,6 @@
     }
   ],
   "pushDynamic": [
-    {
-      "file": "collab-electron/src/main/acp-agent.ts",
-      "line": 84,
-      "why": "push channel name is a variable or template literal, not resolvable from text",
-      "coverage": "dynamic"
-    },
     {
       "file": "collab-electron/src/main/host-acp-permission.ts",
       "line": 39,
@@ -52674,35 +51166,49 @@
   ],
   "brokenBridgeCalls": [
     {
-      "method": "ptyForegroundProcess",
+      "method": "browserEvaluate",
       "callers": [
-        "collab-electron/src/windows/terminal/src/App.tsx:202"
+        "collab-electron/src/windows/shell/src/canvas-rpc.js:338"
+      ]
+    },
+    {
+      "method": "browserInfo",
+      "callers": [
+        "collab-electron/src/windows/shell/src/canvas-rpc.js:358"
+      ]
+    },
+    {
+      "method": "browserScroll",
+      "callers": [
+        "collab-electron/src/windows/shell/src/canvas-rpc.js:328"
+      ]
+    },
+    {
+      "method": "browserWait",
+      "callers": [
+        "collab-electron/src/windows/shell/src/canvas-rpc.js:348"
+      ]
+    },
+    {
+      "method": "focusAgentSession",
+      "callers": [
+        "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx:388"
       ]
     }
   ],
   "bridgeBlindSpots": [
-    "focusAgentSession",
     "getBuildIdentity",
     "isDirectory",
-    "notifyCwdChanged",
     "notifyPtySessionId",
-    "offCdTo",
     "offPtyData",
     "offPtyExit",
-    "onAgentPromptComplete",
-    "onAgentPromptError",
-    "onAgentSessionFailed",
-    "onAgentSessionReady",
-    "onAgentUpdate",
     "onBrowserTileFocusUrl",
     "onCanvasPinch",
     "onCanvasRpcRequest",
-    "onCdTo",
     "onFileRenamed",
     "onFileSelected",
     "onFilesDeleted",
     "onFocusSearch",
-    "onFocusTab",
     "onFolderSelected",
     "onForwardToWebview",
     "onFsChanged",
@@ -52713,7 +51219,6 @@
     "onPtyData",
     "onPtyExit",
     "onReplayData",
-    "onRunInTerminal",
     "onScopeChanged",
     "onSettingsToggle",
     "onShortcut",
@@ -52723,30 +51228,10 @@
     "onWorkspaceAdded",
     "onWorkspaceRemoved",
     "qf",
-    "sendToHost"
+    "sendToHost",
+    "startReplay"
   ],
   "lifetime": [
-    {
-      "kind": "lifetime",
-      "module": "collab-electron/src/main/acp-agent.ts",
-      "spawns": 1,
-      "status": "unreaped",
-      "reapedBy": [],
-      "breakAt": "quit",
-      "why": "This module starts 1 process and the quit path never stops it. A closed seat can outlive the app.",
-      "hops": [
-        {
-          "layer": "spawn",
-          "present": true,
-          "detail": "collab-electron/src/main/acp-agent.ts · 1 spawn site"
-        },
-        {
-          "layer": "quit",
-          "present": false,
-          "detail": "collab-electron/src/main/index.ts never stops it"
-        }
-      ]
-    },
     {
       "kind": "lifetime",
       "module": "collab-electron/src/main/sidecar/server.ts",
@@ -52887,7 +51372,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            1298
+            1305
           ]
         }
       ]
@@ -52939,7 +51424,7 @@
         "hops": 1,
         "path": [
           {
-            "from": "collab-electron/src/main/kernel.ts:1322",
+            "from": "collab-electron/src/main/kernel.ts:1329",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -52981,7 +51466,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1322",
+            "from": "collab-electron/src/main/kernel.ts:1329",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -53023,7 +51508,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1322",
+            "from": "collab-electron/src/main/kernel.ts:1329",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -53065,7 +51550,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1322",
+            "from": "collab-electron/src/main/kernel.ts:1329",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -53107,7 +51592,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1322",
+            "from": "collab-electron/src/main/kernel.ts:1329",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -53149,7 +51634,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1322",
+            "from": "collab-electron/src/main/kernel.ts:1329",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -53191,7 +51676,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1322",
+            "from": "collab-electron/src/main/kernel.ts:1329",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -53228,7 +51713,7 @@
         "hops": 1,
         "path": [
           {
-            "from": "collab-electron/src/main/kernel.ts:1333",
+            "from": "collab-electron/src/main/kernel.ts:1340",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "recordGovernedToolReceipt"
           }
@@ -53396,8 +51881,8 @@
           "type": "static",
           "file": "collab-electron/src/main/peer-delivery.ts",
           "lines": [
-            122,
-            136
+            170,
+            184
           ]
         }
       ]
@@ -54808,19 +53293,43 @@
   ],
   "strip": [
     {
-      "kind": "unused-bridge",
-      "bucket": "maybe-later",
-      "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
-      "what": "agentKill() → agent:kill",
-      "where": "collab-electron/src/preload/universal.ts:695",
-      "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
+      "kind": "unreached-ipc",
+      "bucket": "safe-leftover",
+      "advice": "REMOVAL-CANDIDATE. Nothing can reach it today, but static non-reachability is not permission: rule out a packaged or dynamically-loaded caller first.",
+      "what": "browser:evaluate",
+      "where": "collab-electron/src/main/ipc-browser.ts:198",
+      "why": "Registered in main; nothing in preload calls it. The renderer cannot reach this handler."
+    },
+    {
+      "kind": "unreached-ipc",
+      "bucket": "safe-leftover",
+      "advice": "REMOVAL-CANDIDATE. Nothing can reach it today, but static non-reachability is not permission: rule out a packaged or dynamically-loaded caller first.",
+      "what": "browser:info",
+      "where": "collab-electron/src/main/ipc-browser.ts:182",
+      "why": "Registered in main; nothing in preload calls it. The renderer cannot reach this handler."
+    },
+    {
+      "kind": "unreached-ipc",
+      "bucket": "safe-leftover",
+      "advice": "REMOVAL-CANDIDATE. Nothing can reach it today, but static non-reachability is not permission: rule out a packaged or dynamically-loaded caller first.",
+      "what": "browser:scroll",
+      "where": "collab-electron/src/main/ipc-browser.ts:133",
+      "why": "Registered in main; nothing in preload calls it. The renderer cannot reach this handler."
+    },
+    {
+      "kind": "unreached-ipc",
+      "bucket": "safe-leftover",
+      "advice": "REMOVAL-CANDIDATE. Nothing can reach it today, but static non-reachability is not permission: rule out a packaged or dynamically-loaded caller first.",
+      "what": "browser:wait",
+      "where": "collab-electron/src/main/ipc-browser.ts:147",
+      "why": "Registered in main; nothing in preload calls it. The renderer cannot reach this handler."
     },
     {
       "kind": "unused-bridge",
       "bucket": "maybe-later",
       "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
       "what": "openFolder() → dialog:open-folder",
-      "where": "collab-electron/src/preload/universal.ts:454",
+      "where": "collab-electron/src/preload/universal.ts:429",
       "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
     },
     {
@@ -54828,7 +53337,7 @@
       "bucket": "maybe-later",
       "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
       "what": "openImageDialog() → dialog:open-image",
-      "where": "collab-electron/src/preload/universal.ts:317",
+      "where": "collab-electron/src/preload/universal.ts:305",
       "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
     },
     {
@@ -54836,7 +53345,7 @@
       "bucket": "maybe-later",
       "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
       "what": "countFiles() → fs:count-files",
-      "where": "collab-electron/src/preload/universal.ts:270",
+      "where": "collab-electron/src/preload/universal.ts:260",
       "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
     },
     {
@@ -54868,7 +53377,7 @@
       "bucket": "maybe-later",
       "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
       "what": "permissionDecision() → qf:sessions:permissionDecision",
-      "where": "collab-electron/src/preload/universal.ts:167",
+      "where": "collab-electron/src/preload/universal.ts:157",
       "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
     },
     {
@@ -54891,14 +53400,6 @@
       "kind": "unused-bridge",
       "bucket": "maybe-later",
       "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
-      "what": "runInTerminal() → viewer:run-in-terminal",
-      "where": "collab-electron/src/preload/universal.ts:290",
-      "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
-    },
-    {
-      "kind": "unused-bridge",
-      "bucket": "maybe-later",
-      "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
       "what": "workspaceRemove() → workspace:remove",
       "where": "collab-electron/src/preload/shell.ts:262",
       "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
@@ -54908,8 +53409,48 @@
       "bucket": "maybe-later",
       "advice": "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
       "what": "updateFrontmatter() → workspace:update-frontmatter",
-      "where": "collab-electron/src/preload/universal.ts:326",
+      "where": "collab-electron/src/preload/universal.ts:314",
       "why": "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it."
+    },
+    {
+      "kind": "dead-wire",
+      "bucket": "broken-now",
+      "advice": "Fix or remove. This call fails at runtime today.",
+      "what": "agent:cancel",
+      "where": "collab-electron/src/preload/universal.ts:656",
+      "why": "Preload calls this channel and no main handler registers it. This call fails at runtime."
+    },
+    {
+      "kind": "dead-wire",
+      "bucket": "broken-now",
+      "advice": "Fix or remove. This call fails at runtime today.",
+      "what": "agent:kill",
+      "where": "collab-electron/src/preload/universal.ts:661",
+      "why": "Preload calls this channel and no main handler registers it. This call fails at runtime."
+    },
+    {
+      "kind": "dead-wire",
+      "bucket": "broken-now",
+      "advice": "Fix or remove. This call fails at runtime today.",
+      "what": "agent:prompt",
+      "where": "collab-electron/src/preload/universal.ts:651",
+      "why": "Preload calls this channel and no main handler registers it. This call fails at runtime."
+    },
+    {
+      "kind": "dead-wire",
+      "bucket": "broken-now",
+      "advice": "Fix or remove. This call fails at runtime today.",
+      "what": "agent:save-messages",
+      "where": "collab-electron/src/preload/universal.ts:666",
+      "why": "Preload calls this channel and no main handler registers it. This call fails at runtime."
+    },
+    {
+      "kind": "dead-wire",
+      "bucket": "broken-now",
+      "advice": "Fix or remove. This call fails at runtime today.",
+      "what": "agent:spawn",
+      "where": "collab-electron/src/preload/universal.ts:646",
+      "why": "Preload calls this channel and no main handler registers it. This call fails at runtime."
     }
   ],
   "legacyLeads": [
@@ -54974,8 +53515,8 @@
       "what": "2 SQL statements outside execute()",
       "where": "collab-electron/src/main/peer-delivery.ts",
       "lines": [
-        122,
-        136
+        170,
+        184
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -55132,13 +53673,13 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "fd60b38",
+      "commit": "2f7ea77",
       "generatedAt": "2026-08-26"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "2f7ea77",
-      "generatedAt": "2026-08-26"
+      "commit": "929de18c",
+      "generatedAt": "2026-08-28"
     },
     "verdict": "better",
     "why": "39 improvement(s), nothing added or hidden",
@@ -55428,7 +53969,15 @@
     ],
     "regressed": [],
     "changedConfidence": [],
-    "changedOwner": [],
+    "changedOwner": [
+      {
+        "id": "ownership:process-cleanup",
+        "gained": [],
+        "lost": [
+          "collab-electron/src/main/acp-agent.ts"
+        ]
+      }
+    ],
     "changedCoverage": [],
     "stats": {
       "added": 0,
@@ -55436,7 +53985,7 @@
       "resolved": 40,
       "regressed": 0,
       "changedConfidence": 0,
-      "changedOwner": 0,
+      "changedOwner": 1,
       "coverageWorse": 0,
       "coverageBetter": 0,
       "undecidedFrom": 39,
@@ -55553,10 +54102,37 @@
       "verdict": "undecided"
     },
     {
-      "id": "unused-bridge:agentKill() → agent:kill",
-      "kind": "unused-bridge",
-      "what": "agentKill() → agent:kill",
-      "where": "collab-electron/src/preload/universal.ts:695",
+      "id": "unreached-ipc:browser:evaluate",
+      "kind": "unreached-ipc",
+      "what": "browser:evaluate",
+      "where": "collab-electron/src/main/ipc-browser.ts:198",
+      "blocker": "package-proof",
+      "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
+      "verdict": "undecided"
+    },
+    {
+      "id": "unreached-ipc:browser:info",
+      "kind": "unreached-ipc",
+      "what": "browser:info",
+      "where": "collab-electron/src/main/ipc-browser.ts:182",
+      "blocker": "package-proof",
+      "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
+      "verdict": "undecided"
+    },
+    {
+      "id": "unreached-ipc:browser:scroll",
+      "kind": "unreached-ipc",
+      "what": "browser:scroll",
+      "where": "collab-electron/src/main/ipc-browser.ts:133",
+      "blocker": "package-proof",
+      "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
+      "verdict": "undecided"
+    },
+    {
+      "id": "unreached-ipc:browser:wait",
+      "kind": "unreached-ipc",
+      "what": "browser:wait",
+      "where": "collab-electron/src/main/ipc-browser.ts:147",
       "blocker": "package-proof",
       "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
       "verdict": "undecided"
@@ -55565,7 +54141,7 @@
       "id": "unused-bridge:openFolder() → dialog:open-folder",
       "kind": "unused-bridge",
       "what": "openFolder() → dialog:open-folder",
-      "where": "collab-electron/src/preload/universal.ts:454",
+      "where": "collab-electron/src/preload/universal.ts:429",
       "blocker": "package-proof",
       "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
       "verdict": "undecided"
@@ -55574,7 +54150,7 @@
       "id": "unused-bridge:openImageDialog() → dialog:open-image",
       "kind": "unused-bridge",
       "what": "openImageDialog() → dialog:open-image",
-      "where": "collab-electron/src/preload/universal.ts:317",
+      "where": "collab-electron/src/preload/universal.ts:305",
       "blocker": "package-proof",
       "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
       "verdict": "undecided"
@@ -55583,7 +54159,7 @@
       "id": "unused-bridge:countFiles() → fs:count-files",
       "kind": "unused-bridge",
       "what": "countFiles() → fs:count-files",
-      "where": "collab-electron/src/preload/universal.ts:270",
+      "where": "collab-electron/src/preload/universal.ts:260",
       "blocker": "package-proof",
       "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
       "verdict": "undecided"
@@ -55619,7 +54195,7 @@
       "id": "unused-bridge:permissionDecision() → qf:sessions:permissionDecision",
       "kind": "unused-bridge",
       "what": "permissionDecision() → qf:sessions:permissionDecision",
-      "where": "collab-electron/src/preload/universal.ts:167",
+      "where": "collab-electron/src/preload/universal.ts:157",
       "blocker": "package-proof",
       "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
       "verdict": "undecided"
@@ -55643,15 +54219,6 @@
       "verdict": "undecided"
     },
     {
-      "id": "unused-bridge:runInTerminal() → viewer:run-in-terminal",
-      "kind": "unused-bridge",
-      "what": "runInTerminal() → viewer:run-in-terminal",
-      "where": "collab-electron/src/preload/universal.ts:290",
-      "blocker": "package-proof",
-      "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
-      "verdict": "undecided"
-    },
-    {
       "id": "unused-bridge:workspaceRemove() → workspace:remove",
       "kind": "unused-bridge",
       "what": "workspaceRemove() → workspace:remove",
@@ -55664,18 +54231,54 @@
       "id": "unused-bridge:updateFrontmatter() → workspace:update-frontmatter",
       "kind": "unused-bridge",
       "what": "updateFrontmatter() → workspace:update-frontmatter",
-      "where": "collab-electron/src/preload/universal.ts:326",
+      "where": "collab-electron/src/preload/universal.ts:314",
       "blocker": "package-proof",
       "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
       "verdict": "undecided"
     },
     {
-      "id": "lifetime:collab-electron/src/main/acp-agent.ts",
-      "kind": "lifetime",
-      "what": "unreaped",
-      "where": "collab-electron/src/main/acp-agent.ts",
-      "blocker": "founder-decision",
-      "reason": "starts a long-lived child the quit path does not reap (unreaped) — decide whether that is intended",
+      "id": "dead-wire:agent:cancel",
+      "kind": "dead-wire",
+      "what": "agent:cancel",
+      "where": "collab-electron/src/preload/universal.ts:656",
+      "blocker": "package-proof",
+      "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
+      "verdict": "undecided"
+    },
+    {
+      "id": "dead-wire:agent:kill",
+      "kind": "dead-wire",
+      "what": "agent:kill",
+      "where": "collab-electron/src/preload/universal.ts:661",
+      "blocker": "package-proof",
+      "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
+      "verdict": "undecided"
+    },
+    {
+      "id": "dead-wire:agent:prompt",
+      "kind": "dead-wire",
+      "what": "agent:prompt",
+      "where": "collab-electron/src/preload/universal.ts:651",
+      "blocker": "package-proof",
+      "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
+      "verdict": "undecided"
+    },
+    {
+      "id": "dead-wire:agent:save-messages",
+      "kind": "dead-wire",
+      "what": "agent:save-messages",
+      "where": "collab-electron/src/preload/universal.ts:666",
+      "blocker": "package-proof",
+      "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
+      "verdict": "undecided"
+    },
+    {
+      "id": "dead-wire:agent:spawn",
+      "kind": "dead-wire",
+      "what": "agent:spawn",
+      "where": "collab-electron/src/preload/universal.ts:646",
+      "blocker": "package-proof",
+      "reason": "registered in main with no static caller; a packaged or dynamic caller must be ruled out before removal",
       "verdict": "undecided"
     },
     {
@@ -55724,32 +54327,48 @@
       "verdict": "undecided"
     },
     {
-      "id": "broken-bridge-call:ptyForegroundProcess",
+      "id": "broken-bridge-call:browserEvaluate",
       "kind": "broken-bridge-call",
-      "what": "ptyForegroundProcess",
-      "where": "collab-electron/src/windows/terminal/src/App.tsx:202",
+      "what": "browserEvaluate",
+      "where": "collab-electron/src/windows/shell/src/canvas-rpc.js:338",
       "blocker": "product-defect",
       "reason": "the renderer awaits a bridge method no preload exposes; it throws when that path runs",
-      "verdict": "repair",
-      "owner": "founder",
-      "decision": {
-        "owner": "founder",
-        "reason": "REAL RUNTIME DEFECT in a live window. terminal IS a build input, and terminal/src/App.tsx:202 awaits window.api.ptyForegroundProcess(session.id), which neither preload exposes — it throws TypeError when that path runs. Verified pre-existing at d543b01, so atlas-strip-1 did not cause it; removing the orphaned pty:foreground-process main handler was correct. Fix is to restore the preload method or drop the call site.",
-        "remediation_trigger": null,
-        "review_or_expiry": null,
-        "complete": false,
-        "missing": [
-          "remediation_trigger"
-        ]
-      }
+      "verdict": "undecided"
     },
     {
-      "id": "push:cd-to",
-      "kind": "push-no-sender",
-      "what": "cd-to",
-      "where": "collab-electron/src/preload/universal.ts:98",
-      "blocker": "package-proof",
-      "reason": "a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing",
+      "id": "broken-bridge-call:browserInfo",
+      "kind": "broken-bridge-call",
+      "what": "browserInfo",
+      "where": "collab-electron/src/windows/shell/src/canvas-rpc.js:358",
+      "blocker": "product-defect",
+      "reason": "the renderer awaits a bridge method no preload exposes; it throws when that path runs",
+      "verdict": "undecided"
+    },
+    {
+      "id": "broken-bridge-call:browserScroll",
+      "kind": "broken-bridge-call",
+      "what": "browserScroll",
+      "where": "collab-electron/src/windows/shell/src/canvas-rpc.js:328",
+      "blocker": "product-defect",
+      "reason": "the renderer awaits a bridge method no preload exposes; it throws when that path runs",
+      "verdict": "undecided"
+    },
+    {
+      "id": "broken-bridge-call:browserWait",
+      "kind": "broken-bridge-call",
+      "what": "browserWait",
+      "where": "collab-electron/src/windows/shell/src/canvas-rpc.js:348",
+      "blocker": "product-defect",
+      "reason": "the renderer awaits a bridge method no preload exposes; it throws when that path runs",
+      "verdict": "undecided"
+    },
+    {
+      "id": "broken-bridge-call:focusAgentSession",
+      "kind": "broken-bridge-call",
+      "what": "focusAgentSession",
+      "where": "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx:388",
+      "blocker": "product-defect",
+      "reason": "the renderer awaits a bridge method no preload exposes; it throws when that path runs",
       "verdict": "undecided"
     },
     {
@@ -55792,9 +54411,9 @@
       "id": "ownership:process-cleanup",
       "kind": "duplicate-ownership",
       "what": "Process cleanup",
-      "where": "collab-electron/src/main/acp-agent.ts",
+      "where": "collab-electron/src/main/git-replay.ts",
       "blocker": "founder-decision",
-      "reason": "4 files export names matching this responsibility, but on NAME evidence only; the contract forbids name matching alone from producing a confirmed defect, so this needs a human read",
+      "reason": "3 files export names matching this responsibility, but on NAME evidence only; the contract forbids name matching alone from producing a confirmed defect, so this needs a human read",
       "verdict": "undecided"
     },
     {
@@ -55817,6 +54436,7 @@
     }
   ],
   "decisionOrphans": [
+    "broken-bridge-call:ptyForegroundProcess",
     "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
     "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
     "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"

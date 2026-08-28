@@ -56,7 +56,7 @@ const GATE = import.meta.dir;
 const REPO = join(GATE, "../../..");
 const FAKE_CLI = join(GATE, "fake-cli.ts");
 
-const EXPECTED_QA_PROFILE_COUNT = 9;
+const EXPECTED_QA_PROFILE_COUNT = 6;
 
 function canonicalProfiles(appRoot: string): DockProfileRegistration[] {
   return discoverDockProfileManifests(appRoot, { qaMode: true })
@@ -91,12 +91,6 @@ function copyFixtureRoot(target: string): void {
     "species/hermes/prompts/research-director.md",
     "species/hermes/prompts/worker.md",
     "species/hermes/prompts/critic.md",
-    "species/claude-code/dock-profiles.json",
-    "species/claude-code/qa-dock-profiles.json",
-    "species/claude-code/launch.json",
-    "species/claude-code/packed/claude-code.meta.json",
-    "species/claude-code/prompts/orchestrator.md",
-    "species/claude-code/prompts/worker.md",
     "tools/qf-proof-agent/dock-profiles.json",
     "tools/qf-proof-agent/launch.json",
     "tools/qf-proof-agent/packed/qf-proof-agent.meta.json",
@@ -110,7 +104,6 @@ function copyFixtureRoot(target: string): void {
   }
   for (const ref of [
     "species/hermes/packed/hermes.aospkg",
-    "species/claude-code/packed/claude-code.aospkg",
     "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
   ]) {
     const destination = join(target, ref);
@@ -136,8 +129,8 @@ function assertExactDefaults(
   expectedProfiles: DockProfileRegistration[],
 ): Record<string, unknown>[] {
   const rows = queryObjects(db, "agent_definition", undefined, null, 0, undefined, "asc");
-  assert(rows.length === EXPECTED_QA_PROFILE_COUNT, "bootstrap row count must be exactly nine", rows);
-  assert(expectedProfiles.length === EXPECTED_QA_PROFILE_COUNT, "canonical retained profile count must be exactly nine", expectedProfiles);
+  assert(rows.length === EXPECTED_QA_PROFILE_COUNT, "bootstrap row count must be exactly six", rows);
+  assert(expectedProfiles.length === EXPECTED_QA_PROFILE_COUNT, "canonical retained profile count must be exactly six", expectedProfiles);
   for (const expected of expectedProfiles) {
     const row = rows.find((candidate) => candidate.id === expected.name);
     assert(row, `missing default ${expected.name}`);
@@ -161,7 +154,6 @@ function assertExactDefaults(
 function assertSourceMetadataAgreement(): void {
   for (const adapter of [
     { root: "species/hermes", packageName: "hermes.aospkg" },
-    { root: "species/claude-code", packageName: "claude-code.aospkg" },
     { root: "tools/qf-proof-agent", packageName: "qf-proof-agent.aospkg" },
   ]) {
     const launch = JSON.parse(readFileSync(join(REPO, adapter.root, "launch.json"), "utf8")) as Record<string, unknown>;
@@ -658,6 +650,141 @@ function assertStaticLaunchSurface(): void {
     /if \(entry\.peerRole\)[\s\S]*unregisterSeatPty\(entry\.peerRole, entry\.ptySessionId\)/.test(nativeHost),
     "native-TUI cancel/teardown must owner-unregister peer roles directly",
   );
+
+  assertAvailabilityAndRefusalContracts(dock, ipc, host);
+}
+
+function assertAvailabilityAndRefusalContracts(
+  dock: string,
+  ipc: string,
+  host: string,
+): void {
+  assert(
+    /\.filter\(\(row\) => row\?\.availability\?\.available === true\)/.test(dock),
+    "launchable Dock projection must exclude unavailable definitions",
+  );
+  const graph = readFileSync(
+    join(REPO, "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx"),
+    "utf8",
+  );
+  assert(graph.includes('title: "Agent session"'), "WorkspaceGraph must use the neutral Agent session projection label");
+  assert(!graph.includes('title: "Claude Code"'), "WorkspaceGraph retains the removed Claude identity");
+
+  const availabilityStart = host.indexOf("export function getDockDefinitionAvailability(");
+  const availabilityEnd = host.indexOf("/** Initialize missing package-owned", availabilityStart);
+  assert(availabilityStart >= 0 && availabilityEnd > availabilityStart, "Dock availability projection is missing");
+  const availability = host.slice(availabilityStart, availabilityEnd);
+  assert(
+    /try\s*\{[\s\S]*getDefinitionRuntime\([\s\S]*catch \(error\)/.test(availability),
+    "Dock availability must catch the resolver throw",
+  );
+  assert(/available: false/.test(availability), "resolver failure must project available=false");
+  assert(ipc.includes("const availability = getDockDefinitionAvailability(definition)"), "definitions:list must carry resolver availability");
+  assert(ipc.includes('"qf:sessions:spawn"'), "qf:sessions:spawn IPC entrypoint is missing");
+  const spawnStart = ipc.indexOf('"qf:sessions:spawn"');
+  const spawnEnd = ipc.indexOf('ipcMain.handle(', spawnStart + 1);
+  const spawn = ipc.slice(spawnStart, spawnEnd < 0 ? undefined : spawnEnd);
+  assert(/parseDefinitionLaunchRequest\(args\)[\s\S]*admitAndStartSession\(definitionId/.test(spawn), "qf:sessions:spawn must use the closed definition before admission");
+
+  const admissionStart = host.indexOf("export async function admitAndStartSession(");
+  const dispatchIndex = host.indexOf("return dispatchRuntimeRoute(", admissionStart);
+  const resolveIndex = host.indexOf("const runtime = getDefinitionRuntime(definitionId);", admissionStart);
+  assert(admissionStart >= 0 && resolveIndex >= 0 && dispatchIndex > resolveIndex, "saved-row spawn must resolve before runtime admission");
+}
+
+function assertSavedRowRefusal(db: KernelDb, appRoot: string): void {
+  const savedRows = [
+    {
+      name: "claude-code-orchestrator",
+      role: "claude-orchestrator",
+      package_ref: "species/claude-code/packed/claude-code.aospkg",
+      runtime_profile: "claude-code-orchestrator",
+      system_prompt_ref: "prompts/orchestrator.md",
+      capability_groups: ["desk.orchestrate"],
+      display_name: "Orchestrator",
+    },
+    {
+      name: "claude-code-worker",
+      role: "claude-worker",
+      package_ref: "species/claude-code/packed/claude-code.aospkg",
+      runtime_profile: "claude-code-worker",
+      system_prompt_ref: "prompts/worker.md",
+      capability_groups: ["market.read"],
+      display_name: "Market Researcher",
+    },
+  ];
+  for (const row of savedRows) {
+    execute(db, "register_agent_definition", row, trace());
+  }
+  const count = (sql: string): number => Number((db.query(sql).get() as { n: number }).n);
+  const before = {
+    sessions: count("SELECT COUNT(*) AS n FROM agent_session"),
+    links: count("SELECT COUNT(*) AS n FROM links"),
+    spawnedFrom: count("SELECT COUNT(*) AS n FROM links WHERE kind = 'spawned_from'"),
+  };
+  const refusals: Array<{ definitionId: string; message: string; available: false; launchable: false }> = [];
+  for (const row of savedRows) {
+    const definitionId = row.name;
+    const launchRequest = parseDefinitionLaunchRequest({ definitionId });
+    assert(launchRequest === definitionId, `${definitionId} qf:sessions:spawn parser changed identity`);
+    let message = "";
+    try {
+      resolveDefinitionRuntime(definitionId, appRoot, (id) => definition(db, id));
+      fail(`${definitionId} saved row unexpectedly resolved after package removal`);
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+      assert(/missing|runtime|metadata|package/i.test(message), `${definitionId} refusal reason does not name missing runtime`, message);
+    }
+    refusals.push({ definitionId, message, available: false, launchable: false });
+  }
+  const after = {
+    sessions: count("SELECT COUNT(*) AS n FROM agent_session"),
+    links: count("SELECT COUNT(*) AS n FROM links"),
+    spawnedFrom: count("SELECT COUNT(*) AS n FROM links WHERE kind = 'spawned_from'"),
+  };
+  assert(JSON.stringify(before) === JSON.stringify(after), "saved fake-row refusal created durable session or link", { before, after });
+  console.log(`saved_rows_refused=${JSON.stringify(refusals)} before=${JSON.stringify(before)} after=${JSON.stringify(after)} os_process_delta=0`);
+}
+
+function runG6Falsifier(name: string, source: { dock: string; graph: string; host: string }): void {
+  if (process.env.QF_G6_FALSIFY !== name) return;
+  if (name === "saved-claude-launchable") {
+    const bait = source.dock.replace(
+      ".filter((row) => row?.availability?.available === true)",
+      ".filter(() => true)",
+    );
+    try {
+      assert(/\.filter\(\(row\) => row\?\.availability\?\.available === true\)/.test(bait), "saved Claude row entered launchable projection");
+    } catch {
+      console.error("falsifier=saved-claude-launchable result=red defect=unavailable saved row admitted");
+      throw new Error("falsifier=saved-claude-launchable result=red");
+    }
+  }
+  if (name === "spawn-before-refusal") {
+    const bait = source.host.replace("const runtime = getDefinitionRuntime(definitionId);", "const runtime = undefined;");
+    try {
+      assertAdmissionResolvesBeforeDispatch(bait);
+    } catch {
+      console.error("falsifier=spawn-before-refusal result=red defect=admission precedes saved-row resolver refusal");
+      throw new Error("falsifier=spawn-before-refusal result=red");
+    }
+  }
+  if (name === "workspace-identity") {
+    const bait = source.graph.replace('title: "Agent session"', 'title: "Claude Code"');
+    try {
+      assert(bait.includes('title: "Agent session"'), "WorkspaceGraph renders the removed Claude identity");
+    } catch {
+      console.error("falsifier=workspace-identity result=red defect=WorkspaceGraph rendered Claude Code");
+      throw new Error("falsifier=workspace-identity result=red");
+    }
+  }
+}
+
+function assertAdmissionResolvesBeforeDispatch(host: string): void {
+  const start = host.indexOf("export async function admitAndStartSession(");
+  const resolveIndex = host.indexOf("const runtime = getDefinitionRuntime(definitionId);", start);
+  const dispatchIndex = host.indexOf("return dispatchRuntimeRoute(", start);
+  assert(start >= 0 && resolveIndex >= 0 && dispatchIndex > resolveIndex, "saved-row spawn must resolve before runtime admission");
 }
 
 async function main(): Promise<number> {
@@ -675,6 +802,11 @@ async function main(): Promise<number> {
     assertSourceMetadataAgreement();
     assertStrictManifests(work);
     assertStaticLaunchSurface();
+    runG6Falsifier(process.env.QF_G6_FALSIFY ?? "", {
+      dock: readFileSync(join(REPO, "collab-electron/src/windows/shell/src/dock.js"), "utf8"),
+      graph: readFileSync(join(REPO, "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx"), "utf8"),
+      host: readFileSync(join(REPO, "collab-electron/src/main/agent-host.ts"), "utf8"),
+    });
 
     db = openKernel(":memory:");
     const first = bootstrap(db, appRoot);
@@ -709,6 +841,7 @@ async function main(): Promise<number> {
     const preserved = definition(conflictDb, conflictDefinitionId);
     assert(preserved?.role === "operator-preserved-conflict" && preserved?.package_ref === "operator/custom.aospkg", "bootstrap overwrote conflicting operator row", preserved);
     assert(eventCount(conflictDb) === conflictBeforeEvents + EXPECTED_QA_PROFILE_COUNT - 1, "conflict bootstrap event count wrong");
+    assertSavedRowRefusal(db, appRoot);
 
     const orchestrator = resolvedRow(db, appRoot, hermesOrchestratorId);
     const worker = resolvedRow(db, appRoot, hermesWorkerId);

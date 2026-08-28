@@ -53,11 +53,7 @@ export const HERMES_REF = "species/hermes/packed/hermes.aospkg";
 export const HERMES_META = "species/hermes/packed/hermes.meta.json";
 export const HERMES_LAUNCH = "species/hermes/launch.json";
 export const HERMES_DOCK_PROFILES = "species/hermes/dock-profiles.json";
-export const CLAUDE_REF = "species/claude-code/packed/claude-code.aospkg";
-export const CLAUDE_META = "species/claude-code/packed/claude-code.meta.json";
-export const CLAUDE_LAUNCH = "species/claude-code/launch.json";
-export const CLAUDE_DOCK_PROFILES = "species/claude-code/dock-profiles.json";
-
+export const HERMES_TOOLS_ALLOWLIST = "species/hermes/tools-allowlist.json";
 
 export const QF_LINUX_EXECUTABLE = "quantflow";
 export const QF_PACKAGE_NAME = "@quantflow/electron";
@@ -68,16 +64,13 @@ export const PRODUCTION_RUNTIME_CONTROL_FILES = [
   HERMES_META,
   HERMES_LAUNCH,
   HERMES_DOCK_PROFILES,
-  CLAUDE_META,
-  CLAUDE_LAUNCH,
-  CLAUDE_DOCK_PROFILES,
+  HERMES_TOOLS_ALLOWLIST,
 ] as const;
 
 export const QA_RUNTIME_CONTROL_FILES = [
   QF_PROOF_AGENT_META,
   QF_PROOF_AGENT_LAUNCH,
   QF_PROOF_AGENT_DOCK_PROFILES,
-  "species/claude-code/qa-dock-profiles.json",
   ...PRODUCTION_RUNTIME_CONTROL_FILES,
 ] as const;
 

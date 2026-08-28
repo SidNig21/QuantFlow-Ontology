@@ -145,7 +145,7 @@ export function WorkspaceGraph({
 		for (const [sessionId, session] of agentSessions) {
 			agentNodes.push({
 				id: `agent:${sessionId}`,
-				title: "Claude Code",
+				title: "Agent session",
 				path: "",
 				weight: session.interactions.length,
 				nodeType: "agent",

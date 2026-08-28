@@ -60,7 +60,6 @@ const ALLOW_PREFIXES = [
   "qa/gates/windows-dock-ontology.ts",
   "qa/gates/windows-dock-capability.ts",
   "qa/gates/windows-dock-hire.ts",
-  "qa/gates/windows-dock-species.ts",
   "qa/gates/windows-research-question.ts",
   "qa/gates/kernel-task-delegation.ts",
   "qa/gates/kernel-market-lineage.ts",
@@ -72,12 +71,6 @@ const ALLOW_PREFIXES = [
   // R13 installed-artifact gate: builds an isolated Kernel path for the
   // installed process proof, never for product code.
   "qa/gates/windows-installer.ts",
-  // R4 Claude Code adapter: reads QF_KERNEL_DB *only* to assert the app set it,
-  // and never uses the value. Verified 2026-08-05 — the file contains no sqlite
-  // import, no Database construction, and no other reference to the variable.
-  // R1's contract that a seat never holds a database handle is intact; this is a
-  // presence check that the grep cannot distinguish from a resolver.
-  "species/claude-code/src/claude-code.mjs",
   "collab-electron/",
   "qa/gates/kernel-one-path.ts",
   "species/hermes/agent-package/src/acp-shim.ts",

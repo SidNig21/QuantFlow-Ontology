@@ -19,7 +19,6 @@ import {
   QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY,
   QF_KERNEL_SCHEMA_UPGRADE,
   QF_LINUX_EXECUTABLE,
-  CLAUDE_REF,
   QF_PACKAGE_NAME,
   QF_UPDATE_OWNER,
   QF_UPDATE_REPOSITORY,
@@ -44,9 +43,7 @@ function testTmpPath(label: string): string {
 function seedMinimalPackage(root: string): void {
   const resources = join(root, "resources");
   mkdirSync(join(resources, "species/hermes/packed"), { recursive: true });
-  mkdirSync(join(resources, "species/claude-code/packed"), { recursive: true });
   writeFileSync(join(resources, HERMES_REF), "hermes");
-  writeFileSync(join(resources, CLAUDE_REF), "claude");
   mkdirSync(join(resources, "species/hermes/prompts"), { recursive: true });
   copyFileSync(join(repoRoot, "species/hermes/prompts/research-director.md"), join(resources, "species/hermes/prompts/research-director.md"));
   for (const rel of RUNTIME_CONTROL_FILES) {
@@ -54,10 +51,6 @@ function seedMinimalPackage(root: string): void {
     mkdirSync(dirname(destination), { recursive: true });
     copyFileSync(join(repoRoot, rel), destination);
   }
-  writeFileSync(
-    join(resources, "species/hermes/tools-allowlist.json"),
-    "[]",
-  );
   writeFileSync(join(root, QF_LINUX_EXECUTABLE), "#!/bin/sh\nexit 0\n");
   chmodSync(join(root, QF_LINUX_EXECUTABLE), 0o755);
   writeFileSync(

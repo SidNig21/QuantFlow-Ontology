@@ -98,7 +98,6 @@ export function formatDockCapabilities(groups) {
 export function dockAdapterLabel(adapterId) {
 	const id = String(adapterId ?? "").toLowerCase();
 	if (id === "hermes") return "Hermes";
-	if (id === "claude-code") return "Claude Code";
 	return String(adapterId ?? "Adapter");
 }
 

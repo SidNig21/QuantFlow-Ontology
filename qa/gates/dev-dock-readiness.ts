@@ -5,6 +5,7 @@ import {
   lstatSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   statSync,
@@ -18,6 +19,10 @@ import {
   discoverDockProfileManifests,
   type DockProfileManifest,
 } from "../../collab-electron/src/main/dock-profiles.ts";
+import {
+  prepareRuntimeStaging,
+  PRODUCTION_RUNTIME_FILES,
+} from "../../collab-electron/scripts/package-lib/runtime-staging.ts";
 import { resolveRuntimeAdapterMetadata } from "../../collab-electron/src/main/runtime-adapter.ts";
 
 const REPO = resolve(import.meta.dir, "../..");
@@ -26,12 +31,13 @@ const HERMES_PACKAGE_REF = "species/hermes/packed/hermes.aospkg";
 const HERMES_META = join(REPO, "species/hermes/packed/hermes.meta.json");
 const PRODUCTION_ASSETS = [
   "species/hermes/dock-profiles.json",
-  HERMES_PACKAGE_REF,
+  "species/hermes/launch.json",
   "species/hermes/packed/hermes.meta.json",
-  "species/claude-code/dock-profiles.json",
-  "species/claude-code/packed/claude-code.aospkg",
-  "species/claude-code/packed/claude-code.meta.json",
-  "species/claude-code/packed/claude-code.mjs",
+  "species/hermes/tools-allowlist.json",
+  HERMES_PACKAGE_REF,
+  "species/hermes/prompts/research-director.md",
+  "species/hermes/prompts/worker.md",
+  "species/hermes/prompts/critic.md",
 ] as const;
 const HERMES_PACK_INPUTS = [
   "species/hermes/launch.json",
@@ -158,22 +164,22 @@ function cleanEnvironment(): NodeJS.ProcessEnv {
     Object.entries(process.env).filter(([key]) => ![
       "QF_UI_PROOF_RESOURCE_ROOT",
       "QF_DEV_HERMES_PACK_SCRIPT",
-      "QF_DEV_CLAUDE_CODE_PACK_SCRIPT",
       "QF_DEV_DOCK_READINESS_MARKER",
       "QF_DOCK_QA_MODE",
       "QF_UI_PROOF_FAIL_DEFINITION",
       "QF_UI_PROOF_DELAY_SPAWN_MS",
+      "QF_G6_FALSIFY",
     ].includes(key)),
   );
 }
 
-function baseEnvironment(root: string): NodeJS.ProcessEnv {
+function baseEnvironment(root: string, resourceRoot: string = REPO): NodeJS.ProcessEnv {
   const appRoot = join(root, "app-root");
   mkdirSync(join(appRoot, "artifacts"), { recursive: true });
   return {
     ...cleanEnvironment(),
     QF_UI_PROOF: "1",
-    QF_UI_PROOF_RESOURCE_ROOT: REPO,
+    QF_UI_PROOF_RESOURCE_ROOT: resourceRoot,
     QF_APP_ROOT: appRoot,
     QF_APP_DIR: join(appRoot, "app"),
     QF_KERNEL_DB: join(appRoot, "kernel.db"),
@@ -224,6 +230,28 @@ function assertNativeProductionProfiles(root: string): DockProfileManifest[] {
 function assertRegularNonEmpty(path: string): void {
   assert(existsSync(path) && lstatSync(path).isFile(), `missing tracked adapter asset: ${path}`);
   assert(statSync(path).size > 0, `empty tracked adapter asset: ${path}`);
+}
+
+function stagedFiles(root: string): string[] {
+  const files: string[] = [];
+  const visit = (directory: string): void => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) visit(path);
+      else if (entry.isFile()) files.push(path.slice(root.length + 1).replaceAll("\\", "/"));
+    }
+  };
+  visit(root);
+  return files.sort();
+}
+
+function assertExactProductionStaging(root: string): void {
+  const actual = stagedFiles(root);
+  const expected = [...PRODUCTION_RUNTIME_FILES].sort();
+  assert(JSON.stringify(actual) === JSON.stringify(expected), "production staging path set is not exactly P1", {
+    expected,
+    actual,
+  });
 }
 
 function repoStatus(): string {
@@ -345,20 +373,20 @@ async function waitForProductionDock(root: string, pidFile: string): Promise<num
     const readiness = await app.send("app.readiness") as { canvas?: boolean; dockProfileIds?: string[] };
     if (readiness.canvas !== true) return false;
     const ids = readiness.dockProfileIds ?? [];
-    assert(ids.filter((id) => id === "hermes-orchestrator").length === 1, "Hermes Orchestrator definition count is not exactly one");
+    assert(ids.filter((id) => id === "hermes-research-director").length === 1, "Research Director definition count is not exactly one");
     assert(ids.filter((id) => id === "hermes-worker").length === 1, "Hermes Market Researcher definition count is not exactly one");
     const ui = await app.evaluate<{ ok: boolean; definitions: Array<{ id?: string; availability?: { available?: boolean } }> }>("window.shellApi.qf.listDefinitions()");
-    const orchestrators = ui.definitions.filter((row) => row.id === "hermes-orchestrator");
+    const orchestrators = ui.definitions.filter((row) => row.id === "hermes-research-director");
     const workers = ui.definitions.filter((row) => row.id === "hermes-worker");
     assert(ui.ok && orchestrators.length === 1 && workers.length === 1, "Hermes Dock definitions are not exact");
-    assert(orchestrators[0]!.availability?.available === true, "Hermes Orchestrator is unavailable");
+    assert(orchestrators[0]!.availability?.available === true, "Research Director is unavailable");
     assert(workers[0]!.availability?.available === true, "Hermes Market Researcher is unavailable");
     const cards = await app.evaluate<{ orchestrator: number; worker: number }>(`(() => {
       const ready = (definitionId) => [...document.querySelectorAll(
         '#dock-species-list .lrow[role="button"][data-definition-id="' + definitionId + '"]',
       )].filter((row) => !row.classList.contains('lrow-unavailable') && row.querySelector('.dock-adapter')?.textContent?.startsWith('Hermes'));
       return {
-        orchestrator: ready('hermes-orchestrator').length,
+        orchestrator: ready('hermes-research-director').length,
         worker: ready('hermes-worker').length,
       };
     })()`);
@@ -370,11 +398,30 @@ async function waitForProductionDock(root: string, pidFile: string): Promise<num
 
 async function proveGreen(root: string): Promise<void> {
   for (const relativePath of PRODUCTION_ASSETS) assertRegularNonEmpty(join(REPO, relativePath));
-  const hermesProfiles = assertNativeProductionProfiles(REPO);
-  assert(hermesProfiles.some((manifest) => manifest.profiles.some((profile) => profile.name === "hermes-orchestrator")), "Hermes Orchestrator profile missing");
+  const resourceRoot = mkdtempSync(join(root, "production-resource-"));
+  prepareRuntimeStaging({ stagingRoot: resourceRoot, repoRoot: REPO }, { qaMode: false });
+  if (process.env.QF_G6_FALSIFY === "package-claude-resource") {
+    const bait = join(resourceRoot, "species/claude-code/packed/claude-code.aospkg");
+    mkdirSync(dirname(bait), { recursive: true });
+    writeFileSync(bait, "credential-free G6 production-resource bait\n");
+    let red = false;
+    try {
+      assertExactProductionStaging(resourceRoot);
+    } catch {
+      red = true;
+      console.error("falsifier=package-claude-resource result=red defect=Claude resource entered production staging");
+    } finally {
+      rmSync(bait, { force: true });
+    }
+    assert(red, "package-claude-resource falsifier unexpectedly passed");
+    throw new Error("falsifier=package-claude-resource result=red");
+  }
+  assertExactProductionStaging(resourceRoot);
+  const hermesProfiles = assertNativeProductionProfiles(resourceRoot);
+  assert(hermesProfiles.some((manifest) => manifest.profiles.some((profile) => profile.name === "hermes-research-director")), "Research Director profile missing");
   assert(hermesProfiles.some((manifest) => manifest.profiles.some((profile) => profile.name === "hermes-worker")), "Hermes worker profile missing");
 
-  const run = runPublicDev(baseEnvironment(root), root);
+  const run = runPublicDev(baseEnvironment(root, resourceRoot), root);
   activeDevRun = run;
   try {
     const electronPid = await waitForProductionDock(root, run.pidFile);
@@ -385,10 +432,10 @@ async function proveGreen(root: string): Promise<void> {
     assert(exitCode === 0, `public bun run dev exited with ${exitCode}`);
     console.log("development_root=repository");
     console.log("hermes_adapter=tracked_native_tui");
-    console.log("claude_code_adapter=tracked_native_tui");
+    console.log("production_runtime=hermes_only");
     console.log("agentos_packaging_used=false");
     console.log("electron_process_started=true");
-    console.log("hermes_orchestrator_launchable=true");
+    console.log("hermes_research_director_launchable=true");
     console.log("hermes_worker_definition_launchable=true");
   } finally {
     activeDevRun = null;

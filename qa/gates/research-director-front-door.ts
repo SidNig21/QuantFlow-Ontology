@@ -31,6 +31,15 @@ const DIRECTOR_ID = "hermes-research-director";
 const SPECIALIST_ID = "hermes-worker";
 const OLD_DIRECTOR_ID = "hermes-orchestrator";
 const QUESTION = "NFL Week 2 is coming up; use Strategy qf-nfl-v1 and tell me what data coverage we have before looking for opportunities.";
+const PROTECTED_EXTERNAL_CLI_SEAM = [
+  "collab-electron/src/main/integrations.ts",
+  "collab-electron/src/main/integrations.test.ts",
+  "collab-electron/src/main/pty.ts",
+  "collab-electron/packages/collab-canvas-skill/skills/collab-canvas/SKILL.md",
+  "collab-electron/packages/components/src/Terminal/TerminalTab.tsx",
+  "collab-electron/packages/shared/src/viewer-item.ts",
+  "collab-electron/packages/shared/src/viewer-item.test.ts",
+] as const;
 
 type WatchdogOptions = {
   deadlineMs: number;
@@ -532,11 +541,38 @@ function createManifestCopy(): string {
     "species/hermes/packed/hermes.aospkg",
     "species/hermes/packed/hermes.meta.json",
     "species/hermes/prompts/research-director.md",
-    "species/claude-code/dock-profiles.json",
-    "species/claude-code/packed/claude-code.aospkg",
-    "species/claude-code/packed/claude-code.meta.json",
   ]) copyInput(root, path);
   return root;
+}
+
+function seamReceipt(root: string): string[] {
+  return PROTECTED_EXTERNAL_CLI_SEAM.map((relativePath) => {
+    const bytes = readFileSync(join(root, relativePath));
+    return `${relativePath}=${createHash("sha256").update(bytes).digest("hex")}`;
+  });
+}
+
+function runExternalCliSeamFalsifier(roots: string[]): void {
+  if (process.env.QF_G6_FALSIFY !== "external-cli-seam") return;
+  const root = mkdtempSync(join(tmpdir(), "qf-g6-external-cli-seam-"));
+  roots.push(root);
+  for (const relativePath of PROTECTED_EXTERNAL_CLI_SEAM) copyInput(root, relativePath);
+  const before = seamReceipt(root);
+  const baitPath = join(root, PROTECTED_EXTERNAL_CLI_SEAM[0]);
+  writeFileSync(baitPath, `${readFileSync(baitPath, "utf8")}\nG6 external-cli seam bait\n`, "utf8");
+  const baitAfter = seamReceipt(root);
+  let red = false;
+  try {
+    assert(JSON.stringify(baitAfter) === JSON.stringify(before), "external CLI seam bait was not detected");
+  } catch {
+    red = true;
+    console.error("falsifier=external-cli-seam result=red defect=protected external CLI seam changed");
+  }
+  assert(red, "external-cli-seam falsifier unexpectedly passed");
+  for (const relativePath of PROTECTED_EXTERNAL_CLI_SEAM) copyInput(root, relativePath);
+  assert(JSON.stringify(seamReceipt(root)) === JSON.stringify(before), "external-cli seam fixture did not restore");
+  console.log("falsifier=external-cli-seam restored=true");
+  throw new Error("falsifier=external-cli-seam result=red");
 }
 
 function runProfileFalsifiers(roots: string[]): void {
@@ -1100,12 +1136,14 @@ export async function runResearchDirectorFrontDoorGate(): Promise<{ ok: boolean 
   let launchPids = new Set<number>();
   let beforeProcesses: Awaited<ReturnType<typeof processSnapshot>> = [];
   const repositoryBefore = repoReceipt();
+  const protectedSeamBefore = seamReceipt(REPO_ROOT);
   const diagnostic = createTimeoutDiagnosticContext();
   let ok = false;
   try {
     const watched = await runWithWatchdog(
       async () => {
         assertProductionSourceContracts();
+        runExternalCliSeamFalsifier(roots);
         runProfileFalsifiers(roots);
         runProductSourceFalsifier(roots);
         await runCleanupFalsifier(roots, (pid) => { activePid = pid; });
@@ -1201,6 +1239,10 @@ export async function runResearchDirectorFrontDoorGate(): Promise<{ ok: boolean 
     const repositoryUnchanged = repositoryBefore === repositoryAfter;
     console.log(`repository_tree_unchanged=${repositoryUnchanged ? "true" : "false"}`);
     if (!repositoryUnchanged || Object.values(cleanup).some((value) => value !== 0)) ok = false;
+    const protectedSeamAfter = seamReceipt(REPO_ROOT);
+    const protectedSeamUnchanged = JSON.stringify(protectedSeamBefore) === JSON.stringify(protectedSeamAfter);
+    console.log(`generic-external-cli-seam-preservation=${protectedSeamUnchanged ? "true" : "false"}`);
+    if (!protectedSeamUnchanged) ok = false;
     if (Date.now() - startedAt >= RESEARCH_DIRECTOR_FRONT_DOOR_DEADLINE_MS) ok = false;
     console.log(`elapsed_ms=${Date.now() - startedAt}`);
   }

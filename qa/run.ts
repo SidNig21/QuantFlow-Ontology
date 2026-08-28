@@ -564,18 +564,6 @@ const gates: Gate[] = [
     },
   },
   {
-    name: "windows-dock-species",
-    description:
-      "R4: Claude Code and Hermes-contract seats share ontology gateway; no hermes MCP hardcode",
-    run: async () => {
-      const { runWindowsDockSpeciesGate } = await import(
-        "./gates/windows-dock-species.ts"
-      );
-      const { ok } = await runWindowsDockSpeciesGate();
-      return ok;
-    },
-  },
-  {
     name: "kernel-task-delegation",
     description:
       "R5: create_task + assigned_to + complete_task survive reopen; illegal transition refused",
@@ -883,7 +871,7 @@ const gates: Gate[] = [
   {
     name: "dock-production-inventory",
     description:
-      "R13: production Dock excludes QA fixture identities while QA closure retains claude-code-ungranted",
+      "G6: production Dock is exact Hermes and QA staging is exact Hermes plus generic qf-proof",
     run: async () => {
       const { runDockProductionInventoryGate } = await import(
         "./gates/dock-production-inventory.ts"

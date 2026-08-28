@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ 2f7ea77` on 2026-08-26 by
+> Generated from `wo-golden-g2 @ 929de18c` on 2026-08-28 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**39 of 40 findings have not been looked at.**
+**49 of 49 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 39 |
-| `repair` | 1 |
+| `undecided` | 49 |
+| `repair` | 0 |
 | `remove` | 0 |
 | `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 39 findings still need a decision.
+**Not all clear.** 49 findings still need a decision.
 
 ## The four hops
 
@@ -31,9 +31,9 @@ and it can die or cheat at any one of them:
 
 ```mermaid
 flowchart TD
-  R["<b>1 · renderer</b><br/>30 surface subsystems<br/>calls a bridge method"]
-  P["<b>2 · preload</b><br/>3 bridges · 130 methods<br/>116 of them called"]
-  M["<b>3 · main</b><br/>126 IPC channels<br/>113 live · 13 unused · 0 dead"]
+  R["<b>1 · renderer</b><br/>29 surface subsystems<br/>calls a bridge method"]
+  P["<b>2 · preload</b><br/>3 bridges · 124 methods<br/>106 of them called"]
+  M["<b>3 · main</b><br/>124 IPC channels<br/>104 live · 11 unused · 5 dead"]
   H{"<b>4 · is it governed?</b>"}
   E["<b>execute&#40;&#41;</b><br/>the only sanctioned write"]
   DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]
@@ -44,9 +44,11 @@ flowchart TD
   A["<b>ungoverned SQL</b><br/>amber evidence only<br/>not a proven breach"]
   H -->|"reaches-sql 2"| A
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
-  H -->|"writes-disk 9"| FS
+  H -->|"writes-disk 8"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
-  H -->|"read-only 96"| RO
+  H -->|"read-only 90"| RO
+  U["<b>unknown</b><br/>module or handler coverage incomplete"]
+  H -->|"unknown 5"| U
 
   QA["<b>QA · governance</b><br/>11 subsystems<br/>asserts the rules above"]
   SP["<b>Species · runtimes</b><br/>3 subsystems<br/>launched by path,<br/>not imported"]
@@ -61,7 +63,7 @@ flowchart TD
   classDef truth fill:#10243d,stroke:#3b82f6,color:#e6f0ff
   class E,RO good
   class FS bad
-  class A,QA,SP,SC gray
+  class A,U,QA,SP,SC gray
   class DB,R,P,M,H truth
 ```
 
@@ -84,9 +86,9 @@ handler that mutates state without `execute()` is cheating even when it works.
 | `write-door` | reaches `execute()`, the sole sanctioned mutation path | 19 |
 | `cheats` | reaches SQL outside `execute()` **and** a function on that path carries a current hard red | 0 |
 | `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 2 |
-| `writes-disk` | writes a file; never reaches the Kernel at all | 9 |
-| `unknown` | handler or module resolution coverage is incomplete; not claimed read-only | 0 |
-| `read-only` | no mutation seen | 96 |
+| `writes-disk` | writes a file; never reaches the Kernel at all | 8 |
+| `unknown` | handler or module resolution coverage is incomplete; not claimed read-only | 5 |
+| `read-only` | no mutation seen | 90 |
 
 #### Reaches ungoverned SQL, but not a hard red (6)
 
@@ -106,7 +108,7 @@ loop.
 | `qf:tasks:create` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
 | `qf:tasks:surface` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
 
-### Broken at hop 1 (1)
+### Broken at hop 1 (5)
 
 A window calls a bridge method the preload **does not expose**. This throws
 `TypeError: … is not a function` the moment the code path runs. It is invisible to
@@ -116,7 +118,11 @@ exists.
 
 | Method | Called from | Exists in preload |
 |---|---|---|
-| `ptyForegroundProcess` | `collab-electron/src/windows/terminal/src/App.tsx:202` | **no** |
+| `browserEvaluate` | `collab-electron/src/windows/shell/src/canvas-rpc.js:338` | **no** |
+| `browserInfo` | `collab-electron/src/windows/shell/src/canvas-rpc.js:358` | **no** |
+| `browserScroll` | `collab-electron/src/windows/shell/src/canvas-rpc.js:328` | **no** |
+| `browserWait` | `collab-electron/src/windows/shell/src/canvas-rpc.js:348` | **no** |
+| `focusAgentSession` | `collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx:388` | **no** |
 
 These are **product defects, not map findings** — fix the call site or restore the
 method. Removing the call site is only correct if the feature is genuinely gone.
@@ -125,11 +131,11 @@ method. Removing the call site is only correct if the feature is genuinely gone.
 > in a preload file counts as declared, type annotations included. A missed break is
 > recoverable; a false accusation gets working code deleted.
 
-**43 bridge methods exist but could not be paired to a channel.**
+**33 bridge methods exist but could not be paired to a channel.**
 Almost all are `on*`/`off*` event subscribers, and they are unpaired for a structural
 reason, not a parsing one — see the next paragraph.
 
-### The push direction — main → renderer (47 channels)
+### The push direction — main → renderer (44 channels)
 
 Everything above traces **renderer → main**. The main process also pushes the other
 way, and that direction runs on two layers — the second is a tunnel:
@@ -143,30 +149,28 @@ tunnelled  main --send("shell:forward", target, inner)--> shell preload
 
 | Status | Count | Meaning |
 |---|---:|---|
-| `live` | 34 | a send site and a preload listener |
+| `live` | 26 | a send site and a preload listener |
 | `renderer-terminated` | 2 | consumed by the shell dispatcher; no preload listener expected |
 | `renderer-originated` | 5 | sent by the shell renderer into a webview, not by main |
-| `dynamic-sender` | 3 | a template-literal channel shares this prefix — **coverage boundary, not debt** |
+| `dynamic-sender` | 9 | a template-literal channel shares this prefix — **coverage boundary, not debt** |
 | `tunnel` | 1 | `shell:forward` itself, the transport |
-| **`no-sender`** | **2** | **a preload subscribes and nothing sends it** |
+| **`no-sender`** | **1** | **a preload subscribes and nothing sends it** |
 | **`no-listener`** | **0** | **main pushes it and nothing receives** |
 
-14 channels travel inside the tunnel. Resolving it matters: a regex that
+12 channels travel inside the tunnel. Resolving it matters: a regex that
 matches only `webContents.send("literal")` sees `"shell:forward"` and misses every
 inner name — and those inner names are exactly the ones that then look like orphan
-listeners. That single mistake would have produced 14 false deletes.
+listeners. That single mistake would have produced 12 false deletes.
 
-#### `no-sender` (2)
+#### `no-sender` (1)
 
-- `cd-to` — `collab-electron/src/preload/universal.ts:98` · **INVESTIGATE**
-  - a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing
 - `shell:loading-status` — `collab-electron/src/preload/shell.ts:178` · **INVESTIGATE**
   - a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing
 
 **Confidence is `medium` on every row here, and the disposition is `INVESTIGATE`, never
 `REMOVE`.** These patterns are textual, and text may not create a high-confidence
 architectural red on its own — promoting any of this to a confirmed defect requires the
-AST pass. 7 send sites build their channel or target
+AST pass. 6 send sites build their channel or target
 dynamically and are recorded as explicit coverage boundaries rather than omitted.
 
 ## The product loop
@@ -183,7 +187,7 @@ badge is not a score:
 | `R` runtime | the loop was observed executing |
 | `F` founder | the founder has confirmed it does its job |
 
-**`S` alone is not `SGRF`.** 9 of 11 loops are statically connected; 0 carry all four tiers.
+**`S` alone is not `SGRF`.** 7 of 11 loops are statically connected; 0 carry all four tiers.
 
 | Loop | Badge | Static | Gate | Runtime | Founder |
 |---|---|---|---|---|---|
@@ -191,8 +195,8 @@ badge is not a score:
 | **PLAN** | `SG` | connected | covered | unproven | unproven |
 | **RECRUIT** | `SG` | connected | covered | unproven | unproven |
 | **ASSIGN** | `SG` | connected | covered | unproven | unproven |
-| **WATCH** | `SG` | connected | covered | unproven | unproven |
-| **STEER** | `SG` | connected | covered | unproven | unproven |
+| **WATCH** | `-` | degraded | partial | unproven | unproven |
+| **STEER** | `G` | degraded | covered | unproven | unproven |
 | **PUBLISH** | `SG` | connected | covered | unproven | unproven |
 | **REVIEW** | `G` | degraded | covered | unproven | unproven |
 | **REOPEN** | `SG` | connected | covered | unproven | unproven |
@@ -202,6 +206,19 @@ badge is not a score:
 Runtime and founder read `unproven` on every loop, and that is the honest state: no
 runtime trace and no founder-confirmation record exist in this repo. **Unproven with a
 stated reason is not a gap** — it is the difference between an unknown and a lie.
+
+### WATCH — degraded
+
+The operator can see work in flight: a PTY, then an agent session on top of it.
+
+- `agent:spawn` — **dead**: breaks at main
+- nominated gate absent: windows-dock-species
+
+### STEER — degraded
+
+Interrupt or redirect work in flight without losing the record of it.
+
+- `agent:cancel` — **dead**: breaks at main
 
 ### REVIEW — degraded
 
@@ -213,7 +230,7 @@ The governed critic path. R15 shipped on this, and R16 renders it.
 
 Sessions and processes end cleanly, and nothing keeps running after the app closes.
 
-- `agent:kill` — **unused**: breaks at renderer
+- `agent:kill` — **dead**: breaks at main
 
 A `gate` tier of `covered` means the nominated gate FILE is present. It never claims
 the gate passed — running it is out of scope for a sub-60-second check, and asserting a
@@ -227,8 +244,8 @@ and each window's own script — so this is a file-level graph, not a call graph
 
 | | Files | Meaning |
 |---|---:|---|
-| `entrypoint` | 18 | the app starts here |
-| `reachable` | 212 | imported from an entrypoint |
+| `entrypoint` | 16 | the app starts here |
+| `reachable` | 203 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -239,38 +256,43 @@ and each window's own script — so this is a file-level graph, not a call graph
 Three buckets, because they call for three different actions. **Do not treat these as
 one list.**
 
-### Broken now — fix or remove (0)
+### Broken now — fix or remove (5)
 
 _these fail at runtime today_
 
-None.
+- `agent:cancel` — collab-electron/src/preload/universal.ts:656
+- `agent:kill` — collab-electron/src/preload/universal.ts:661
+- `agent:prompt` — collab-electron/src/preload/universal.ts:651
+- `agent:save-messages` — collab-electron/src/preload/universal.ts:666
+- `agent:spawn` — collab-electron/src/preload/universal.ts:646
 
-### Removal candidate — static evidence only (0)
+### Removal candidate — static evidence only (4)
 
 _registered in main, no static caller found; needs package + dynamic-caller proof before deletion_
 
-None.
+- `browser:evaluate` — collab-electron/src/main/ipc-browser.ts:198
+- `browser:info` — collab-electron/src/main/ipc-browser.ts:182
+- `browser:scroll` — collab-electron/src/main/ipc-browser.ts:133
+- `browser:wait` — collab-electron/src/main/ipc-browser.ts:147
 
-### Maybe later — do NOT delete on sight (13)
+### Maybe later — do NOT delete on sight (11)
 
 _works end to end, but nothing calls it yet_
 
 > `qf:review:projection` is in this bucket and is exactly what R16 needs to render
 > the Evaluation tile. Deleting this bucket wholesale would remove the next rung.
 
-- `agentKill() → agent:kill` — collab-electron/src/preload/universal.ts:695
-- `openFolder() → dialog:open-folder` — collab-electron/src/preload/universal.ts:454
-- `openImageDialog() → dialog:open-image` — collab-electron/src/preload/universal.ts:317
-- `countFiles() → fs:count-files` — collab-electron/src/preload/universal.ts:270
+- `openFolder() → dialog:open-folder` — collab-electron/src/preload/universal.ts:429
+- `openImageDialog() → dialog:open-image` — collab-electron/src/preload/universal.ts:305
+- `countFiles() → fs:count-files` — collab-electron/src/preload/universal.ts:260
 - `getHomePath() → get-home-path` — collab-electron/src/preload/shell.ts:317
 - `deleteConnectionsForTile() → qf:connections:deleteForTile` — collab-electron/src/preload/shell.ts:128
 - `getGovernedReviewProjection() → qf:review:projection` — collab-electron/src/preload/shell.ts:90
-- `permissionDecision() → qf:sessions:permissionDecision` — collab-electron/src/preload/universal.ts:167
+- `permissionDecision() → qf:sessions:permissionDecision` — collab-electron/src/preload/universal.ts:157
 - `openSettings() → settings:open` — collab-electron/src/preload/shell.ts:218
 - `openExternal() → shell:open-external` — collab-electron/src/preload/shell.ts:311
-- `runInTerminal() → viewer:run-in-terminal` — collab-electron/src/preload/universal.ts:290
 - `workspaceRemove() → workspace:remove` — collab-electron/src/preload/shell.ts:262
-- `updateFrontmatter() → workspace:update-frontmatter` — collab-electron/src/preload/universal.ts:326
+- `updateFrontmatter() → workspace:update-frontmatter` — collab-electron/src/preload/universal.ts:314
 
 ## Write-door violations
 
@@ -332,8 +354,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 233 of
-234 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 222 of
+223 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/kernel.ts` — **8 files depend on it**, it imports 7
@@ -375,21 +397,21 @@ asked before the change, when nothing is red yet.
 
 ### Blast-radius coverage
 
-**233 of 234 files that have a reachability verdict** carry a blast radius.
+**222 of 223 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**536 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**522 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 302 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 299 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
 | File | Dependents | Imports | Wires |
 |---|---:|---:|---:|
+| `collab-electron/src/main/file-filter.ts` | 51+ | 2 | 0 |
 | `packages/qf-kernel/src/trace.ts` | 51+ | 1 | 0 |
-| `collab-electron/src/main/files.ts` | 50+ | 2 | 0 |
 | `packages/qf-kernel/src/registry-drift.ts` | 50+ | 0 | 0 |
 | `packages/qf-kernel/src/upgrade.ts` | 50+ | 3 | 0 |
-| `packages/qf-kernel/src/pipeline.ts` | 47+ | 6 | 0 |
+| `collab-electron/src/main/files.ts` | 48+ | 2 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
 learned the difference: transport bookkeeping (tables created by the peer-bus DDL,
@@ -426,7 +448,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (536 files)
+## Per-analyzer coverage (522 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -434,19 +456,19 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 532 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 277 | 0 | 4 | 0 | 255 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 525 |
-| `persistence` | 23 | 26 | 0 | 0 | 487 |
-| `lifetime` | 6 | 57 | 0 | 0 | 473 |
-| `packaging` | 232 | 0 | 0 | 105 | 199 |
-| `ownership` | 20 | 0 | 0 | 344 | 172 |
-| `reach` | 231 | 3 | 0 | 302 | 0 |
+| `imports` | 518 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 267 | 0 | 3 | 0 | 252 |
+| `ipcPush` | 7 | 0 | 3 | 0 | 512 |
+| `persistence` | 23 | 26 | 0 | 0 | 473 |
+| `lifetime` | 5 | 56 | 0 | 0 | 461 |
+| `packaging` | 221 | 0 | 0 | 102 | 199 |
+| `ownership` | 19 | 0 | 0 | 334 | 169 |
+| `reach` | 220 | 3 | 0 | 299 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 302 files means those trees are
+failure — `reach: unsupported` on 299 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
-`packaging: unsupported` on 105 files means the packaging
+`packaging: unsupported` on 102 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
 
 ### The invariant
@@ -454,15 +476,16 @@ manifests are not parsed, so ship status is genuinely unproven rather than assum
 **Unexplained undecided: 0.** This is the contract's
 target, and it is *not* the coverage number above — coverage counts analyzer cells,
 this counts findings nobody has ruled on that also fail to say why. Of the
-39 undecided findings, each carries a blocker:
+49 undecided findings, each carries a blocker:
 
 | Blocker | Findings | Meaning |
 |---|---:|---|
-| `founder-decision` | 20 | the code cannot say which answer is right — this needs your intent |
+| `founder-decision` | 19 | the code cannot say which answer is right — this needs your intent |
 | `ast-coverage` | 2 | the analyzer could not resolve this statically |
-| `package-proof` | 17 | a packaged or dynamically-loaded caller must be ruled out first |
+| `package-proof` | 23 | a packaged or dynamically-loaded caller must be ruled out first |
+| `product-defect` | 5 | a real runtime defect: fix the code and the finding goes away |
 
-**20 of 39 are waiting on you, not on the tool.**
+**19 of 49 are waiting on you, not on the tool.**
 Zero unknowns is not the goal and never was: forcing that number down buys fake
 certainty. Zero *unexplained* is the goal, and it is met.
 
@@ -497,7 +520,7 @@ discovered from the AST.
 | Runtime launch / admission | 3 | 0 | medium |
 | Exact task delivery | 5 | 3 | high |
 | Layout / cache persistence | 0 | 0 | — *unclaimed* |
-| Process cleanup | 4 | 0 | medium |
+| Process cleanup | 3 | 0 | medium |
 | Research review / publication | 6 | 2 | high |
 | Artifact storage | 7 | 4 | high |
 
@@ -507,7 +530,7 @@ discovered from the AST.
 
 - **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 573
-- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 491
+- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 507
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 395
 - `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 601
 
@@ -558,14 +581,12 @@ not stopped by the quit path leaves that process running after the app closes.
 
 | Module | Long-lived spawns | Reaped by quit |
 |---|---:|---|
-| `acp-agent.ts` | 1 | **no** |
 | `sidecar/server.ts` | 1 | **no** |
 | `tmux.ts` | 1 | **no** |
 | `pty.ts` | 2 | **partial** — pty.setShuttingDown(), pty.killAllAndWait(), pty.shutdownSidecarIfIdle() |
 | `git-replay.ts` | 1 | yes |
 | `watcher.ts` | 1 | yes |
 
-- `acp-agent.ts` — This module starts 1 process and the quit path never stops it. A closed seat can outlive the app.
 - `sidecar/server.ts` — This module starts 1 process and the quit path never stops it. A closed seat can outlive the app.
 - `tmux.ts` — This module starts 1 process and the quit path never stops it. A closed seat can outlive the app.
 - `pty.ts` — Stopped by setShuttingDown, killAllAndWait, but shutdownSidecarIfIdle is conditional — that resource survives a close while busy.
