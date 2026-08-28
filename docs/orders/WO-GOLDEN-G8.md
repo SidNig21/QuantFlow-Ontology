@@ -1,6 +1,6 @@
 # WO-GOLDEN-G8 — Kernel, schema, Law-B, and proof-integrity repair
 
-status: **SEMANTIC READER FINAL YES / YES — EXACTLY ONE BOUNDED BUILDER OPEN**
+status: **INDEPENDENT VERIFIER FAIL — FOUR-DEFECT READER AMENDMENT PENDING / BUILDER CLOSED**
 order-type: Golden Baseline Phase 2 bounded Kernel/schema/proof-integrity group
 current-evidence-branch: `wo-golden-g2`
 parent-group: G7 **CLOSED / PASS WITH INHERITED REDS**
@@ -23,8 +23,13 @@ final-reader-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 final-reader-authority: `baedcecd55b91dc3c5d951f969a2111d5cedf4d2`
 final-reader-tree: `33695d1ac5a53b56077bbf739d94e6e230d6533b`
 final-reader-verdict: **YES / YES — all Round 1 and Round 2 defects cured; no remaining defects**
-reader-authority: **CLOSED — final semantic Reader accepted this order**
-builder-authority: **OPEN — exactly one bounded G8 Builder under this order**
+reader-authority: **REOPENED FOR ONE BOUNDED FOUR-DEFECT AMENDMENT ONLY**
+independent-verifier-verdict: **FAIL — four finite defects; no other assertion reopened**
+independent-verifier-evidence-head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
+independent-verifier-evidence-tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a5`
+independent-verifier-product-candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
+independent-verifier-product-tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
+builder-authority: **CLOSED — no Builder while this amendment awaits semantic Reader acceptance**
 g9-order: **UNCHANGED — full G9 remains after G8**
 r18-authority: **FROZEN**
 
@@ -66,11 +71,12 @@ current set above, not a variable historical rescan. The 89 lifecycle
 declarations remain `experimental` under ADR-0004; G8 does not promote schema
 stability.
 
-Round 1 Reader disposition is recorded in
-`docs/orders/evidence/golden-baseline/g8/READER-ACCEPTANCE.md`. The order is
-Builder-ready: the Round 2 lifecycle wording defect is cured and the same
-Reader returned `YES / YES`. Exactly one bounded G8 Builder is now open under
-the file surface and starting matrix below.
+The prior Reader disposition is recorded in
+`docs/orders/evidence/golden-baseline/g8/READER-ACCEPTANCE.md`. At that prior
+authority the order was Builder-ready: the Round 2 lifecycle wording defect was
+cured and the same Reader returned `YES / YES`. The independent Verifier then
+returned the four-defect FAIL recorded below, so that prior Builder opening is
+now suspended and the current Builder authority is closed.
 
 ## Reader contract — exactly two questions
 
@@ -94,8 +100,38 @@ Final semantic Reader acceptance is recorded for task
 `01a04716-ef0f-72d1-aaa1-be295596f893` at authority commit
 `baedcecd55b91dc3c5d951f969a2111d5cedf4d2`, tree
 `33695d1ac5a53b56077bbf739d94e6e230d6533b`, with verdict `YES / YES` and no
-remaining defects. `NEXT.md` is now rotated to exactly one bounded G8 Builder
-under this order.
+remaining defects. `NEXT.md` was then rotated to exactly one bounded G8 Builder
+under this order; the later independent Verifier FAIL suspended that authority.
+
+## Independent Verifier FAIL and one bounded amendment
+
+The independent G8 Verifier failed the immutable product candidate
+`b20966dc8ec86193de8af092df45248fbeb3fc1b` (tree
+`3023dc2091b8b3c44da564266b0d24126da2247c`) at evidence head
+`2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8` (tree
+`99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a5`). This reopens only the four
+finite defects below. The candidate's other assertions, behavior, cleanup,
+and G8 boundaries remain the evidence baseline; no unrelated repair or scope
+expansion is authorized.
+
+| ID | Exact defect | One bounded repair/amendment requirement | Required red/restore-green proof |
+| --- | --- | --- | --- |
+| V-01 | The packaged proof embedded evidence-head SHA `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8` as package identity instead of candidate SHA `b20966dc8ec86193de8af092df45248fbeb3fc1b` | Derive package identity from the immutable candidate commit/tree, bind the embedded `candidate_sha` to the exact full candidate SHA, and keep evidence-head identity separate metadata. No evidence receipt may substitute for candidate identity | Isolated proof bait embeds the evidence-head SHA while the immutable candidate stays fixed; the package identity assertion must exit 1 naming both SHAs and the mismatch. Restore the exact candidate SHA and require exit 0; preserve every other package assertion |
+| V-02 | `qa/gates/hermes-research.ts` accepts `task--abc` and `taask-abc` for `task-abc` | Narrow normalization to documented transport wrapping only. Preserve exact Kernel Task/transport identity; no character insertion, deletion, substitution, or fuzzy repair is allowed | Independently bait each malformed spelling against exact `task-abc`; each must exit 1 with exact expected/actual identity. A documented wrapper-only representation of `task-abc` must remain accepted and restore to exit 0 |
+| V-03 | `collab-electron/src/main/sidecar/server.ts` and `packages/qf-kernel/src/upgrade.ts` changed outside the frozen manifest | Reader-approved amendment must add exactly these two paths to the frozen manifest with their pre-repair SHA-256, current consumer/reachability purpose, compatibility proof, QA proof, and rollback identity. Do not discard required work unless source evidence proves a path unnecessary; no other manifest expansion is allowed | The amendment receipt must print both exact paths, pre/post SHA-256, candidate parent, and changed-path equality. A third path or either omitted hash is red; exact two-path amendment and unchanged remainder restore green |
+| V-04 | `qa/gates/golden-g8-kernel-proof.ts` reports literal `process_delta`/`root_delta` values instead of measured gate-owned state | Snapshot actual gate-owned process IDs and root paths before and after each focused run; compute and emit deltas from those snapshots, retaining existing cleanup assertions and zero-residue meaning | Isolated bait creates one gate-owned process/root or removes it from the measured snapshot; the proof must report actual before/after sets, computed nonzero delta or missing cleanup, and exit 1. Restore the measurement and require the existing zero-residue run exit 0 |
+
+For V-03, the current candidate-bound source hashes to freeze are
+`collab-electron/src/main/sidecar/server.ts` =
+`7AE53F139B847FBC5638322301BDDAEB8D4CBEA70BB765140BCD809697AF153C` and
+`packages/qf-kernel/src/upgrade.ts` =
+`C0D6047FEC75632E9FB59E82B278E7BF09D3A0F67610BB6F1CA4F398B764A660`.
+These two paths are the only proposed manifest amendment; the Reader must
+approve their exact hashes before any Builder can edit them.
+
+The amendment is Reader-pending. Builder authority is closed until the same
+semantic Reader approves this exact four-defect packet; no test or product
+implementation is authorized in this Router turn.
 
 ## Frozen current set and exact starting testimony
 

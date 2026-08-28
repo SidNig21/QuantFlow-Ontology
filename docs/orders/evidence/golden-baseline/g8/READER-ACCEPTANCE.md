@@ -1,6 +1,6 @@
 # G8 semantic Reader acceptance
 
-status: **FINAL SEMANTIC READER YES / YES — EXACTLY ONE BOUNDED BUILDER OPEN**
+status: **INDEPENDENT VERIFIER FAIL — FOUR-DEFECT READER AMENDMENT PENDING / BUILDER CLOSED**
 order: `docs/orders/WO-GOLDEN-G8.md`
 reader_task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 reader_round: `1`
@@ -12,7 +12,13 @@ final_reader_task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 final_reader_authority: `baedcecd55b91dc3c5d951f969a2111d5cedf4d2`
 final_reader_tree: `33695d1ac5a53b56077bbf739d94e6e230d6533b`
 final_reader_verdict: **YES / YES — no remaining defects**
-builder_authority: **OPEN — exactly one bounded G8 Builder under the accepted order**
+independent_verifier_verdict: **FAIL — four finite defects; see VERIFIER-ACCEPTANCE.md**
+independent_verifier_evidence_head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
+independent_verifier_evidence_tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a`
+independent_verifier_product_candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
+independent_verifier_product_tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
+reader_amendment_status: **READER APPROVAL PENDING FOR EXACT V-01 THROUGH V-04 ONLY**
+builder_authority: **CLOSED — no Builder while this amendment awaits semantic Reader approval**
 
 ## Reader answers
 
@@ -95,9 +101,21 @@ Reader confirmed that all eight Round 1 corrections, the sole Round 2
 lifecycle correction, the finite scope exclusions, and the fail-capable gate
 contracts are now unambiguous. No defects remain.
 
-Exactly one bounded G8 Builder is authorized under
-`docs/orders/WO-GOLDEN-G8.md`; later groups remain closed and R18 remains
-frozen.
+At that prior authority exactly one bounded G8 Builder was authorized under
+`docs/orders/WO-GOLDEN-G8.md`; the later independent Verifier FAIL suspended
+that authority. Later groups remain closed and R18 remains frozen.
+
+## Post-verifier disposition
+
+The independent Verifier then returned **FAIL** for the immutable candidate
+`b20966dc8ec86193de8af092df45248fbeb3fc1b` at evidence head
+`2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`. The exact bounded repair packet
+is [VERIFIER-ACCEPTANCE.md](VERIFIER-ACCEPTANCE.md) and contains only V-01
+through V-04: candidate/package identity binding, narrow PTY identity
+normalization, Reader-approved hashing of the two out-of-manifest paths, and
+measured process/root deltas. The prior Reader `YES / YES` remains valid for
+the prior order text; Builder authority is now closed pending Reader approval
+of this amendment.
 
 ## Amendment disposition
 
@@ -110,4 +128,5 @@ executable 89-declaration lifecycle invariant, with the promotion target
 corrected to `active`. No product, test, or gate code is changed by this
 receipt, no later-group Builder authority opens, G9/G10/G11/G12 remain outside
 scope, and R18 remains frozen. The final Reader has now opened exactly one bounded G8
-Builder under the accepted order; no later group is authorized.
+Builder under the prior accepted order; that authority is suspended by the
+Verifier FAIL and no later group is authorized.
