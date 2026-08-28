@@ -1,26 +1,31 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G7 CLOSED / G8 READER AMENDMENT PENDING
+# NEXT — R18 GOLDEN BASELINE HOLD / G7 CLOSED / G8 REPAIR BUILDER OPEN
 
-status: G7 CLOSED / PASS WITH INHERITED REDS / G8 VERIFIER FAIL — READER AMENDMENT PENDING
+status: G7 CLOSED / PASS WITH INHERITED REDS / G8 AMENDMENT READER YES / YES — BOUNDED V-01 THROUGH V-04 BUILDER OPEN
 rotated-at: 2026-08-28
-rotated-by: Router after final G8 semantic Reader acceptance
+rotated-by: Router after fresh G8 amendment Reader acceptance
 active-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md)
-builder-authority: **CLOSED — no G8 Builder while the four-defect amendment awaits Reader approval**
-g8-reader-status: **AMENDMENT PENDING — exact V-01 through V-04 only**
+builder-authority: **OPEN — exactly one bounded G8 repair Builder for V-01 through V-04; no later-group authority**
+g8-reader-status: **AMENDMENT YES / YES — exact V-01 through V-04 accepted**
 g8-reader-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 g8-reader-authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
 g8-reader-round-2-authority: `d6e68c8997bc28eb3a68e211737429ec64ab02b7`
 g8-final-reader-authority: `baedcecd55b91dc3c5d951f969a2111d5cedf4d2`
 g8-final-reader-tree: `33695d1ac5a53b56077bbf739d94e6e230d6533b`
 g8-reader-verdict: **FINAL YES / YES**
-g8-reader-acceptance: [Final Reader and amendment status](evidence/golden-baseline/g8/READER-ACCEPTANCE.md)
+g8-amendment-reader-task: `01a047ea-2e77-79e3-9052-47982b265786`
+g8-amendment-reader-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
+g8-amendment-reader-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
+g8-amendment-reader-verdict: **YES / YES**
+g8-reader-acceptance: [Fresh amendment Reader acceptance](evidence/golden-baseline/g8/READER-ACCEPTANCE.md)
 g8-verifier-verdict: **FAIL — four finite defects; no other assertion reopened**
 g8-evidence-head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
 g8-evidence-tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a`
 g8-product-candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
 g8-product-tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
 g8-verifier-acceptance: [G8 Verifier FAIL — V-01 through V-04](evidence/golden-baseline/g8/VERIFIER-ACCEPTANCE.md)
-g8-builder-starting-authority: **SUSPENDED — prior start was baedcecd55b91dc3c5d951f969a2111d5cedf4d2**
-g8-builder-starting-tree: **SUSPENDED — prior start was 33695d1ac5a53b56077bbf739d94e6e230d6533b**
+g8-builder-starting-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
+g8-builder-starting-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
+g8-builder-scope: **exactly V-01 through V-04; four named source paths plus generated artifacts caused solely by those repairs**
 g8-builder-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md)
 g6-status: **CLOSED / PASS WITH INHERITED G8/G12 REDS**
 g6-verifier-task: `01a04695-825e-7893-89fb-d0efb6ceec3c`
@@ -111,6 +116,20 @@ Fresh Reader task `01a0423b-f35d-7de1-8508-db6f921f25dc` returned `NO / NO` on t
 
 Fresh Reader task `01a04244-afb8-77c1-a18c-323dd5a05afb` returned `NO / NO` on the second contract. [The final causal contract](WO-GOLDEN-G5.md#reader-defects-after-07186ed) removes contradictory false cases, centralizes the guard into two causal sites, makes each lifecycle path fail-capable, and adds an exact Director-notification-before-result-return assertion with reordering falsifier. That historical contract was superseded by final Reader task `01a0426f-d4bf-7413-b974-643f935131d8`, which returned YES / YES against authority `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268`.
 
-## Final G5 candidate state
+## Historical final G5 candidate state
 
 The final causal Reader and independent Verifier are complete; G5 is closed as PASS WITH INHERITED G8/G12 REDS. G6 is closed as PASS WITH INHERITED G8/G12 REDS under its independent Verifier receipt. G7 is closed as PASS WITH INHERITED REDS under its independent Verifier receipt. G8 is the only active order and is pending the same semantic Reader's approval of the exact four-defect amendment after the independent Verifier FAIL; its Builder authority is closed. Full G9 remains after G8, and R18 remains FROZEN until Phase 2 + Phase 3 Golden PASS.
+## Current G8 amendment routing
+
+This current routing supersedes the historical pending/closed wording in the
+handoff narrative above; the authority fields at the top of this file govern.
+Fresh amendment Reader task `01a047ea-2e77-79e3-9052-47982b265786` returned
+**YES / YES** against amendment head `1d121ef3ebf9af4014632417d98984d468e93cdb`
+(tree `ed66a06c9ade1a97559f06cd18e236497b77239c`), accepting exactly V-01
+through V-04. Exactly one bounded G8 repair Builder is open from that
+identity; G9 remains after G8 and R18 remains frozen.
+Builder source surface: `qa/gates/hermes-research.ts` for V-01/V-02,
+`qa/gates/golden-g8-kernel-proof.ts` for V-04,
+`collab-electron/src/main/sidecar/server.ts` and
+`packages/qf-kernel/src/upgrade.ts` for V-03, plus generated artifacts caused
+solely by those repairs. Any other path requires a new Reader amendment.

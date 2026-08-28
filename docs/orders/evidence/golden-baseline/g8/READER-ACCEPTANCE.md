@@ -1,6 +1,6 @@
 # G8 semantic Reader acceptance
 
-status: **INDEPENDENT VERIFIER FAIL — FOUR-DEFECT READER AMENDMENT PENDING / BUILDER CLOSED**
+status: **FRESH AMENDMENT READER YES / YES — EXACTLY ONE BOUNDED V-01 THROUGH V-04 REPAIR BUILDER OPEN**
 order: `docs/orders/WO-GOLDEN-G8.md`
 reader_task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 reader_round: `1`
@@ -17,8 +17,15 @@ independent_verifier_evidence_head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
 independent_verifier_evidence_tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a`
 independent_verifier_product_candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
 independent_verifier_product_tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
-reader_amendment_status: **READER APPROVAL PENDING FOR EXACT V-01 THROUGH V-04 ONLY**
-builder_authority: **CLOSED — no Builder while this amendment awaits semantic Reader approval**
+reader_amendment_status: **ACCEPTED — exact V-01 through V-04 only**
+amendment_reader_task: `01a047ea-2e77-79e3-9052-47982b265786`
+amendment_reader_authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
+amendment_reader_tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
+amendment_reader_verdict: **YES / YES**
+builder_starting_authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
+builder_starting_tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
+builder_scope: **exactly V-01 through V-04; four named source paths plus generated artifacts caused solely by those repairs**
+builder_authority: **OPEN — exactly one bounded G8 repair Builder for V-01 through V-04**
 
 ## Reader answers
 
@@ -114,8 +121,28 @@ is [VERIFIER-ACCEPTANCE.md](VERIFIER-ACCEPTANCE.md) and contains only V-01
 through V-04: candidate/package identity binding, narrow PTY identity
 normalization, Reader-approved hashing of the two out-of-manifest paths, and
 measured process/root deltas. The prior Reader `YES / YES` remains valid for
-the prior order text; Builder authority is now closed pending Reader approval
-of this amendment.
+the prior order text; the fresh amendment Reader acceptance below authorizes
+exactly one bounded repair Builder.
+
+## Fresh amendment Reader acceptance
+
+Fresh G8 amendment Reader task `01a047ea-2e77-79e3-9052-47982b265786`
+reviewed the exact V-01 through V-04 packet against amendment head
+`1d121ef3ebf9af4014632417d98984d468e93cdb`, tree
+`ed66a06c9ade1a97559f06cd18e236497b77239c`, and returned **YES / YES**.
+
+1. **YES.** Each of V-01 through V-04 has a finite, fail-capable repair and
+   red/restore-green proof, while the prior G8 assertions remain preserved.
+2. **YES.** The amendment opens only the four named repairs; G9 Report/result
+   authority, G10 Canvas/Mission, G11 docs/history, G12 operations, and R18
+   remain outside scope or frozen as recorded.
+
+Exactly one bounded G8 repair Builder is authorized from the amendment head.
+Its source surface is exactly `qa/gates/hermes-research.ts` for V-01/V-02,
+`qa/gates/golden-g8-kernel-proof.ts` for V-04,
+`collab-electron/src/main/sidecar/server.ts` and
+`packages/qf-kernel/src/upgrade.ts` for V-03, plus generated artifacts caused
+solely by those repairs. Any other path requires a new Reader amendment.
 
 ## Amendment disposition
 
@@ -127,6 +154,7 @@ saved-state predecessor matrix, exact malformed restoration receipts, and
 executable 89-declaration lifecycle invariant, with the promotion target
 corrected to `active`. No product, test, or gate code is changed by this
 receipt, no later-group Builder authority opens, G9/G10/G11/G12 remain outside
-scope, and R18 remains frozen. The final Reader has now opened exactly one bounded G8
-Builder under the prior accepted order; that authority is suspended by the
-Verifier FAIL and no later group is authorized.
+scope, and R18 remains frozen. The final Reader opened exactly one bounded G8
+Builder under the prior accepted order; the fresh amendment Reader has now
+re-authorized exactly one bounded repair Builder for V-01 through V-04, and no
+later group is authorized.

@@ -1,6 +1,6 @@
 # WO-GOLDEN-G8 — Kernel, schema, Law-B, and proof-integrity repair
 
-status: **INDEPENDENT VERIFIER FAIL — FOUR-DEFECT READER AMENDMENT PENDING / BUILDER CLOSED**
+status: **AMENDMENT READER YES / YES — EXACTLY ONE BOUNDED V-01 THROUGH V-04 REPAIR BUILDER OPEN**
 order-type: Golden Baseline Phase 2 bounded Kernel/schema/proof-integrity group
 current-evidence-branch: `wo-golden-g2`
 parent-group: G7 **CLOSED / PASS WITH INHERITED REDS**
@@ -23,13 +23,20 @@ final-reader-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 final-reader-authority: `baedcecd55b91dc3c5d951f969a2111d5cedf4d2`
 final-reader-tree: `33695d1ac5a53b56077bbf739d94e6e230d6533b`
 final-reader-verdict: **YES / YES — all Round 1 and Round 2 defects cured; no remaining defects**
-reader-authority: **REOPENED FOR ONE BOUNDED FOUR-DEFECT AMENDMENT ONLY**
+reader-authority: **CLOSED — fresh amendment Reader accepted exactly V-01 through V-04**
 independent-verifier-verdict: **FAIL — four finite defects; no other assertion reopened**
 independent-verifier-evidence-head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
 independent-verifier-evidence-tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a5`
 independent-verifier-product-candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
 independent-verifier-product-tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
-builder-authority: **CLOSED — no Builder while this amendment awaits semantic Reader acceptance**
+builder-authority: **OPEN — exactly one bounded G8 repair Builder for V-01 through V-04**
+amendment-reader-task: `01a047ea-2e77-79e3-9052-47982b265786`
+amendment-reader-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
+amendment-reader-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
+amendment-reader-verdict: **YES / YES**
+builder-starting-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
+builder-starting-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
+builder-scope: **exactly V-01 through V-04; four named source paths plus generated artifacts caused solely by those repairs**
 g9-order: **UNCHANGED — full G9 remains after G8**
 r18-authority: **FROZEN**
 
@@ -75,8 +82,9 @@ The prior Reader disposition is recorded in
 `docs/orders/evidence/golden-baseline/g8/READER-ACCEPTANCE.md`. At that prior
 authority the order was Builder-ready: the Round 2 lifecycle wording defect was
 cured and the same Reader returned `YES / YES`. The independent Verifier then
-returned the four-defect FAIL recorded below, so that prior Builder opening is
-now suspended and the current Builder authority is closed.
+returned the four-defect FAIL recorded below, suspending that prior Builder
+opening. The fresh amendment Reader acceptance below reopens exactly one
+bounded repair Builder from the amendment head; no broader G8 authority opens.
 
 ## Reader contract — exactly two questions
 
@@ -129,9 +137,13 @@ For V-03, the current candidate-bound source hashes to freeze are
 These two paths are the only proposed manifest amendment; the Reader must
 approve their exact hashes before any Builder can edit them.
 
-The amendment is Reader-pending. Builder authority is closed until the same
-semantic Reader approves this exact four-defect packet; no test or product
-implementation is authorized in this Router turn.
+The same semantic Reader task
+`01a047ea-2e77-79e3-9052-47982b265786` returned **YES / YES** against amendment
+head `1d121ef3ebf9af4014632417d98984d468e93cdb`, tree
+`ed66a06c9ade1a97559f06cd18e236497b77239c`, accepting exactly V-01 through
+V-04. Exactly one bounded G8 repair Builder is open from that immutable
+amendment identity; no test or product implementation is authorized outside
+the four named repairs.
 
 ## Frozen current set and exact starting testimony
 
@@ -302,9 +314,12 @@ path with a measured G8 defect or a directly caused generated artifact. No
 other product, test, gate, package, installer, report, Canvas, history, or
 operations path is authorized.
 
-The Builder starts from Reader authority
+The prior Builder surface starts from Reader authority
 `baedcecd55b91dc3c5d951f969a2111d5cedf4d2` and tree
-`33695d1ac5a53b56077bbf739d94e6e230d6533b`. Its required starting matrix is
+`33695d1ac5a53b56077bbf739d94e6e230d6533b` as historical evidence. The
+fresh amendment Builder starts from Reader-approved amendment head
+`1d121ef3ebf9af4014632417d98984d468e93cdb` and tree
+`ed66a06c9ade1a97559f06cd18e236497b77239c`. Its required starting matrix is
 the exact command block in `## Required normal matrix`, including
 `repo-shape`, `doc-links`, `rung-ladder`, `kernel-one-path`,
 `kernel-sole-writer`, `kernel-sole-writer-app`, `governed-review`,
@@ -312,7 +327,12 @@ the exact command block in `## Required normal matrix`, including
 `golden-g8-kernel-proof`, `golden-g8-schema-lifecycle`, the schema test and
 generation commands, the Electron build, Atlas check/ratchet, and
 `git diff --check`. The Builder must capture this matrix before mutation and
-the Verifier must rerun it at the immutable candidate.
+the Verifier must rerun it at the immutable candidate. For this repair opening,
+the closed-world source surface is exactly `qa/gates/hermes-research.ts` for
+V-01 and V-02, `qa/gates/golden-g8-kernel-proof.ts` for V-04,
+`collab-electron/src/main/sidecar/server.ts` and
+`packages/qf-kernel/src/upgrade.ts` for V-03, plus generated artifacts caused
+solely by those repairs. Any other path requires a new Reader amendment.
 
 The existing G5 prerequisite vocabulary is available as evidence, not as a
 scope expansion: the direct-critic activation grammar and canonical report

@@ -37,3 +37,12 @@ not authorize product, test, or gate edits. The same semantic Reader must
 approve the exact four-defect amendment before any Builder authority can open.
 G9 Report authority, G10 Canvas/Mission, G11 docs/history, G12 Windows
 operations/installer, and R18 remain outside this amendment.
+
+## Subsequent Reader routing
+
+Fresh amendment Reader task `01a047ea-2e77-79e3-9052-47982b265786` later
+returned **YES / YES** against amendment head
+`1d121ef3ebf9af4014632417d98984d468e93cdb`, tree
+`ed66a06c9ade1a97559f06cd18e236497b77239c`. This later acceptance changes
+authority only: exactly one bounded G8 repair Builder is open for V-01 through
+V-04. The independent Verifier FAIL and its four defects remain unchanged.
