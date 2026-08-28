@@ -1,10 +1,10 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 CLOSED / G9 SEMANTIC READER PENDING
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 CLOSED / G9 SEMANTIC READER NO / NO AMENDMENT
 
-status: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS / G9 SEMANTIC READER PENDING — BUILDER CLOSED
+status: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS / G9 SEMANTIC READER NO / NO — FIVE FINITE AMENDMENTS / BUILDER CLOSED
 rotated-at: 2026-08-28
-rotated-by: Router after fresh final G8 Verifier result
+rotated-by: Router after G9 semantic Reader NO / NO
 active-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md)
-builder-authority: **CLOSED — G9 fresh semantic Reader only; no G9 Builder authority**
+builder-authority: **CLOSED — same G9 Reader reviews exactly five amendments; no G9 Builder authority**
 g8-reader-status: **AMENDMENT YES / YES — exact V-01 through V-04 accepted**
 g8-reader-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 g8-reader-authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
@@ -88,22 +88,26 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G9 — bounded Report authority consolidation; semantic Reader pending; Builder closed
+phase-2-active-group: G9 — bounded Report authority consolidation; semantic Reader NO / NO amendment pending; Builder closed
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
 g3-acceptance: [G3 CLOSED / ACCEPTED](evidence/golden-baseline/g3/GROUP-ACCEPTANCE.md)
 g2-acceptance: [G2 CLOSED / ACCEPTED](evidence/golden-baseline/g2/GROUP-ACCEPTANCE.md)
 g1-acceptance: [G1 CLOSED / ACCEPTED](evidence/golden-baseline/g1/GROUP-ACCEPTANCE.md)
-full-g9-authority: SEMANTIC READER PENDING AFTER G8
+full-g9-authority: SEMANTIC READER NO / NO AMENDMENT PENDING AFTER G8
 full-g8-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md) — CLOSED
-full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — SEMANTIC READER PENDING; BUILDER CLOSED
-g9-reader-status: **PENDING — no Reader task assigned; no Builder authority**
+full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — SEMANTIC READER NO / NO AMENDMENT PENDING; BUILDER CLOSED
+g9-reader-status: **NO / NO — exactly five finite defects; same Reader amendment pending; Builder closed**
+g9-reader-task: `01a0489e-04ea-71a1-8b6a-d0e151621103`
+g9-reader-authority: `d6ab5ed66a18c9de23db047a4b41584acaaeec0e`
+g9-reader-tree: `8f94bf63b16bd74e5ef17461cc4f0d15477efc4f`
+g9-reader-verdict: **NO / NO — strategy identity, durable evidence cardinality, F09 restart, legacy upgrade, and finalizer contract defects recorded**
 g9-starting-authority: `754606932dfb23bd0a6e6f432937b1c2bc436739`
 g9-starting-product-candidate: `61abfa5b23553f86a5c2d95facdf0473310fc44`
 g9-starting-product-tree: `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`
 g9-starting-evidence-tree: `b04a991ca98da1d57b8637a7fcd0738a4e41bd21`
-g9-reader-scaffold: [G9 Reader scaffold](evidence/golden-baseline/g9/READER-ACCEPTANCE.md)
+g9-reader-scaffold: [G9 Reader NO / NO amendment](evidence/golden-baseline/g9/READER-ACCEPTANCE.md)
 r18-authority: FROZEN UNTIL PHASE 2 + PHASE 3 GOLDEN PASS
 protected-main: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 
@@ -113,12 +117,17 @@ Current routing: G8 is closed at candidate
 `61abfa5b23553f86a5c2d95facdf0473310fc44` with evidence head
 `754606932dfb23bd0a6e6f432937b1c2bc436739`, under fresh independent Verifier
 task `01a0487e-4331-76e1-86ed-ef1b8db29e94`, with verdict **PASS WITH INHERITED
-G9/G12 REDS**. G9 is the only next semantic Reader packet; its Builder door is
-closed until a fresh Reader returns `YES / YES` and this file is rotated again.
-The exact G9 starting product/evidence trees and bounded source census are in
-[WO-GOLDEN-G9](WO-GOLDEN-G9.md) and its [Reader scaffold](evidence/golden-baseline/g9/READER-ACCEPTANCE.md).
-The inherited G9 report-boundary red and G12 Windows/package/operations reds
-remain red and are not acceptance.
+G9/G12 REDS**. G9 semantic Reader task
+`01a0489e-04ea-71a1-8b6a-d0e151621103` returned **NO / NO** against authority
+`d6ab5ed66a18c9de23db047a4b41584acaaeec0e` (tree
+`8f94bf63b16bd74e5ef17461cc4f0d15477efc4f`) and named exactly five finite
+defects: strategy identity, durable evidence cardinality, F09 restart proof,
+legacy upgrade order/atomicity, and finalizer persisted-ID agreement. The same
+Reader reviews the bounded amendment; Builder authority remains closed. The
+exact packet is in [WO-GOLDEN-G9](WO-GOLDEN-G9.md) and its [NO / NO Reader
+evidence](evidence/golden-baseline/g9/READER-ACCEPTANCE.md). The inherited G9
+report-boundary red and G12 Windows/package/operations reds remain red and are
+not acceptance.
 
 The remaining paragraphs in this handoff preserve historical G5–G8 routing
 receipts; the authority fields above and this paragraph govern current state.
