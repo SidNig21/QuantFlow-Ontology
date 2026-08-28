@@ -549,8 +549,10 @@ export function execute<C extends string>(
     assertSessionMayClose(db, String(validatedInput.session_id ?? ""));
   }
 
+  let completionRunId: string | undefined;
   if (command === "complete_task") {
-    assertTaskCompletionLineage(db, validatedInput, trace);
+    completionRunId = assertTaskCompletionLineage(db, validatedInput, trace);
+    if (completionRunId) validatedInput = { ...validatedInput, run_id: completionRunId };
   }
   if (command === "resolve_hypothesis") {
     assertHypothesisResolutionEvidence(db, validatedInput);
@@ -657,7 +659,7 @@ function assertTaskCompletionLineage(
   db: KernelDb,
   input: Record<string, unknown>,
   ctx: TrustedExecutionContext,
-): void {
+): string | undefined {
   const taskId = input.task_id;
   const resultArtifactId = input.result_artifact_id;
   if (typeof taskId !== "string" || typeof resultArtifactId !== "string") {
@@ -711,6 +713,33 @@ function assertTaskCompletionLineage(
       "complete_task result artifact must derive from a Kernel-receipted worker ontology read",
     );
   }
+
+  // G9's source-work binding is an existing Kernel support table. When one is
+  // present for this Task, carry its exact Run identity into the completion
+  // event so a later resolver can survive process restart without guessing.
+  const bindingTable = db
+    .query("SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = 'qf_review_source_work'")
+    .get() as { ok: number } | null;
+  if (!bindingTable) return undefined;
+  const bindings = db
+    .query("SELECT source_work FROM qf_review_source_work WHERE source_task_id = ?")
+    .all(taskId) as Array<{ source_work: string }>;
+  if (bindings.length === 0) return undefined;
+  if (bindings.length !== 1) throw new KernelError("complete_task requires exactly one durable source-work binding");
+  let sourceWork: unknown;
+  try {
+    sourceWork = JSON.parse(bindings[0]!.source_work);
+  } catch {
+    throw new KernelError("complete_task durable source-work binding is invalid");
+  }
+  if (!sourceWork || typeof sourceWork !== "object" || Array.isArray(sourceWork)) {
+    throw new KernelError("complete_task durable source-work binding is invalid");
+  }
+  const runId = (sourceWork as Record<string, unknown>).run_id;
+  if (typeof runId !== "string" || runId.length === 0) {
+    throw new KernelError("complete_task durable source-work binding lacks run_id");
+  }
+  return runId;
 }
 
 /** Count events currently in the log (test helper). */

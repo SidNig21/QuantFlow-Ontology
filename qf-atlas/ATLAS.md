@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ 5eaa8073` on 2026-08-28 by
+> Generated from `wo-golden-g2 @ 314616a1` on 2026-08-28 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -357,7 +357,7 @@ asked before the change, when nothing is red yet.
   collab-electron/src/main/index.ts
 ```
 
-`packages/qf-kernel/src/governed-review.ts` — **40 files depend on it**, it imports 8
+`packages/qf-kernel/src/governed-review.ts` — **41 files depend on it**, it imports 8
 
 ```
   packages/qf-kernel/src/index.ts
@@ -370,7 +370,7 @@ asked before the change, when nothing is red yet.
   qa/gates/dock-definition-launch/run.ts
   qa/gates/dock-profile-identity/run.ts
   qa/gates/kernel-drift/run.ts
-  …30 more
+  …31 more
 ```
 
 ### Blast-radius coverage
@@ -385,10 +385,10 @@ Most-depended-on files — change these last:
 
 | File | Dependents | Imports | Wires |
 |---|---:|---:|---:|
-| `packages/qf-kernel/src/trace.ts` | 52+ | 1 | 0 |
+| `packages/qf-kernel/src/trace.ts` | 53+ | 1 | 0 |
 | `collab-electron/src/main/file-filter.ts` | 51+ | 2 | 0 |
-| `packages/qf-kernel/src/registry-drift.ts` | 50+ | 0 | 0 |
-| `packages/qf-kernel/src/upgrade.ts` | 50+ | 3 | 0 |
+| `packages/qf-kernel/src/registry-drift.ts` | 51+ | 0 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | 51+ | 3 | 0 |
 | `collab-electron/src/main/files.ts` | 48+ | 2 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
@@ -525,7 +525,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 359
 - **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 531
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 874
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 882
 - **packages/qf-kernel/src/strategy-outcome.ts** — INSERT INTO artifact at line 195
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentTrajectoryArtifact() at line 32
 - `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 120

@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "5eaa8073",
+    "commit": "314616a1",
     "generatedAt": "2026-08-28",
     "filesScanned": 407,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "a8358cfb7d24deba"
+    "fingerprint": "963fc0302dc1a088"
   },
   "stats": {
     "live": 104,
@@ -2989,7 +2989,7 @@
       "id": "0:packages/qf-kernel/src::execute",
       "layer": 0,
       "name": "execute.ts",
-      "kb": 32.8,
+      "kb": 34.3,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -3000,7 +3000,7 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/execute.ts",
-          "kb": 32.8,
+          "kb": 34.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3042,11 +3042,11 @@
           "dml": 32,
           "dmlLines": [
             135,
-            318,
-            321,
-            330,
-            341,
-            346
+            326,
+            329,
+            338,
+            349,
+            354
           ],
           "executes": 7
         }
@@ -3060,11 +3060,11 @@
           "where": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
             135,
-            318,
-            321,
-            330,
-            341,
-            346
+            326,
+            329,
+            338,
+            349,
+            354
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -3260,14 +3260,14 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 913.2,
+      "kb": 944.3,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 82,
-      "writes": 44,
-      "dml": 21,
-      "executes": 49,
+      "spawns": 83,
+      "writes": 48,
+      "dml": 61,
+      "executes": 66,
       "files": [
         {
           "path": "qa/gates/pre-r18-coherence.ts",
@@ -3318,6 +3318,23 @@
           "dml": 0,
           "dmlLines": [],
           "executes": 0
+        },
+        {
+          "path": "qa/gates/report-authority.ts",
+          "kb": 40,
+          "spawns": 2,
+          "spawnsLive": 0,
+          "writes": 4,
+          "dml": 42,
+          "dmlLines": [
+            319,
+            320,
+            340,
+            341,
+            343,
+            359
+          ],
+          "executes": 17
         },
         {
           "path": "qa/gates/founder-steering.ts",
@@ -3532,19 +3549,6 @@
             48,
             57,
             57
-          ],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/report-authority.ts",
-          "kb": 8.9,
-          "spawns": 1,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 2,
-          "dmlLines": [
-            89,
-            89
           ],
           "executes": 0
         },
@@ -3959,6 +3963,21 @@
         {
           "kind": "outside-write-door",
           "scope": "qa",
+          "what": "42 SQL statements outside execute()",
+          "where": "qa/gates/report-authority.ts",
+          "lines": [
+            319,
+            320,
+            340,
+            341,
+            343,
+            359
+          ],
+          "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
+        },
+        {
+          "kind": "outside-write-door",
+          "scope": "qa",
           "what": "3 SQL statements outside execute()",
           "where": "qa/gates/kernel-sole-writer.ts",
           "lines": [
@@ -3976,17 +3995,6 @@
           "lines": [
             558,
             558
-          ],
-          "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
-        },
-        {
-          "kind": "outside-write-door",
-          "scope": "qa",
-          "what": "2 SQL statements outside execute()",
-          "where": "qa/gates/report-authority.ts",
-          "lines": [
-            89,
-            89
           ],
           "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
         },
@@ -10979,9 +10987,9 @@
         {
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [
-            "exports ensureGovernedReviewSchema() at line 336",
-            "exports executeGovernedReviewTask() at line 724",
-            "exports requestGovernedReview() at line 751"
+            "exports ensureGovernedReviewSchema() at line 344",
+            "exports executeGovernedReviewTask() at line 732",
+            "exports requestGovernedReview() at line 759"
           ],
           "strong": [
             "INSERT INTO evaluation at line 949",
@@ -11067,7 +11075,7 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "INSERT INTO artifact at line 874"
+            "INSERT INTO artifact at line 882"
           ],
           "weight": "strong"
         },
@@ -18532,7 +18540,7 @@
         "reach": "no reach row was produced for this path",
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "persistence": "8 of 8 SQL site(s) are not inside a named function, so no call path can be traced",
+        "persistence": "12 of 12 SQL site(s) are not inside a named function, so no call path can be traced",
         "lifetime": "starts no long-lived child process",
         "packaging": "test or QA code does not ship",
         "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
@@ -25572,10 +25580,11 @@
       "path": "collab-electron/src/main/research-world-projection.ts",
       "reach": "reachable",
       "importers": [
+        "qa/gates/report-authority.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/ontology-gateway.ts"
       ],
-      "importerCount": 2,
+      "importerCount": 3,
       "imports": [],
       "importCount": 0
     },
@@ -26593,14 +26602,14 @@
       "path": "packages/qf-kernel/src/events.ts",
       "reach": "reachable",
       "importers": [
+        "qa/gates/report-authority.ts",
         "packages/qf-kernel/src/create.ts",
         "packages/qf-kernel/src/execute.ts",
         "packages/qf-kernel/src/governed-review.ts",
         "packages/qf-kernel/src/market-context.ts",
-        "packages/qf-kernel/src/deterministic-execution.ts",
-        "packages/qf-kernel/src/market-ingest.ts"
+        "packages/qf-kernel/src/deterministic-execution.ts"
       ],
-      "importerCount": 7,
+      "importerCount": 8,
       "imports": [
         "packages/qf-kernel/src/db.ts"
       ],
@@ -26692,7 +26701,7 @@
         "qa/gates/dock-profile-identity/run.ts",
         "qa/gates/kernel-drift/run.ts"
       ],
-      "importerCount": 26,
+      "importerCount": 27,
       "imports": [
         "packages/qf-kernel/src/db.ts",
         "packages/qf-kernel/src/resolve-path.ts",
@@ -30013,10 +30022,12 @@
     "collab-electron/src/main/research-world-projection.ts": {
       "reach": "reachable",
       "directDependents": [
+        "qa/gates/report-authority.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/ontology-gateway.ts"
       ],
       "transitiveDependents": [
+        "qa/run.ts",
         "collab-electron/src/main/index.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -31444,6 +31455,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31513,6 +31525,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31564,6 +31577,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31626,6 +31640,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31675,6 +31690,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31753,6 +31769,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31780,6 +31797,7 @@
     "packages/qf-kernel/src/events.ts": {
       "reach": "reachable",
       "directDependents": [
+        "qa/gates/report-authority.ts",
         "packages/qf-kernel/src/create.ts",
         "packages/qf-kernel/src/execute.ts",
         "packages/qf-kernel/src/governed-review.ts",
@@ -31789,6 +31807,7 @@
         "packages/qf-kernel/src/strategy-outcome.ts"
       ],
       "transitiveDependents": [
+        "qa/run.ts",
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "qa/gates/golden-g8-kernel-proof.ts",
@@ -31852,6 +31871,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31918,6 +31938,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31965,6 +31986,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32032,6 +32054,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32051,8 +32074,7 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts",
-        "packages/qf-kernel/src/execute.ts"
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -32074,6 +32096,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32162,6 +32185,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32214,6 +32238,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32275,6 +32300,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32338,6 +32364,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32394,6 +32421,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32419,8 +32447,7 @@
         "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts"
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32505,6 +32532,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32569,6 +32597,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32631,6 +32660,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32696,6 +32726,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32718,9 +32749,7 @@
         "collab-electron/src/main/kernel.ts",
         "packages/qf-kernel/src/execute.ts",
         "qa/run.ts",
-        "tools/qf-read-tools/src/discovery.ts",
-        "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts"
+        "tools/qf-read-tools/src/discovery.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -32746,6 +32775,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32811,6 +32841,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32830,8 +32861,7 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts",
-        "packages/qf-kernel/src/governed-review.ts"
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -32857,6 +32887,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32924,6 +32955,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32945,9 +32977,7 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "qa/run.ts",
-        "tools/qf-read-tools/src/discovery.ts",
-        "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts"
+        "tools/qf-read-tools/src/discovery.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33019,6 +33049,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -33063,6 +33094,7 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
+        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -38748,6 +38780,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -39008,6 +39048,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -39308,6 +39356,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -39899,6 +39955,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -40710,6 +40774,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -40965,6 +41037,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -41445,6 +41525,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -42192,6 +42280,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -42627,6 +42723,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -43135,6 +43239,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -43526,6 +43638,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -44260,6 +44380,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -44797,6 +44925,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -45171,6 +45307,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -45676,6 +45820,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -46137,6 +46289,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -46489,6 +46649,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -50183,7 +50351,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            374
+            382
           ]
         }
       ]
@@ -50225,7 +50393,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            361
+            369
           ]
         }
       ]
@@ -50267,7 +50435,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            392
+            400
           ]
         }
       ]
@@ -50309,7 +50477,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            385
+            393
           ]
         }
       ]
@@ -50351,7 +50519,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            341
+            349
           ]
         }
       ]
@@ -50393,7 +50561,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            346
+            354
           ]
         }
       ]
@@ -50415,7 +50583,7 @@
         "hops": 3,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:338",
+            "from": "packages/qf-kernel/src/governed-review.ts:346",
             "fn": "ensureGovernedReviewSchema",
             "calls": "migrateLegacyPublicationTable"
           },
@@ -50440,7 +50608,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            330
+            338
           ]
         }
       ]
@@ -50462,7 +50630,7 @@
         "hops": 3,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:338",
+            "from": "packages/qf-kernel/src/governed-review.ts:346",
             "fn": "ensureGovernedReviewSchema",
             "calls": "migrateLegacyPublicationTable"
           },
@@ -50487,7 +50655,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            318
+            326
           ]
         }
       ]
@@ -50509,7 +50677,7 @@
         "hops": 3,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:338",
+            "from": "packages/qf-kernel/src/governed-review.ts:346",
             "fn": "ensureGovernedReviewSchema",
             "calls": "migrateLegacyPublicationTable"
           },
@@ -50534,7 +50702,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            321
+            329
           ]
         }
       ]
@@ -51364,7 +51532,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            656
+            664
           ]
         }
       ]
@@ -51389,7 +51557,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            488
+            496
           ]
         }
       ]
@@ -51414,7 +51582,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            679
+            687
           ]
         }
       ]
@@ -51439,7 +51607,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            675
+            683
           ]
         }
       ]
@@ -51464,7 +51632,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            716
+            724
           ]
         }
       ]
@@ -51489,7 +51657,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            700
+            708
           ]
         }
       ]
@@ -51514,7 +51682,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            874
+            882
           ]
         }
       ]
@@ -51539,7 +51707,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            536
+            544
           ]
         }
       ]
@@ -51564,7 +51732,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            530
+            538
           ]
         }
       ]
@@ -51841,7 +52009,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            782
+            790
           ]
         }
       ]
@@ -52253,11 +52421,11 @@
       "where": "packages/qf-kernel/src/governed-review.ts",
       "lines": [
         135,
-        318,
-        321,
-        330,
-        341,
-        346
+        326,
+        329,
+        338,
+        349,
+        354
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -52388,6 +52556,21 @@
     {
       "kind": "outside-write-door",
       "scope": "qa",
+      "what": "42 SQL statements outside execute()",
+      "where": "qa/gates/report-authority.ts",
+      "lines": [
+        319,
+        320,
+        340,
+        341,
+        343,
+        359
+      ],
+      "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
+    },
+    {
+      "kind": "outside-write-door",
+      "scope": "qa",
       "what": "12 SQL statements outside execute()",
       "where": "qa/gates/vault-projection/fixture-seed.ts",
       "lines": [
@@ -52439,17 +52622,6 @@
     {
       "kind": "outside-write-door",
       "scope": "qa",
-      "what": "2 SQL statements outside execute()",
-      "where": "qa/gates/report-authority.ts",
-      "lines": [
-        89,
-        89
-      ],
-      "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
-    },
-    {
-      "kind": "outside-write-door",
-      "scope": "qa",
       "what": "1 SQL statement outside execute()",
       "where": "qa/gates/team-composition.ts",
       "lines": [
@@ -52461,12 +52633,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "f7e841ff",
+      "commit": "5eaa8073",
       "generatedAt": "2026-08-28"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "5eaa8073",
+      "commit": "314616a1",
       "generatedAt": "2026-08-28"
     },
     "verdict": "better",

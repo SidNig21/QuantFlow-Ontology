@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { appendEvent } from "./events.ts";
 import {
   bindSourceWork,
   closeKernel,
@@ -9,6 +10,7 @@ import {
   execute,
   openKernel,
   recordGovernedToolReceipt,
+  readGovernedPublicationForEvaluation,
   requestGovernedReview,
   resolveGovernedWorkerEvidence,
   type KernelDb,
@@ -19,9 +21,19 @@ let db: KernelDb | undefined;
 let root: string | undefined;
 let nextCriticSequence = new Map<string, number>();
 
-afterEach(() => {
+async function removeTestRoot(path: string): Promise<void> {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      rmSync(path, { recursive: true, force: true });
+      if (!existsSync(path)) return;
+    } catch {}
+    await Bun.sleep(25);
+  }
+}
+
+afterEach(async () => {
   if (db) closeKernel(db);
-  if (root) rmSync(root, { recursive: true, force: true });
+  if (root) await removeTestRoot(root);
   db = undefined;
   root = undefined;
 });
@@ -90,6 +102,9 @@ type World = {
   strategyId: string;
   datasetId: string;
   missionId: string;
+  label: string;
+  criticId: string;
+  reviewTaskId: string;
 };
 
 function supportWorld(label: string, missionId: string, datasetId: string, family: string, workerId: string, criticId: string, complete = true): World {
@@ -132,6 +147,7 @@ function supportWorld(label: string, missionId: string, datasetId: string, famil
   if (!complete) {
     return {
       sourceTaskId: task.object_id, work, evaluationId: "", reportId: "", strategyId, datasetId, missionId,
+      label, criticId, reviewTaskId,
     };
   }
   const evaluation = execute(db!, "record_evaluation", {
@@ -146,17 +162,32 @@ function supportWorld(label: string, missionId: string, datasetId: string, famil
     sourceTaskId: task.object_id, work, evaluationId: String(evaluation.state.id),
     reportId: String(evaluation.state.report_artifact_id),
     strategyId, datasetId, missionId,
+    label, criticId, reviewTaskId,
   };
 }
 
-function base(): { missionId: string; datasetId: string } {
-  root = mkdtempSync(join(tmpdir(), "qf-g9-authority-"));
+function recordOutcome(world: World, verdict: "rejects" | "inconclusive"): { state: Record<string, unknown> } {
+  const score = verdict === "rejects" ? 0.4 : 0.6;
+  return execute(db!, "record_evaluation", {
+    hypothesis_id: world.work.hypothesis_id, run_id: world.work.run_id,
+    artifact_id: world.work.result_artifact_id, review_task_id: world.reviewTaskId,
+    source_work: world.work, broker_invocation_id: `${world.label}-receipt-4`, verdict,
+    rubric: { faithfulness: score, answer_relevancy: score, context_precision: score, context_recall: score },
+    confidence: 0.9, rationale: `${world.label} is intentionally non-supporting.`,
+    findings: [{ code: "G9_BLOCKED", severity: "warning", message: "The independent review blocks publication.", evidence_refs: [world.work.result_artifact_id] }],
+  }, { ...trace, actor_session_id: world.criticId }) as { state: Record<string, unknown> };
+}
+
+function base(path = ":memory:", ownedRoot = mkdtempSync(join(tmpdir(), "qf-g9-authority-"))): { missionId: string; datasetId: string } {
+  root = ownedRoot;
   process.env.QF_ARTIFACT_ROOT = root;
-  db = openKernel(":memory:");
+  db = openKernel(path, path === ":memory:" ? {} : { create: true });
   session("director", "g9-director", "orchestrator");
   session("worker-a", "g9-worker-a", "worker");
   session("worker-b", "g9-worker-b", "worker");
   session("critic-a", "hermes-critic", "critic");
+  execute(db, "create_agent_session", { session_id: "critic-executor", agent_definition_id: "hermes-critic", label: "critic-executor" }, trace);
+  execute(db, "start_agent_session", { session_id: "critic-executor" }, trace);
   execute(db, "create_agent_session", { session_id: "critic-b", agent_definition_id: "hermes-critic", label: "critic-b" }, trace);
   execute(db, "start_agent_session", { session_id: "critic-b" }, trace);
   nextCriticSequence = new Map<string, number>();
@@ -180,6 +211,18 @@ describe("G9 Report authority", () => {
     expect(() => db!.query("UPDATE qf_review_publication SET is_current = 1 WHERE source_work_key = ?").run(rows[0]!.source_work_key)).toThrow();
     expect(db!.query("SELECT COUNT(*) AS n FROM artifact WHERE kind = 'report'").get()).toEqual({ n: 2 });
     expect(db!.query("SELECT COUNT(*) AS n FROM links WHERE kind = 'gates'").get()).toEqual({ n: 2 });
+
+    const report = db!.query("SELECT storage_ref FROM artifact WHERE id = ?").get(second.reportId) as { storage_ref: string };
+    const payload = JSON.parse(readFileSync(report.storage_ref, "utf8")) as Record<string, unknown>;
+    expect(Object.keys(payload).sort()).toEqual(["publication_evaluation", "schema", "source_result", "source_work"]);
+    expect(payload).not.toHaveProperty("authority_context");
+    expect(rows[1]).toMatchObject({
+      mission_id: missionId,
+      strategy_id: second.strategyId,
+      strategy_version: 1,
+      dataset_id: datasetId,
+      dataset_as_of: "2026-08-28T00:00:00.000Z",
+    });
   });
 
   test("keeps same-version different-strategy and other key fields independent", () => {
@@ -201,6 +244,75 @@ describe("G9 Report authority", () => {
     expect(() => resolveGovernedWorkerEvidence(db!, missing.work as never)).toThrow("Run lacks exact worker evidence binding: g9-missing-run");
     expect(db!.query("SELECT COUNT(*) AS n FROM artifact WHERE kind = 'report'").get()).toEqual({ n: 0 });
     expect(db!.query("SELECT COUNT(*) AS n FROM qf_review_publication").get()).toEqual({ n: 0 });
+  });
+
+  test("refuses rejects, inconclusive reviews, and self-review without publishing", () => {
+    const { missionId, datasetId } = base();
+    const rejected = supportWorld("g9-rejected", missionId, datasetId, "g9-technique", "worker-a", "critic-a", false);
+    completeWorkerTask(rejected.sourceTaskId, "worker-a", "g9-rejected");
+    const rejectResult = recordOutcome(rejected, "rejects");
+    expect(rejectResult.state.report_artifact_id).toBeNull();
+
+    const inconclusive = supportWorld("g9-inconclusive", missionId, datasetId, "g9-technique", "worker-b", "critic-b", false);
+    completeWorkerTask(inconclusive.sourceTaskId, "worker-b", "g9-inconclusive");
+    const inconclusiveResult = recordOutcome(inconclusive, "inconclusive");
+    expect(inconclusiveResult.state.report_artifact_id).toBeNull();
+
+    const selfReview = supportWorld("g9-self-review", missionId, datasetId, "g9-technique", "critic-executor", "critic-executor", false);
+    completeWorkerTask(selfReview.sourceTaskId, "critic-executor", "g9-self-review");
+    expect(() => recordOutcome(selfReview, "rejects")).toThrow("independent critic session");
+    expect(db!.query("SELECT COUNT(*) AS n FROM artifact WHERE kind = 'report'").get()).toEqual({ n: 0 });
+    expect(db!.query("SELECT COUNT(*) AS n FROM qf_review_publication").get()).toEqual({ n: 0 });
+  });
+
+  test("binds completion evidence to the exact Run and rejects zero, multiple, non-trajectory, and mismatched candidates", () => {
+    const { missionId, datasetId } = base();
+    const world = supportWorld("g9-binding", missionId, datasetId, "g9-technique", "worker-a", "critic-a", false);
+    completeWorkerTask(world.sourceTaskId, "worker-a", "g9-binding");
+    const event = db!.query("SELECT id, payload FROM events WHERE type = 'task.completed' AND object_id = ?").get(world.sourceTaskId) as { id: string; payload: string };
+    const originalPayload = JSON.parse(event.payload) as Record<string, unknown>;
+    expect((originalPayload.input as Record<string, unknown>).run_id).toBe(world.work.run_id);
+    expect(resolveGovernedWorkerEvidence(db!, world.work as never).artifactId).toBeString();
+
+    appendEvent(db!, {
+      type: "task.completed",
+      object_type: "task",
+      object_id: world.sourceTaskId,
+      payload: originalPayload,
+      trace_id: "g9-duplicate-completion",
+    });
+    expect(() => resolveGovernedWorkerEvidence(db!, world.work as never)).toThrow("Run lacks exact worker evidence binding: g9-binding-run");
+    db!.query("DELETE FROM events WHERE trace_id = ?").run("g9-duplicate-completion");
+
+    const mismatchedPayload = {
+      ...originalPayload,
+      input: { ...(originalPayload.input as Record<string, unknown>), run_id: "other-run" },
+    };
+    db!.query("UPDATE events SET payload = ? WHERE id = ?").run(JSON.stringify(mismatchedPayload), event.id);
+    expect(() => resolveGovernedWorkerEvidence(db!, world.work as never)).toThrow("Run lacks exact worker evidence binding: g9-binding-run");
+    db!.query("UPDATE events SET payload = ? WHERE id = ?").run(JSON.stringify(originalPayload), event.id);
+
+    const artifactId = JSON.parse(event.payload).input.result_artifact_id as string;
+    db!.query("UPDATE artifact SET kind = 'result_set' WHERE id = ?").run(artifactId);
+    expect(() => resolveGovernedWorkerEvidence(db!, world.work as never)).toThrow("Run lacks exact worker evidence binding: g9-binding-run");
+  });
+
+  test("durable completion and publication survive closing and reopening the Kernel", () => {
+    const restartRoot = mkdtempSync(join(tmpdir(), "qf-g9-restart-"));
+    const restartPath = join(restartRoot, "restart.db");
+    const { missionId, datasetId } = base(restartPath, restartRoot);
+    const world = supportWorld("g9-restart", missionId, datasetId, "g9-technique", "worker-a", "critic-a");
+    closeKernel(db!);
+    db = undefined;
+    db = openKernel(restartPath);
+    expect(resolveGovernedWorkerEvidence(db, world.work as never).artifactId).toBeString();
+    expect(readGovernedPublicationForEvaluation(db, world.evaluationId)).toMatchObject({
+      report_artifact_id: world.reportId,
+      publication_evaluation_id: world.evaluationId,
+      is_current: 1,
+    });
+    closeKernel(db);
+    db = undefined;
   });
 
   test("legacy migration partitions before deterministic fold and aborts atomically", () => {

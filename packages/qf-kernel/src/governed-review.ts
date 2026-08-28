@@ -218,6 +218,8 @@ function eventObject(value: unknown, label: string): JsonRecord {
 /** Resolve the one completed worker trajectory that is allowed to support a Report. */
 export function resolveGovernedWorkerEvidence(db: KernelDb, work: SourceWork): GovernedWorkerEvidence {
   const fail = (): never => { throw new KernelError(`Run lacks exact worker evidence binding: ${work.run_id}`); };
+  const bound = readSourceWork(db, work.source_task_id);
+  if (!bound || !sameJson(bound, work)) fail();
   const assignments = db.query(
     "SELECT to_id FROM links WHERE from_id = ? AND kind = 'assigned_to' ORDER BY created_at ASC, id ASC",
   ).all(work.source_task_id) as Array<{ to_id: string }>;
@@ -229,17 +231,23 @@ export function resolveGovernedWorkerEvidence(db: KernelDb, work: SourceWork): G
       WHERE type = 'task.completed' AND object_type = 'task' AND object_id = ?
       ORDER BY rowid ASC, id ASC`,
   ).all(work.source_task_id) as Array<{ id: string; payload: string }>;
-  let candidates: Array<{ event: { id: string }; artifactId: unknown }> = [];
+  let candidates: Array<{ event: { id: string }; artifactId: unknown; runId: unknown; taskId: unknown }> = [];
   try {
     candidates = events.map((event) => {
       const payload = eventObject(event.payload, "task.completed payload");
       const input = eventObject(payload.input, "task.completed input");
-      return { event, artifactId: input.result_artifact_id };
+    return { event, artifactId: input.result_artifact_id, runId: input.run_id, taskId: input.task_id };
     });
   } catch {
     fail();
   }
-  if (candidates.length !== 1 || typeof candidates[0]!.artifactId !== "string" || candidates[0]!.artifactId.length === 0) fail();
+  if (
+    candidates.length !== 1 ||
+    candidates[0]!.taskId !== work.source_task_id ||
+    (candidates[0]!.runId !== undefined && candidates[0]!.runId !== work.run_id) ||
+    typeof candidates[0]!.artifactId !== "string" ||
+    candidates[0]!.artifactId.length === 0
+  ) fail();
   const artifactId = String(candidates[0]!.artifactId);
   const artifact = db.query("SELECT kind, storage_ref FROM artifact WHERE id = ?").get(artifactId) as { kind: string; storage_ref: string } | null;
   const producers = db.query(
@@ -874,19 +882,11 @@ function insertArtifact(db: KernelDb, id: string, kind: string, bytes: Uint8Arra
   db.query("INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref) VALUES (?, ?, ?, ?, ?)").run(id, new Date().toISOString(), kind, id, storageRef);
 }
 
-function canonicalReport(work: SourceWork, context: AuthorityContext, resultContentHash: string, evaluation: JsonRecord, findingsId: string, findingsHash: string): Uint8Array {
+function canonicalReport(work: SourceWork, resultContentHash: string, evaluation: JsonRecord, findingsId: string, findingsHash: string): Uint8Array {
   const rubric = evaluation.rubric as Rubric;
   const envelope = {
     schema: "qf.research.report.v2",
     source_work: work,
-    authority_context: {
-      mission_id: context.mission_id,
-      strategy_id: context.strategy_id,
-      strategy_version: context.strategy_version,
-      dataset_id: context.dataset_id,
-      dataset_as_of: context.dataset_as_of,
-      authority_key: context.authority_key,
-    },
     source_result: { artifact_id: work.result_artifact_id, content_hash: resultContentHash },
     publication_evaluation: {
       evaluation_id: evaluation.id,
@@ -953,7 +953,7 @@ export function recordGovernedEvaluation(db: KernelDb, input: JsonRecord, trace:
     let reportId: string | null = existingPublication?.report_artifact_id ?? null;
     if (derivedVerdict === "supports" && !authorityContext) throw new KernelError("Report authority context is unavailable");
     if (derivedVerdict === "supports" && !existingPublication) {
-      const reportBytes = canonicalReport(work, authorityContext!, resultArtifact.content_hash, { ...evaluationRow, id: evaluationId }, findingsId, findingsId);
+      const reportBytes = canonicalReport(work, resultArtifact.content_hash, { ...evaluationRow, id: evaluationId }, findingsId, findingsId);
       reportId = contentHash(reportBytes);
       insertArtifact(db, reportId, "report", reportBytes, "reports");
       const predecessor = db.query(
