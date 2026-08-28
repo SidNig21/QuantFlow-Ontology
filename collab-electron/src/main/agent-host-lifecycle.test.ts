@@ -1,8 +1,4 @@
 import { describe, expect, mock, test } from "bun:test";
-import { Database } from "bun:sqlite";
-import { mkdtempSync, rmSync } from "node:fs";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
 import { PeerRoleRegistry } from "./peer-role-registry";
 
 const roles = new PeerRoleRegistry();
@@ -10,6 +6,11 @@ let teardownCalls = 0;
 const definitions = new Map<string, Record<string, unknown>>();
 const sessions = new Map<string, Record<string, unknown>>();
 const tasks = new Map<string, Record<string, unknown>>();
+const pendingResults = new Set<string>();
+
+mock.module("./peer-delivery", () => ({
+  hasUndeliveredResult: (_role: string, sessionId: string, _dbPath: string) => pendingResults.has(sessionId),
+}));
 
 mock.module("./kernel", () => ({
   getArtifactRoot: () => "",
@@ -42,6 +43,9 @@ mock.module("./kernel", () => ({
     } else if (command === "close_agent_session") {
       const session = sessions.get(id);
       if (session) session.status = "closed";
+    } else if (command === "cancel_agent_session") {
+      const session = sessions.get(id);
+      if (session) session.status = "cancelled";
     }
     return { object_id: id, command };
   },
@@ -136,28 +140,6 @@ mock.module("./definition-runtime", () => ({
   }),
 }));
 
-class BunDatabaseSync {
-  private readonly database: Database;
-
-  constructor(path: string) {
-    this.database = new Database(path);
-  }
-
-  prepare(sql: string) {
-    return this.database.prepare(sql);
-  }
-
-  exec(sql: string) {
-    return this.database.exec(sql);
-  }
-
-  close() {
-    this.database.close();
-  }
-}
-
-mock.module("node:sqlite", () => ({ DatabaseSync: BunDatabaseSync }));
-
 const trace = () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
 
 function registerDefinition(kernelExecute: Function, id: string, role: string): void {
@@ -180,99 +162,120 @@ function createSession(kernelExecute: Function, id: string, definitionId: string
   kernelExecute("start_agent_session", { session_id: id }, trace());
 }
 
-function createBus(path: string): Database {
-  const db = new Database(path);
-  db.exec(`
-    CREATE TABLE messages (
-      id TEXT PRIMARY KEY,
-      from_role TEXT,
-      to_role TEXT,
-      from_session_id TEXT,
-      to_session_id TEXT,
-      artifact_id TEXT,
-      body TEXT,
-      message_kind TEXT DEFAULT 'task',
-      reply_to_artifact_id TEXT,
-      created_at TEXT,
-      delivered INTEGER DEFAULT 0,
-      pushed_at TEXT
-    )
-  `);
-  return db;
-}
-
 describe("agent-host native-TUI lifecycle admission", () => {
-  test("holds teardown for an undelivered result and releases it only after acknowledgment", async () => {
-    const busRoot = mkdtempSync(join(tmpdir(), "qf-g5-agent-host-bus-"));
-    const busPath = join(busRoot, "peer-bus.db");
-    const previousPeerBusDb = process.env.QF_PEER_BUS_DB;
-    process.env.QF_PEER_BUS_DB = busPath;
+  const peerBusDb = "peer-bus-fixture";
+
+  async function admitSession(id: string): Promise<{
+    admitted: { sessionId: string; ptySessionId: string };
+    kernelExecute: Function;
+    kernelGetObject: Function;
+  }> {
+    process.env.QF_PEER_BUS_DB = peerBusDb;
+    const { admitAndStartSession } = await import("./agent-host");
+    const { kernelExecute, kernelGetObject } = await import("./kernel");
+    registerDefinition(kernelExecute, "hermes-research-director", "orchestrator");
+    createSession(kernelExecute, id, "hermes-research-director");
+    const admitted = await admitAndStartSession("hermes-research-director", { existingSessionId: id });
+    return { admitted, kernelExecute, kernelGetObject };
+  }
+
+  test("registry.begin blocks direct teardown and releases after acknowledgment", async () => {
+    pendingResults.clear();
     teardownCalls = 0;
-    let bus: Database | null = null;
+    const id = "registry-session";
+    const { admitted, kernelGetObject } = await admitSession(id);
+    const { createNativeTuiTeardownRegistry, closeAgentSessionRow } = await import("./agent-host");
+    pendingResults.add(id);
+    const entry = {
+      cancelled: false,
+      definitionId: "hermes-research-director",
+      guestId: admitted.ptySessionId,
+      kind: "native_tui" as const,
+      ptySessionId: admitted.ptySessionId,
+      peerRole: "orchestrator",
+      turnInFlight: false,
+    } as Parameters<ReturnType<typeof createNativeTuiTeardownRegistry>["begin"]>[1];
+    const registry = createNativeTuiTeardownRegistry(async (value) => {
+      teardownCalls += 1;
+      if (value.peerRole) roles.unregister(value.peerRole, value.ptySessionId);
+    });
 
-    try {
-      const { admitAndStartSession, closeAgentSessionRow } = await import("./agent-host");
-      const { kernelExecute, kernelGetObject } = await import("./kernel");
-      registerDefinition(kernelExecute, "hermes-research-director", "orchestrator");
-      registerDefinition(kernelExecute, "hermes-worker", "worker");
-      createSession(kernelExecute, "director-session", "hermes-research-director");
-      createSession(kernelExecute, "worker-session", "hermes-worker");
-      const mission = kernelExecute("create_mission", {
-        mission_id: "mission-lifecycle",
-        name: "Lifecycle falsifier",
-        objective: "Protect a delegated result recipient.",
-      }, trace()) as { object_id: string };
-      kernelExecute("create_task", {
-        task_id: "task-lifecycle",
-        title: "Complete worker task",
-        description: "A result remains pending at the recipient seat.",
-        assignee_session_id: "worker-session",
-      }, { ...trace(), actor_session_id: "director-session", mission_id: mission.object_id });
-      kernelExecute("complete_task", {
-        task_id: "task-lifecycle",
-        result_artifact_id: "artifact-lifecycle",
-      }, { ...trace(), actor_session_id: "worker-session", mission_id: mission.object_id });
-      expect((kernelGetObject("task", "task-lifecycle") as { status: string }).status).toBe("done");
+    expect(() => registry.begin(id, entry)).toThrow("delegated result remains undelivered");
+    expect(teardownCalls).toBe(0);
+    expect(roles.get("orchestrator")).toBe(`pty-${id}`);
+    expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("running");
 
-      bus = createBus(busPath);
-      bus.prepare(`
-        INSERT INTO messages
-          (id, from_role, to_role, from_session_id, to_session_id, artifact_id, body,
-           message_kind, created_at, pushed_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
-      `).run(
-        "result-message-lifecycle",
-        "worker",
-        "orchestrator",
-        "worker-session",
-        "director-session",
-        "artifact-lifecycle",
-        JSON.stringify({ task_id: "task-lifecycle", artifact_id: "artifact-lifecycle" }),
-        "result",
-        new Date().toISOString(),
-      );
+    pendingResults.delete(id);
+    await registry.begin(id, entry);
+    expect(teardownCalls).toBe(1);
+    expect(roles.get("orchestrator")).toBeUndefined();
 
-      await admitAndStartSession("hermes-research-director", { existingSessionId: "director-session" });
-      expect(roles.get("orchestrator")).toBe("pty-director-session");
+    closeAgentSessionRow(id);
+    expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("closed");
+  });
 
-      // The worker Task is complete, but completion is intermediate—not delivery.
-      expect(() => closeAgentSessionRow("director-session")).toThrow(
-        "delegated result remains undelivered",
-      );
-      expect(teardownCalls).toBe(0);
-      expect(roles.get("orchestrator")).toBe("pty-director-session");
+  test("explicit close blocks before Kernel-row close and releases after acknowledgment", async () => {
+    pendingResults.clear();
+    teardownCalls = 0;
+    const id = "explicit-close-session";
+    const { kernelGetObject } = await admitSession(id);
+    const { closeAgentSessionRow, hasLiveAgentSession } = await import("./agent-host");
+    pendingResults.add(id);
 
-      bus.prepare("UPDATE messages SET pushed_at = ? WHERE id = ?")
-        .run(new Date().toISOString(), "result-message-lifecycle");
-      closeAgentSessionRow("director-session");
-      expect(teardownCalls).toBe(1);
-      expect(roles.get("orchestrator")).toBeUndefined();
-      expect((kernelGetObject("agent_session", "director-session") as { status: string }).status).toBe("closed");
-    } finally {
-      bus?.close();
-      if (previousPeerBusDb === undefined) delete process.env.QF_PEER_BUS_DB;
-      else process.env.QF_PEER_BUS_DB = previousPeerBusDb;
-      try { rmSync(busRoot, { recursive: true, force: true }); } catch {}
-    }
+    expect(() => closeAgentSessionRow(id)).toThrow("delegated result remains undelivered");
+    expect(teardownCalls).toBe(0);
+    expect(hasLiveAgentSession(id)).toBe(true);
+    expect(roles.get("orchestrator")).toBe(`pty-${id}`);
+    expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("running");
+
+    pendingResults.delete(id);
+    closeAgentSessionRow(id);
+    expect(teardownCalls).toBe(1);
+    expect(hasLiveAgentSession(id)).toBe(false);
+    expect(roles.get("orchestrator")).toBeUndefined();
+    expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("closed");
+  });
+
+  test("disposal blocks the native teardown and releases after acknowledgment", async () => {
+    pendingResults.clear();
+    teardownCalls = 0;
+    const id = "disposal-session";
+    const { kernelGetObject } = await admitSession(id);
+    const { disposeAgentHost, hasLiveAgentSession } = await import("./agent-host");
+    pendingResults.add(id);
+
+    await disposeAgentHost();
+    expect(teardownCalls).toBe(0);
+    expect(hasLiveAgentSession(id)).toBe(true);
+    expect(roles.get("orchestrator")).toBe(`pty-${id}`);
+    expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("running");
+
+    pendingResults.delete(id);
+    await disposeAgentHost();
+    expect(teardownCalls).toBe(1);
+    expect(hasLiveAgentSession(id)).toBe(false);
+    expect(roles.get("orchestrator")).toBeUndefined();
+  });
+
+  test("cancel blocks its own teardown and releases after acknowledgment", async () => {
+    pendingResults.clear();
+    teardownCalls = 0;
+    const id = "cancel-session";
+    const { kernelGetObject } = await admitSession(id);
+    const { cancelAgentSession, hasLiveAgentSession } = await import("./agent-host");
+    pendingResults.add(id);
+
+    await expect(cancelAgentSession(id)).rejects.toThrow("delegated result remains undelivered");
+    expect(teardownCalls).toBe(0);
+    expect(hasLiveAgentSession(id)).toBe(true);
+    expect(roles.get("orchestrator")).toBe(`pty-${id}`);
+    expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("running");
+
+    pendingResults.delete(id);
+    await cancelAgentSession(id);
+    expect(teardownCalls).toBe(1);
+    expect(hasLiveAgentSession(id)).toBe(false);
+    expect(roles.get("orchestrator")).toBeUndefined();
+    expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("cancelled");
   });
 });

@@ -33,6 +33,54 @@ import { onPtySessionExit } from "./pty";
 import { PeerRoleRegistry } from "./peer-role-registry";
 import { formatPeerNotification } from "./peer-notification";
 
+function isMissingTransportSchema(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /\bno such table:\s*messages\b/i.test(message)
+    || /\bno such column:\s*pushed_at\b/i.test(message);
+}
+
+/**
+ * Return whether a result addressed to this exact role/session is still
+ * unacknowledged by the push transport. The transport database is optional:
+ * before it exists, or before its schema exists, there cannot be a pending
+ * result. Every other failure blocks teardown conservatively.
+ */
+export function hasUndeliveredResult(
+  role: string,
+  sessionId: string,
+  dbPath: string,
+): boolean {
+  let present: boolean;
+  try {
+    present = Boolean(dbPath) && existsSync(dbPath);
+  } catch {
+    return true;
+  }
+  if (!present) return false;
+
+  let db: DatabaseSync | null = null;
+  try {
+    db = new DatabaseSync(dbPath);
+    const pending = db.prepare(`
+      SELECT 1 AS pending FROM messages
+      WHERE to_role = ? AND to_session_id = ?
+        AND message_kind = 'result' AND pushed_at IS NULL
+      LIMIT 1
+    `).get(role, sessionId);
+    db.close();
+    db = null;
+    return Boolean(pending);
+  } catch (error) {
+    try {
+      db?.close();
+      db = null;
+    } catch {
+      return true;
+    }
+    return isMissingTransportSchema(error) ? false : true;
+  }
+}
+
 /** Peer role ("orchestrator" | "worker" | "worker2" | …) → live ptySessionId. */
 const seatPtyByRole = new PeerRoleRegistry();
 

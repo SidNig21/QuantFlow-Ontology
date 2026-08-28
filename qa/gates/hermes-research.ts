@@ -889,6 +889,147 @@ function boundaryReceipts(output: string, launchSucceeded: boolean): Set<string>
   return receipts;
 }
 
+type OrderedResultReceipt = {
+  kind: "result_receipt" | "result_return";
+  transcript_index: number;
+  task_id: string;
+  artifact_id: string | null;
+};
+
+const DIRECTOR_RESULT_LINE = /^\[QuantFlow RESULT for ([A-Za-z0-9_-]{1,128}) from worker\] (.+)$/;
+export function assertOrderedResultReceipt(
+  receipts: readonly OrderedResultReceipt[],
+  expectedTaskId: string,
+  expectedArtifactId: string,
+): void {
+  const resultReceipts = receipts.filter((receipt) => receipt.kind === "result_receipt");
+  const resultReturns = receipts.filter((receipt) => receipt.kind === "result_return");
+  assert(resultReceipts.length === 1, "expected exactly one matching Director [QuantFlow RESULT ...] PTY receipt, got " + resultReceipts.length);
+  assert(resultReturns.length === 1, "expected exactly one result_return receipt, got " + resultReturns.length);
+  const resultReceipt = resultReceipts[0]!;
+  const resultReturn = resultReturns[0]!;
+  assert(resultReceipt.task_id === expectedTaskId, "Director result task mismatch: expected " + expectedTaskId + ", got " + resultReceipt.task_id);
+  assert(resultReceipt.artifact_id === expectedArtifactId, "Director result artifact mismatch: expected " + expectedArtifactId + ", got " + String(resultReceipt.artifact_id));
+  assert(resultReturn.task_id === expectedTaskId, "result_return task mismatch: expected " + expectedTaskId + ", got " + resultReturn.task_id);
+  assert(resultReceipt.transcript_index < resultReturn.transcript_index, "Director result receipt was not observed before result_return: result=" + resultReceipt.transcript_index + " result_return=" + resultReturn.transcript_index);
+}
+
+function assertPackagedResultReceiptOrdering(output: string, tempRoot: string): {
+  taskId: string;
+  artifactId: string;
+  notificationIndex: number;
+  resultReturnIndex: number;
+} {
+  const kernelPath = join(tempRoot, "stores", TEMP_KERNEL_DB_NAME);
+  const busPath = join(tempRoot, "stores", "peer-bus.db");
+  const bus = new Database(busPath, { readonly: true });
+  const kernel = new Database(kernelPath, { readonly: true });
+  let taskId = "";
+  let artifactId = "";
+  try {
+    const rows = bus.query(`
+      SELECT artifact_id, body FROM messages
+      WHERE message_kind = 'result'
+      ORDER BY created_at ASC, id ASC
+    `).all() as Array<{ artifact_id: string | null; body: string }>;
+    assert(rows.length === 1, "expected exactly one delegated result message, got " + rows.length);
+    const body = jsonRecord(rows[0]!.body);
+    taskId = String(body.task_id ?? "");
+    artifactId = String(rows[0]!.artifact_id ?? "");
+    assert(taskId.length > 0 && artifactId.length > 0, "delegated result message omitted task_id or artifact_id");
+
+    const completion = kernel.query(`
+      SELECT payload FROM events
+      WHERE type = 'task.completed' AND object_id = ?
+      ORDER BY created_at DESC, id DESC LIMIT 1
+    `).get(taskId) as { payload: string } | null;
+    assert(completion, "Kernel task.completed receipt missing for delegated task " + taskId);
+    const completionPayload = JSON.parse(completion.payload) as { input?: { result_artifact_id?: unknown } };
+    const expectedArtifactId = String(completionPayload.input?.result_artifact_id ?? "");
+    assert(expectedArtifactId.length > 0, "Kernel task.completed receipt omitted result_artifact_id for " + taskId);
+    assert(expectedArtifactId === artifactId, "delegated result artifact mismatch: Kernel=" + expectedArtifactId + " transport=" + artifactId);
+  } finally {
+    bus.close();
+    kernel.close();
+  }
+
+  const lines = normalizeOutput(output).split(/\r?\n/);
+  const receipts: OrderedResultReceipt[] = [];
+  for (const [transcriptIndex, line] of lines.entries()) {
+    const resultReceipt = line.trim().match(DIRECTOR_RESULT_LINE);
+    if (resultReceipt) {
+      receipts.push({
+        kind: "result_receipt",
+        transcript_index: transcriptIndex,
+        task_id: resultReceipt[1]!,
+        artifact_id: artifactId,
+      });
+    }
+    const resultReturn = line.match(/QF_SYNTHETIC boundary=result_return role=orchestrator task_id=([^\s]+)/);
+    if (resultReturn) {
+      receipts.push({
+        kind: "result_return",
+        transcript_index: transcriptIndex,
+        task_id: resultReturn[1]!,
+        artifact_id: null,
+      });
+    }
+  }
+  assertOrderedResultReceipt(receipts, taskId, artifactId);
+  const resultReceipt = receipts.find((receipt) => receipt.kind === "result_receipt")!;
+  const resultReturn = receipts.find((receipt) => receipt.kind === "result_return")!;
+  console.log("hermes-first-turn-synthetic: ordered-result-receipt=" + JSON.stringify({
+    task_id: taskId,
+    artifact_id: artifactId,
+    result_receipt_transcript_index: resultReceipt.transcript_index,
+    result_return_transcript_index: resultReturn.transcript_index,
+  }));
+  return {
+    taskId,
+    artifactId,
+    notificationIndex: resultReceipt.transcript_index,
+    resultReturnIndex: resultReturn.transcript_index,
+  };
+}
+
+function runOldImpossibleResultMatcherFalsifier(taskId: string): void {
+  const actual = "[QuantFlow RESULT for " + taskId + " from worker] durable result";
+  const impossible = /QF_SYNTHETIC delivery_received role=orchestrator contract=qf\.peer-notification\.v1 task_id=([^\s]+)/;
+  let rejected = false;
+  try {
+    assert(impossible.test(actual), "legacy synthetic delivery matcher did not match Director result receipt");
+  } catch (error) {
+    rejected = true;
+    console.log("hermes-first-turn-synthetic: FALSIFY RED old-impossible-result-matcher reason=" + errorMessage(error));
+  }
+  assert(rejected, "old impossible result matcher unexpectedly matched Director result receipt");
+  assert(DIRECTOR_RESULT_LINE.test(actual), "correct Director result matcher did not match the exact receipt");
+  console.log("hermes-first-turn-synthetic: FALSIFY GREEN old-impossible-result-matcher corrected");
+}
+
+export function runResultReceiptOrderingFalsifier(taskId: string, artifactId: string): void {
+  runOldImpossibleResultMatcherFalsifier(taskId);
+  const ordered: OrderedResultReceipt[] = [
+    { kind: "result_receipt", transcript_index: 10, task_id: taskId, artifact_id: artifactId },
+    { kind: "result_return", transcript_index: 11, task_id: taskId, artifact_id: null },
+  ];
+  assertOrderedResultReceipt(ordered, taskId, artifactId);
+  const reordered = ordered.map((receipt) => ({
+    ...receipt,
+    transcript_index: receipt.kind === "result_receipt" ? 11 : 10,
+  }));
+  let rejected = false;
+  try {
+    assertOrderedResultReceipt(reordered, taskId, artifactId);
+  } catch (error) {
+    rejected = true;
+    console.log("hermes-first-turn-synthetic: FALSIFY RED notification-before-result_return reason=" + errorMessage(error));
+  }
+  assert(rejected, "reordered notification/result_return receipt unexpectedly passed");
+  assertOrderedResultReceipt(ordered, taskId, artifactId);
+  console.log("hermes-first-turn-synthetic: FALSIFY GREEN notification-before-result_return order restored");
+}
+
 function makeLedger(
   identity: Identity,
   launchState: Launch | null,
@@ -1265,6 +1406,8 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
       return null;
     })();
     const ptyOutput = await captureUntil(run, "boundary=result_return");
+    const resultReceipt = assertPackagedResultReceiptOrdering(ptyOutput, tempRoot);
+    if (label === "hermes-first-turn-synthetic") runResultReceiptOrderingFalsifier(resultReceipt.taskId, resultReceipt.artifactId);
     const evidence = await evidencePromise;
     assert(evidence, `research chain did not publish a Report; pty=${tail(ptyOutput)}`);
     const fullPtyOutput = `${ptyOutput}\n${await captureFor(run, 12_000)}`;

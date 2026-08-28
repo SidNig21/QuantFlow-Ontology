@@ -30,7 +30,31 @@ const KERNEL_ALLOWED = new Set([
  * peer messages into recipient TUIs. Exempt ONLY from the node:sqlite pattern —
  * still flagged if it ever references the Kernel db or imports the Kernel pkg.
  */
-const TRANSPORT_SQLITE_ALLOWED = "collab-electron/src/main/peer-delivery.ts";
+const TRANSPORT_SQLITE_ALLOWED = new Set([
+  "collab-electron/src/main/peer-delivery.ts",
+  "collab-electron/src/main/peer-delivery.test.ts",
+]);
+const AGENT_HOST = "collab-electron/src/main/agent-host.ts";
+const PEER_DELIVERY_TEST = "collab-electron/src/main/peer-delivery.test.ts";
+const KERNEL_SOLE_WRITER_FALSIFIER = process.env.QF_G5_KERNEL_SOLE_WRITER_FALSIFY ?? "";
+const KERNEL_SOLE_WRITER_FALSIFIERS = new Set([
+  "agent-host-node-sqlite",
+  "peer-delivery-test-qf-kernel",
+  "peer-delivery-test-kernel-db",
+]);
+
+function sourceWithKernelSoleWriterFalsifier(rel: string, text: string): string {
+  if (KERNEL_SOLE_WRITER_FALSIFIER === "agent-host-node-sqlite" && rel === AGENT_HOST) {
+    return `${text}\nimport { DatabaseSync } from "node:sqlite";\n`;
+  }
+  if (KERNEL_SOLE_WRITER_FALSIFIER === "peer-delivery-test-qf-kernel" && rel === PEER_DELIVERY_TEST) {
+    return `${text}\nimport "qf-kernel";\n`;
+  }
+  if (KERNEL_SOLE_WRITER_FALSIFIER === "peer-delivery-test-kernel-db" && rel === PEER_DELIVERY_TEST) {
+    return `${text}\nconst forbiddenTransportPath = "kernel.db";\n`;
+  }
+  return text;
+}
 /** Frozen legacy Collaborator path — debt #14. No *new* SDK imports here. */
 const ACP_FROZEN = "collab-electron/src/main/acp-agent.ts";
 /**
@@ -134,6 +158,9 @@ export function checkKernelSoleWriterApp(): {
   files.push(join(REPO_ROOT, HOST_ACP_CLIENT));
   files.push(join(REPO_ROOT, HOST_ACP_POLICY));
   const offenders: string[] = [];
+  if (KERNEL_SOLE_WRITER_FALSIFIER && !KERNEL_SOLE_WRITER_FALSIFIERS.has(KERNEL_SOLE_WRITER_FALSIFIER)) {
+    offenders.push(`unknown kernel-sole-writer falsifier: ${KERNEL_SOLE_WRITER_FALSIFIER}`);
+  }
 
   for (const full of files) {
     const rel = relative(REPO_ROOT, full).split("\\").join("/");
@@ -143,13 +170,14 @@ export function checkKernelSoleWriterApp(): {
     } catch {
       continue;
     }
+    const scanText = sourceWithKernelSoleWriterFalsifier(rel, text);
 
     if (!KERNEL_ALLOWED.has(rel)) {
       for (const p of KERNEL_PATTERNS) {
-        if (p.re.test(text)) {
+        if (p.re.test(scanText)) {
           // Transport reader may match node:sqlite only; Kernel filename / qf-kernel
           // still bite so it can never quietly touch domain truth.
-          if (rel === TRANSPORT_SQLITE_ALLOWED && p.name === "node:sqlite") {
+          if (TRANSPORT_SQLITE_ALLOWED.has(rel) && p.name === "node:sqlite") {
             continue;
           }
           offenders.push(`${rel} (${p.name})`);
@@ -158,7 +186,7 @@ export function checkKernelSoleWriterApp(): {
       }
     }
 
-    scanAgentPatterns(rel, text, offenders);
+    scanAgentPatterns(rel, scanText, offenders);
   }
 
   // Bridge must stay a re-export — no direct SDK import (gate hygiene).
