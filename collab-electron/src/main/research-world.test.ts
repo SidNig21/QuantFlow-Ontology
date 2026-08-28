@@ -20,7 +20,7 @@ function kernel(): KernelDb {
   return openKernel(":memory:");
 }
 
-function completeWorkerTask(db: KernelDb, root: string, taskId: string, workerId: string, label: string): void {
+function completeWorkerTask(db: KernelDb, root: string, taskId: string, workerId: string, label: string, sourceWork: { source_task_id: string; hypothesis_id: string; run_id: string; result_artifact_id: string; executor_session_id: string }): void {
   const readBytes = new TextEncoder().encode(JSON.stringify({
     contract: "qf.ontology.v1", tool: "qf_venue_get", arguments: { id: `venue-${label}` },
     result: { id: `venue-${label}` }, session_id: workerId, role: "worker",
@@ -42,6 +42,8 @@ function completeWorkerTask(db: KernelDb, root: string, taskId: string, workerId
     kind: "trajectory", bytes: resultBytes, storage_ref: resultPath,
     links: [{ kind: "produces", from_id: workerId }, { kind: "derived_from", to_id: read.object_id }],
   }, { trace_id: `${label}-trace`, span_id: `${label}-result-span`, actor_session_id: workerId });
+  sourceWork.result_artifact_id = result.object_id;
+  bindSourceWork(db, sourceWork, { trace_id: `${label}-trace`, span_id: `${label}-bind-span` });
   execute(db, "complete_task", { task_id: taskId, result_artifact_id: result.object_id }, {
     trace_id: `${label}-trace`, span_id: `${label}-complete-span`, actor_session_id: workerId,
   });
@@ -134,15 +136,16 @@ describe("Main research-world projection", () => {
         strategy_spec: { contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: "edge" },
         params: { limit: 1 },
       }, { ...localTrace, actor_session_id: "worker-world" });
-      const resultArtifactId = String(run.state.result_artifact_id);
-      const sourceWork = bindSourceWork(db, {
-        source_task_id: sourceTask.object_id,
-        hypothesis_id: hypothesis.object_id,
-        run_id: run.object_id,
-        result_artifact_id: resultArtifactId,
-        executor_session_id: "worker-world",
-      }, localTrace);
-      completeWorkerTask(db, root, sourceTask.object_id, "worker-world", "normal-world");
+       const runResultArtifactId = String(run.state.result_artifact_id);
+       const sourceWork = {
+         source_task_id: sourceTask.object_id,
+         hypothesis_id: hypothesis.object_id,
+         run_id: run.object_id,
+         result_artifact_id: runResultArtifactId,
+         executor_session_id: "worker-world",
+       };
+       completeWorkerTask(db, root, sourceTask.object_id, "worker-world", "normal-world", sourceWork);
+       const workerResultArtifactId = sourceWork.result_artifact_id;
       const admission = requestGovernedReview(db, sourceTask.object_id, "normal-world-attempt", "critic-world", localTrace);
       expect(admission.kind).toBe("admitted");
       const reviewTaskId = String(admission.review_task_id);
@@ -150,7 +153,7 @@ describe("Main research-world projection", () => {
       for (const [sequence, toolName, args] of [
         [1, "qf_hypothesis_get", { id: hypothesis.object_id }],
         [2, "qf_run_get", { id: run.object_id }],
-        [3, "qf_artifact_get", { id: resultArtifactId }],
+         [3, "qf_artifact_get", { id: workerResultArtifactId }],
         [4, "qf_record_evaluation", { verdict: "supports" }],
       ] as const) {
         recordGovernedToolReceipt(db, {
@@ -166,7 +169,7 @@ describe("Main research-world projection", () => {
       const evaluation = execute(db, "record_evaluation", {
         hypothesis_id: hypothesis.object_id,
         run_id: run.object_id,
-        artifact_id: resultArtifactId,
+         artifact_id: workerResultArtifactId,
         review_task_id: reviewTaskId,
         source_work: sourceWork,
         broker_invocation_id: "normal-world-4",
@@ -174,7 +177,7 @@ describe("Main research-world projection", () => {
         rubric: { faithfulness: 0.9, answer_relevancy: 0.9, context_precision: 0.9, context_recall: 0.9 },
         confidence: 0.9,
         rationale: "The governed world is complete.",
-        findings: [{ code: "WORLD_COMPLETE", severity: "info", message: "Every required lineage edge is durable.", evidence_refs: [resultArtifactId] }],
+         findings: [{ code: "WORLD_COMPLETE", severity: "info", message: "Every required lineage edge is durable.", evidence_refs: [workerResultArtifactId] }],
       }, { ...localTrace, actor_session_id: "critic-world" });
       expect(evaluation.state.report_artifact_id).toBeString();
 
@@ -186,7 +189,8 @@ describe("Main research-world projection", () => {
           "agent_session:director-world",
           "agent_session:worker-world",
           "artifact:" + String(evaluation.state.findings_artifact_id),
-          "artifact:" + resultArtifactId,
+           "artifact:" + runResultArtifactId,
+           "artifact:" + workerResultArtifactId,
           "artifact:" + String(evaluation.state.report_artifact_id),
           "dataset:" + dataset.object_id,
           "evaluation:" + String(evaluation.state.id),
@@ -196,12 +200,13 @@ describe("Main research-world projection", () => {
           "task:" + String(admission.review_task_id),
           "task:" + sourceTask.object_id,
         ].sort());
-        expect(projection.world.objects).toHaveLength(13);
-        expect(projection.world.links).toHaveLength(15);
+         expect(projection.world.objects).toHaveLength(14);
+         expect(projection.world.links).toHaveLength(15);
         expect(projection.world.current_report_id).toBe(String(evaluation.state.report_artifact_id));
         expect(projection.world.report_ids).toContain(String(evaluation.state.report_artifact_id));
         expect(projection.world.objects.find((object) => object.type === "evaluation")?.fields.semantic_markers).toEqual(["EVALUATION"]);
-        expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === resultArtifactId)?.fields.semantic_markers).toContain("RAW ARTIFACT");
+         expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === runResultArtifactId)?.fields.semantic_markers).toContain("RAW ARTIFACT");
+         expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === workerResultArtifactId)?.fields.semantic_markers).toContain("RAW ARTIFACT");
         expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === String(evaluation.state.report_artifact_id))?.fields.semantic_markers).toContain("PUBLISHED REPORT");
         expect(projection.world.links.map(({ kind, from_id, to_id }) => `${kind}:${from_id}:${to_id}`)).toEqual([
           `assigned_to:${sourceTask.object_id}:worker-world`,
@@ -212,11 +217,11 @@ describe("Main research-world projection", () => {
           `delegates_to:director-world:worker-world`,
           `evaluated_by:${hypothesis.object_id}:${evaluation.state.id}`,
           `evaluated_by:${run.object_id}:${evaluation.state.id}`,
-          `evaluated_by:${resultArtifactId}:${evaluation.state.id}`,
+          `evaluated_by:${workerResultArtifactId}:${evaluation.state.id}`,
           `gates:${evaluation.state.id}:${evaluation.state.report_artifact_id}`,
           `performed_by:${evaluation.state.id}:critic-world`,
           `produces:critic-world:${evaluation.state.findings_artifact_id}`,
-          `produces:${run.object_id}:${resultArtifactId}`,
+          `produces:${run.object_id}:${runResultArtifactId}`,
           `tests:${run.object_id}:${hypothesis.object_id}`,
           `uses:${run.object_id}:${dataset.object_id}`,
         ].sort());
@@ -239,7 +244,7 @@ describe("Main research-world projection", () => {
     const params = { limit: 1 };
     type World = {
       mission: string; hypothesis: string; task: string; run: string; dataset: string;
-      resultArtifact: string; reviewTask: string; evaluation: string; findings: string; report: string;
+      resultArtifact: string; workerResultArtifact: string; reviewTask: string; evaluation: string; findings: string; report: string;
       director: string; worker: string; critic: string;
     };
 
@@ -301,12 +306,13 @@ describe("Main research-world projection", () => {
           run_id: `${prefix}-shared-run`, dataset_id: dataset.object_id, hypothesis_id: hypothesis.object_id,
           strategy_spec: strategySpec, params,
         }, { ...localTrace, actor_session_id: worker });
-        const resultArtifact = String(run.state.result_artifact_id);
-        const sourceWork = bindSourceWork(db, {
-          source_task_id: task.object_id, hypothesis_id: hypothesis.object_id, run_id: run.object_id,
-          result_artifact_id: resultArtifact, executor_session_id: worker,
-        }, localTrace);
-        completeWorkerTask(db, root, task.object_id, worker, `${prefix}-shared`);
+         const resultArtifact = String(run.state.result_artifact_id);
+         const sourceWork = {
+           source_task_id: task.object_id, hypothesis_id: hypothesis.object_id, run_id: run.object_id,
+           result_artifact_id: resultArtifact, executor_session_id: worker,
+         };
+         completeWorkerTask(db, root, task.object_id, worker, `${prefix}-shared`, sourceWork);
+         const workerResultArtifact = sourceWork.result_artifact_id;
         const admission = requestGovernedReview(db, task.object_id, `${prefix}-shared-attempt`, critic, localTrace);
         expect(admission.kind).toBe("admitted");
         const reviewTask = String(admission.review_task_id);
@@ -314,7 +320,7 @@ describe("Main research-world projection", () => {
         for (const [sequence, toolName, args] of [
           [1, "qf_hypothesis_get", { id: hypothesis.object_id }],
           [2, "qf_run_get", { id: run.object_id }],
-          [3, "qf_artifact_get", { id: resultArtifact }],
+           [3, "qf_artifact_get", { id: workerResultArtifact }],
           [4, "qf_record_evaluation", { verdict: "supports" }],
         ] as const) {
           recordGovernedToolReceipt(db, {
@@ -323,15 +329,15 @@ describe("Main research-world projection", () => {
           }, localTrace);
         }
         const evaluation = execute(db, "record_evaluation", {
-          hypothesis_id: hypothesis.object_id, run_id: run.object_id, artifact_id: resultArtifact,
+           hypothesis_id: hypothesis.object_id, run_id: run.object_id, artifact_id: workerResultArtifact,
           review_task_id: reviewTask, source_work: sourceWork, broker_invocation_id: `${prefix}-shared-4`,
           verdict: "supports", rubric: { faithfulness: 0.9, answer_relevancy: 0.9, context_precision: 0.9, context_recall: 0.9 },
           confidence: 0.9, rationale: `${prefix} review is complete.`,
-          findings: [{ code: `${prefix.toUpperCase()}_COMPLETE`, severity: "info", message: "The governed world is complete.", evidence_refs: [resultArtifact] }],
+           findings: [{ code: `${prefix.toUpperCase()}_COMPLETE`, severity: "info", message: "The governed world is complete.", evidence_refs: [workerResultArtifact] }],
         }, { ...localTrace, actor_session_id: critic });
         return {
           mission: mission.object_id, hypothesis: hypothesis.object_id, task: task.object_id, run: run.object_id,
-          dataset: dataset.object_id, resultArtifact, reviewTask, evaluation: String(evaluation.state.id),
+           dataset: dataset.object_id, resultArtifact, workerResultArtifact, reviewTask, evaluation: String(evaluation.state.id),
           findings: String(evaluation.state.findings_artifact_id), report: String(evaluation.state.report_artifact_id),
           director, worker, critic,
         };
@@ -344,15 +350,15 @@ describe("Main research-world projection", () => {
 
       const allDistinctIds = [
         decoy.mission, decoy.hypothesis, decoy.task, decoy.run, decoy.reviewTask, decoy.evaluation,
-        decoy.findings, decoy.report, decoy.director, decoy.worker, decoy.critic,
+         decoy.findings, decoy.report, decoy.workerResultArtifact, decoy.director, decoy.worker, decoy.critic,
         target.mission, target.hypothesis, target.task, target.run, target.reviewTask, target.evaluation,
-        target.findings, target.report, target.director, target.worker, target.critic,
+         target.findings, target.report, target.workerResultArtifact, target.director, target.worker, target.critic,
       ];
       expect(new Set(allDistinctIds).size).toBe(allDistinctIds.length);
 
       const expectedObjects = (world: World) => [
         `agent_session:${world.critic}`, `agent_session:${world.director}`, `agent_session:${world.worker}`,
-        `artifact:${world.findings}`, `artifact:${world.resultArtifact}`, `artifact:${world.report}`,
+         `artifact:${world.findings}`, `artifact:${world.resultArtifact}`, `artifact:${world.workerResultArtifact}`, `artifact:${world.report}`,
         `dataset:${world.dataset}`, `evaluation:${world.evaluation}`, `hypothesis:${world.hypothesis}`,
         `mission:${world.mission}`, `run:${world.run}`, `task:${world.reviewTask}`, `task:${world.task}`,
       ].sort();
@@ -361,9 +367,9 @@ describe("Main research-world projection", () => {
         `belongs_to:${world.task}:${world.mission}`, `delegated_by:${world.reviewTask}:${world.director}`,
         `delegated_by:${world.task}:${world.director}`, `delegates_to:${world.director}:${world.worker}`,
         `evaluated_by:${world.hypothesis}:${world.evaluation}`, `evaluated_by:${world.run}:${world.evaluation}`,
-        `evaluated_by:${world.resultArtifact}:${world.evaluation}`, `gates:${world.evaluation}:${world.report}`,
+         `evaluated_by:${world.workerResultArtifact}:${world.evaluation}`, `gates:${world.evaluation}:${world.report}`,
         `performed_by:${world.evaluation}:${world.critic}`, `produces:${world.critic}:${world.findings}`,
-        `produces:${world.run}:${world.resultArtifact}`, `tests:${world.run}:${world.hypothesis}`,
+         `produces:${world.run}:${world.resultArtifact}`, `tests:${world.run}:${world.hypothesis}`,
         `uses:${world.run}:${world.dataset}`,
       ].sort();
       const assertWorld = (world: World) => {
@@ -371,10 +377,10 @@ describe("Main research-world projection", () => {
         expect(projection.ok).toBe(true);
         if (!projection.ok) return;
         expect(projection.world.objects.map((object) => `${object.type}:${object.id}`).sort()).toEqual(expectedObjects(world));
-        expect(projection.world.objects).toHaveLength(13);
-        expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === world.resultArtifact)?.fields.run_id).toBe(world.run);
+         expect(projection.world.objects).toHaveLength(14);
+         expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === world.workerResultArtifact)?.fields.run_id).toBe(world.run);
         expect(projection.world.links.map(({ kind, from_id, to_id }) => `${kind}:${from_id}:${to_id}`).sort()).toEqual(expectedLinks(world));
-        expect(projection.world.links).toHaveLength(15);
+         expect(projection.world.links).toHaveLength(15);
         expect(projection.world.missing_lineage).toEqual([]);
         return new Set(projection.world.objects.map((object) => object.id));
       };

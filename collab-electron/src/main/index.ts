@@ -14,7 +14,7 @@ import {
   type WebContents,
 } from "electron";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { fromCollabFileUrl } from "@collab/shared/collab-file-url";
@@ -54,7 +54,11 @@ import {
   kernelOpenHypothesisForQuestion,
   kernelRunGuidedResearch,
   kernelRunR17DirectorResearch,
+  kernelBindSourceWork,
+  kernelFreezeSourceWork,
   kernelContinueGovernedResearchResult,
+  kernelRecordGovernedToolReceipt,
+  kernelRecordGovernedEvaluation,
   kernelFailGovernedCriticCompletion,
   kernelFinalizeResearchEvaluation,
   kernelGovernedCriticProgress,
@@ -1225,7 +1229,21 @@ app.whenReady().then(async () => {
       missionForSession: missionForDirectorSession,
       marketObjectExists: kernelMarketObjectExists,
       readMarketTrajectoryResult: kernelReadMarketTrajectoryResult,
-      commitResult: commitCollaborationResult,
+      commitResult: (input) => commitCollaborationResult(input, (artifactId) => {
+        const hypothesisId = researchHypothesisForSession(input.delegatorSessionId);
+        if (!hypothesisId) throw new Error(`research result has no exact Hypothesis binding for ${input.delegatorSessionId}`);
+        const strategyId = researchStrategyForSession(input.delegatorSessionId);
+        if (!strategyId) throw new Error("TECHNIQUE COVERAGE REFUSED");
+        const run = kernelRunR17DirectorResearch(input.workerSessionId, hypothesisId, artifactId, strategyId);
+        if (!run) throw new Error("research result could not create exact deterministic Run");
+        kernelBindSourceWork({
+          source_task_id: input.taskId,
+          hypothesis_id: run.hypothesisId,
+          run_id: run.runId,
+          result_artifact_id: artifactId,
+          executor_session_id: input.workerSessionId,
+        });
+      }),
       ...(process.env.QF_R17_GATE === "1" ? { mintTaskId: () => "task-r17-gate" } : {}),
       notify: (input) => {
         const busDb = process.env.QF_PEER_BUS_DB;
@@ -1260,16 +1278,24 @@ app.whenReady().then(async () => {
         setTimeout(() => {
           void (async () => {
             try {
-              const hypothesisId = researchHypothesisForSession(change.delegatorSessionId);
-              if (!hypothesisId) throw new Error(`research result has no exact Hypothesis binding for ${change.delegatorSessionId}`);
-              const strategyId = researchStrategyForSession(change.delegatorSessionId);
-              if (!strategyId) throw new Error("TECHNIQUE COVERAGE REFUSED");
-              const run = kernelRunR17DirectorResearch(change.workerSessionId, hypothesisId, change.artifactId, strategyId);
-              closeAdmittedSession(change.workerSessionId);
-              if (!run) {
-                closeAdmittedSession(change.delegatorSessionId);
-                return;
+              const sourceWork = kernelFreezeSourceWork(change.taskId);
+              if (sourceWork.result_artifact_id !== change.artifactId) {
+                throw new Error("research result Artifact does not match the frozen source work");
               }
+              const runRow = kernelGetObject("run", sourceWork.run_id);
+              if (!runRow) throw new Error("research result has no exact deterministic Run");
+              const runParams = JSON.parse(String(runRow.params)) as { result_artifact_id?: unknown };
+              const runResultArtifactId = typeof runParams.result_artifact_id === "string" ? runParams.result_artifact_id : "";
+              const runResultArtifact = runResultArtifactId ? kernelGetObject("artifact", runResultArtifactId) : null;
+              if (!runResultArtifact) throw new Error("research result Run has no durable result Artifact");
+              const runMetrics = JSON.parse(readFileSync(String(runResultArtifact.storage_ref), "utf8")) as { metrics?: Record<string, unknown> };
+              const run = {
+                hypothesisId: sourceWork.hypothesis_id,
+                runId: sourceWork.run_id,
+                artifactId: sourceWork.result_artifact_id,
+                metrics: runMetrics.metrics ?? {},
+              };
+              closeAdmittedSession(change.workerSessionId);
               const criticSessionId = `critic-${crypto.randomUUID()}`;
               createKernelAgentSession(
                 {
@@ -1294,7 +1320,7 @@ app.whenReady().then(async () => {
                 source_task_id: change.taskId,
                 hypothesis_id: run.hypothesisId,
                 run_id: run.runId,
-                result_artifact_id: run.artifactId,
+                result_artifact_id: sourceWork.result_artifact_id,
                 executor_session_id: change.workerSessionId,
                 critic_session_id: criticSessionId,
                 attempt_id: `review-${run.runId}`,
@@ -1528,10 +1554,24 @@ app.whenReady().then(async () => {
   );
   registerMethod(
     "qf.research.run_kernel_falsifiers",
-    () => {
+    async (params) => {
       if (process.env.QF_HERMES_SYNTHETIC_TEST !== "1") {
         throw new Error("Kernel falsifiers are synthetic-test-only");
       }
+      const requestedDefinitionId = params && typeof params === "object"
+        ? (params as Record<string, unknown>).agent_definition_id
+        : undefined;
+      const executorDefinitionId = typeof requestedDefinitionId === "string" && requestedDefinitionId.length > 0
+        ? requestedDefinitionId
+        : "hermes-research-director";
+      const executorSessionId = `kernel-falsifier-executor-${crypto.randomUUID()}`;
+      const executorTrace = createKernelAgentSession(
+        { sessionId: executorSessionId, definitionId: executorDefinitionId, label: "Kernel falsifier executor" },
+        { execute: kernelExecute, newTrace: () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) },
+      );
+      kernelExecute("start_agent_session", { session_id: executorSessionId }, {
+        ...executorTrace, span_id: crypto.randomUUID(),
+      });
       const dataset = kernelEnsureSampleResearchDataset({ includeFutureRow: false });
       const datasetLinks = kernelGetLinks(String(dataset.object_id), { kind: "derived_from" });
       const datasetArtifact = kernelGetObject("artifact", String(datasetLinks.find((link) => link.from_id === String(dataset.object_id))?.to_id));
@@ -1554,30 +1594,118 @@ app.whenReady().then(async () => {
         "Kernel falsifier rejects unsupported evaluation",
         String(dataset.object_id),
       );
-      const executorSessionId = `kernel-falsifier-executor-${crypto.randomUUID()}`;
-      createKernelAgentSession(
-        { sessionId: executorSessionId, definitionId: "hermes-research-director", label: "Kernel falsifier executor" },
-        { execute: kernelExecute, newTrace: () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) },
-      );
       const run = kernelRunGuidedResearch(executorSessionId, hypothesisId, "trajectory:kernel-falsifier-worker");
       if (!run) throw new Error("Kernel falsifier could not create exact deterministic Run");
+      const mission = kernelExecute("create_mission", {
+        mission_id: `kernel-falsifier-mission-${crypto.randomUUID()}`,
+        name: "Kernel falsifier mission",
+        objective: "Exercise the actual Electron research falsifier boundary.",
+      }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) as { object_id: string };
+      const sourceTask = kernelExecute("create_task", {
+        task_id: `kernel-falsifier-task-${crypto.randomUUID()}`,
+        title: "Kernel falsifier source work",
+        description: "Complete the exact source work used by the synthetic rejection control.",
+        assignee_session_id: executorSessionId,
+      }, {
+        trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(),
+        actor_session_id: executorSessionId, mission_id: mission.object_id,
+      }) as { object_id: string };
+      const falsifierArtifactRoot = join(getArtifactRoot(), "kernel-falsifier");
+      mkdirSync(falsifierArtifactRoot, { recursive: true });
+      const readBytes = new TextEncoder().encode(JSON.stringify({
+        contract: "qf.ontology.v1",
+        tool: "qf_venue_get",
+        arguments: { id: "venue-kernel-falsifier" },
+        result: { id: "venue-kernel-falsifier" },
+        session_id: executorSessionId,
+        role: "worker",
+        created_at: new Date().toISOString(),
+        nonce: crypto.randomUUID(),
+      }));
+      const readPath = join(falsifierArtifactRoot, `${crypto.randomUUID()}-read.json`);
+      writeFileSync(readPath, readBytes);
+      const read = kernelExecute("publish_artifact", {
+        kind: "trajectory", bytes: readBytes, storage_ref: readPath,
+        links: [{ kind: "produces", from_id: executorSessionId }],
+      }, {
+        trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(),
+        actor_session_id: executorSessionId, ontology_read_tool: "qf_venue_get",
+      }) as { object_id: string };
+      const workerBytes = new TextEncoder().encode(JSON.stringify({
+        contract: "qf.collaboration.v1", kind: "result", task_id: sourceTask.object_id,
+        from_session_id: executorSessionId, result: "kernel falsifier source result",
+      }));
+      const workerPath = join(falsifierArtifactRoot, `${crypto.randomUUID()}-result.json`);
+      writeFileSync(workerPath, workerBytes);
+      const workerResult = kernelExecute("publish_artifact", {
+        kind: "trajectory", bytes: workerBytes, storage_ref: workerPath,
+        links: [{ kind: "produces", from_id: executorSessionId }, { kind: "derived_from", to_id: read.object_id }],
+      }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: executorSessionId }) as { object_id: string };
+      const sourceWork = {
+        source_task_id: sourceTask.object_id,
+        hypothesis_id: hypothesisId,
+        run_id: run.runId,
+        result_artifact_id: workerResult.object_id,
+        executor_session_id: executorSessionId,
+      };
+      kernelBindSourceWork(sourceWork);
+      kernelExecute("complete_task", {
+        task_id: sourceTask.object_id, result_artifact_id: workerResult.object_id,
+      }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: executorSessionId });
       const criticSessionId = `kernel-falsifier-critic-${crypto.randomUUID()}`;
       createKernelAgentSession(
         { sessionId: criticSessionId, definitionId: "hermes-critic", label: "Kernel falsifier critic" },
         { execute: kernelExecute, newTrace: () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) },
       );
       kernelExecute("start_agent_session", { session_id: criticSessionId }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
-      let rejectsReason = "";
-      const evaluation = kernelExecute("record_evaluation", {
-        hypothesis_id: run.hypothesisId,
+      const continuation = await kernelContinueGovernedResearchResult({
+        source_task_id: sourceTask.object_id,
+        hypothesis_id: hypothesisId,
         run_id: run.runId,
-        artifact_id: run.artifactId,
+        result_artifact_id: workerResult.object_id,
+        executor_session_id: executorSessionId,
+        critic_session_id: criticSessionId,
+        attempt_id: `kernel-falsifier-review-${crypto.randomUUID()}`,
+        deliver: async () => {},
+      });
+      const readReceipts = [
+        ["qf_hypothesis_get", { id: hypothesisId }],
+        ["qf_run_get", { id: run.runId }],
+        ["qf_artifact_get", { id: workerResult.object_id }],
+        ["qf_record_evaluation", { verdict: "rejects" }],
+      ] as const;
+      const evaluationInvocationId = `kernel-falsifier-record-${crypto.randomUUID()}`;
+      for (let index = 0; index < readReceipts.length; index += 1) {
+        kernelRecordGovernedToolReceipt({
+          invocation_id: index === 3 ? evaluationInvocationId : `kernel-falsifier-receipt-${crypto.randomUUID()}`,
+          session_id: criticSessionId,
+          task_id: continuation.review_task_id,
+          tool_name: readReceipts[index]![0],
+          arguments: readReceipts[index]![1],
+          result: { ok: true },
+          broker_sequence: index + 1,
+        });
+      }
+      let rejectsReason = "";
+      const evaluation = kernelRecordGovernedEvaluation({
+        hypothesis_id: hypothesisId,
+        run_id: run.runId,
+        artifact_id: workerResult.object_id,
+        review_task_id: continuation.review_task_id,
+        source_work: sourceWork,
+        broker_invocation_id: evaluationInvocationId,
         verdict: "rejects",
         confidence: 0.9,
         rationale: "Kernel rejection falsifier control.",
-        findings: "The control intentionally rejects the exact Run.",
-      }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: criticSessionId }) as { object_id: string };
-      const final = kernelFinalizeResearchEvaluation(evaluation.object_id);
+        rubric: { faithfulness: 0.2, answer_relevancy: 0.2, context_precision: 0.2, context_recall: 0.2 },
+        findings: [{
+          code: "KERNEL_FALSIFIER",
+          severity: "warning",
+          message: "The control intentionally rejects the exact Run.",
+          evidence_refs: [hypothesisId, run.runId, workerResult.object_id, executorSessionId],
+        }],
+      }, criticSessionId);
+      const final = kernelFinalizeResearchEvaluation(String(evaluation.id));
       if (final.reportArtifactId !== null || final.status !== "rejected") {
         throw new Error("rejects Evaluation unexpectedly produced a Report");
       }
@@ -1598,7 +1726,7 @@ app.whenReady().then(async () => {
       }
       return {
         missing_report: { outcome: "rejected", reason: missingReportReason },
-        rejects_evaluation: { outcome: "rejected", reason: rejectsReason, run_id: run.runId, evaluation_id: evaluation.object_id },
+        rejects_evaluation: { outcome: "rejected", reason: rejectsReason, run_id: run.runId, evaluation_id: String(evaluation.id) },
         changed_repeat: { outcome: "rejected", reason: repeatReason, run_id: run.runId },
       };
     },

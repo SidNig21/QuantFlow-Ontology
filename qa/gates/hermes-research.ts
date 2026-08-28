@@ -812,7 +812,6 @@ function readResearch(tempRoot: string, hypothesisId: string): {
     }
     assert(sourceWork.hypothesis_id === hypothesisId, "Report source_work selected the wrong Hypothesis");
     assert(sourceWork.run_id === String(run.id), "Report source_work selected the wrong Run");
-    assert(sourceWork.result_artifact_id === result.id, "Report source_work selected the wrong result Artifact");
     assert(String(sourceResult.artifact_id) === result.id, "Report source_result omitted the exact result Artifact id");
     assert(String(sourceResult.content_hash) === result.content_hash, "Report source_result omitted the exact result Artifact hash");
     assert(String(publication.evaluation_id) === String(evaluation.id), "Report publication_evaluation selected the wrong Evaluation");
@@ -845,6 +844,7 @@ function readResearch(tempRoot: string, hypothesisId: string): {
       return receipt?.kind === "trajectory" ? [receipt] : [];
     });
     if (!performed?.to_id || !workerResult || !workerProducer?.from_id || readTrajectory.length === 0 || !findings) return null;
+    assert(sourceWork.result_artifact_id === workerResult.id, "Report source_work selected the wrong worker result Artifact");
     const producerSession = getObject(db, "agent_session", workerProducer.from_id);
     assert(String(producerSession?.label ?? "").toLowerCase().includes("worker"), "Report evidence was not produced by a worker session");
     assert(performed.to_id !== workerProducer.from_id, "critic and worker lineage collapsed to one session");
@@ -1781,13 +1781,21 @@ async function runEnforcementFalsifiers(): Promise<void> {
 }
 
 async function runGateFalsifiers(launchState: Launch): Promise<void> {
-  const result = await rpcCall(launchState.endpoint, "qf.research.run_kernel_falsifiers") as Record<string, Record<string, unknown>>;
+  try {
+    await rpcCall(launchState.endpoint, "qf.research.run_kernel_falsifiers", { agent_definition_id: "hermes-orchestrator" });
+    throw new Error("stale Hermes agent profile unexpectedly succeeded");
+  } catch (error) {
+    const reason = errorMessage(error);
+    assert(reason.includes("unknown agent_definition_id: hermes-orchestrator"), `stale Hermes profile failed for the wrong reason: ${reason}`);
+    console.log(`hermes-first-turn-synthetic: FALSIFY RED stale-profile rejected=${reason}`);
+  }
+  const result = await rpcCall(launchState.endpoint, "qf.research.run_kernel_falsifiers", { agent_definition_id: "hermes-research-director" }) as Record<string, Record<string, unknown>>;
   for (const [name, receipt] of Object.entries(result)) {
     assert(receipt.outcome === "rejected", `Kernel falsifier ${name} did not go red`);
     console.log(`hermes-first-turn-synthetic: FALSIFY RED ${name} rejected=${String(receipt.reason)}`);
   }
   assert(result.missing_report && result.rejects_evaluation && result.changed_repeat, "Kernel falsifier receipt set is incomplete");
-  console.log("hermes-first-turn-synthetic: FALSIFY GREEN missing Evaluation, rejects Evaluation, and changed replay restored to accepted positive-control boundaries");
+  console.log("hermes-first-turn-synthetic: FALSIFY GREEN stale profile restored to hermes-research-director; missing Evaluation, rejects Evaluation, and changed replay restored to accepted positive-control boundaries");
 }
 async function runResearchPackage(packageRoot: string, label: "hermes-first-turn-synthetic" | "windows-hermes-research-chain"): Promise<void> {
   const tempRoot = createGateTempRoot(`qf-${label}-`);
@@ -2026,6 +2034,37 @@ export async function runHermesFirstTurnSyntheticGate(): Promise<{ ok: boolean }
   const summary = cleanupSummary("hermes-first-turn-synthetic");
   if (!cleanupPass(summary)) console.error("hermes-first-turn-synthetic: FAIL temp cleanup did not reach roots_remaining=0 and leaked=[]");
   return { ok: gateOk && cleanupPass(summary) };
+}
+
+/**
+ * G9's narrow F10 proof: exercise the packaged Electron RPC executor itself,
+ * including the stale profile refusal and the supported positive control.
+ */
+export async function runHermesStaleProfileBoundaryGate(): Promise<boolean> {
+  if (process.platform !== "win32") return false;
+  beginCleanupTracking("hermes-first-turn-synthetic");
+  let run: Launch | null = null;
+  let gateOk = false;
+  const tempRoot = createGateTempRoot("qf-hermes-f10-");
+  try {
+    const packageRoot = await buildWindowsPackage(tempRoot);
+    run = await launch(packageRoot, join(tempRoot, "rpc"), null, "hermes-first-turn-synthetic", null, null);
+    await runGateFalsifiers(run);
+    await shutdown(run);
+    run = null;
+    gateOk = true;
+  } catch (error) {
+    console.error(`hermes-f10: FAIL ${errorMessage(error)}`);
+    if (run) {
+      try { await shutdown(run); } catch {}
+      run = null;
+    }
+  } finally {
+    await wait(1_000);
+    await removeGateTempRoot("hermes-first-turn-synthetic", tempRoot);
+  }
+  const summary = cleanupSummary("hermes-first-turn-synthetic");
+  return gateOk && cleanupPass(summary);
 }
 
 export async function runWindowsHermesResearchChainGate(): Promise<{ ok: boolean }> {

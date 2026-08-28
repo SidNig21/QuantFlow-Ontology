@@ -66,7 +66,7 @@ function dataset(id: string, asOf: string): string {
   return version.object_id;
 }
 
-function completeWorkerTask(taskId: string, workerId: string, label: string): string {
+function completeWorkerTask(taskId: string, workerId: string, label: string, sourceWork?: Record<string, string>, complete = true): string {
   const readBytes = new TextEncoder().encode(JSON.stringify({
     contract: "qf.ontology.v1", tool: "qf_venue_get", arguments: { id: `venue-${label}` },
     result: { id: `venue-${label}` }, session_id: workerId, role: "worker",
@@ -88,7 +88,11 @@ function completeWorkerTask(taskId: string, workerId: string, label: string): st
     kind: "trajectory", bytes: resultBytes, storage_ref: resultPath,
     links: [{ kind: "produces", from_id: workerId }, { kind: "derived_from", to_id: read.object_id }],
   }, { ...trace, actor_session_id: workerId });
-  execute(db!, "complete_task", { task_id: taskId, result_artifact_id: result.object_id }, {
+  if (sourceWork) {
+    sourceWork.result_artifact_id = result.object_id;
+    bindSourceWork(db!, sourceWork, trace);
+  }
+  if (complete) execute(db!, "complete_task", { task_id: taskId, result_artifact_id: result.object_id }, {
     ...trace, actor_session_id: workerId,
   });
   return result.object_id;
@@ -120,11 +124,11 @@ function supportWorld(label: string, missionId: string, datasetId: string, famil
     strategy_spec: { contract: "qf.strategy.v1", family, version: 1, stake_model: "flat", score_field: "edge" },
     params: { limit: 1 },
   }, { ...trace, actor_session_id: workerId });
-  const work = bindSourceWork(db!, {
+  const work: Record<string, string> = {
     source_task_id: task.object_id, hypothesis_id: hypothesis.object_id, run_id: run.object_id,
     result_artifact_id: String(run.state.result_artifact_id), executor_session_id: workerId,
-  }, trace);
-  if (complete) completeWorkerTask(task.object_id, workerId, label);
+  };
+  completeWorkerTask(task.object_id, workerId, label, work, complete);
   const admission = requestGovernedReview(db!, task.object_id, `${label}-attempt`, criticId, trace);
   if (admission.kind !== "admitted") throw new Error(`G9 admission refused: ${JSON.stringify(admission)}`);
   const reviewTaskId = String(admission.review_task_id);
@@ -134,7 +138,7 @@ function supportWorld(label: string, missionId: string, datasetId: string, famil
   for (const [sequence, toolName, args] of [
     [1, "qf_hypothesis_get", { id: hypothesis.object_id }],
     [2, "qf_run_get", { id: run.object_id }],
-    [3, "qf_artifact_get", { id: String(run.state.result_artifact_id) }],
+    [3, "qf_artifact_get", { id: work.result_artifact_id }],
     [4, "qf_record_evaluation", { verdict: "supports" }],
   ] as const) {
     const actualSequence = sequenceStart + sequence - 1;
@@ -152,7 +156,7 @@ function supportWorld(label: string, missionId: string, datasetId: string, famil
   }
   const evaluation = execute(db!, "record_evaluation", {
     hypothesis_id: hypothesis.object_id, run_id: run.object_id,
-    artifact_id: String(run.state.result_artifact_id), review_task_id: reviewTaskId,
+    artifact_id: work.result_artifact_id, review_task_id: reviewTaskId,
     source_work: work, broker_invocation_id: `${label}-receipt-${sequenceStart + 3}`, verdict: "supports",
     rubric: { faithfulness: 0.9, answer_relevancy: 0.9, context_precision: 0.9, context_recall: 0.9 },
     confidence: 0.9, rationale: `${label} is independently supported.`,
@@ -268,6 +272,20 @@ describe("G9 Report authority", () => {
   test("binds completion evidence to the exact Run and rejects zero, multiple, non-trajectory, and mismatched candidates", () => {
     const { missionId, datasetId } = base();
     const world = supportWorld("g9-binding", missionId, datasetId, "g9-technique", "worker-a", "critic-a", false);
+    const readArtifactId = String((db!.query("SELECT to_id FROM links WHERE from_id = ? AND kind = 'derived_from' LIMIT 1").get(world.work.result_artifact_id) as { to_id: string }).to_id);
+    const wrongBytes = new TextEncoder().encode(JSON.stringify({ contract: "qf.collaboration.v1", kind: "result", task_id: world.sourceTaskId, from_session_id: "worker-a", result: "wrong" }));
+    const wrongPath = join(root!, "g9-binding-wrong-result.json");
+    writeFileSync(wrongPath, wrongBytes);
+    const wrong = execute(db!, "publish_artifact", {
+      kind: "trajectory", bytes: wrongBytes, storage_ref: wrongPath,
+      links: [{ kind: "produces", from_id: "worker-a" }, { kind: "derived_from", to_id: readArtifactId }],
+    }, { ...trace, actor_session_id: "worker-a" });
+    const eventsBeforeWrongCompletion = Number((db!.query("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n);
+    expect(() => execute(db!, "complete_task", { task_id: world.sourceTaskId, result_artifact_id: wrong.object_id }, {
+      ...trace, actor_session_id: "worker-a",
+    })).toThrow("complete_task result_artifact_id does not match frozen source-work binding");
+    expect(Number((db!.query("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n)).toBe(eventsBeforeWrongCompletion);
+    expect(db!.query("SELECT status FROM task WHERE id = ?").get(world.sourceTaskId)).toEqual({ status: "open" });
     completeWorkerTask(world.sourceTaskId, "worker-a", "g9-binding");
     const event = db!.query("SELECT id, payload FROM events WHERE type = 'task.completed' AND object_id = ?").get(world.sourceTaskId) as { id: string; payload: string };
     const originalPayload = JSON.parse(event.payload) as Record<string, unknown>;

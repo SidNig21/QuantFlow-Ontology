@@ -4,7 +4,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { DatabaseSync } from "node:sqlite";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import {
   attachKernel,
@@ -51,8 +51,30 @@ import {
   type ResearchWorldRequest,
 } from "./research-world-projection";
 
+type DatabaseStatement = {
+  run(...params: unknown[]): unknown;
+  get(...params: unknown[]): unknown;
+  all(...params: unknown[]): unknown;
+};
+
+type DatabaseSyncLike = {
+  prepare(sql: string): DatabaseStatement;
+  exec(sql: string): unknown;
+};
+
+const requireRuntimeModule = createRequire(import.meta.url);
+
+function openDatabaseSync(path: string): DatabaseSyncLike {
+  if (process.versions.bun) {
+    const { Database } = requireRuntimeModule("bun:sqlite") as { Database: new (path: string) => DatabaseSyncLike };
+    return new Database(path);
+  }
+  const { DatabaseSync } = requireRuntimeModule("node:sqlite") as { DatabaseSync: new (path: string) => DatabaseSyncLike };
+  return new DatabaseSync(path);
+}
+
 /** Node DatabaseSync adapter with savepoints for Kernel commands inside app transactions. */
-export function wrapDatabaseSync(raw: DatabaseSync): KernelDb {
+export function wrapDatabaseSync(raw: DatabaseSyncLike): KernelDb {
   let transactionDepth = 0;
   return {
     query(sql: string) {
@@ -108,7 +130,7 @@ export function openAppKernel(): KernelDb {
   // WO-K3: artifact bytes share the platform root; inject for MCP/child seats.
   process.env.QF_ARTIFACT_ROOT = resolveArtifactRoot().path;
   process.env.QF_PEER_BUS_DB ??= join(QF_APP_DIR, "peer-bus.db");
-  const raw = new DatabaseSync(kernelPath);
+  const raw = openDatabaseSync(kernelPath);
   kernelDb = attachKernel(wrapDatabaseSync(raw), {
     path: resolved.path,
     provenance: resolved.provenance,
@@ -273,9 +295,9 @@ export type PeerBusMessage = {
   delivered: number;
 };
 
-function openPeerBus(path: string): DatabaseSync {
+function openPeerBus(path: string): DatabaseSyncLike {
   mkdirSync(dirname(path), { recursive: true });
-  const db = new DatabaseSync(path);
+  const db = openDatabaseSync(path);
   db.exec("PRAGMA journal_mode = WAL;");
   db.exec(PEER_BUS_DDL);
   for (const ddl of [
@@ -430,7 +452,7 @@ export function commitCollaborationResult(input: {
   result: string;
   citedMarketIds: string[];
   readTrajectoryArtifactIds: string[];
-}): { artifactId: string; completion: unknown } {
+}, prepareCompletion?: (artifactId: string) => void): { artifactId: string; completion: unknown } {
   const context = {
     trace_id: crypto.randomUUID(),
     span_id: crypto.randomUUID(),
@@ -444,11 +466,14 @@ export function commitCollaborationResult(input: {
   const committed = runAtomicResultCommit(
     getKernelDb(),
     () => publishCollaborationResult(input, rawExecute),
-    (published) => rawExecute(
-      "complete_task",
-      { task_id: input.taskId, result_artifact_id: published.artifactId },
-      context,
-    ),
+    (published) => {
+      prepareCompletion?.(published.artifactId);
+      return rawExecute(
+        "complete_task",
+        { task_id: input.taskId, result_artifact_id: published.artifactId },
+        context,
+      );
+    },
   );
   notifyKernelEvents();
   return {
@@ -684,7 +709,17 @@ export async function kernelContinueGovernedResearchResult(
     throw new Error("governed research continuation requires non-empty identities");
   }
 
-  kernelBindSourceWork(sourceWork);
+  const persistedSourceWork = (() => {
+    try {
+      return kernelFreezeSourceWork(sourceWork.source_task_id);
+    } catch {
+      kernelBindSourceWork(sourceWork);
+      return sourceWork;
+    }
+  })();
+  if (JSON.stringify(persistedSourceWork) !== JSON.stringify(sourceWork)) {
+    throw new Error("governed research continuation does not match the frozen source work");
+  }
   const admission = kernelRequestGovernedReview(
     sourceWork.source_task_id,
     input.attempt_id,
@@ -695,7 +730,7 @@ export async function kernelContinueGovernedResearchResult(
     typeof admission.review_task_id !== "string" ||
     admission.review_task_id.length === 0 ||
     !admission.source_work ||
-    JSON.stringify(admission.source_work) !== JSON.stringify(sourceWork) ||
+    JSON.stringify(admission.source_work) !== JSON.stringify(persistedSourceWork) ||
     admission.critic_session_id !== input.critic_session_id
   ) {
     throw new Error("governed research review admission did not return the exact review Task and source work");
@@ -1130,7 +1165,7 @@ export function kernelRunGuidedResearch(
   };
 }
 
-export function kernelFinalizeResearchEvaluation(evaluationId: string): {
+export function kernelFinalizeResearchEvaluation(evaluationId: string, database: KernelDb = getKernelDb()): {
   reportArtifactId: string | null;
   hypothesisId: string;
   status: string;
@@ -1138,21 +1173,23 @@ export function kernelFinalizeResearchEvaluation(evaluationId: string): {
   evidenceArtifactId: string | null;
   current: boolean;
 } {
-  const evaluation = kernelGetObject("evaluation", evaluationId);
+  const readObject = (type: string, id: string) => getObject(database, type, id);
+  const readLinks = (id: string, options?: GetLinksOptions) => getLinks(database, id, options);
+  const evaluation = readObject("evaluation", evaluationId);
   if (!evaluation) throw new Error(`Evaluation not found: ${evaluationId}`);
-  const lineage = kernelGetLinks(evaluationId, { kind: "evaluated_by" });
+  const lineage = readLinks(evaluationId, { kind: "evaluated_by" });
   const hypothesisId = lineage.find((link) =>
-    link.to_id === evaluationId && kernelGetObject("hypothesis", link.from_id)
+    link.to_id === evaluationId && readObject("hypothesis", link.from_id)
   )?.from_id;
   const runId = lineage.find((link) =>
-    link.to_id === evaluationId && kernelGetObject("run", link.from_id)
+    link.to_id === evaluationId && readObject("run", link.from_id)
   )?.from_id;
   if (!hypothesisId || !runId) throw new Error("Evaluation lacks exact hypothesis and Run lineage");
   const verdict = String(evaluation.verdict);
   const status = verdict === "supports" ? "supported" : verdict === "rejects" ? "rejected" : "inconclusive";
-  const existingHypothesis = kernelGetObject("hypothesis", hypothesisId);
+  const existingHypothesis = readObject("hypothesis", hypothesisId);
   if (existingHypothesis && String(existingHypothesis.status) === "open") {
-    kernelExecute("resolve_hypothesis", {
+    execute(database, "resolve_hypothesis", {
       hypothesis_id: hypothesisId, evaluation_id: evaluationId, status,
     }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
   } else if (!existingHypothesis || String(existingHypothesis.status) !== status) {
@@ -1166,10 +1203,10 @@ export function kernelFinalizeResearchEvaluation(evaluationId: string): {
   } catch {
     throw new Error(`Evaluation lacks exact source work: ${evaluationId}`);
   }
-  const evidence = resolveGovernedWorkerEvidence(getKernelDb(), sourceWork);
-  const publication = readGovernedPublicationForEvaluation(getKernelDb(), evaluationId);
+  const evidence = resolveGovernedWorkerEvidence(database, sourceWork);
+  const publication = readGovernedPublicationForEvaluation(database, evaluationId);
   if (!publication) throw new Error(`Evaluation lacks persisted Report publication: ${evaluationId}`);
-  const gates = getKernelDb().query(
+  const gates = database.query(
     "SELECT to_id FROM links WHERE kind = 'gates' AND from_id = ? ORDER BY created_at ASC, id ASC",
   ).all(evaluationId) as Array<{ to_id: string }>;
   if (gates.length !== 1 || gates[0]!.to_id !== publication.report_artifact_id || String(evaluation.publication_report_id ?? "") !== publication.report_artifact_id) {

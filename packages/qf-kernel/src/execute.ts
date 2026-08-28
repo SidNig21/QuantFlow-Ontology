@@ -715,8 +715,9 @@ function assertTaskCompletionLineage(
   }
 
   // G9's source-work binding is an existing Kernel support table. When one is
-  // present for this Task, carry its exact Run identity into the completion
-  // event so a later resolver can survive process restart without guessing.
+  // present for this Task, the completion must carry the exact frozen worker
+  // Artifact and Run identity. This check is deliberately before the state
+  // transition transaction so a substituted Artifact leaves no completion event.
   const bindingTable = db
     .query("SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = 'qf_review_source_work'")
     .get() as { ok: number } | null;
@@ -726,17 +727,34 @@ function assertTaskCompletionLineage(
     .all(taskId) as Array<{ source_work: string }>;
   if (bindings.length === 0) return undefined;
   if (bindings.length !== 1) throw new KernelError("complete_task requires exactly one durable source-work binding");
-  let sourceWork: unknown;
+  let sourceWork: Record<string, unknown>;
   try {
-    sourceWork = JSON.parse(bindings[0]!.source_work);
+    const parsed = JSON.parse(bindings[0]!.source_work) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("not an object");
+    }
+    sourceWork = parsed as Record<string, unknown>;
   } catch {
     throw new KernelError("complete_task durable source-work binding is invalid");
   }
-  if (!sourceWork || typeof sourceWork !== "object" || Array.isArray(sourceWork)) {
+  const sourceWorkKeys = [
+    "source_task_id",
+    "hypothesis_id",
+    "run_id",
+    "result_artifact_id",
+    "executor_session_id",
+  ];
+  if (Object.keys(sourceWork).sort().join(",") !== sourceWorkKeys.slice().sort().join(",")) {
     throw new KernelError("complete_task durable source-work binding is invalid");
   }
-  const runId = (sourceWork as Record<string, unknown>).run_id;
-  if (typeof runId !== "string" || runId.length === 0) {
+  if (sourceWork.source_task_id !== taskId) {
+    throw new KernelError("complete_task durable source-work binding names a different source Task");
+  }
+  if (sourceWork.result_artifact_id !== resultArtifactId) {
+    throw new KernelError("complete_task result_artifact_id does not match frozen source-work binding");
+  }
+  const runId = sourceWork.run_id;
+  if (typeof runId !== "string" || runId.length === 0 || !db.query("SELECT 1 AS ok FROM run WHERE id = ?").get(runId)) {
     throw new KernelError("complete_task durable source-work binding lacks run_id");
   }
   return runId;

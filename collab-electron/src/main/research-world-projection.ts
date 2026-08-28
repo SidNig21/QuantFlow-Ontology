@@ -399,6 +399,7 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   const runFields = runParams && typeof runParams === "object" && !Array.isArray(runParams)
     ? runParams as Record<string, unknown> : {};
   addId(ids, "dataset", runFields.dataset_id);
+  addId(ids, "artifact", runFields.result_artifact_id);
 
   for (const link of allLinks) {
     if (link.from_id !== selectedTaskId) continue;
@@ -462,7 +463,7 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   addSelectedLink("tests", source.run_id, source.hypothesis_id);
   addSelectedLink("uses", source.run_id, runFields.dataset_id);
   addSelectedLink("uses", source.run_id, selectedStrategyId);
-  addSelectedLink("produces", source.run_id, source.result_artifact_id);
+  addSelectedLink("produces", source.run_id, runFields.result_artifact_id);
   for (const gradeId of gradeArtifactIds) {
     for (const link of allLinks.filter((candidate) => candidate.from_id === gradeId && ["grades_ticket", "grades_run", "grades_strategy", "grades_run_result"].includes(candidate.kind))) {
       addSelectedLink(link.kind, link.from_id, link.to_id);
@@ -492,7 +493,7 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   };
   requireLink("run", String(source.run_id), "tests", (link) => link.kind === "tests" && link.from_id === source.run_id);
   requireLink("run", String(source.run_id), "uses", (link) => link.kind === "uses" && link.from_id === source.run_id && objectType(snapshot, link.to_id) === "dataset");
-  requireLink("run", String(source.run_id), "produces", (link) => link.kind === "produces" && link.from_id === source.run_id && link.to_id === source.result_artifact_id);
+  requireLink("run", String(source.run_id), "produces", (link) => link.kind === "produces" && link.from_id === source.run_id && link.to_id === runFields.result_artifact_id);
   const objects: ResearchWorldObject[] = [];
   for (const type of OBJECT_TYPES) for (const id of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, id, reports));
   const resultArtifact = objects.find((object) => object.type === "artifact" && object.id === String(source.result_artifact_id));

@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ 314616a1` on 2026-08-28 by
+> Generated from `wo-golden-g2 @ 10aedeb4` on 2026-08-28 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -39,14 +39,14 @@ flowchart TD
   DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]
 
   R --> P --> M --> H
-  H -->|"write-door 19"| E
+  H -->|"write-door 20"| E
   E --> DB
   A["<b>ungoverned SQL</b><br/>amber evidence only<br/>not a proven breach"]
   H -->|"reaches-sql 2"| A
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
   H -->|"writes-disk 7"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
-  H -->|"read-only 83"| RO
+  H -->|"read-only 82"| RO
 
   QA["<b>QA · governance</b><br/>11 subsystems<br/>asserts the rules above"]
   SP["<b>Species · runtimes</b><br/>3 subsystems<br/>launched by path,<br/>not imported"]
@@ -81,12 +81,12 @@ handler that mutates state without `execute()` is cheating even when it works.
 
 | At hop 4 the handler… | | Count |
 |---|---|---:|
-| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 19 |
+| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 20 |
 | `cheats` | reaches SQL outside `execute()` **and** a function on that path carries a current hard red | 0 |
 | `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 2 |
 | `writes-disk` | writes a file; never reaches the Kernel at all | 7 |
 | `unknown` | handler or module resolution coverage is incomplete; not claimed read-only | 0 |
-| `read-only` | no mutation seen | 83 |
+| `read-only` | no mutation seen | 82 |
 
 #### Reaches ungoverned SQL, but not a hard red (6)
 
@@ -493,28 +493,28 @@ discovered from the AST.
 2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
 - **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
-- **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 573
+- **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 577
 - `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 507
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 395
-- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 601
+- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 626
 
 ### Exact task delivery
 
 3 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
 - **packages/qf-kernel/src/execute.ts** — UPDATE task at line 121
-- **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 640
-- **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 985
-- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 511
+- **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 644
+- **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 1006
+- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 536
 - `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 81
 
 ### Research review / publication
 
 2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 949
-- **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1318
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 639
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 970
+- **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1322
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 664
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 228
@@ -523,12 +523,12 @@ discovered from the AST.
 
 4 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
-- **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 359
+- **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 363
 - **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 531
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 882
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 903
 - **packages/qf-kernel/src/strategy-outcome.ts** — INSERT INTO artifact at line 195
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentTrajectoryArtifact() at line 32
-- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 120
+- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 142
 - `packages/qf-kernel/src/resolve-artifact-root.ts` — exports resolveArtifactRoot() at line 25
 
 **`strong` is structural** — the file mutates the responsibility's table or owns its

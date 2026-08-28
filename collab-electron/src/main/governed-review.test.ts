@@ -161,6 +161,7 @@ describe("R15 production governed-review seams", () => {
       getKernelDb,
       kernelContinueGovernedResearchResult,
       kernelExecute,
+      kernelBindSourceWork,
       kernelRecordGovernedToolReceipt,
       kernelRecordGovernedEvaluation,
       kernelRunGuidedResearch,
@@ -254,6 +255,13 @@ describe("R15 production governed-review seams", () => {
           { kind: "derived_from", to_id: read.object_id },
         ],
       }, { ...trace(), actor_session_id: "worker-continuation" }) as { object_id: string };
+      kernelBindSourceWork({
+        source_task_id: task.object_id,
+        hypothesis_id: run.hypothesisId,
+        run_id: run.runId,
+        result_artifact_id: resultTrajectory.object_id,
+        executor_session_id: "worker-continuation",
+      });
       kernelExecute("complete_task", {
         task_id: task.object_id, result_artifact_id: resultTrajectory.object_id,
       }, { ...trace(), actor_session_id: "worker-continuation" });
@@ -269,7 +277,7 @@ describe("R15 production governed-review seams", () => {
         source_task_id: task.object_id,
         hypothesis_id: run.hypothesisId,
         run_id: run.runId,
-        result_artifact_id: run.artifactId,
+        result_artifact_id: resultTrajectory.object_id,
         executor_session_id: "worker-continuation",
         critic_session_id: "critic-continuation",
         attempt_id: "continuation-attempt",
@@ -344,7 +352,36 @@ describe("R15 production governed-review seams", () => {
         const caseRun = kernelRunGuidedResearch(workerId, caseHypothesis.object_id, `${suffix}-evidence`);
         expect(caseRun).not.toBeNull();
         if (!caseRun) throw new Error(`missing ${suffix} deterministic run`);
-        return { criticId, taskId: caseTask.object_id, run: caseRun };
+        const caseReadBytes = new TextEncoder().encode(JSON.stringify({
+          contract: "qf.ontology.v1", tool: "qf_venue_get", arguments: { id: `venue-${suffix}` },
+          result: { id: `venue-${suffix}` }, session_id: workerId, role: "worker",
+          created_at: "2026-08-28T00:00:00.000Z", nonce: `${suffix}-read-nonce`,
+        }));
+        const caseReadPath = join(artifactRoot, `${suffix}-read.json`);
+        writeFileSync(caseReadPath, caseReadBytes);
+        const caseRead = kernelExecute("publish_artifact", {
+          kind: "trajectory", bytes: caseReadBytes, storage_ref: caseReadPath,
+          links: [{ kind: "produces", from_id: workerId }],
+        }, { ...trace(), actor_session_id: workerId, ontology_read_tool: "qf_venue_get" } as never) as { object_id: string };
+        const caseResultBytes = new TextEncoder().encode(JSON.stringify({
+          contract: "qf.collaboration.v1", kind: "result", task_id: caseTask.object_id,
+          from_session_id: workerId, result: "completed",
+        }));
+        const caseResultPath = join(artifactRoot, `${suffix}-result.json`);
+        writeFileSync(caseResultPath, caseResultBytes);
+        const caseResult = kernelExecute("publish_artifact", {
+          kind: "trajectory", bytes: caseResultBytes, storage_ref: caseResultPath,
+          links: [{ kind: "produces", from_id: workerId }, { kind: "derived_from", to_id: caseRead.object_id }],
+        }, { ...trace(), actor_session_id: workerId }) as { object_id: string };
+        kernelBindSourceWork({
+          source_task_id: caseTask.object_id,
+          hypothesis_id: caseRun.hypothesisId,
+          run_id: caseRun.runId,
+          result_artifact_id: caseResult.object_id,
+          executor_session_id: workerId,
+        });
+        kernelExecute("complete_task", { task_id: caseTask.object_id, result_artifact_id: caseResult.object_id }, { ...trace(), actor_session_id: workerId });
+        return { criticId, taskId: caseTask.object_id, run: caseRun, resultArtifactId: caseResult.object_id };
       };
 
       const runDeliveryFailureCase = async (suffix: string, falseWrite: number, message: string) => {
@@ -366,7 +403,7 @@ describe("R15 production governed-review seams", () => {
           source_task_id: failureCase.taskId,
           hypothesis_id: failureCase.run.hypothesisId,
           run_id: failureCase.run.runId,
-          result_artifact_id: failureCase.run.artifactId,
+          result_artifact_id: failureCase.resultArtifactId,
           executor_session_id: `worker-${suffix}`,
           critic_session_id: failureCase.criticId,
           attempt_id: `${suffix}-attempt`,
@@ -414,12 +451,12 @@ describe("R15 production governed-review seams", () => {
       };
       readReceipt(1, "qf_hypothesis_get", { id: run.hypothesisId });
       readReceipt(2, "qf_run_get", { id: run.runId });
-      readReceipt(3, "qf_artifact_get", { id: run.artifactId });
+      readReceipt(3, "qf_artifact_get", { id: resultTrajectory.object_id });
       readReceipt(4, "qf_record_evaluation", { verdict: "supports" });
       const evaluation = kernelRecordGovernedEvaluation({
         hypothesis_id: run.hypothesisId,
         run_id: run.runId,
-        artifact_id: run.artifactId,
+        artifact_id: resultTrajectory.object_id,
         review_task_id: continuation.review_task_id,
         source_work: continuation.source_work,
         broker_invocation_id: "continuation-4",
@@ -427,7 +464,7 @@ describe("R15 production governed-review seams", () => {
         rubric: { faithfulness: 0.9, answer_relevancy: 0.9, context_precision: 0.9, context_recall: 0.9 },
         confidence: 0.9,
         rationale: "The worker result is governed and complete.",
-        findings: [{ code: "GOVERNED", severity: "info", message: "The exact source work was reviewed.", evidence_refs: [run.artifactId] }],
+        findings: [{ code: "GOVERNED", severity: "info", message: "The exact source work was reviewed.", evidence_refs: [resultTrajectory.object_id] }],
       }, "critic-continuation");
       expect(evaluation.verdict).toBe("supports");
       expect(evaluation.report_artifact_id).toBeString();

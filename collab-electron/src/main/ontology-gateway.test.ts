@@ -38,13 +38,14 @@ mock.module("electron", () => ({
   BrowserWindow: { getAllWindows: () => [] },
 }));
 
-const {
-  getKernelPath,
-  kernelGetLinks,
-  kernelGetObject,
-  kernelExecute,
-  openAppKernel,
-} = await import("./kernel");
+  const {
+    getKernelPath,
+    kernelGetLinks,
+    kernelGetObject,
+    kernelExecute,
+    kernelBindSourceWork,
+    openAppKernel,
+  } = await import("./kernel");
 const { registerOntologyGatewayRpc } = await import("./ontology-gateway");
 
 test("only ontology reads receive the Kernel read marker", () => {
@@ -426,14 +427,20 @@ test("an admitted governed critic receives and records the verified Artifact rec
       result: "The deterministic result is ready for independent review.",
       citedMarketIds: ["venue-hermes-synthetic"],
       readTrajectoryArtifactIds: [marketRead.artifactId],
-    });
+    }, (artifactId) => kernelBindSourceWork({
+      source_task_id: sourceTask.object_id,
+      hypothesis_id: run.hypothesisId,
+      run_id: run.runId,
+      result_artifact_id: artifactId,
+      executor_session_id: "gateway-worker",
+    }));
     expect(committedResult.artifactId).toBeTruthy();
     expect(kernelGetObject("task", sourceTask.object_id)?.status).toBe("done");
     const continuation = await kernelContinueGovernedResearchResult({
       source_task_id: sourceTask.object_id,
       hypothesis_id: run.hypothesisId,
       run_id: run.runId,
-      result_artifact_id: run.artifactId,
+      result_artifact_id: committedResult.artifactId,
       executor_session_id: "gateway-worker",
       critic_session_id: "gateway-critic",
       attempt_id: "gateway-artifact-receipt-attempt",
@@ -555,13 +562,13 @@ test("an admitted governed critic receives and records the verified Artifact rec
     expect(indexSource).toContain("}, 2_000);");
     callOntologyReadTool(critic, "qf_hypothesis_get", { id: hypothesis.object_id });
     callOntologyReadTool(critic, "qf_run_get", { id: run.runId });
-    callOntologyReadTool(critic, "qf_artifact_get", { id: run.artifactId });
+    callOntologyReadTool(critic, "qf_artifact_get", { id: committedResult.artifactId });
     const reportBefore = db.query("SELECT COUNT(*) AS count FROM artifact WHERE kind = 'report'").get() as { count: number };
     expect(Number(reportBefore.count)).toBe(0);
     const recorded = await callOntologyTool(critic, "qf_record_evaluation", {
       hypothesis_id: hypothesis.object_id,
       run_id: run.runId,
-      artifact_id: run.artifactId,
+      artifact_id: committedResult.artifactId,
       verdict: "supports",
       confidence: 0.9,
       rationale: "The canonical v2 publication is bound to the exact deterministic Run.",
@@ -570,7 +577,7 @@ test("an admitted governed critic receives and records the verified Artifact rec
         code: "CANONICAL_V2",
         severity: "info",
         message: "Canonical v2 publication was written once.",
-        evidence_refs: [hypothesis.object_id, run.runId, run.artifactId],
+        evidence_refs: [hypothesis.object_id, run.runId, committedResult.artifactId],
       }],
     });
     const evaluationId = String((recorded.result as { object_id?: unknown }).object_id ?? "");
@@ -634,7 +641,7 @@ test("an admitted governed critic receives and records the verified Artifact rec
       "qf_venue_get",
       { id: "venue-hermes-synthetic" },
     );
-    commitCollaborationResult({
+    const secondCommittedResult = commitCollaborationResult({
       taskId: secondTask.object_id,
       workerSessionId: "gateway-worker",
       workerRole: "worker",
@@ -643,12 +650,18 @@ test("an admitted governed critic receives and records the verified Artifact rec
       result: "The successor deterministic result is ready for independent review.",
       citedMarketIds: ["venue-hermes-synthetic"],
       readTrajectoryArtifactIds: [secondRead.artifactId],
-    });
+    }, (artifactId) => kernelBindSourceWork({
+      source_task_id: secondTask.object_id,
+      hypothesis_id: secondRun.hypothesisId,
+      run_id: secondRun.runId,
+      result_artifact_id: artifactId,
+      executor_session_id: "gateway-worker",
+    }));
     const secondContinuation = await kernelContinueGovernedResearchResult({
       source_task_id: secondTask.object_id,
       hypothesis_id: secondRun.hypothesisId,
       run_id: secondRun.runId,
-      result_artifact_id: secondRun.artifactId,
+      result_artifact_id: secondCommittedResult.artifactId,
       executor_session_id: "gateway-worker",
       critic_session_id: "gateway-critic",
       attempt_id: "gateway-artifact-receipt-successor-attempt",
@@ -656,11 +669,11 @@ test("an admitted governed critic receives and records the verified Artifact rec
     });
     callOntologyReadTool(critic, "qf_hypothesis_get", { id: secondHypothesis.object_id });
     callOntologyReadTool(critic, "qf_run_get", { id: secondRun.runId });
-    callOntologyReadTool(critic, "qf_artifact_get", { id: secondRun.artifactId });
+    callOntologyReadTool(critic, "qf_artifact_get", { id: secondCommittedResult.artifactId });
     const secondRecorded = await callOntologyTool(critic, "qf_record_evaluation", {
       hypothesis_id: secondHypothesis.object_id,
       run_id: secondRun.runId,
-      artifact_id: secondRun.artifactId,
+      artifact_id: secondCommittedResult.artifactId,
       verdict: "supports",
       confidence: 0.9,
       rationale: "The successor result is independently supported and preserves prior history.",
@@ -669,7 +682,7 @@ test("an admitted governed critic receives and records the verified Artifact rec
         code: "CANONICAL_V2_SUCCESSOR",
         severity: "info",
         message: "The successor publication preserves the prior authority row as history.",
-        evidence_refs: [secondHypothesis.object_id, secondRun.runId, secondRun.artifactId],
+        evidence_refs: [secondHypothesis.object_id, secondRun.runId, secondCommittedResult.artifactId],
       }],
     });
     expect(secondContinuation.outcome).toBe("delivered");

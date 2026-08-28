@@ -213,9 +213,13 @@ function assertIndependentEvaluationForReport(db: KernelDb, evaluationId: string
   ) {
     throw new KernelError("publish_artifact report refuses self-review");
   }
+  const runResultArtifactId = runParams.result_artifact_id;
+  if (typeof runResultArtifactId !== "string" || runResultArtifactId.length === 0) {
+    throw new KernelError("publish_artifact report requires a Run result Artifact");
+  }
   const output = db
     .query(`SELECT 1 AS ok FROM links WHERE kind = 'produces' AND from_id = ? AND to_id = ?`)
-    .get(runs[0]!.id, results[0]!.id);
+    .get(runs[0]!.id, runResultArtifactId);
   const findingsProducer = db
     .query(`SELECT from_id FROM links WHERE kind = 'produces' AND to_id = ?`)
     .all(evaluation.critic_findings_ref) as Array<{ from_id: string }>;

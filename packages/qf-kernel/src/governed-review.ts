@@ -473,15 +473,36 @@ function validateStoredSourceWork(db: KernelDb, work: SourceWork): void {
   const hypothesis = db.query("SELECT id FROM hypothesis WHERE id = ?").get(work.hypothesis_id);
   const run = db.query("SELECT status, params FROM run WHERE id = ?").get(work.run_id) as { status: string; params: string } | null;
   const artifact = db.query("SELECT id, kind FROM artifact WHERE id = ?").get(work.result_artifact_id) as { id: string; kind: string } | null;
-  if (!task || !hypothesis || !run || run.status !== "succeeded" || !artifact || artifact.kind !== "result_set") throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+  if (!task || !hypothesis || !run || run.status !== "succeeded" || !artifact || artifact.kind !== "trajectory") throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
   const params = parseJson(run.params, "Run params");
   if (params.executor_session_id !== work.executor_session_id) throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+  const runResultArtifactId = params.result_artifact_id;
+  const runResultArtifact = typeof runResultArtifactId === "string"
+    ? db.query("SELECT id, kind FROM artifact WHERE id = ?").get(runResultArtifactId) as { id: string; kind: string } | null
+    : null;
+  if (!runResultArtifact || runResultArtifact.kind !== "result_set") throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
   const executor = db.query("SELECT status FROM agent_session WHERE id = ?").get(work.executor_session_id) as { status: string } | null;
   if (!executor) throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+  const workerArtifactLinks = db.query("SELECT from_id FROM links WHERE kind = 'produces' AND from_id = ? AND to_id = ?").all(work.executor_session_id, work.result_artifact_id) as Array<{ from_id: string }>;
+  if (workerArtifactLinks.length !== 1) throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
   const outputLinks = db.query("SELECT to_id FROM links WHERE kind = 'produces' AND from_id = ?").all(work.run_id) as Array<{ to_id: string }>;
-  if (outputLinks.length !== 1 || outputLinks[0]!.to_id !== work.result_artifact_id) throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+  if (outputLinks.length !== 1 || outputLinks[0]!.to_id !== runResultArtifactId) throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
   const assignments = db.query("SELECT to_id FROM links WHERE kind = 'assigned_to' AND from_id = ?").all(work.source_task_id) as Array<{ to_id: string }>;
   if (assignments.length !== 1 || assignments[0]!.to_id !== work.executor_session_id) throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+}
+
+function readRunResultArtifact(db: KernelDb, work: SourceWork): { artifactId: string; content_hash: string; bytes: Uint8Array } {
+  const run = db.query("SELECT params FROM run WHERE id = ?").get(work.run_id) as { params: string } | null;
+  if (!run) throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+  const params = parseJson(run.params, "Run params");
+  if (typeof params.result_artifact_id !== "string" || params.result_artifact_id.length === 0) {
+    throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+  }
+  const resultArtifact = readArtifactBytes(db, params.result_artifact_id);
+  if (db.query("SELECT kind FROM artifact WHERE id = ?").get(params.result_artifact_id as string)?.kind !== "result_set") {
+    throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+  }
+  return { artifactId: params.result_artifact_id, ...resultArtifact };
 }
 
 /** R14 binds the immutable tuple once. A later renderer/Main/critic value cannot replace it. */
@@ -882,12 +903,12 @@ function insertArtifact(db: KernelDb, id: string, kind: string, bytes: Uint8Arra
   db.query("INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref) VALUES (?, ?, ?, ?, ?)").run(id, new Date().toISOString(), kind, id, storageRef);
 }
 
-function canonicalReport(work: SourceWork, resultContentHash: string, evaluation: JsonRecord, findingsId: string, findingsHash: string): Uint8Array {
+function canonicalReport(work: SourceWork, sourceResultArtifactId: string, resultContentHash: string, evaluation: JsonRecord, findingsId: string, findingsHash: string): Uint8Array {
   const rubric = evaluation.rubric as Rubric;
   const envelope = {
     schema: "qf.research.report.v2",
     source_work: work,
-    source_result: { artifact_id: work.result_artifact_id, content_hash: resultContentHash },
+    source_result: { artifact_id: sourceResultArtifactId, content_hash: resultContentHash },
     publication_evaluation: {
       evaluation_id: evaluation.id,
       critic_session_id: evaluation.critic_session_id,
@@ -929,7 +950,7 @@ export function recordGovernedEvaluation(db: KernelDb, input: JsonRecord, trace:
   const findings = exactFindings(input.findings, work);
   const findingsBytes = new TextEncoder().encode(JSON.stringify(findings));
   const findingsId = contentHash(findingsBytes);
-  const resultArtifact = readArtifactBytes(db, work.result_artifact_id);
+  const resultArtifact = readRunResultArtifact(db, work);
   const authorityContext = derivedVerdict === "supports" ? authorityContextForSourceWork(db, work) : null;
   if (derivedVerdict === "supports") resolveGovernedWorkerEvidence(db, work);
   let runMetrics: unknown = null;
@@ -953,7 +974,7 @@ export function recordGovernedEvaluation(db: KernelDb, input: JsonRecord, trace:
     let reportId: string | null = existingPublication?.report_artifact_id ?? null;
     if (derivedVerdict === "supports" && !authorityContext) throw new KernelError("Report authority context is unavailable");
     if (derivedVerdict === "supports" && !existingPublication) {
-      const reportBytes = canonicalReport(work, resultArtifact.content_hash, { ...evaluationRow, id: evaluationId }, findingsId, findingsId);
+      const reportBytes = canonicalReport(work, resultArtifact.artifactId, resultArtifact.content_hash, { ...evaluationRow, id: evaluationId }, findingsId, findingsId);
       reportId = contentHash(reportBytes);
       insertArtifact(db, reportId, "report", reportBytes, "reports");
       const predecessor = db.query(

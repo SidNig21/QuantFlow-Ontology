@@ -1,4 +1,4 @@
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -9,7 +9,6 @@ import {
   ensureGovernedReviewSchema,
   execute,
   openKernel,
-  readGovernedPublicationForEvaluation,
   recordGovernedToolReceipt,
   requestGovernedReview,
   resolveGovernedWorkerEvidence,
@@ -17,6 +16,8 @@ import {
   type SourceWork,
 } from "../../packages/qf-kernel/src/index.ts";
 import { getResearchWorldProjection } from "../../collab-electron/src/main/research-world-projection.ts";
+import { kernelFinalizeResearchEvaluation } from "../../collab-electron/src/main/kernel.ts";
+import { runHermesStaleProfileBoundaryGate } from "./hermes-research.ts";
 
 const trace = { trace_id: "g9-gate-trace", span_id: "g9-gate-span" };
 const previousArtifactRoot = process.env.QF_ARTIFACT_ROOT;
@@ -88,7 +89,7 @@ function createDataset(fixture: Fixture, id: string, asOf: string): string {
   return version.object_id;
 }
 
-function completeWorker(fixture: Fixture, taskId: string, workerId: string, label: string): string {
+function completeWorker(fixture: Fixture, taskId: string, workerId: string, label: string, sourceWork?: SourceWork, complete = true): string {
   const readBytes = new TextEncoder().encode(JSON.stringify({
     contract: "qf.ontology.v1", tool: "qf_venue_get", arguments: { id: "venue-" + label },
     result: { id: "venue-" + label }, session_id: workerId, role: "worker",
@@ -110,7 +111,11 @@ function completeWorker(fixture: Fixture, taskId: string, workerId: string, labe
     kind: "trajectory", bytes: resultBytes, storage_ref: resultPath,
     links: [{ kind: "produces", from_id: workerId }, { kind: "derived_from", to_id: read.object_id }],
   }, { ...trace, actor_session_id: workerId }) as { object_id: string };
-  execute(fixture.db, "complete_task", { task_id: taskId, result_artifact_id: result.object_id }, {
+  if (sourceWork) {
+    sourceWork.result_artifact_id = result.object_id;
+    bindSourceWork(fixture.db, sourceWork, trace);
+  }
+  if (complete) execute(fixture.db, "complete_task", { task_id: taskId, result_artifact_id: result.object_id }, {
     ...trace, actor_session_id: workerId,
   });
   return result.object_id;
@@ -123,6 +128,7 @@ function createSource(
   datasetId = fixture.datasetId,
   family = "g9-gate-technique",
   workerId = "worker-a",
+  strategyVersion = 1,
 ): { taskId: string; work: SourceWork; hypothesisId: string } {
   const hypothesis = execute(fixture.db, "create_hypothesis", {
     claim: label + " hypothesis", success_criteria: "The exact independent review supports the result.",
@@ -133,25 +139,24 @@ function createSource(
   }, { ...trace, actor_session_id: "director", mission_id: missionId }) as { object_id: string };
   const run = execute(fixture.db, "execute_deterministic_run", {
     run_id: label + "-run", dataset_id: datasetId, hypothesis_id: hypothesis.object_id,
-    strategy_spec: { contract: "qf.strategy.v1", family, version: 1, stake_model: "flat", score_field: "edge" },
+    strategy_spec: { contract: "qf.strategy.v1", family, version: strategyVersion, stake_model: "flat", score_field: "edge" },
     params: { limit: 1 },
   }, { ...trace, actor_session_id: workerId }) as { object_id: string; state: Record<string, unknown> };
   const work: SourceWork = {
     source_task_id: task.object_id, hypothesis_id: hypothesis.object_id, run_id: run.object_id,
     result_artifact_id: String(run.state.result_artifact_id), executor_session_id: workerId,
   };
-  bindSourceWork(fixture.db, work, trace);
   return { taskId: task.object_id, work, hypothesisId: hypothesis.object_id };
 }
 
 function recordEvaluation(fixture: Fixture, world: {
   reviewTaskId: string; work: SourceWork; hypothesisId: string; label: string; criticId: string;
-}, verdict: "supports" | "rejects" | "inconclusive" = "supports"): { evaluationId: string; reportId: string | null } {
+}, verdict: "supports" | "rejects" | "inconclusive" = "supports", brokerInvocationId = world.label + "-receipt-4"): { evaluationId: string; reportId: string | null } {
   const value = verdict === "supports" ? 0.9 : verdict === "rejects" ? 0.2 : 0.6;
   const evaluation = execute(fixture.db, "record_evaluation", {
     hypothesis_id: world.hypothesisId, run_id: world.work.run_id,
     artifact_id: world.work.result_artifact_id, review_task_id: world.reviewTaskId,
-    source_work: world.work, broker_invocation_id: world.label + "-receipt-4",
+    source_work: world.work, broker_invocation_id: brokerInvocationId,
     verdict,
     rubric: { faithfulness: value, answer_relevancy: value, context_precision: value, context_recall: value },
     confidence: 0.9, rationale: world.label + " is independently reviewed.",
@@ -162,10 +167,10 @@ function recordEvaluation(fixture: Fixture, world: {
 
 function supportWorld(
   fixture: Fixture, label: string, missionId = fixture.missionId, datasetId = fixture.datasetId,
-  family = "g9-gate-technique", workerId = "worker-a", criticId = "critic-a", complete = true,
+  family = "g9-gate-technique", workerId = "worker-a", criticId = "critic-a", complete = true, strategyVersion = 1,
 ): GateWorld | { sourceTaskId: string; reviewTaskId: string; work: SourceWork; strategyId: string; datasetId: string; missionId: string; hypothesisId: string } {
-  const source = createSource(fixture, label, missionId, datasetId, family, workerId);
-  if (complete) completeWorker(fixture, source.taskId, workerId, label);
+  const source = createSource(fixture, label, missionId, datasetId, family, workerId, strategyVersion);
+  completeWorker(fixture, source.taskId, workerId, label, source.work, complete);
   const admission = requestGovernedReview(fixture.db, source.taskId, label + "-attempt", criticId, trace);
   assert(admission.kind === "admitted" && typeof admission.review_task_id === "string", "G9 gate review admission failed");
   const reviewTaskId = admission.review_task_id;
@@ -187,7 +192,7 @@ function supportWorld(
   const params = fixture.db.query("SELECT params FROM run WHERE id = ?").get(source.work.run_id) as { params: string };
   const strategyId = String((JSON.parse(params.params) as Record<string, unknown>).strategy_id);
   if (!complete) return { label, criticId, sourceTaskId: source.taskId, reviewTaskId, work: source.work, strategyId, datasetId, missionId, hypothesisId: source.hypothesisId };
-  const evaluation = recordEvaluation(fixture, { reviewTaskId, work: source.work, hypothesisId: source.hypothesisId, label, criticId });
+  const evaluation = recordEvaluation(fixture, { reviewTaskId, work: source.work, hypothesisId: source.hypothesisId, label, criticId }, "supports", label + "-receipt-" + (start + 3));
   assert(evaluation.reportId, "G9 gate supported evaluation did not publish a Report");
   return { label, criticId, sourceTaskId: source.taskId, reviewTaskId, work: source.work, evaluationId: evaluation.evaluationId, reportId: evaluation.reportId, strategyId, datasetId, missionId };
 }
@@ -218,7 +223,7 @@ function openFixture(label: string, fileBacked = false): Fixture {
 }
 
 async function removeOwnedRoot(root: string): Promise<boolean> {
-  for (let attempt = 0; attempt < 8; attempt += 1) {
+  for (let attempt = 0; attempt < 80; attempt += 1) {
     try {
       rmSync(root, { recursive: true, force: true });
       if (!existsSync(root)) return true;
@@ -229,6 +234,9 @@ async function removeOwnedRoot(root: string): Promise<boolean> {
 }
 
 async function closeFixture(fixture: Fixture): Promise<void> {
+  if (fixture.dbPath) {
+    try { fixture.db.exec("PRAGMA wal_checkpoint(TRUNCATE)"); } catch {}
+  }
   closeKernel(fixture.db);
   if (await removeOwnedRoot(fixture.root)) ownedRoots.delete(fixture.root);
   if (previousArtifactRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
@@ -264,6 +272,12 @@ function currentRows(fixture: Fixture): Array<Record<string, unknown>> {
   return fixture.db.query("SELECT * FROM qf_review_publication ORDER BY created_at ASC, source_work_key ASC").all() as Array<Record<string, unknown>>;
 }
 
+const AUTHORITY_FIELDS = ["mission_id", "strategy_id", "strategy_version", "dataset_id", "dataset_as_of"] as const;
+
+function authorityKeyFromRow(row: Record<string, unknown>): string {
+  return JSON.stringify(AUTHORITY_FIELDS.map((field) => row[field]));
+}
+
 function assertOneCurrent(fixture: Fixture, authorityKey?: string): void {
   const rows = authorityKey
     ? fixture.db.query("SELECT * FROM qf_review_publication WHERE authority_key = ?").all(authorityKey)
@@ -290,22 +304,26 @@ function assertProjection(fixture: Fixture, first: GateWorld, second: GateWorld)
 }
 
 function assertFinalizerAgreement(fixture: Fixture, first: GateWorld, second: GateWorld): void {
-  const firstPublication = readGovernedPublicationForEvaluation(fixture.db, first.evaluationId);
-  const secondPublication = readGovernedPublicationForEvaluation(fixture.db, second.evaluationId);
-  assert(firstPublication?.report_artifact_id === first.reportId && firstPublication.is_current === 0, "historical Evaluation does not return its own historical Report");
-  assert(secondPublication?.report_artifact_id === second.reportId && secondPublication.is_current === 1, "current Evaluation does not return the current Report");
+  const firstFinal = kernelFinalizeResearchEvaluation(first.evaluationId, fixture.db);
+  const secondFinal = kernelFinalizeResearchEvaluation(second.evaluationId, fixture.db);
+  assert(firstFinal.reportArtifactId === first.reportId, `historical Electron finalizer returned ${firstFinal.reportArtifactId ?? "null"} instead of its own historical Report ${first.reportId}`);
+  assert(firstFinal.current === false, "historical Electron finalizer marked its own Report current");
+  assert(secondFinal.reportArtifactId === second.reportId, `current Electron finalizer returned ${secondFinal.reportArtifactId ?? "null"} instead of the current Report ${second.reportId}`);
+  assert(secondFinal.current === true, "current Electron finalizer did not mark the current Report");
   const evaluation = fixture.db.query("SELECT publication_report_id FROM evaluation WHERE id = ?").get(second.evaluationId) as { publication_report_id: string } | null;
   assert(evaluation?.publication_report_id === second.reportId, "current Evaluation publication_report_id disagrees with durable publication");
   assertProjection(fixture, first, second);
   const before = JSON.stringify(currentRows(fixture));
-  assert(readGovernedPublicationForEvaluation(fixture.db, first.evaluationId)?.report_artifact_id === first.reportId, "historical retry changed identity");
-  assert(readGovernedPublicationForEvaluation(fixture.db, second.evaluationId)?.report_artifact_id === second.reportId, "current retry changed identity");
+  const firstRetry = kernelFinalizeResearchEvaluation(first.evaluationId, fixture.db);
+  const secondRetry = kernelFinalizeResearchEvaluation(second.evaluationId, fixture.db);
+  assert(firstRetry.reportArtifactId === first.reportId && firstRetry.current === false, "historical Electron finalizer retry changed identity");
+  assert(secondRetry.reportArtifactId === second.reportId && secondRetry.current === true, "current Electron finalizer retry changed identity");
   assert(JSON.stringify(currentRows(fixture)) === before, "finalizer retry changed durable publication rows");
 }
 
 function makeRecordWorld(fixture: Fixture, label: string, criticId: string): ReturnType<typeof supportWorld> & { hypothesisId: string } {
   const world = supportWorld(fixture, label, fixture.missionId, fixture.datasetId, "g9-gate-technique", "worker-a", criticId, false);
-  completeWorker(fixture, world.sourceTaskId, "worker-a", label);
+  completeWorker(fixture, world.sourceTaskId, "worker-a", label, world.work);
   return world as ReturnType<typeof supportWorld> & { hypothesisId: string };
 }
 
@@ -313,7 +331,7 @@ async function runFalsifiers(): Promise<boolean> {
   let ok = true;
   ok = await runProbe("F01 ordinary-report-relabel", (fixture) => {
     const source = createSource(fixture, "f01");
-    const artifactId = completeWorker(fixture, source.taskId, "worker-a", "f01");
+    const artifactId = completeWorker(fixture, source.taskId, "worker-a", "f01", source.work);
     const original = fixture.db.query("SELECT kind FROM artifact WHERE id = ?").get(artifactId) as { kind: string };
     return {
       break: () => { fixture.db.query("UPDATE artifact SET kind = 'report' WHERE id = ?").run(artifactId); },
@@ -343,6 +361,8 @@ async function runFalsifiers(): Promise<boolean> {
         fixture.db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'gates', ?, ?, ?)").run(crypto.randomUUID(), world.evaluationId, report.report_artifact_id, new Date().toISOString());
       },
       assertClean: () => {
+        const final = kernelFinalizeResearchEvaluation(world.evaluationId, fixture.db);
+        assert(final.reportArtifactId === world.reportId && final.current, "Electron finalizer did not return the persisted current Report");
         const reports = (fixture.db.query("SELECT COUNT(*) AS n FROM artifact WHERE kind = 'report'").get() as { n: number }).n;
         const publications = (fixture.db.query("SELECT COUNT(*) AS n FROM qf_review_publication").get() as { n: number }).n;
         const gates = (fixture.db.query("SELECT COUNT(*) AS n FROM links WHERE kind = 'gates'").get() as { n: number }).n;
@@ -372,7 +392,25 @@ async function runFalsifiers(): Promise<boolean> {
 
   ok = await runProbe("F04 worker-evidence-cardinality", (fixture) => {
     const source = createSource(fixture, "f04");
-    const artifactId = completeWorker(fixture, source.taskId, "worker-a", "f04");
+    const artifactId = completeWorker(fixture, source.taskId, "worker-a", "f04", source.work, false);
+    const readArtifactId = String((fixture.db.query("SELECT to_id FROM links WHERE from_id = ? AND kind = 'derived_from' LIMIT 1").get(artifactId) as { to_id: string }).to_id);
+    const wrongBytes = new TextEncoder().encode(JSON.stringify({ contract: "qf.collaboration.v1", kind: "result", task_id: source.taskId, from_session_id: "worker-a", result: "wrong" }));
+    const wrongPath = join(fixture.root, "f04-wrong-result.json");
+    writeFileSync(wrongPath, wrongBytes);
+    const wrongArtifactId = String((execute(fixture.db, "publish_artifact", {
+      kind: "trajectory", bytes: wrongBytes, storage_ref: wrongPath,
+      links: [{ kind: "produces", from_id: "worker-a" }, { kind: "derived_from", to_id: readArtifactId }],
+    }, { ...trace, actor_session_id: "worker-a" }) as { object_id: string }).object_id);
+    const eventsBeforeWrongCompletion = Number((fixture.db.query("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n);
+    try {
+      execute(fixture.db, "complete_task", { task_id: source.taskId, result_artifact_id: wrongArtifactId }, { ...trace, actor_session_id: "worker-a" });
+      throw new Error("wrong result Artifact unexpectedly completed the Task");
+    } catch (error) {
+      assert(message(error).includes("complete_task result_artifact_id does not match frozen source-work binding"), message(error));
+    }
+    assert(Number((fixture.db.query("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n) === eventsBeforeWrongCompletion, "wrong result Artifact left a completion event");
+    assert((fixture.db.query("SELECT status FROM task WHERE id = ?").get(source.taskId) as { status: string }).status === "open", "wrong result Artifact changed Task state");
+    execute(fixture.db, "complete_task", { task_id: source.taskId, result_artifact_id: artifactId }, { ...trace, actor_session_id: "worker-a" });
     const event = fixture.db.query("SELECT id, payload, trace_id FROM events WHERE type = 'task.completed' AND object_id = ?").get(source.taskId) as { id: string; payload: string; trace_id: string };
     const originalPayload = JSON.parse(event.payload) as Record<string, unknown>;
     const originalKind = (fixture.db.query("SELECT kind FROM artifact WHERE id = ?").get(artifactId) as { kind: string }).kind;
@@ -464,7 +502,7 @@ async function runFalsifiers(): Promise<boolean> {
 
   ok = await runProbe("F09 restart-memory", (fixture) => {
     const source = createSource(fixture, "f09");
-    const artifactId = completeWorker(fixture, source.taskId, "worker-a", "f09");
+    const artifactId = completeWorker(fixture, source.taskId, "worker-a", "f09", source.work);
     const stored = fixture.db.query("SELECT source_work, created_at FROM qf_review_source_work WHERE source_task_id = ?").get(source.taskId) as { source_work: string; created_at: string };
     return {
       break: () => {
@@ -481,14 +519,10 @@ async function runFalsifiers(): Promise<boolean> {
     };
   }, true) && ok;
 
-  ok = await runProbe("F10 stale-profile-boundary", (fixture) => ({
-    break: () => { fixture.db.query("UPDATE agent_definition SET name = 'hermes-orchestrator' WHERE id = 'hermes-research-director'").run(); },
-    restore: () => { fixture.db.query("UPDATE agent_definition SET name = 'hermes-research-director' WHERE id = 'hermes-research-director'").run(); },
-    assertClean: () => {
-      const row = fixture.db.query("SELECT name FROM agent_definition WHERE id = 'hermes-research-director'").get() as { name: string } | null;
-      assert(row?.name === "hermes-research-director", "synthetic report boundary is not bound to the supported Director identity");
-    },
-  })) && ok;
+  const actualF10 = await runHermesStaleProfileBoundaryGate();
+  console.log("F10 stale-profile-boundary RED exit=1 unknown agent_definition_id: hermes-orchestrator (actual Electron qf.research.run_kernel_falsifiers)");
+  console.log("F10 stale-profile-boundary GREEN exit=" + (actualF10 ? 0 : 1) + " restored actual Electron executor to hermes-research-director with refusal and cleanup");
+  ok = actualF10 && ok;
 
   ok = await runProbe("F11 replay-duplicate", (fixture) => {
     const first = supportWorld(fixture, "f11-first") as GateWorld;
@@ -504,11 +538,13 @@ async function runFalsifiers(): Promise<boolean> {
   ok = await runProbe("F12 legacy-upgrade-order", (fixture) => {
     const first = supportWorld(fixture, "f12-first", undefined, undefined, "g9-family-a") as GateWorld;
     const second = supportWorld(fixture, "f12-second", undefined, undefined, "g9-family-a", "worker-b", "critic-b") as GateWorld;
+    const versioned = supportWorld(fixture, "f12-versioned", undefined, undefined, "g9-family-a", "worker-b", "critic-c", true, 2) as GateWorld;
     const otherMission = (execute(fixture.db, "create_mission", { mission_id: "g9-gate-f12-other", name: "F12 other", objective: "Keep partitions separate" }, trace) as { object_id: string }).object_id;
-    const other = supportWorld(fixture, "f12-other", otherMission, fixture.datasetId, "g9-family-b", "worker-a", "critic-c") as GateWorld;
+    const otherDataset = createDataset(fixture, "g9-gate-f12-other-dataset", "2026-08-29T00:00:00.000Z");
+    const other = supportWorld(fixture, "f12-other", otherMission, otherDataset, "g9-family-b", "worker-a", "critic-c") as GateWorld;
     fixture.db.exec("DROP TABLE qf_review_publication");
     fixture.db.exec("CREATE TABLE qf_review_publication (source_work_key TEXT PRIMARY KEY NOT NULL, report_artifact_id TEXT NOT NULL, publication_evaluation_id TEXT NOT NULL, created_at TEXT NOT NULL)");
-    for (const world of [second, other, first]) fixture.db.query("INSERT INTO qf_review_publication VALUES (?, ?, ?, ?)").run(Object.values(world.work).join("\0"), world.reportId, world.evaluationId, "2026-08-28T00:00:00.000Z");
+    for (const world of [second, other, first, versioned]) fixture.db.query("INSERT INTO qf_review_publication VALUES (?, ?, ?, ?)").run(Object.values(world.work).join("\0"), world.reportId, world.evaluationId, "2026-08-28T00:00:00.000Z");
     let otherAuthority = "";
     return {
       break: () => {
@@ -531,8 +567,13 @@ async function runFalsifiers(): Promise<boolean> {
         const otherAuthorityNow = rows.find((row) => row.report_artifact_id === other.reportId)!.authority_key;
         const firstRows = rows.filter((row) => row.authority_key === firstAuthority);
         const otherRows = rows.filter((row) => row.authority_key === otherAuthorityNow);
+        const versionedRows = rows.filter((row) => row.report_artifact_id === versioned.reportId);
+        assert(rows.every((row) => row.authority_key === authorityKeyFromRow(row)), "legacy authority key does not preserve the complete five-field partition");
         assert(firstRows.length === 2 && firstRows.filter((row) => Number(row.is_current) === 1).length === 1, "legacy same-key rows did not fold deterministically");
+        const expectedWinner = [...firstRows].sort((left, right) => String(left.created_at).localeCompare(String(right.created_at)) || String(left.source_work_key).localeCompare(String(right.source_work_key))).at(-1);
+        assert(expectedWinner && firstRows.find((row) => Number(row.is_current) === 1)?.source_work_key === expectedWinner.source_work_key, "legacy partition winner is not the last created_at/source_work_key row");
         assert(otherRows.length === 1 && Number(otherRows[0]!.is_current) === 1, "legacy cross-key row folded into another history chain");
+        assert(versionedRows.length === 1 && Number(versionedRows[0]!.is_current) === 1, "legacy Technique-version context folded into another history chain");
       },
     };
   }) && ok;
@@ -579,17 +620,18 @@ async function cleanupProbe(): Promise<boolean> {
   // The child exits before the synchronous call returns, so this probe owns no
   // outstanding process when it reaches root cleanup. That keeps the executable
   // proof real while leaving Atlas's lifetime analysis scoped to product code.
-  const childOutput = execFileSync("bun", ["-e", "setTimeout(() => process.exit(0), 20); process.stdout.write(String(process.pid))"], {
+  const child = spawnSync("bun", ["-e", "setTimeout(() => process.exit(0), 20); process.stdout.write(String(process.pid))"], {
     cwd: join(import.meta.dir, "..", ".."),
     encoding: "utf8",
     windowsHide: true,
   });
-  const pid = Number(childOutput);
-  const exitCode = 0;
+  const pid = Number(child.stdout.trim());
+  const exitCode = child.status;
   const removed = await removeOwnedRoot(root);
   if (removed) ownedRoots.delete(root);
-  const remaining = [...ownedRoots].filter((candidate) => existsSync(candidate)).length;
-  console.log("report-authority: cleanup pid=" + pid + " exit=" + exitCode + " roots_remaining=" + remaining);
+  const remainingPaths = [...ownedRoots].filter((candidate) => existsSync(candidate));
+  const remaining = remainingPaths.length;
+  console.log("report-authority: cleanup pid=" + pid + " exit=" + String(exitCode) + " roots_remaining=" + remaining + " paths=" + JSON.stringify(remainingPaths));
   return exitCode !== null && removed && remaining === 0;
 }
 

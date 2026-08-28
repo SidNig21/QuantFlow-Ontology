@@ -53,16 +53,17 @@ function fixture(deliver = true, admit = true) {
   const dataset = execute(db, "register_dataset_version", { kind: "results", artifact_id: datasetArtifact.object_id, content_hash: datasetArtifact.object_id, as_of: "2026-08-15T11:00:00.000Z", coverage: { deterministic_score_field: "edge" } }, trace);
   const run = execute(db, "execute_deterministic_run", { run_id: "r15-run", dataset_id: dataset.object_id, strategy_spec: { contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: "edge" }, params: { limit: 1 } }, { ...trace, actor_session_id: "executor" });
   const task = execute(db, "create_task", { task_id: "source-task", title: "Reviewable research", description: "Review the exact completed research.", assignee_session_id: "executor" }, { ...trace, actor_session_id: "director", mission_id: mission.object_id });
-  const work = bindSourceWork(db, { source_task_id: task.object_id, hypothesis_id: hypothesis.object_id, run_id: run.object_id, result_artifact_id: String(run.state.result_artifact_id), executor_session_id: "executor" }, trace);
+  const work = { source_task_id: task.object_id, hypothesis_id: hypothesis.object_id, run_id: run.object_id, result_artifact_id: String(run.state.result_artifact_id), executor_session_id: "executor" };
+  completeWorkerTask(task.object_id, work, false);
   const admission = admit ? requestGovernedReview(db, "source-task", "attempt-1", "critic", trace) : null;
   if (admission) {
     expect(admission.kind).toBe("admitted");
     if (deliver) markGovernedDelivery(db, String(admission.review_task_id), "delivered", trace);
   }
-  return { work, taskId: admission ? String(admission.review_task_id) : "", hypothesisId: hypothesis.object_id, runId: run.object_id, artifactId: String(run.state.result_artifact_id) };
+  return { work, taskId: admission ? String(admission.review_task_id) : "", hypothesisId: hypothesis.object_id, runId: run.object_id, artifactId: work.result_artifact_id };
 }
 
-function completeWorkerTask(taskId: string): void {
+function completeWorkerTask(taskId: string, sourceWork: { result_artifact_id: string; source_task_id: string; hypothesis_id: string; run_id: string; executor_session_id: string }, complete = true): void {
   const readBytes = new TextEncoder().encode(JSON.stringify({
     contract: "qf.ontology.v1",
     tool: "qf_venue_get",
@@ -92,7 +93,9 @@ function completeWorkerTask(taskId: string): void {
       { kind: "derived_from", to_id: read.object_id },
     ],
   }, { ...trace, actor_session_id: "executor" });
-  execute(db!, "complete_task", {
+  sourceWork.result_artifact_id = result.object_id;
+  bindSourceWork(db!, sourceWork, trace);
+  if (complete) execute(db!, "complete_task", {
     task_id: taskId, result_artifact_id: result.object_id,
   }, { ...trace, actor_session_id: "executor" });
 }
@@ -160,7 +163,7 @@ describe("R15 governed review", () => {
 
   test("freezes the tuple, requires exact reads, canonicalizes findings, and publishes supports", () => {
     const f = fixture();
-    completeWorkerTask("source-task");
+    completeWorkerTask("source-task", f.work);
     readReceipt(f.taskId, "qf_hypothesis_get", { id: f.hypothesisId }, 1);
     readReceipt(f.taskId, "qf_run_get", { id: f.runId }, 2);
     readReceipt(f.taskId, "qf_artifact_get", { id: f.artifactId }, 3);
