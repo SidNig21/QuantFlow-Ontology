@@ -1,0 +1,31 @@
+case	red_exit	red_observed_defect	restore_exit	restore_observed_output
+required-current-bridge	1	required current bridge missing=collab-electron/src/preload/shell.ts:ipcRenderer.invoke("qf:research:submitQuestion"	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+dynamic-forward-channel	1	shell:forward dynamic agent family missing	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+live-pty-send-variant	1	required current bridge missing=collab-electron/src/preload/universal.ts:ipcRenderer.send("pty:send-raw-keys"	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+saved-state-consumer	1	saved-state consumer missing=collab-electron/src/windows/shell/src/tile-manager.js:restoreCanvasState	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+retained-direct-dependency	1	unexpected dependency delta=collab-electron/package.json#devDependencies#d3	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+orphan-lock-closure	1	lock added entries=g7-orphan	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+package-runtime-resource	1	retained package resource missing=species/hermes/dock-profiles.json	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:transport	1	shell:forward transport tuple missing	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:create-artifact-tile	1	shell:forward static channel missing=create-artifact-tile	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:create-graph-tile	1	shell:forward static channel missing=create-graph-tile	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:create-term-tile	1	shell:forward static channel missing=create-term-tile	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:file-renamed	1	shell:forward static channel missing=file-renamed	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:file-selected	1	shell:forward static channel missing=file-selected	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:files-deleted	1	shell:forward static channel missing=files-deleted	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:folder-selected	1	shell:forward static channel missing=folder-selected	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:fs-changed	1	shell:forward static channel missing=fs-changed	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:handoffs-changed	1	shell:forward static channel missing=handoffs-changed	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:nav-drag-active	1	shell:forward static channel missing=nav-drag-active	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:open-browser-tile	1	shell:forward static channel missing=open-browser-tile	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:open-terminal	1	shell:forward static channel missing=open-terminal	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:replay:data	1	shell:forward static channel missing=replay:data	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:sessions-changed	1	shell:forward static channel missing=sessions-changed	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:wikilinks-updated	1	shell:forward static channel missing=wikilinks-updated	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:workspace-added	1	shell:forward static channel missing=workspace-added	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:workspace-removed	1	shell:forward static channel missing=workspace-removed	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:spawn-failed	1	shell:forward static channel missing=spawn-failed	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:spawn-pending	1	shell:forward static channel missing=spawn-pending	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:spawn-reconciled	1	shell:forward static channel missing=spawn-reconciled	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:agent:${event.kind}	1	shell:forward dynamic agent family missing	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+shell-forward:viewer:${workspacePath}	1	shell:forward dynamic viewer target missing	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
