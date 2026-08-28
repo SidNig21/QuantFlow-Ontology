@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "10aedeb4",
+    "commit": "363219f1",
     "generatedAt": "2026-08-28",
     "filesScanned": 407,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "5c84f80ce82011be"
+    "fingerprint": "e6e6e567b53c19a6"
   },
   "stats": {
     "live": 104,
@@ -3024,7 +3024,7 @@
       "id": "0:packages/qf-kernel/src::governed",
       "layer": 0,
       "name": "governed-review.ts",
-      "kb": 60.1,
+      "kb": 60.2,
       "x": 1.01,
       "z": 0.85,
       "status": "alert",
@@ -3035,7 +3035,7 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/governed-review.ts",
-          "kb": 60.1,
+          "kb": 60.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
@@ -10897,7 +10897,7 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "UPDATE task at line 1006"
+            "UPDATE task at line 1007"
           ],
           "weight": "strong"
         },
@@ -10988,12 +10988,12 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [
             "exports ensureGovernedReviewSchema() at line 344",
-            "exports executeGovernedReviewTask() at line 753",
-            "exports requestGovernedReview() at line 780"
+            "exports executeGovernedReviewTask() at line 754",
+            "exports requestGovernedReview() at line 781"
           ],
           "strong": [
-            "INSERT INTO evaluation at line 970",
-            "UPDATE evaluation at line 998"
+            "INSERT INTO evaluation at line 971",
+            "UPDATE evaluation at line 999"
           ],
           "weight": "strong"
         },
@@ -11075,7 +11075,7 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "INSERT INTO artifact at line 903"
+            "INSERT INTO artifact at line 904"
           ],
           "weight": "strong"
         },
@@ -50342,7 +50342,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:1036",
+            "from": "packages/qf-kernel/src/governed-review.ts:1037",
             "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -50384,7 +50384,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:1036",
+            "from": "packages/qf-kernel/src/governed-review.ts:1037",
             "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -50426,7 +50426,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:1036",
+            "from": "packages/qf-kernel/src/governed-review.ts:1037",
             "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -50468,7 +50468,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:1036",
+            "from": "packages/qf-kernel/src/governed-review.ts:1037",
             "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -50510,7 +50510,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:1036",
+            "from": "packages/qf-kernel/src/governed-review.ts:1037",
             "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -50552,7 +50552,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:1036",
+            "from": "packages/qf-kernel/src/governed-review.ts:1037",
             "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -50599,7 +50599,7 @@
             "calls": "migrateLegacyPublicationTable"
           },
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:1036",
+            "from": "packages/qf-kernel/src/governed-review.ts:1037",
             "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -50646,7 +50646,7 @@
             "calls": "migrateLegacyPublicationTable"
           },
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:1036",
+            "from": "packages/qf-kernel/src/governed-review.ts:1037",
             "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -50693,7 +50693,7 @@
             "calls": "migrateLegacyPublicationTable"
           },
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:1036",
+            "from": "packages/qf-kernel/src/governed-review.ts:1037",
             "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -51543,7 +51543,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            685
+            686
           ]
         }
       ]
@@ -51568,7 +51568,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            517
+            518
           ]
         }
       ]
@@ -51593,7 +51593,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            708
+            709
           ]
         }
       ]
@@ -51618,7 +51618,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            704
+            705
           ]
         }
       ]
@@ -51643,7 +51643,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            745
+            746
           ]
         }
       ]
@@ -51668,7 +51668,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            729
+            730
           ]
         }
       ]
@@ -51693,7 +51693,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            903
+            904
           ]
         }
       ]
@@ -51718,7 +51718,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            565
+            566
           ]
         }
       ]
@@ -51743,7 +51743,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            559
+            560
           ]
         }
       ]
@@ -51768,7 +51768,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            970
+            971
           ]
         }
       ]
@@ -51793,7 +51793,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            998
+            999
           ]
         }
       ]
@@ -51818,9 +51818,9 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            972,
             973,
-            1000
+            974,
+            1001
           ]
         }
       ]
@@ -51845,7 +51845,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            966
+            967
           ]
         }
       ]
@@ -51870,7 +51870,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1003
+            1004
           ]
         }
       ]
@@ -51895,7 +51895,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            987
+            988
           ]
         }
       ]
@@ -51920,7 +51920,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            984
+            985
           ]
         }
       ]
@@ -51945,7 +51945,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1008
+            1009
           ]
         }
       ]
@@ -51970,7 +51970,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1005
+            1006
           ]
         }
       ]
@@ -51995,7 +51995,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1006
+            1007
           ]
         }
       ]
@@ -52020,7 +52020,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            811
+            812
           ]
         }
       ]
@@ -52644,12 +52644,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "314616a1",
+      "commit": "10aedeb4",
       "generatedAt": "2026-08-28"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "10aedeb4",
+      "commit": "363219f1",
       "generatedAt": "2026-08-28"
     },
     "verdict": "better",
