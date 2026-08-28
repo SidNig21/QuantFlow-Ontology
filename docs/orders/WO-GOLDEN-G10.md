@@ -1,6 +1,6 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: READER AMENDMENT REQUIRED — bounded order amended after finite Reader NO / NO; no Builder authority
+status: READER ROUND-2 AMENDMENT REQUIRED — minimum route/allowlist amendment after Reader NO / NO; no Builder authority
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
@@ -9,6 +9,9 @@ reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
 reader-reread: **REQUIRED — the same Reader must reread this amended order and NEXT.md and return YES / YES; no substitute Reader or Builder is authorized**
+reader-round-2-authority: `f7c1457ddcaab927a146293a3744f252ccd37fd4`
+reader-round-2-verdict: **NO / NO — exact gate-registration file, live snapshot route, and consumer/allowlist boundary still required**
+reader-round-2-reread: **REQUIRED — the same Reader must reread this Round-2 amendment and NEXT.md and return YES / YES; no Builder authority**
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-disposition: Current Canvas/Mission/runtime coherence group from the audited Phase-2 disposition
 accepted-g9-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
@@ -98,6 +101,19 @@ and elapsed time never establish liveness. The proof covers both `native_tui`
 and `host_acp`; if either is excluded, the order must name that exact exclusion
 and render its runtime result exactly `Not recorded`.
 
+The exact read-only snapshot route is Main `qf:sessions:runtime-snapshot` in
+`collab-electron/src/main/ipc-kernel.ts` → the shell preload
+`window.shellApi.qf.getRuntimeSnapshot()` in
+`collab-electron/src/preload/shell.ts` → the shell Canvas renderer in
+`collab-electron/src/windows/shell/src/renderer.js`. The Main handler reads the
+existing `collab-electron/src/main/agent-host.ts` live registry and returns a
+sorted `Array<{ sessionId: string; live: boolean }>` keyed by exact
+`agent_session.id`; it is read-only and never derives `live` from persisted
+status, terminal text, or elapsed time. The shared type is frozen in
+`collab-electron/packages/shared/src/window-api.d.ts`. Dock, Canvas, and Inspect
+must consume that one snapshot through `participant-projection.js`; no one of
+the three may fetch or derive a separate liveness value.
+
 Use the existing participant projection contract or one pure equivalent shared
 by Dock, Canvas, and Inspect. `agent_session.status` supplies the persisted Session axis;
 the current runtime observation supplies Runtime liveness; Task ownership and
@@ -167,9 +183,19 @@ and only for a named defect above:
 - `collab-electron/src/main/mission-context.ts` only for the existing Mission
   view binding/clear boundary;
 - `collab-electron/src/main/runtime-adapter.ts` only for real runtime observation;
+- `collab-electron/src/main/agent-host.ts` only for the read-only live-registry
+  snapshot keyed by exact `agent_session.id`;
+- `collab-electron/src/main/ipc-kernel.ts` only for the read-only
+  `qf:sessions:runtime-snapshot` Main handler;
+- `collab-electron/src/preload/shell.ts` only for the matching
+  `window.shellApi.qf.getRuntimeSnapshot()` bridge;
+- `collab-electron/packages/shared/src/window-api.d.ts` only for the matching
+  `{ sessionId, live }` snapshot type;
 - `collab-electron/src/main/ipc-browser.ts`,
   `collab-electron/src/main/canvas-rpc.ts`, and the paired preload/type surface
   only for the five routed calls;
+- `qa/run.ts` only to register the exact
+  `golden-g10-canvas-runtime` command;
 - focused tests/fixtures for the named behavior;
 - the named `golden-g10-canvas-runtime` QA gate at
   `qa/gates/golden-g10-canvas-runtime.ts`, invoked by
@@ -210,6 +236,10 @@ may not replace the Main/preload boundary with mocks or call `execute()` as a
 shortcut around the UI path. The gate independently queries the isolated Kernel
 and compares Mission, Task, participant, Dataset, Technique, Run, Artifact,
 Evaluation, Report, and link ids to the production response and rendered DOM.
+The gate is registered in `qa/run.ts` only under the exact name
+`golden-g10-canvas-runtime` and is invoked by
+`bun qa/run.ts golden-g10-canvas-runtime`; no other `qa/run.ts` change is in
+scope.
 
 The normal proof must show:
 
@@ -219,8 +249,9 @@ The normal proof must show:
    deleting or rewriting Kernel facts;
 3. successful submission, failed submission, close, and reopen preserve the
    durable Mission and do not force an exclusive world view;
-4. Dock and Canvas share one participant projection and agree on session,
-   runtime, work, recovery, role, Task, output, and Mission binding;
+4. Dock, Canvas, and Inspect consume the one `{ sessionId, live }` snapshot and
+   agree on session, runtime, work, recovery, role, Task, output, and Mission
+   binding;
 5. live, starting, stopped, unavailable, closed, and unassigned cases are
    distinguished using real runtime observations and persisted facts;
 6. existing Mission/Task/Dataset/Technique/producer links are shown and genuine
@@ -317,3 +348,11 @@ The Reader task `01a04a11-0b55-79b3-b6c0-55285177dd55` returned **NO / NO** at
 authority `43e0c779e4b255624eefd021716d2afe5245020e` with the six finite
 amendments now incorporated above. The same Reader must reread this amended
 order and `NEXT.md` and return **YES / YES** before any G10 Builder starts.
+
+The same Reader's Round-2 reread returned **NO / NO** against authority
+`f7c1457ddcaab927a146293a3744f252ccd37fd4` because the exact gate-registration
+file, read-only Main→preload→renderer `{sessionId, live}` route, and shared
+Dock/Canvas/Inspect snapshot boundary were not yet frozen. This minimum
+Round-2 amendment is now incorporated above. The same Reader must reread this
+Round-2 amendment and `NEXT.md` and return **YES / YES** before any G10 Builder
+starts.

@@ -1,16 +1,18 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 READER AMENDMENT REQUIRED
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 ROUND-2 READER AMENDMENT REQUIRED
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 READER NO / NO — AMENDMENT REREAD REQUIRED
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 ROUND-2 READER NO / NO — REREAD REQUIRED
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **CLOSED — same G10 Reader must reread the finite amendments and return YES / YES before one bounded G10 Builder; no G10 mutation is authorized yet**
-g10-status: **READER NO / NO — six finite amendments recorded; same Reader reread required**
+builder-authority: **CLOSED — same G10 Reader must reread the Round-2 amendment and return YES / YES before one bounded G10 Builder; no G10 mutation is authorized yet**
+g10-status: **ROUND-2 READER NO / NO — exact route/allowlist amendment recorded; same Reader reread required**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; Reader must return YES / YES**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 g10-reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 g10-reader-verdict: **NO / NO — six finite amendments required; same Reader reread of amended WO-GOLDEN-G10 and NEXT.md is required**
+g10-reader-round-2-authority: `f7c1457ddcaab927a146293a3744f252ccd37fd4`
+g10-reader-round-2-verdict: **NO / NO — exact gate-registration file, live snapshot route, and consumer/allowlist boundary required; same Reader reread required**
 g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
@@ -107,7 +109,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Reader pending; no Builder authority
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Round-2 Reader amendment required; no Builder authority
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -177,7 +179,7 @@ descendant Node PIDs `30836`, `20836`, and `30096` survived;
 `roots_remaining=0` and `leaked=[]`. G10 must preserve this ownership and may
 not repair, relabel, or absorb it.
 
-G10 is now the sole active Phase-2 order. Its bounded Reader-pending packet is
+G10 is now the sole active Phase-2 order. Its bounded Round-2 Reader-pending packet is
 [WO-GOLDEN-G10](WO-GOLDEN-G10.md): explicit ordinary/mission/full-lineage
 Canvas views and return, no submit/reopen hiding, real runtime liveness with
 separate session/work/recovery axes, truthful existing relations, and the five
@@ -225,6 +227,35 @@ finite amendments are now binding in [WO-GOLDEN-G10](WO-GOLDEN-G10.md):
 
 The same Reader must reread the amended G10 order and this handoff and return
 **YES / YES**. Until then, the Builder door remains closed.
+
+### G10 Round-2 minimum amendment — same Reader reread required
+
+The same Reader's Round-2 reread returned **NO / NO** against authority
+`f7c1457ddcaab927a146293a3744f252ccd37fd4` because the exact gate-registration
+file, read-only Main→preload→renderer `{sessionId, live}` route, and shared
+Dock/Canvas/Inspect snapshot boundary were not frozen. The minimum amendment
+now binding in [WO-GOLDEN-G10](WO-GOLDEN-G10.md) is:
+
+1. `qa/run.ts` may be edited only to register the exact
+   `golden-g10-canvas-runtime` command, invoked by
+   `bun qa/run.ts golden-g10-canvas-runtime`.
+2. The one read-only route is Main
+   `qf:sessions:runtime-snapshot` in `collab-electron/src/main/ipc-kernel.ts`
+   → `window.shellApi.qf.getRuntimeSnapshot()` in
+   `collab-electron/src/preload/shell.ts` → shell Canvas
+   `collab-electron/src/windows/shell/src/renderer.js`; Main reads the existing
+   `collab-electron/src/main/agent-host.ts` live registry and returns sorted
+   `{ sessionId, live }` rows keyed by exact `agent_session.id`.
+3. The only additional allowed files are `agent-host.ts` for the read-only live
+   registry helper, `ipc-kernel.ts` for that handler, `preload/shell.ts` for the
+   bridge, and `packages/shared/src/window-api.d.ts` for the snapshot type;
+   each is limited to this route.
+4. Dock, Canvas, and Inspect must consume that one snapshot through
+   `participant-projection.js`; no consumer may derive a separate liveness
+   value from persisted status, terminal text, or elapsed time.
+
+The same Reader must reread this Round-2 amendment and the amended G10 order
+and return **YES / YES**. Until then, the Builder door remains closed.
 
 ## Historical G9-open handoff (superseded)
 
