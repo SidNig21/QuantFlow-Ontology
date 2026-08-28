@@ -1,18 +1,21 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 ROUND-2 READER AMENDMENT REQUIRED
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 BUILDER OPEN / INDEPENDENT VERIFIER REQUIRED
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 ROUND-2 READER NO / NO — REREAD REQUIRED
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 BUILDER OPEN — ROUND-3 READER YES / YES
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **CLOSED — same G10 Reader must reread the Round-2 amendment and return YES / YES before one bounded G10 Builder; no G10 mutation is authorized yet**
-g10-status: **ROUND-2 READER NO / NO — exact route/allowlist amendment recorded; same Reader reread required**
+builder-authority: **OPEN — exactly one bounded G10 Builder is authorized under WO-GOLDEN-G10; one independent Verifier must follow; no second Builder or scope expansion**
+g10-status: **BUILDER OPEN — Round-3 Reader YES / YES; exactly one bounded G10 Builder; independent Verifier required afterward**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; Reader must return YES / YES**
+g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 g10-reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 g10-reader-verdict: **NO / NO — six finite amendments required; same Reader reread of amended WO-GOLDEN-G10 and NEXT.md is required**
 g10-reader-round-2-authority: `f7c1457ddcaab927a146293a3744f252ccd37fd4`
 g10-reader-round-2-verdict: **NO / NO — exact gate-registration file, live snapshot route, and consumer/allowlist boundary required; same Reader reread required**
+g10-reader-round-3-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
+g10-reader-round-3-authority: `4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`
+g10-reader-round-3-verdict: **YES / YES — prior amendments accepted; exactly one bounded G10 Builder open; one independent Verifier required afterward**
 g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
@@ -109,7 +112,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Round-2 Reader amendment required; no Builder authority
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Round-3 Reader YES / YES; exactly one Builder open; independent Verifier required afterward; no second Builder
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -179,13 +182,15 @@ descendant Node PIDs `30836`, `20836`, and `30096` survived;
 `roots_remaining=0` and `leaked=[]`. G10 must preserve this ownership and may
 not repair, relabel, or absorb it.
 
-G10 is now the sole active Phase-2 order. Its bounded Round-2 Reader-pending packet is
+G10 is now the sole active Phase-2 order. Its bounded accepted packet is
 [WO-GOLDEN-G10](WO-GOLDEN-G10.md): explicit ordinary/mission/full-lineage
 Canvas views and return, no submit/reopen hiding, real runtime liveness with
 separate session/work/recovery axes, truthful existing relations, and the five
-G7-routed Canvas/browser calls. No G10 Builder is authorized until the same
-Reader rereads the amended packet and answers the two exact questions in its
-Reader brief **YES / YES**.
+G7-routed Canvas/browser calls. The same Reader's Round-3 reread has answered
+the two exact questions in its Reader brief **YES / YES**. Exactly one bounded
+G10 Builder is authorized under this accepted order; one independent Verifier
+must follow and decide G10, and no second Builder or scope expansion is
+authorized.
 
 ### G10 finite Reader amendments — same Reader reread required
 
@@ -225,10 +230,13 @@ finite amendments are now binding in [WO-GOLDEN-G10](WO-GOLDEN-G10.md):
    inherited G12 PIDs `30512`, `17316`, `30836`, `20836`, and `30096` remain
    untouched and unchanged.
 
-The same Reader must reread the amended G10 order and this handoff and return
-**YES / YES**. Until then, the Builder door remains closed.
+The same Reader reread the amended G10 order and this handoff in Round 3 and
+returned **YES / YES** against authority `4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`.
+The Round-2 reread requirement is satisfied. The current Builder door is open
+exactly once under the accepted G10 order, with one independent Verifier
+required afterward.
 
-### G10 Round-2 minimum amendment — same Reader reread required
+### G10 Round-2 minimum amendment — accepted in Round 3
 
 The same Reader's Round-2 reread returned **NO / NO** against authority
 `f7c1457ddcaab927a146293a3744f252ccd37fd4` because the exact gate-registration
@@ -254,8 +262,21 @@ now binding in [WO-GOLDEN-G10](WO-GOLDEN-G10.md) is:
    `participant-projection.js`; no consumer may derive a separate liveness
    value from persisted status, terminal text, or elapsed time.
 
-The same Reader must reread this Round-2 amendment and the amended G10 order
-and return **YES / YES**. Until then, the Builder door remains closed.
+The same Reader's Round-3 reread accepted this Round-2 amendment and the
+amended G10 order with **YES / YES** against authority
+`4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`.
+
+### G10 Round-3 Reader acceptance — Builder open
+
+The same Reader task `01a04a11-0b55-79b3-b6c0-55285177dd55` returned
+**YES / YES** after rereading the amended G10 order and this `NEXT.md` against
+authority `4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`. All prior finite
+amendments remain intact. Exactly one bounded G10 Builder is authorized under
+[WO-GOLDEN-G10](WO-GOLDEN-G10.md). The Builder must preserve G9 Report
+authority, exact G12 survivor ownership, the G11 boundary, the R18 freeze, the
+Kernel sole-writer law, and every accepted allowlist and falsifier boundary.
+One independent Verifier, not Router or the Builder, must follow and decide
+G10 PASS/FAIL. No second Builder or G10 scope expansion is authorized.
 
 ## Historical G9-open handoff (superseded)
 

@@ -1,17 +1,21 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: READER ROUND-2 AMENDMENT REQUIRED — minimum route/allowlist amendment after Reader NO / NO; no Builder authority
+status: READER ACCEPTED — ROUND-3 YES / YES; exactly one bounded G10 Builder open; independent Verifier required afterward
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **NO — the same Reader must reread this amended order and return YES / YES before one bounded G10 Builder may start**
+build-authority: **YES — exactly one bounded G10 Builder is authorized under this accepted order; one independent Verifier must follow and decide G10; no second Builder or scope expansion**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
-reader-reread: **REQUIRED — the same Reader must reread this amended order and NEXT.md and return YES / YES; no substitute Reader or Builder is authorized**
+reader-reread: **SATISFIED IN ROUND 3 — the same Reader reread this order and NEXT.md and returned YES / YES; no substitute Reader is authorized**
 reader-round-2-authority: `f7c1457ddcaab927a146293a3744f252ccd37fd4`
 reader-round-2-verdict: **NO / NO — exact gate-registration file, live snapshot route, and consumer/allowlist boundary still required**
-reader-round-2-reread: **REQUIRED — the same Reader must reread this Round-2 amendment and NEXT.md and return YES / YES; no Builder authority**
+reader-round-2-reread: **SATISFIED IN ROUND 3 — the same Reader reread this Round-2 amendment and NEXT.md and returned YES / YES; no substitute Reader is authorized**
+reader-round-3-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
+reader-round-3-authority: `4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`
+reader-round-3-verdict: **YES / YES — all prior amendments remain intact; exactly one bounded G10 Builder is authorized and one independent Verifier must follow**
+reader-round-3-reread: **SATISFIED — same Reader reread this order and NEXT.md at the Round-3 authority above**
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-disposition: Current Canvas/Mission/runtime coherence group from the audited Phase-2 disposition
 accepted-g9-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
@@ -356,3 +360,13 @@ Dock/Canvas/Inspect snapshot boundary were not yet frozen. This minimum
 Round-2 amendment is now incorporated above. The same Reader must reread this
 Round-2 amendment and `NEXT.md` and return **YES / YES** before any G10 Builder
 starts.
+
+The same Reader's Round-3 reread returned **YES / YES** against authority
+`4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64` and confirmed that all prior
+amendments remain intact. Exactly one bounded G10 Builder is now authorized
+under this accepted order. The Builder must preserve G9 Report authority, the
+exact G12 survivor ownership, the G11 boundary, the R18 freeze, the Kernel
+sole-writer law, and every frozen allowlist and falsifier contract. After that
+one Builder, exactly one independent Verifier must rerun the accepted G10
+gates and decide PASS/FAIL; Router is not the Verifier, and no second Builder
+or scope expansion is authorized.
