@@ -1,6 +1,6 @@
 # WO-GOLDEN-G8 — Kernel, schema, Law-B, and proof-integrity repair
 
-status: **READER ROUND 2 NO / NO — ONE FINITE ORDER DEFECT / BUILDER CLOSED**
+status: **SEMANTIC READER FINAL YES / YES — EXACTLY ONE BOUNDED BUILDER OPEN**
 order-type: Golden Baseline Phase 2 bounded Kernel/schema/proof-integrity group
 current-evidence-branch: `wo-golden-g2`
 parent-group: G7 **CLOSED / PASS WITH INHERITED REDS**
@@ -19,8 +19,12 @@ reader-round-1-authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
 reader-round-1-verdict: **NO / NO — eight finite order defects; same Reader must re-read**
 reader-round-2-authority: `d6e68c8997bc28eb3a68e211737429ec64ab02b7`
 reader-round-2-verdict: **NO / NO — one finite lifecycle promotion-target wording defect**
-reader-authority: **OPEN FOR THE SAME SEMANTIC READER TO RE-READ ONLY**
-builder-authority: **CLOSED UNTIL FRESH READER YES / YES**
+final-reader-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
+final-reader-authority: `baedcecd55b91dc3c5d951f969a2111d5cedf4d2`
+final-reader-tree: `33695d1ac5a53b56077bbf739d94e6e230d6533b`
+final-reader-verdict: **YES / YES — all Round 1 and Round 2 defects cured; no remaining defects**
+reader-authority: **CLOSED — final semantic Reader accepted this order**
+builder-authority: **OPEN — exactly one bounded G8 Builder under this order**
 g9-order: **UNCHANGED — full G9 remains after G8**
 r18-authority: **FROZEN**
 
@@ -64,8 +68,9 @@ stability.
 
 Round 1 Reader disposition is recorded in
 `docs/orders/evidence/golden-baseline/g8/READER-ACCEPTANCE.md`. The order is
-not Builder-ready until the Round 2 lifecycle wording defect recorded there is
-cured and the same Reader returns `YES / YES`.
+Builder-ready: the Round 2 lifecycle wording defect is cured and the same
+Reader returned `YES / YES`. Exactly one bounded G8 Builder is now open under
+the file surface and starting matrix below.
 
 ## Reader contract — exactly two questions
 
@@ -84,6 +89,13 @@ starting product/evidence trees:
 The Reader records `YES / YES` or `NO / NO` with finite defects in the G8
 evidence directory. No G8 Builder may edit until the Reader returns `YES / YES`
 and `NEXT.md` is rotated.
+
+Final semantic Reader acceptance is recorded for task
+`01a04716-ef0f-72d1-aaa1-be295596f893` at authority commit
+`baedcecd55b91dc3c5d951f969a2111d5cedf4d2`, tree
+`33695d1ac5a53b56077bbf739d94e6e230d6533b`, with verdict `YES / YES` and no
+remaining defects. `NEXT.md` is now rotated to exactly one bounded G8 Builder
+under this order.
 
 ## Frozen current set and exact starting testimony
 
@@ -238,6 +250,33 @@ the exact 13 offender paths, the directly coupled Kernel/schema/proof files
 named by that manifest, the existing focused QA/test files, and generated
 artifacts caused solely by those edits. A necessary path outside that list is
 a stop and requires a Reader-approved order amendment.
+
+The Builder surface is exact and closed-world. The named K1 surface is the 13
+paths in the offender table. The only pre-authorized directly coupled source
+families are `packages/qf-kernel/src/governed-review.ts`,
+`packages/qf-kernel/src/execute.ts`,
+`qf-kernel-schema/src/commands.ts`,
+`qf-kernel-schema/src/schema.ts`,
+`qf-kernel-schema/src/define.ts`, the three current ontology files under
+`qf-kernel-schema/src/ontology/`, `collab-electron/src/main/kernel.ts`,
+`qa/run.ts`, and the existing focused QA/test files that the pre-mutation
+manifest names. A source-family name is not wildcard permission: the Builder
+must list each exact path and SHA-256 before editing, and may include only a
+path with a measured G8 defect or a directly caused generated artifact. No
+other product, test, gate, package, installer, report, Canvas, history, or
+operations path is authorized.
+
+The Builder starts from Reader authority
+`baedcecd55b91dc3c5d951f969a2111d5cedf4d2` and tree
+`33695d1ac5a53b56077bbf739d94e6e230d6533b`. Its required starting matrix is
+the exact command block in `## Required normal matrix`, including
+`repo-shape`, `doc-links`, `rung-ladder`, `kernel-one-path`,
+`kernel-sole-writer`, `kernel-sole-writer-app`, `governed-review`,
+`hermes-first-turn-synthetic`, `golden-g7-protocol-dependencies`,
+`golden-g8-kernel-proof`, `golden-g8-schema-lifecycle`, the schema test and
+generation commands, the Electron build, Atlas check/ratchet, and
+`git diff --check`. The Builder must capture this matrix before mutation and
+the Verifier must rerun it at the immutable candidate.
 
 The existing G5 prerequisite vocabulary is available as evidence, not as a
 scope expansion: the direct-critic activation grammar and canonical report

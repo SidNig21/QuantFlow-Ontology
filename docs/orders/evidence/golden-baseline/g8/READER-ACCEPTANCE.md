@@ -1,6 +1,6 @@
 # G8 semantic Reader acceptance
 
-status: **READER ROUND 2 NO / NO — ONE FINITE ORDER DEFECT; BUILDER CLOSED**
+status: **FINAL SEMANTIC READER YES / YES — EXACTLY ONE BOUNDED BUILDER OPEN**
 order: `docs/orders/WO-GOLDEN-G8.md`
 reader_task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 reader_round: `1`
@@ -8,8 +8,11 @@ reader_authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
 reader_verdict: **NO / NO**
 reader_round_2_authority: `d6e68c8997bc28eb3a68e211737429ec64ab02b7`
 reader_round_2_verdict: **NO / NO**
-builder_authority: **CLOSED**
-same_reader_reread: **REQUIRED AFTER THIS ORDER-ONLY AMENDMENT**
+final_reader_task: `01a04716-ef0f-72d1-aaa1-be295596f893`
+final_reader_authority: `baedcecd55b91dc3c5d951f969a2111d5cedf4d2`
+final_reader_tree: `33695d1ac5a53b56077bbf739d94e6e230d6533b`
+final_reader_verdict: **YES / YES — no remaining defects**
+builder_authority: **OPEN — exactly one bounded G8 Builder under the accepted order**
 
 ## Reader answers
 
@@ -82,6 +85,20 @@ The eight Round 1 defects are otherwise cured. This correction changes only
 order/evidence wording; Builder authority remains closed and the same Reader
 must re-read again.
 
+## Final Reader acceptance
+
+The same Reader task `01a04716-ef0f-72d1-aaa1-be295596f893` re-read the
+corrected packet at authority commit
+`baedcecd55b91dc3c5d951f969a2111d5cedf4d2`, tree
+`33695d1ac5a53b56077bbf739d94e6e230d6533b`, and returned **YES / YES**. The
+Reader confirmed that all eight Round 1 corrections, the sole Round 2
+lifecycle correction, the finite scope exclusions, and the fail-capable gate
+contracts are now unambiguous. No defects remain.
+
+Exactly one bounded G8 Builder is authorized under
+`docs/orders/WO-GOLDEN-G8.md`; later groups remain closed and R18 remains
+frozen.
+
 ## Amendment disposition
 
 This Reader receipt is historical authority for the eight Round 1 defects and
@@ -91,6 +108,6 @@ generated-command/runtime join, packaged live identity/modes, finite
 saved-state predecessor matrix, exact malformed restoration receipts, and
 executable 89-declaration lifecycle invariant, with the promotion target
 corrected to `active`. No product, test, or gate code is changed by this
-receipt, no G8 Builder authority opens, G9/G10/G11/G12 remain outside scope,
-and R18 remains frozen. The same Reader must re-read the corrected order
-before any Builder door can open.
+receipt, no later-group Builder authority opens, G9/G10/G11/G12 remain outside
+scope, and R18 remains frozen. The final Reader has now opened exactly one bounded G8
+Builder under the accepted order; no later group is authorized.
