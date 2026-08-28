@@ -1,10 +1,10 @@
 # WO-GOLDEN-G9 — Report authority consolidation
 
-status: BUILDER OPEN — FINAL READER YES / YES; EXACTLY ONE BOUNDED G9 BUILDER
+status: REPAIR REQUIRED — INDEPENDENT G9 VERIFIER FINITE FAIL; EXACTLY ONE SAME-ORDER REPAIR BUILDER OPEN
 kind: Golden Baseline Phase 2 bounded Report/result-authority group
 owner: Router
 depends: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS
-build-authority: YES — exactly one bounded G9 Builder; no second Builder and no G10–G12/R18 work
+build-authority: YES — exactly one bounded same-order G9 repair Builder for the eight recorded defects; no new Reader and no G10–G12/R18 work
 reader-task: 01a0489e-04ea-71a1-8b6a-d0e151621103
 reader-round: FINAL
 reader-reviewed-authority: 8d78fb714998cc52d50538d6f9ea9a3323f75535
@@ -14,11 +14,22 @@ reader-round-1-authority: d6ab5ed66a18c9de23db047a4b41584acaaeec0e
 reader-round-1-tree: 8f94bf63b16bd74e5ef17461cc4f0d15477efc4f
 reader-round-2-authority: d6c0d7e91d726d8b5a33050f403efec87a3f1cd4
 reader-round-2-tree: 54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182
-builder-status: OPEN — exactly one bounded G9 Builder under this order
-builder-starting-authority: 8d78fb714998cc52d50538d6f9ea9a3323f75535
-builder-starting-tree: 9af6ae1714c49fc9caa8e59915d0bc88b11a9b35
-builder-candidate: none — Builder not yet run
-builder-evidence: none — Builder not yet run
+builder-status: REPAIR OPEN — exactly one same-order G9 repair Builder under this order
+builder-starting-authority: 4ef49077b2b423601c02b043de82b34d231bb7f5
+builder-starting-tree: bdba7c9540122288866bed6fb4aa57952c6f025e
+builder-starting-evidence-head: f7e841ff3e075bd49ed70bf8da79c2409ca5c899
+builder-starting-evidence-tree: 69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f
+builder-candidate: none — repair Builder not yet run
+builder-evidence: none — repair Builder not yet run
+verifier-task: 01a048fb-7a31-7880-b64b-98275789a38d
+verifier-verdict: FINITE FAIL — exactly eight defects; no semantic scope/order change
+verifier-candidate: 4ef49077b2b423601c02b043de82b34d231bb7f5
+verifier-candidate-tree: bdba7c9540122288866bed6fb4aa57952c6f025e
+verifier-evidence-head: f7e841ff3e075bd49ed70bf8da79c2409ca5c899
+verifier-evidence-tree: 69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f
+verifier-atlas-diff: WORSE — governed-review coverage indexed→partial; three expected persistence sites
+verifier-ratchet: HARD RED 0; repair must have no coverage regression
+reader-recheck: NOT REQUIRED — final Reader meaning, scope, and order remain accepted
 starting-authority: 754606932dfb23bd0a6e6f432937b1c2bc436739
 starting-product-candidate: 61abfa5b23553f86a5c2d95facdf0473310fc44
 starting-product-tree: 94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013
@@ -33,8 +44,10 @@ A research answer becomes a durable Report only after an independent review, and
 there is one clearly marked current answer for each Mission, Technique version,
 and point-in-time research state while older answers remain inspectable. The
 final Reader accepted all seven cumulative cures with no new ambiguity or scope
-expansion. This packet now opens exactly one bounded implementation Builder;
-the independent Verifier still decides whether its immutable candidate passes.
+expansion. The independent Verifier found eight finite implementation and
+evidence defects in the first candidate; this packet closes that Builder
+authority and opens exactly one same-order repair Builder. No Reader review is
+needed because meaning, scope, and dependency order are unchanged.
 
 ## Authority and dependency order
 
@@ -111,9 +124,43 @@ other Builder authority.
 | 6 | legacy rows partition by the complete five-field key before fold, with cross-key F12 isolation |
 | 7 | current and historical finalizers return their own persisted ids, with separate fail-capable agreement and retry cases |
 
-The final Reader verdict is semantic acceptance only. No Builder candidate or
-Builder evidence exists yet; the next mutation must start at the exact
-`builder-starting-authority` and `builder-starting-tree` above.
+The final Reader verdict is semantic acceptance only. At Reader time no Builder
+candidate or evidence existed. The subsequent candidate and independent
+Verifier result are recorded below; the repair mutation must start at the exact
+repair product identity above and keep the evidence head read-only.
+
+## Independent G9 Verifier FINITE FAIL — exactly eight defects
+
+Independent Verifier task `01a048fb-7a31-7880-b64b-98275789a38d` returned
+**FINITE FAIL** for product candidate
+`4ef49077b2b423601c02b043de82b34d231bb7f5` (tree
+`bdba7c9540122288866bed6fb4aa57952c6f025e`) with evidence head
+`f7e841ff3e075bd49ed70bf8da79c2409ca5c899` (tree
+`69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`). The semantic contract was not
+rejected and no new Reader is required. The first Builder is closed for repair;
+only the same order's repair Builder may address these eight finite defects:
+
+| # | Verifier defect | bounded repair obligation |
+| ---: | --- | --- |
+| 1 | The Builder report bound the wrong evidence head | bind the report and every acceptance receipt to evidence head `f7e841ff3e075bd49ed70bf8da79c2409ca5c899`, tree `69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`; never substitute the earlier `4f7753b9…` receipt |
+| 2 | The starting source manifest omitted `packages/qf-kernel/src/index.ts` and `packages/qf-kernel/src/portable.ts` | add both literal full paths to the repair manifest with their exact starting Git-tree-byte SHA-256 and disposition |
+| 3 | Four recorded parent hashes were wrong | recompute and replace exactly those four parent hashes from immutable Git-tree bytes at the repair starting product identity; no checkout-derived values |
+| 4 | Five candidate hashes were CRLF checkout-byte hashes rather than Git-tree-byte hashes | recompute all candidate hashes from committed tree bytes and record the exact byte basis; CRLF normalization is not a candidate identity |
+| 5 | F01–F14 used source-pattern checks and dummy cleanup rather than executable isolated red/green behavior | replace or supplement the gate with real isolated Kernel/Artifact fixtures and executable deliberate breaks: each named red must fail for the named defect, restore the exact behavior, and pass; cleanup must observe actual owned process/root state |
+| 6 | Focused tests omitted zero/multiple/mismatch worker evidence, restart, exact retry, refusals, and separate current/historical finalizer cases | add fail-capable executable tests for every omitted case, including exact `work.run_id`, close/reopen, current/history IDs, and no-duplicate retry behavior |
+| 7 | Worker evidence was not bound to exact `work.run_id` across `governed-review.ts`, `execute.ts`, and `kernel.ts` | persist and enforce the exact Run identity in the existing durable completion/evidence relation; a candidate from another Run is a hard red before Report/publication/projection write |
+| 8 | Top-level `authority_context` violated the canonical packaged Report shape | preserve the five-field authority lineage in the existing canonical Report payload/metadata shape without adding or weakening a top-level contract; adjust the gate only to assert the truthful existing packaged shape, never to relax it |
+
+The repair Builder starts from failed product candidate
+`4ef49077b2b423601c02b043de82b34d231bb7f5` / tree
+`bdba7c9540122288866bed6fb4aa57952c6f025e`, with evidence head
+`f7e841ff3e075bd49ed70bf8da79c2409ca5c899` / tree
+`69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f` read-only. The repair must preserve
+the final Reader's accepted meaning, the G8 close, inherited G12/environment
+reds, and the G10–G12/R18 boundaries. The Atlas diff is currently **WORSE**
+because governed-review coverage changed indexed → partial with three expected
+persistence sites; the repair must remove that coverage regression. The Atlas
+ratchet remains `HARD RED 0` and must stay so.
 
 ## Fixed semantic contract
 
@@ -144,6 +191,9 @@ strategy ids are different authority contexts and must not supersede one
 another. Its canonical text or hash is durable Kernel state, not renderer input
 or process memory. Dataset content identity remains part of persisted Dataset
 and Run lineage, but the current-selection key has exactly these five fields.
+The packaged Report keeps that five-field lineage inside its existing canonical
+payload/metadata shape; a new top-level `authority_context` contract is not
+allowed, and a gate may assert only the truthful existing packaged shape.
 
 For one authority context, exactly one publication is current. A later
 supporting publication atomically makes its predecessor explicit history and
@@ -166,11 +216,13 @@ relation; no map, sidecar, or new ontology link may replace it.
 For the source Task and Run being finalized, the resolver must find exactly one
 matching completed-task trajectory: one `task.completed` event, one non-empty
 `payload.input.result_artifact_id`, an existing Artifact of kind `trajectory`,
-and the exact assigned-worker/producer/source-work identities. Zero matches,
+the exact persisted `work.run_id` equal to the Run being finalized, and the
+exact assigned-worker/producer/source-work identities. Zero matches,
 multiple matching completion events or candidates, a non-trajectory candidate,
 or any mismatched Task/Run/worker/source-work identity is a hard red before any
-Report, publication row, or projection is written. The resolver must return the
-same persisted trajectory after process restart.
+Report, publication row, or projection is written. The exact Run identity must
+remain durable across `governed-review.ts`, `execute.ts`, and `kernel.ts`; the
+resolver must return the same persisted trajectory after process restart.
 
 ### Legacy publication upgrade and finalizer return contract
 
@@ -352,23 +404,33 @@ hard-coded ids or a self-authored expected manifest.
 
 ## Exact source manifest requirement
 
-The Builder must freeze one sorted, literal source manifest before mutation at
-the exact `builder-starting-authority` and `builder-starting-tree` above. The
-manifest must enumerate, by full path and role, every source/consumer/write/
-publication path in the inventory table and every focused test or fixture that
-will be exercised; it must also list generated Atlas paths and the evidence
-paths separately. Directory globs, inferred paths, or a self-authored expected
-manifest are not sufficient. For every row record the parent blob SHA-256 and
-one disposition: read-only census, editable candidate surface, generated
-projection, or receipt-only evidence. Before the candidate is reported, record
-the complete literal changed/untracked path list and post-candidate SHA-256s.
-Any changed path absent from the manifest, any read-only source changed without
-new Reader authority, any unlisted untracked path, or any candidate-to-evidence
-file that is not receipt-only (`non-receipt=0`) is a hard red. This manifest is
-release evidence only and never a second runtime truth store.
+The first Builder's `BUILDER-STARTING-MANIFEST.md` is failed evidence and must
+not be rewritten. The repair Builder must freeze a new sorted, literal source
+manifest before mutation at the exact repair product identity
+`4ef49077b2b423601c02b043de82b34d231bb7f5` / tree
+`bdba7c9540122288866bed6fb4aa57952c6f025e`, while binding the read-only prior
+evidence to `f7e841ff3e075bd49ed70bf8da79c2409ca5c899` / tree
+`69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`. The repair manifest must enumerate,
+by full path and role, every source/consumer/write/publication path in the
+inventory table, every focused test or fixture exercised, generated Atlas
+paths, and receipt-only evidence paths separately. It must explicitly include
+`packages/qf-kernel/src/index.ts` and `packages/qf-kernel/src/portable.ts`,
+which the first manifest omitted. Directory globs, inferred paths, or a
+self-authored expected manifest are not sufficient.
+
+Every parent and candidate hash in the repair manifest/report must be the
+SHA-256 of the exact Git-tree blob bytes at the named identity, not a checked-out
+CRLF-normalized file. Record the parent blob hash and disposition for each row;
+before reporting, record the complete literal changed/untracked path list and
+post-candidate Git-tree-byte SHA-256s. Any wrong parent hash, checkout-byte
+hash, changed path absent from the manifest, unlisted untracked path, or
+candidate-to-evidence file that is not receipt-only (`non-receipt=0`) is a hard
+red. This manifest is release evidence only and never a second runtime truth
+store.
 
 The exact editable source surface is limited to the candidate allowlist below:
-`packages/qf-kernel/src/governed-review.ts`, directly caused support-schema or
+`packages/qf-kernel/src/governed-review.ts`, `packages/qf-kernel/src/execute.ts`
+only for exact durable `work.run_id` binding, directly caused support-schema or
 upgrade tests, `packages/qf-kernel/src/create.ts` only for the named Report
 guard, `collab-electron/src/main/kernel.ts`,
 `collab-electron/src/main/index.ts`,
@@ -380,16 +442,20 @@ trajectory writer/host and every out-of-scope boundary remain read-only.
 
 ## Starting-SHA matrix
 
-The Builder is authorized exactly once from the final Reader authority
-`8d78fb714998cc52d50538d6f9ea9a3323f75535` (tree
-`9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`). It preserves the inherited G8
-identities at the top of this file as the measured baseline and must reproduce
-every row below against this clean Builder starting identity. Any red not named
-below stops Builder mutation and any second Builder is unauthorized.
+The first Builder's 19-row matrix is frozen in
+`evidence/golden-baseline/g9/BUILDER-STARTING-MATRIX.md` and remains immutable.
+The same-order repair Builder is authorized exactly once from failed product
+candidate `4ef49077b2b423601c02b043de82b34d231bb7f5` (tree
+`bdba7c9540122288866bed6fb4aa57952c6f025e`), with evidence head
+`f7e841ff3e075bd49ed70bf8da79c2409ca5c899` (tree
+`69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`) read-only. It must rerun every
+row below from that product identity and add repair rows R1–R9 in
+`evidence/golden-baseline/g9/REPAIR-BUILDER-BRIEF.md`. Any red not named below
+stops repair mutation and any second Builder is unauthorized.
 
 | # | command | starting disposition |
 | ---: | --- | --- |
-| 1 | git rev-parse HEAD and git rev-parse HEAD^{tree} | must equal Builder starting authority `8d78fb714998cc52d50538d6f9ea9a3323f75535` and tree `9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`; inherited G8 candidate/evidence identities remain exactly as recorded above |
+| 1 | git rev-parse HEAD and git rev-parse HEAD^{tree} | repair start must equal product candidate `4ef49077b2b423601c02b043de82b34d231bb7f5` and tree `bdba7c9540122288866bed6fb4aa57952c6f025e`; evidence head `f7e841ff3e075bd49ed70bf8da79c2409ca5c899` / tree `69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f` is receipt-only |
 | 2 | bun qa/run.ts artifact-root | inherited prerequisite proof; remain green or reproduce only its accepted environment red |
 | 3 | bun qa/run.ts governed-review | current G8 evidence: 15/15 governed-review tests green |
 | 4 | bun test src/r15-governed-review.test.ts in packages/qf-kernel | current G8 evidence: repaired test stable; final Verifier observed 30/30 |
@@ -442,9 +508,12 @@ generic terminal row is not a Director result receipt. G9 does not change G8.
 
 ## Candidate allowlist and out of scope
 
-The candidate may change only:
+The first candidate's allowlist remains the historical implementation surface.
+The same-order repair Builder may change only the following paths, and only to
+address the eight recorded defects:
 
 - packages/qf-kernel/src/governed-review.ts and exact support-schema/upgrade tests;
+- packages/qf-kernel/src/execute.ts only for exact durable `work.run_id` binding;
 - packages/qf-kernel/src/create.ts only for a directly caused exact Report guard;
 - collab-electron/src/main/kernel.ts for the volatile map and duplicate finalizer;
 - collab-electron/src/main/index.ts for finalizer callback and stale identity;
@@ -464,11 +533,16 @@ execution is allowed.
 
 ## Rollback, cleanup, and evidence identity
 
-A failed Builder candidate returns to the immutable G8 product candidate
-61abfa5b23553f86a5c2d95facdf0473310fc44 (tree
-94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013) in a separate worktree operation.
-No shared-history reset, branch switch in the shared checkout, canonical
-database deletion, or evidence rewrite is authorized.
+A failed first Builder candidate remains immutable at
+`4ef49077b2b423601c02b043de82b34d231bb7f5` (tree
+`bdba7c9540122288866bed6fb4aa57952c6f025e`) with evidence head
+`f7e841ff3e075bd49ed70bf8da79c2409ca5c899` / tree
+`69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`. A failed repair returns to that
+immutable repair start, while the original G8 product candidate
+`61abfa5b23553f86a5c2d95facdf0473310fc44` / tree
+`94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013` remains the older Golden rollback
+boundary. No shared-history reset, branch switch in the shared checkout,
+canonical database deletion, or evidence rewrite is authorized.
 
 Each focused run uses a fresh isolated file Kernel and Artifact root. Cleanup
 reports actual before/after owned PID and root sets, with zero remaining owned
@@ -476,11 +550,11 @@ product processes and zero owned roots. Pre-existing unrelated roots are listed
 and preserved. No credential, canonical founder database, or live market state
 may be opened, copied, hashed, or logged.
 
-The Builder produces one immutable candidate SHA/tree and a separate receipt-only
-evidence SHA/tree. The Verifier binds its decision to both and reports clean
-status. The Builder starts from the final Reader amendment identity above; the
-Router's later authority/evidence commit is not a product candidate and does
-not change that starting matrix.
+The repair Builder produces one immutable candidate SHA/tree and a separate
+receipt-only evidence SHA/tree. The Verifier binds its decision to both and
+reports clean status. The repair starts from the failed product candidate above;
+the evidence head is read-only, and this Router authority/evidence commit is
+not a product candidate and does not change the repair starting matrix.
 
 ## Report back
 

@@ -17,11 +17,11 @@ starting-product-candidate: `61abfa5b23553f86a5c2d95facdf0473310fc44`
 starting-product-tree: `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`
 starting-evidence-tree: `b04a991ca98da1d57b8637a7fcd0738a4e41bd21`
 accepted-trajectory-prerequisite: `4a12b948746c108bae3143d5982decd50a6957e9`
-candidate-after-reader: **none — Builder has not run; this Reader verdict opens exactly one bounded Builder**
-evidence-after-reader: **this Router documentation record is receipt-only and not a product candidate**
+candidate-after-reader: **none at Reader time; subsequent candidate `4ef49077b2b423601c02b043de82b34d231bb7f5` received finite Verifier FAIL**
+evidence-after-reader: **this Reader record is receipt-only; subsequent evidence is bound in `VERIFIER-ACCEPTANCE.md`**
 builder-starting-authority: `8d78fb714998cc52d50538d6f9ea9a3323f75535`
 builder-starting-tree: `9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`
-builder-status: **OPEN — exactly one bounded G9 Builder under WO-GOLDEN-G9**
+builder-status: **REPAIR OPEN — exactly one same-order G9 repair Builder under WO-GOLDEN-G9**
 
 ## Plain-language review target
 
@@ -128,6 +128,19 @@ cumulative cures with no new ambiguity or scope expansion:
 This is semantic acceptance only. It opens exactly one bounded G9 Builder under
 `WO-GOLDEN-G9.md`; no candidate or Builder evidence exists yet, and the
 independent Verifier remains the authority for implementation acceptance.
+
+## Post-reader implementation verification
+
+The first Builder candidate was later inspected by independent Verifier task
+`01a048fb-7a31-7880-b64b-98275789a38d`, which returned **FINITE FAIL** for
+candidate `4ef49077b2b423601c02b043de82b34d231bb7f5` (tree
+`bdba7c9540122288866bed6fb4aa57952c6f025e`) at evidence head
+`f7e841ff3e075bd49ed70bf8da79c2409ca5c899` (tree
+`69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`). The separate
+[Verifier acceptance](VERIFIER-ACCEPTANCE.md) records exactly eight finite
+implementation/evidence defects. The semantic YES / YES remains accepted, so
+no new Reader is required; the same-order [repair Builder brief](REPAIR-BUILDER-BRIEF.md)
+is the only active repair authority.
 
 ## Exactly two Reader questions
 

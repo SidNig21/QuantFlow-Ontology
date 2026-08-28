@@ -1,10 +1,10 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 CLOSED / G9 FINAL READER YES / YES / BUILDER OPEN
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 CLOSED / G9 VERIFIER FINITE FAIL / REPAIR BUILDER OPEN
 
-status: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS / G9 FINAL READER YES / YES — ALL SEVEN CUMULATIVE DEFECTS CURED / EXACTLY ONE BOUNDED BUILDER OPEN
+status: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS / G9 INDEPENDENT VERIFIER FINITE FAIL — EIGHT DEFECTS / EXACTLY ONE SAME-ORDER REPAIR BUILDER OPEN
 rotated-at: 2026-08-28
-rotated-by: Router after final G9 semantic Reader YES / YES
+rotated-by: Router after independent G9 Verifier FINITE FAIL
 active-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md)
-builder-authority: **OPEN — exactly one bounded G9 Builder under WO-GOLDEN-G9; no second Builder and no G10–G12/R18 work**
+builder-authority: **OPEN — exactly one same-order G9 repair Builder for exactly eight finite defects; no new Reader, no second Builder, and no G10–G12/R18 work**
 g8-reader-status: **AMENDMENT YES / YES — exact V-01 through V-04 accepted**
 g8-reader-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 g8-reader-authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
@@ -88,16 +88,16 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G9 — bounded Report authority consolidation; final semantic Reader YES / YES; exactly one Builder open
+phase-2-active-group: G9 — bounded Report authority consolidation; independent Verifier FINITE FAIL; exactly one same-order repair Builder open
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
 g3-acceptance: [G3 CLOSED / ACCEPTED](evidence/golden-baseline/g3/GROUP-ACCEPTANCE.md)
 g2-acceptance: [G2 CLOSED / ACCEPTED](evidence/golden-baseline/g2/GROUP-ACCEPTANCE.md)
 g1-acceptance: [G1 CLOSED / ACCEPTED](evidence/golden-baseline/g1/GROUP-ACCEPTANCE.md)
-full-g9-authority: FINAL SEMANTIC READER YES / YES AFTER G8; EXACTLY ONE BOUNDED BUILDER OPEN
+full-g9-authority: FINAL SEMANTIC READER YES / YES AFTER G8; INDEPENDENT VERIFIER FINITE FAIL; EXACTLY ONE SAME-ORDER REPAIR BUILDER OPEN
 full-g8-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md) — CLOSED
-full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — FINAL READER YES / YES; EXACTLY ONE BOUNDED BUILDER OPEN
+full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — VERIFIER FINITE FAIL; EXACTLY ONE SAME-ORDER REPAIR BUILDER OPEN
 g9-reader-status: **FINAL YES / YES — all seven cumulative defects cured; no new ambiguity or scope expansion**
 g9-reader-task: `01a0489e-04ea-71a1-8b6a-d0e151621103`
 g9-reader-round: FINAL
@@ -108,16 +108,29 @@ g9-reader-round-1-authority: `d6ab5ed66a18c9de23db047a4b41584acaaeec0e`
 g9-reader-round-1-tree: `8f94bf63b16bd74e5ef17461cc4f0d15477efc4f`
 g9-reader-round-2-authority: `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4`
 g9-reader-round-2-tree: `54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182`
-g9-builder-status: **OPEN — exactly one bounded G9 Builder under WO-GOLDEN-G9**
-g9-builder-starting-authority: `8d78fb714998cc52d50538d6f9ea9a3323f75535`
-g9-builder-starting-tree: `9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`
-g9-builder-starting-matrix: **WO-GOLDEN-G9 § Starting-SHA matrix, rows 1–19, bound to the exact source manifest; no candidate yet**
-g9-builder-surface: **WO-GOLDEN-G9 candidate allowlist only: governed-review/support-schema tests, directly caused Report guard, Electron finalizer seams, durable projection, named stale-profile proof, report-authority gate/registration, focused tests/fixtures; generated Atlas/evidence only**
+g9-builder-status: **REPAIR OPEN — exactly one same-order G9 repair Builder for exactly eight finite defects**
+g9-builder-starting-authority: `4ef49077b2b423601c02b043de82b34d231bb7f5`
+g9-builder-starting-tree: `bdba7c9540122288866bed6fb4aa57952c6f025e`
+g9-builder-starting-evidence-head: `f7e841ff3e075bd49ed70bf8da79c2409ca5c899`
+g9-builder-starting-evidence-tree: `69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`
+g9-builder-starting-matrix: **REPAIR-BUILDER-BRIEF.md: prior 19-row G9 matrix rerun from failed candidate, plus repair rows R1–R9; corrected literal Git-tree-byte source manifest required**
+g9-builder-surface: **REPAIR-BUILDER-BRIEF.md only: governed-review.ts, execute.ts, Electron kernel.ts, report-authority.ts, directly caused focused tests/fixtures; generated Atlas/evidence only**
+g9-verifier-task: `01a048fb-7a31-7880-b64b-98275789a38d`
+g9-verifier-verdict: **FINITE FAIL — exactly eight defects; accepted Reader meaning/scope/order unchanged**
+g9-verifier-candidate: `4ef49077b2b423601c02b043de82b34d231bb7f5`
+g9-verifier-candidate-tree: `bdba7c9540122288866bed6fb4aa57952c6f025e`
+g9-verifier-evidence-head: `f7e841ff3e075bd49ed70bf8da79c2409ca5c899`
+g9-verifier-evidence-tree: `69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`
+g9-verifier-atlas-diff: **WORSE — governed-review indexed→partial; three expected persistence sites**
+g9-verifier-ratchet: **HARD RED 0; repair must have no coverage regression**
+g9-reader-recheck: **NOT REQUIRED — final semantic YES / YES remains accepted**
 g9-starting-authority: `754606932dfb23bd0a6e6f432937b1c2bc436739`
 g9-starting-product-candidate: `61abfa5b23553f86a5c2d95facdf0473310fc44`
 g9-starting-product-tree: `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`
 g9-starting-evidence-tree: `b04a991ca98da1d57b8637a7fcd0738a4e41bd21`
 g9-reader-scaffold: [G9 final Reader acceptance](evidence/golden-baseline/g9/READER-ACCEPTANCE.md)
+g9-verifier-acceptance: [G9 independent Verifier finite-fail receipt](evidence/golden-baseline/g9/VERIFIER-ACCEPTANCE.md)
+g9-repair-brief: [G9 same-order repair Builder brief](evidence/golden-baseline/g9/REPAIR-BUILDER-BRIEF.md)
 r18-authority: FROZEN UNTIL PHASE 2 + PHASE 3 GOLDEN PASS
 protected-main: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 
@@ -131,11 +144,16 @@ G9/G12 REDS**. G9 semantic Reader task
 `01a0489e-04ea-71a1-8b6a-d0e151621103` returned final **YES / YES** against
 amendment authority `8d78fb714998cc52d50538d6f9ea9a3323f75535` (tree
 `9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`), confirming all seven cumulative
-defects cured with no new ambiguity or scope expansion. Exactly one bounded G9
-Builder is open from that authority; its starting matrix is the 19-row
-WO-GOLDEN-G9 matrix and its exact source-manifest requirement, with no candidate
-or Builder evidence yet. The exact packet is in
-[WO-GOLDEN-G9](WO-GOLDEN-G9.md) and its [final Reader evidence](evidence/golden-baseline/g9/READER-ACCEPTANCE.md). The
+defects cured with no new ambiguity or scope expansion. Independent Verifier
+task `01a048fb-7a31-7880-b64b-98275789a38d` then returned **FINITE FAIL** for
+candidate `4ef49077b2b423601c02b043de82b34d231bb7f5` (tree
+`bdba7c9540122288866bed6fb4aa57952c6f025e`) at evidence head
+`f7e841ff3e075bd49ed70bf8da79c2409ca5c899` (tree
+`69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`), recording exactly eight finite
+defects. Exactly one same-order G9 repair Builder is open from the failed
+product candidate, with the evidence head read-only; no new Reader is required.
+The exact packet is in
+[WO-GOLDEN-G9](WO-GOLDEN-G9.md), with the [final Reader evidence](evidence/golden-baseline/g9/READER-ACCEPTANCE.md), [Verifier receipt](evidence/golden-baseline/g9/VERIFIER-ACCEPTANCE.md), and [repair brief](evidence/golden-baseline/g9/REPAIR-BUILDER-BRIEF.md). The
 inherited G9 report-boundary red and G12 Windows/package/operations reds remain
 red and are not acceptance.
 

@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "67b01ff6",
+    "commit": "f7e841ff",
     "generatedAt": "2026-08-28",
     "filesScanned": 407,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -52461,16 +52461,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "5a5f76f6",
+      "commit": "67b01ff6",
       "generatedAt": "2026-08-28"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "67b01ff6",
+      "commit": "f7e841ff",
       "generatedAt": "2026-08-28"
     },
-    "verdict": "worse",
-    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
+    "verdict": "better",
+    "why": "34 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -52520,6 +52520,27 @@
         "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
         "kind": "persistence",
         "what": "qf_review_task create table if not exists",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+        "kind": "persistence",
+        "what": "qf_review_publication_legacy drop table",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+        "kind": "persistence",
+        "what": "qf_review_publication alter table",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into",
+        "kind": "persistence",
+        "what": "qf_review_publication insert into",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
@@ -52695,26 +52716,17 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [
-      {
-        "path": "packages/qf-kernel/src/governed-review.ts",
-        "analyzer": "persistence",
-        "from": "indexed",
-        "to": "partial",
-        "direction": "worse",
-        "reason": "1 of 32 SQL site(s) are not inside a named function, so no call path can be traced"
-      }
-    ],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
-      "resolved": 31,
+      "resolved": 34,
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 1,
+      "coverageWorse": 0,
       "coverageBetter": 0,
-      "undecidedFrom": 31,
+      "undecidedFrom": 34,
       "undecidedTo": null
     }
   },
