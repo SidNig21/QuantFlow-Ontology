@@ -14,6 +14,17 @@ let INTERNAL_APP_ACTIONS = new Set<string>();
 let internalTaskActionHandlers: Readonly<Record<string, unknown>> = {};
 let internalAppActionHandlers: Readonly<Record<string, unknown>> = {};
 let internalCommandHandlers: Readonly<Record<string, unknown>> = {};
+const gateOwnedRoots = new Set<string>();
+
+type GateOwnedState = { process_ids: number[]; root_paths: string[] };
+type GateOwnedDelta = GateOwnedState & {
+  process_before: number[];
+  process_after: number[];
+  root_before: string[];
+  root_after: string[];
+  process_delta: number;
+  root_delta: number;
+};
 
 type K1Row = { id: string; path: string; bait: "env" | "literal" };
 const K1_ROWS: readonly K1Row[] = [
@@ -87,11 +98,94 @@ function baitSource(row: K1Row): string {
     : `const baitPath = ${JSON.stringify(forbiddenDbName())};\nvoid baitPath;\n`;
 }
 
+function createGateOwnedRoot(prefix: string): string {
+  const root = mkdtempSync(join(tmpdir(), prefix));
+  gateOwnedRoots.add(root);
+  return root;
+}
+
+function releaseGateOwnedRoot(root: string): void {
+  try { rmSync(root, { recursive: true, force: true }); } catch {}
+  if (!existsSync(root)) gateOwnedRoots.delete(root);
+}
+
+function snapshotGateOwnedState(): GateOwnedState {
+  return {
+    process_ids: [process.pid],
+    root_paths: [...gateOwnedRoots].filter((root) => existsSync(root)).sort(),
+  };
+}
+
+function setDelta(before: readonly string[] | readonly number[], after: readonly string[] | readonly number[]): { added: string[]; removed: string[]; delta: number } {
+  const beforeSet = new Set(before);
+  const afterSet = new Set(after);
+  const added = [...afterSet].filter((value) => !beforeSet.has(value)).map(String).sort();
+  const removed = [...beforeSet].filter((value) => !afterSet.has(value)).map(String).sort();
+  return { added, removed, delta: added.length + removed.length };
+}
+
+function gateOwnedDelta(before: GateOwnedState, after: GateOwnedState): GateOwnedDelta {
+  const process = setDelta(before.process_ids, after.process_ids);
+  const root = setDelta(before.root_paths, after.root_paths);
+  return {
+    process_before: before.process_ids,
+    process_after: after.process_ids,
+    root_before: before.root_paths,
+    root_after: after.root_paths,
+    process_ids: after.process_ids,
+    root_paths: after.root_paths,
+    process_delta: process.delta,
+    root_delta: root.delta,
+  };
+}
+
+function runGateOwnedStateFalsifier(): void {
+  const before = snapshotGateOwnedState();
+  const baitRoot = createGateOwnedRoot("qf-g8-state-bait-");
+  try {
+    const red = gateOwnedDelta(before, snapshotGateOwnedState());
+    const resultOk = red.process_delta === 0 && red.root_delta === 0;
+    let caught = false;
+    try {
+      assert(resultOk, "gate-owned cleanup proof accepted a live bait root");
+    } catch (error) {
+      caught = true;
+      console.log(`golden-g8-kernel-proof: FALSIFY RED gate-owned-state ${JSON.stringify({
+        process_before: red.process_before,
+        process_after: red.process_after,
+        root_before: red.root_before,
+        root_after: red.root_after,
+        process_delta: red.process_delta,
+        root_delta: red.root_delta,
+        caught,
+        result_ok: resultOk,
+        red_exit: 1,
+        reason: error instanceof Error ? error.message : String(error),
+      })}`);
+    }
+    assert(caught, "gate-owned cleanup proof did not reject a live bait root");
+  } finally {
+    releaseGateOwnedRoot(baitRoot);
+  }
+  const restored = gateOwnedDelta(before, snapshotGateOwnedState());
+  assert(restored.process_delta === 0 && restored.root_delta === 0, "gate-owned cleanup restore left process or root residue");
+  console.log(`golden-g8-kernel-proof: FALSIFY GREEN gate-owned-state ${JSON.stringify({
+    process_before: restored.process_before,
+    process_after: restored.process_after,
+    root_before: restored.root_before,
+    root_after: restored.root_after,
+    process_delta: restored.process_delta,
+    root_delta: restored.root_delta,
+    restored: true,
+    normal_rerun_exit: 0,
+  })}`);
+}
+
 function runK1Falsifier(row: K1Row): void {
-  const root = mkdtempSync(join(tmpdir(), "qf-g8-k1-"));
+  const before = snapshotGateOwnedState();
+  const root = createGateOwnedRoot("qf-g8-k1-");
   const target = join(root, row.path);
   const clean = Buffer.from("export const cleanFixture = true;\n", "utf8");
-  const beforePids = new Set([process.pid]);
   let baitPresentBefore = false;
   let baitPathExistsAfter = true;
   try {
@@ -117,13 +211,30 @@ function runK1Falsifier(row: K1Row): void {
     assert(Buffer.compare(readFileSync(target), clean) === 0, `${row.id} restore did not restore exact clean bytes`);
     baitPathExistsAfter = readFileSync(target).includes(forbiddenDbName()) || readFileSync(target).includes(forbiddenEnvName());
     assert(!baitPathExistsAfter, `${row.id} restored file still contains bait`);
-    const afterPids = new Set([process.pid]);
-    assert(afterPids.size - beforePids.size === 0, `${row.id} changed the process set`);
   } finally {
-    try { rmSync(root, { recursive: true, force: true }); } catch {}
+    releaseGateOwnedRoot(root);
     assert(!existsSync(root), `${row.id} isolated root survived cleanup`);
   }
-  console.log(`golden-g8-kernel-proof: FALSIFY ${JSON.stringify({ mode: row.id, path: row.path, caught: true, result_ok: false, bait_present_before: baitPresentBefore, bait_cleanup: !baitPathExistsAfter, bait_path_exists_after: baitPathExistsAfter, process_delta: 0, root_delta: 0, restored: true, red_exit: 1, normal_rerun_exit: 0 })}`);
+  const delta = gateOwnedDelta(before, snapshotGateOwnedState());
+  assert(delta.process_delta === 0 && delta.root_delta === 0, `${row.id} changed the gate-owned process or root set`);
+  console.log(`golden-g8-kernel-proof: FALSIFY ${JSON.stringify({
+    mode: row.id,
+    path: row.path,
+    caught: true,
+    result_ok: false,
+    bait_present_before: baitPresentBefore,
+    bait_cleanup: !baitPathExistsAfter,
+    bait_path_exists_after: baitPathExistsAfter,
+    process_before: delta.process_before,
+    process_after: delta.process_after,
+    root_before: delta.root_before,
+    root_after: delta.root_after,
+    process_delta: delta.process_delta,
+    root_delta: delta.root_delta,
+    restored: true,
+    red_exit: 1,
+    normal_rerun_exit: 0,
+  })}`);
 }
 
 type InternalRow = {
@@ -207,6 +318,7 @@ function runLawBFalsifier(): void {
 
 export async function runGoldenG8KernelProofGate(): Promise<{ ok: boolean }> {
   try {
+    runGateOwnedStateFalsifier();
     if (!(await runFrozenPackageInstall("golden-g8-kernel-proof:qf-kernel", join(REPO_ROOT, "packages/qf-kernel")))) return { ok: false };
     const commands = await import("../../qf-kernel-schema/src/commands.ts");
     const kernel = await import("../../packages/qf-kernel/src/execute.ts");

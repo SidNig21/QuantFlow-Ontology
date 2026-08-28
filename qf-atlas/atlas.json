@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "f348cbc3",
+    "commit": "a41afa6d",
     "generatedAt": "2026-08-28",
     "filesScanned": 406,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "3271c7c6de78f434"
+    "fingerprint": "5f4413c636d925d3"
   },
   "stats": {
     "live": 104,
@@ -3240,11 +3240,11 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 896.4,
+      "kb": 904.5,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 80,
+      "spawns": 81,
       "writes": 44,
       "dml": 19,
       "executes": 49,
@@ -3261,8 +3261,8 @@
         },
         {
           "path": "qa/gates/hermes-research.ts",
-          "kb": 96.8,
-          "spawns": 4,
+          "kb": 101.3,
+          "spawns": 5,
           "spawnsLive": 2,
           "writes": 1,
           "dml": 0,
@@ -3393,6 +3393,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/golden-g8-kernel-proof.ts",
+          "kb": 17.8,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 5,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/kernel-sole-writer.ts",
           "kb": 17.8,
           "spawns": 0,
@@ -3404,16 +3414,6 @@
             42,
             44
           ],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/golden-g8-kernel-proof.ts",
-          "kb": 14.2,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 5,
-          "dml": 0,
-          "dmlLines": [],
           "executes": 0
         },
         {
@@ -51832,12 +51832,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "07920166",
+      "commit": "f348cbc3",
       "generatedAt": "2026-08-28"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "f348cbc3",
+      "commit": "a41afa6d",
       "generatedAt": "2026-08-28"
     },
     "verdict": "better",

@@ -99,7 +99,7 @@ type Launch = {
   identity: Identity;
   submission: Record<string, unknown>;
 };
-type Identity = { commitSha: string; packagedAt: string };
+type Identity = { commitSha: string; packagedAt: string; evidenceHeadSha: string };
 type ArtifactReceipt = { id: string; content_hash: string; kind?: string; storage_ref?: string };
 type GateLabel = "hermes-first-turn-synthetic" | "windows-hermes-research-chain";
 type CleanupError = {
@@ -305,6 +305,31 @@ function currentCommit(): string {
   return sha;
 }
 
+function resolveProductCandidateSha(evidenceHeadSha: string): string {
+  const configured = process.env.QF_PRODUCT_CANDIDATE_SHA?.trim();
+  const candidateSha = configured || evidenceHeadSha;
+  assert(/^[0-9a-f]{40}$/.test(candidateSha), `product candidate SHA is not a full SHA: ${candidateSha}`);
+  const resolved = execFileSync("git", ["rev-parse", "--verify", `${candidateSha}^{commit}`], {
+    cwd: REPO_ROOT,
+    encoding: "utf8",
+  }).trim();
+  assert(resolved === candidateSha, `product candidate SHA is not an immutable commit: ${candidateSha}`);
+  return candidateSha;
+}
+
+function assertPackageCandidateIdentity(
+  candidateSha: string,
+  embeddedCandidateSha: string,
+  evidenceHeadSha: string,
+): void {
+  assert(/^[0-9a-f]{40}$/.test(candidateSha), `product candidate SHA is not a full SHA: ${candidateSha}`);
+  assert(/^[0-9a-f]{40}$/.test(evidenceHeadSha), `evidence head SHA is not a full SHA: ${evidenceHeadSha}`);
+  assert(
+    embeddedCandidateSha === candidateSha,
+    `packaged candidate identity mismatch: candidate_sha=${candidateSha} evidence_head_sha=${evidenceHeadSha} embedded_candidate_sha=${embeddedCandidateSha}`,
+  );
+}
+
 function timestamp(): string {
   const value = new Date().toISOString();
   assert(new Date(value).toISOString() === value, "package timestamp is not canonical ISO UTC");
@@ -312,10 +337,40 @@ function timestamp(): string {
 }
 
 function setBuildIdentity(): Identity {
-  const identity = { commitSha: currentCommit(), packagedAt: timestamp() };
+  const evidenceHeadSha = currentCommit();
+  const identity = { commitSha: resolveProductCandidateSha(evidenceHeadSha), packagedAt: timestamp(), evidenceHeadSha };
   process.env.QF_BUILD_COMMIT_SHA = identity.commitSha;
   process.env.QF_BUILD_TIMESTAMP = identity.packagedAt;
   return identity;
+}
+
+function runPackageIdentityFalsifier(): void {
+  const candidateSha = "a".repeat(40);
+  const evidenceHeadSha = "b".repeat(40);
+  let rejected = false;
+  try {
+    assertPackageCandidateIdentity(candidateSha, evidenceHeadSha, evidenceHeadSha);
+  } catch (error) {
+    rejected = true;
+    console.log(`hermes-first-turn-synthetic: FALSIFY RED package-candidate-evidence-mismatch ${JSON.stringify({
+      candidate_sha: candidateSha,
+      evidence_head_sha: evidenceHeadSha,
+      embedded_candidate_sha: evidenceHeadSha,
+      caught: true,
+      result_ok: false,
+      red_exit: 1,
+      reason: errorMessage(error),
+    })}`);
+  }
+  assert(rejected, "candidate/evidence package identity mismatch unexpectedly passed");
+  assertPackageCandidateIdentity(candidateSha, candidateSha, evidenceHeadSha);
+  console.log(`hermes-first-turn-synthetic: FALSIFY GREEN package-candidate-evidence-mismatch ${JSON.stringify({
+    candidate_sha: candidateSha,
+    evidence_head_sha: evidenceHeadSha,
+    embedded_candidate_sha: candidateSha,
+    restored: true,
+    normal_rerun_exit: 0,
+  })}`);
 }
 
 async function runChild(
@@ -568,8 +623,16 @@ async function launch(
   try {
     const ready = await waitForReady(child, endpointFile);
     const readiness = ready.readiness as Record<string, unknown>;
-    const identity = readiness.buildIdentity as Record<string, unknown> | undefined;
-    assert(identity?.commitSha && identity?.packagedAt, "packaged app readiness omitted build identity");
+    const buildIdentity = readiness.buildIdentity as Record<string, unknown> | undefined;
+    assert(buildIdentity?.commitSha && buildIdentity?.packagedAt, "packaged app readiness omitted build identity");
+    const evidenceHeadSha = currentCommit();
+    const candidateSha = resolveProductCandidateSha(evidenceHeadSha);
+    const identity: Identity = {
+      commitSha: String(buildIdentity.commitSha),
+      packagedAt: String(buildIdentity.packagedAt),
+      evidenceHeadSha,
+    };
+    assertPackageCandidateIdentity(candidateSha, identity.commitSha, evidenceHeadSha);
     assert(readiness.dockProfileIds?.includes("hermes-research-director"), "production Hermes Research Director profile is absent");
     assert(readiness.dockProfileIds?.includes("hermes-worker"), "production Hermes worker profile is absent");
     assert(readiness.dockProfileIds?.includes("hermes-critic"), "production Hermes critic profile is absent");
@@ -827,6 +890,27 @@ function normalizeOutput(value: string): string {
     .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "");
 }
 
+function normalizeTransportCursorWrap(value: string): string {
+  // ConPTY can wrap a long visible line by emitting CRLF, moving the cursor
+  // back to the continuation column, and re-emitting the boundary character.
+  // Remove only that documented frame and only its one proven repeated byte;
+  // visible insertion, deletion, and substitution without this frame remain
+  // identity failures.
+  const frame = /(?:\u001b\[[0-?]*[ -/]*[@-~])*(?:\r\n|\n|\r)(?:\u001b\[[0-?]*[ -/]*[@-~])*\u001b\[\d+;\d+H/g;
+  let normalized = value;
+  for (;;) {
+    frame.lastIndex = 0;
+    const match = frame.exec(normalized);
+    if (!match || match.index === undefined) return normalized;
+    const before = normalized.slice(0, match.index);
+    const afterIndex = match.index + match[0].length;
+    const previous = before[before.length - 1];
+    const next = normalized[afterIndex];
+    const dropNext = previous !== undefined && previous === next;
+    normalized = before + normalized.slice(afterIndex + (dropNext ? 1 : 0));
+  }
+}
+
 async function captureFor(launchState: Launch, timeoutMs: number, needle?: string): Promise<string> {
   let latest = "";
   const capturedBySession = new Map<string, string>();
@@ -873,7 +957,7 @@ async function captureDirectorFor(launchState: Launch, timeoutMs: number, needle
         { sessionId: launchState.ptySessionId },
       ) as { output?: unknown };
       if (typeof captured.output === "string" && captured.output.length >= latest.length) {
-        latest = normalizeOutput(captured.output);
+        latest = captured.output;
       }
     } catch {
       // The exact Director PTY is the only accepted source; do not fall back to
@@ -959,7 +1043,7 @@ type OrderedResultReceipt = {
 
 const DIRECTOR_RESULT_LINE = /^\[QuantFlow RESULT for ([A-Za-z0-9_-]{1,128}) from worker\] (.+)$/;
 function compactPtyOutput(value: string): string {
-  return normalizeOutput(value).replace(/[\r\n]+/g, "");
+  return normalizeOutput(normalizeTransportCursorWrap(value)).replace(/[\r\n]+/g, "");
 }
 
 function directorResultMatch(value: string): RegExpMatchArray | null {
@@ -970,29 +1054,39 @@ function resultReturnMatch(value: string): RegExpMatchArray | null {
   return compactPtyOutput(value).match(/QF_SYNTHETIC boundary=result_return[\s\S]*?task_id=([A-Za-z0-9_-]{1,128})(?=QF_SYNTHETIC|$)/);
 }
 
-function matchesWrappedTaskId(observed: string, expected: string): boolean {
-  const memo = new Map<string, boolean>();
-  const match = (observedIndex: number, expectedIndex: number): boolean => {
-    const key = `${observedIndex}:${expectedIndex}`;
-    const cached = memo.get(key);
-    if (cached !== undefined) return cached;
-    if (expectedIndex === expected.length) {
-      const done = observedIndex === observed.length;
-      memo.set(key, done);
-      return done;
+function matchesTransportWrappedTaskId(observed: string, expected: string): boolean {
+  // ANSI/control bytes and line endings are transport framing. The visible
+  // task token itself must remain byte-for-byte identical to Kernel identity.
+  return compactPtyOutput(observed) === expected;
+}
+
+function runTaskIdentityFalsifier(): void {
+  const expected = "task-abc";
+  for (const actual of ["task--abc", "taask-abc"] as const) {
+    let rejected = false;
+    try {
+      assert(matchesTransportWrappedTaskId(actual, expected), `PTY task identity drifted: expected ${expected}, got ${actual}`);
+    } catch (error) {
+      rejected = true;
+      console.log(`hermes-first-turn-synthetic: FALSIFY RED task-identity ${JSON.stringify({
+        expected_task_id: expected,
+        actual_task_id: actual,
+        caught: true,
+        result_ok: false,
+        red_exit: 1,
+        reason: errorMessage(error),
+      })}`);
     }
-    if (observedIndex >= observed.length || observed[observedIndex] !== expected[expectedIndex]) {
-      memo.set(key, false);
-      return false;
-    }
-    const consumed = match(observedIndex + 1, expectedIndex + 1);
-    const skippedWrapDuplicate = observed[observedIndex + 1] === observed[observedIndex]
-      && match(observedIndex + 2, expectedIndex + 1);
-    const result = consumed || skippedWrapDuplicate;
-    memo.set(key, result);
-    return result;
-  };
-  return match(0, 0);
+    assert(rejected, `malformed PTY task identity unexpectedly passed: ${actual}`);
+  }
+  const transportWrapped = `${expected.slice(0, -4)}-\r\n\u001b[18;6H-${expected.slice(-3)}\r\n`;
+  assert(matchesTransportWrappedTaskId(transportWrapped, expected), "documented transport framing changed the exact task identity");
+  console.log(`hermes-first-turn-synthetic: FALSIFY GREEN task-identity ${JSON.stringify({
+    expected_task_id: expected,
+    transport_wrapped_actual: expected,
+    restored: true,
+    normal_rerun_exit: 0,
+  })}`);
 }
 
 function exactWrappedTaskIdFromMarker(
@@ -1010,7 +1104,7 @@ function exactWrappedTaskIdFromMarker(
     : compactOutput.indexOf(suffix, taskStart);
   assert(taskEnd > taskStart, `PTY omitted task token after marker ${marker}`);
   const observedTaskId = compactOutput.slice(taskStart, taskEnd);
-  assert(matchesWrappedTaskId(observedTaskId, expectedTaskId), `PTY task identity drifted: expected ${expectedTaskId}, got ${observedTaskId}`);
+  assert(matchesTransportWrappedTaskId(observedTaskId, expectedTaskId), `PTY task identity drifted: expected ${expectedTaskId}, got ${observedTaskId}`);
   return markerIndex;
 }
 
@@ -1881,10 +1975,14 @@ async function packageInstalled(tempRoot: string): Promise<{ root: string; ident
   assert(installer && existsSync(installer), `NSIS installer missing: ${installerName}`);
   const status = JSON.parse(readFileSync(join(dist, "RELEASE-STATUS.json"), "utf8")) as Record<string, unknown>;
   const releaseBuild = status.build as Record<string, unknown>;
-  assert(releaseBuild?.commit_sha === requestedIdentity.commitSha, "RELEASE-STATUS candidate SHA drifted");
+  assertPackageCandidateIdentity(
+    requestedIdentity.commitSha,
+    String(releaseBuild?.commit_sha ?? ""),
+    requestedIdentity.evidenceHeadSha,
+  );
   const packagedAt = String(releaseBuild?.packaged_at ?? "");
   assert(new Date(packagedAt).toISOString() === packagedAt, "RELEASE-STATUS package time is not canonical ISO UTC");
-  const identity: Identity = { commitSha: requestedIdentity.commitSha, packagedAt };
+  const identity: Identity = { commitSha: requestedIdentity.commitSha, packagedAt, evidenceHeadSha: requestedIdentity.evidenceHeadSha };
   const installRoot = join(tempRoot, "installed");
   mkdirSync(installRoot, { recursive: true });
   const installed = await runChild(installer, ["/S", `/D=${installRoot}`], tempRoot, { ...process.env, TEMP: join(tempRoot, "temp"), TMP: join(tempRoot, "temp") }, 2 * 60 * 1000);
@@ -1895,6 +1993,8 @@ async function packageInstalled(tempRoot: string): Promise<{ root: string; ident
 }
 
 export async function runHermesFirstTurnSyntheticGate(): Promise<{ ok: boolean }> {
+  runPackageIdentityFalsifier();
+  runTaskIdentityFalsifier();
   if (process.platform !== "win32") {
     console.error("hermes-first-turn-synthetic: FAIL (native Windows 11 is required; WSL is not acceptance evidence)");
     return { ok: false };
@@ -1911,7 +2011,11 @@ export async function runHermesFirstTurnSyntheticGate(): Promise<{ ok: boolean }
     const tempRoot = createGateTempRoot("qf-hermes-first-turn-synthetic-");
     try {
       const packageRoot = await buildWindowsPackage(tempRoot);
-      console.log(`hermes-first-turn-synthetic: package-identity=${JSON.stringify(identity)}`);
+      console.log(`hermes-first-turn-synthetic: package-identity=${JSON.stringify({
+        candidate_sha: identity.commitSha,
+        evidence_head_sha: identity.evidenceHeadSha,
+        packaged_at: identity.packagedAt,
+      })}`);
       await runResearchPackage(packageRoot, "hermes-first-turn-synthetic");
     } finally {
       await removeGateTempRoot("hermes-first-turn-synthetic", tempRoot);
