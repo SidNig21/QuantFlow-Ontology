@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "c7cc7f4a",
+    "commit": "07920166",
     "generatedAt": "2026-08-28",
     "filesScanned": 406,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -51832,38 +51832,24 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "847f881f",
+      "commit": "c7cc7f4a",
       "generatedAt": "2026-08-28"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "c7cc7f4a",
+      "commit": "07920166",
       "generatedAt": "2026-08-28"
     },
     "verdict": "better",
-    "why": "34 improvement(s), nothing added or hidden",
+    "why": "31 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
-      {
-        "id": "persistence:collab-electron/src/main/kernel.ts:kernelSeedVisibleResearchWorld:links:insert-into",
-        "kind": "persistence",
-        "what": "links insert into",
-        "where": "collab-electron/src/main/kernel.ts",
-        "note": "was undecided"
-      },
       {
         "id": "persistence:collab-electron/src/main/updater/update-manager.ts:error:check:update",
         "kind": "persistence",
         "what": "check update",
         "where": "collab-electron/src/main/updater/update-manager.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:bindSourceWork:qf_review_source_work:insert-into",
-        "kind": "persistence",
-        "what": "qf_review_source_work insert into",
-        "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
       {
@@ -51905,13 +51891,6 @@
         "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
         "kind": "persistence",
         "what": "qf_review_task create table if not exists",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:recordGovernedToolReceipt:qf_review_invocation:insert-into",
-        "kind": "persistence",
-        "what": "qf_review_invocation insert into",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
@@ -52091,13 +52070,13 @@
     "stats": {
       "added": 0,
       "newlyDetected": 0,
-      "resolved": 34,
+      "resolved": 31,
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
       "coverageWorse": 0,
       "coverageBetter": 0,
-      "undecidedFrom": 34,
+      "undecidedFrom": 31,
       "undecidedTo": null
     }
   },
