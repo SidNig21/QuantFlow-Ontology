@@ -499,7 +499,8 @@ function readRunResultArtifact(db: KernelDb, work: SourceWork): { artifactId: st
     throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
   }
   const resultArtifact = readArtifactBytes(db, params.result_artifact_id);
-  if (db.query("SELECT kind FROM artifact WHERE id = ?").get(params.result_artifact_id as string)?.kind !== "result_set") {
+  const resultArtifactRow = db.query("SELECT kind FROM artifact WHERE id = ?").get(params.result_artifact_id as string) as { kind: string } | null;
+  if (resultArtifactRow?.kind !== "result_set") {
     throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
   }
   return { artifactId: params.result_artifact_id, ...resultArtifact };

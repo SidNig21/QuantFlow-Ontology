@@ -14,6 +14,7 @@ import {
   requestGovernedReview,
   resolveGovernedWorkerEvidence,
   type KernelDb,
+  type SourceWork,
 } from "./index.ts";
 
 const trace = { trace_id: "g9-trace", span_id: "g9-span" };
@@ -66,7 +67,7 @@ function dataset(id: string, asOf: string): string {
   return version.object_id;
 }
 
-function completeWorkerTask(taskId: string, workerId: string, label: string, sourceWork?: Record<string, string>, complete = true): string {
+function completeWorkerTask(taskId: string, workerId: string, label: string, sourceWork?: SourceWork, complete = true): string {
   const readBytes = new TextEncoder().encode(JSON.stringify({
     contract: "qf.ontology.v1", tool: "qf_venue_get", arguments: { id: `venue-${label}` },
     result: { id: `venue-${label}` }, session_id: workerId, role: "worker",
@@ -100,7 +101,7 @@ function completeWorkerTask(taskId: string, workerId: string, label: string, sou
 
 type World = {
   sourceTaskId: string;
-  work: Record<string, string>;
+  work: SourceWork;
   evaluationId: string;
   reportId: string;
   strategyId: string;
@@ -124,7 +125,7 @@ function supportWorld(label: string, missionId: string, datasetId: string, famil
     strategy_spec: { contract: "qf.strategy.v1", family, version: 1, stake_model: "flat", score_field: "edge" },
     params: { limit: 1 },
   }, { ...trace, actor_session_id: workerId });
-  const work: Record<string, string> = {
+  const work: SourceWork = {
     source_task_id: task.object_id, hypothesis_id: hypothesis.object_id, run_id: run.object_id,
     result_artifact_id: String(run.state.result_artifact_id), executor_session_id: workerId,
   };
