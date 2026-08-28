@@ -36,3 +36,6 @@ changed	bun qf-atlas/generate.mjs --check	0	PASS; current map
 changed	bun qf-atlas/ratchet.mjs	0	PASS; baseline=3 HARD RED=0 unexplained=0 AMBER=20 undecided=31
 changed	git diff --check	0	PASS; only expected CRLF replacement warnings
 candidate	bun qa/run.ts hermes-first-turn-synthetic	0	PASS; package identity candidate=b20966dc8ec86193de8af092df45248fbeb3fc1b; roots_remaining=0 leaked=[] remainingGateOwnedProcesses=0
+amendment-v01-v02-v04	bun qa/run.ts golden-g8-kernel-proof	0	PASS; V-04 live-root bait measured root_delta=1 then restored process_delta=0 root_delta=0; exact 13 K1 red/green; no residue
+amendment-v03	Get-FileHash -Algorithm SHA256 collab-electron/src/main/sidecar/server.ts; Get-FileHash -Algorithm SHA256 packages/qf-kernel/src/upgrade.ts	0	PASS; Reader-admitted pre/post SHA-256 unchanged; exactly two retained source paths; third_path=false
+amendment-candidate	git show --stat --oneline 6a26340162148118c84f0148638bd36a32a3af99	0	PASS; product candidate is exactly five bounded QA/atlas paths; candidate tree=1b242d47035745f356eb0f3ff2ec9beda584eb7c
