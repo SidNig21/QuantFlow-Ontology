@@ -1,0 +1,27 @@
+id	phase	command	expected_exit	actual_exit	status	receipt
+g6-01	normal	bun qa/run.ts repo-shape	0	0	PASS	Builder tool transcript
+g6-02	normal	bun qa/run.ts doc-links	0	0	PASS	post-deletion index; Builder tool transcript
+g6-03	normal	bun qa/run.ts rung-ladder	0	0	PASS	Builder tool transcript
+g6-04	normal	bun qa/run.ts dock-production-inventory	0	0	PASS	P1/Q1 exact sets; Builder tool transcript
+g6-05	normal	bun qa/run.ts dev-dock-readiness	0	0	PASS	native host access; real Electron; Builder tool transcript
+g6-06	normal	bun qa/run.ts dock-definition-launch	0	0	PASS	saved-row refusal; Builder tool transcript
+g6-07	normal	bun qa/run.ts kernel-one-path	0	1	INHERITED_RED	13 pre-existing offenders; G8-protected non-regression
+g6-08	normal	bun qa/run.ts research-director-front-door	0	0	PASS	native host access; real front door; Builder tool transcript
+g6-09	changed-surface	bun test collab-electron/src/main/dock-profiles.test.ts	0	0	PASS	11 pass / 0 fail
+g6-10	changed-surface	bun test collab-electron/scripts/package-lib/runtime-staging.test.ts	0	0	PASS	3 pass / 0 fail
+g6-11	changed-surface	bun test collab-electron/scripts/package-lib/package-inspect.test.ts	0	1	INHERITED_RED	12 pass / 3 frozen platform-fixture failures
+g6-12	changed-surface	bun test collab-electron/src/main/integrations.test.ts	0	0	PASS	12 pass / 0 fail; protected seam behavior
+g6-13	normal	bun qa/run.ts hermes-launch-policy	0	1	INHERITED_RED	WSL E_ACCESSDENIED creating fake Hermes; same starting red
+g6-14	normal	bun qa/run.ts golden-g4-retired-route	0	0	PASS	Builder tool transcript
+g6-15	normal	bun qa/run.ts golden-g5-consumer-census	0	0	PASS	Builder tool transcript
+g6-16	normal	bun qa/run.ts golden-g5-saved-state	0	0	PASS	Builder tool transcript
+g6-17	normal	bun qa/run.ts kernel-sole-writer-app	0	0	PASS	Builder tool transcript
+g6-18	normal	bun run --cwd collab-electron build	0	0	PASS	native host access; Electron build completed
+g6-19	normal	git diff --check	0	0	PASS	Builder tool transcript
+atlas-pre-edit	atlas	bun qf-atlas/generate.mjs --check	0	1	INHERITED_RED	stale fingerprint at starting head
+atlas-pre-edit-ratchet	atlas	bun qf-atlas/ratchet.mjs	0	1	INHERITED_RED	stale fingerprint at starting head
+atlas-generate	atlas	bun qf-atlas/generate.mjs	0	0	PASS	403 files / 124 channels
+atlas-check	atlas	bun qf-atlas/generate.mjs --check	0	0	PASS	current generated map
+atlas-ratchet	atlas	bun qf-atlas/ratchet.mjs	0	0	PASS	HARD RED 0 / unexplained coverage 0
+atlas-diff	atlas	bun qf-atlas/generate.mjs --diff 929de18c181f3d42eedede5b1ea3246108cc3a1d	0	0	PASS	mixed analyzer diff; no G6 product verdict
+atlas-falsify	atlas	node qf-atlas/falsify.mjs	0	1	INHERITED_RED	23 cases passed; pre-existing missing bait directory ENOENT
