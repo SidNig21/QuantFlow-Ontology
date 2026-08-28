@@ -1,11 +1,14 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G5 CLOSED / G6 SEMANTIC READER PENDING
+# NEXT — R18 GOLDEN BASELINE HOLD / G5 CLOSED / G6 BOUNDED BUILDER AUTHORITY OPEN
 
-status: G5 CLOSED / G6 SEMANTIC READER PENDING
+status: G5 CLOSED / G6 BOUNDED BUILDER AUTHORITY OPEN
 rotated-at: 2026-08-27
-rotated-by: Router after independent G5 verification
+rotated-by: Router after amended G6 semantic Reader acceptance
 active-order: [WO-GOLDEN-G6](WO-GOLDEN-G6.md)
-builder-authority: **CLOSED — G6 semantic Reader only; no G6 Builder authority**
-g6-reader-status: **PENDING CORRECTED FRESH SEMANTIC READER** (Round 1 task `01a0464f-cf3a-7ca2-9d94-415f7ca8252f` returned NO / NO; seven finite defects recorded in the G6 Reader receipt)
+builder-authority: **OPEN — exactly one Builder may execute [WO-GOLDEN-G6](WO-GOLDEN-G6.md); no G7/G11/G12/R18 work**
+g6-reader-status: **PASS / YES / YES — amended Reader task `01a0464f-cf3a-7ca2-9d94-415f7ca8252f` against amendment `4b773e2836e8fac752f584ea103dc7d6192ca43a` (tree `3e7a581700a2d0852ead260a6fdb967b857a4ee3`); all seven defects cured; no new ambiguity or scope expansion**
+g6-reader-task: `01a0464f-cf3a-7ca2-9d94-415f7ca8252f`
+g6-reader-amendment-sha: `4b773e2836e8fac752f584ea103dc7d6192ca43a`
+g6-reader-amendment-tree: `3e7a581700a2d0852ead260a6fdb967b857a4ee3`
 g6-provisional-source-scope-task: 01a04625-d2da-7ed1-b63e-48d7eabc4059 (measured testimony only; not semantic approval)
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
@@ -48,7 +51,7 @@ G4 closed at `2d491f20a030b9ac0b476846535f2ecc71239af1`. G5 closed at evidence h
 
 The independent G5 Verifier task `01a04624-d75d-7c12-a35d-2fdf105962f6` proved every G5-owned normal selector and falsifier green, the exact preserved deletion boundary, changed-surface proofs, product/config identity, and clean G5-owned process/root state. Its one packaged reproduction exited 1 at `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`: zero concrete Director result receipts before `result_return` (G8) and the inherited EACCES/orphan root (G12). The fresh `x0W0CL` and prior `Fz8BQs` roots remain untouched; no Bun/Electron process remains. The packaged command is not PASS.
 
-The fresh semantic Reader task `01a04034-6afb-73a3-9f0e-6419fa5f76ec` returned `NO / NO` against authority `5248031` with finite defects; that historical candidate was superseded. The final causal Reader task `01a0426f-d4bf-7413-b974-643f935131d8` returned **YES / YES** against authority `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268`; the independent Verifier then closed G5 under the exact bounded result-delivery and inherited-red contract recorded in [G5 verifier acceptance](evidence/golden-baseline/g5/VERIFIER-ACCEPTANCE.md). G5 Builder authority is closed. G6 is Reader-only pending.
+The fresh semantic Reader task `01a04034-6afb-73a3-9f0e-6419fa5f76ec` returned `NO / NO` against authority `5248031` with finite defects; that historical candidate was superseded. The final causal Reader task `01a0426f-d4bf-7413-b974-643f935131d8` returned **YES / YES** against authority `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268`; the independent Verifier then closed G5 under the exact bounded result-delivery and inherited-red contract recorded in [G5 verifier acceptance](evidence/golden-baseline/g5/VERIFIER-ACCEPTANCE.md). G5 Builder authority is closed. The amended G6 Reader task `01a0464f-cf3a-7ca2-9d94-415f7ca8252f` returned **YES / YES** against amendment `4b773e2836e8fac752f584ea103dc7d6192ca43a` (tree `3e7a581700a2d0852ead260a6fdb967b857a4ee3`), with no new ambiguity or scope expansion. Exactly one Builder is authorized to execute [WO-GOLDEN-G6](WO-GOLDEN-G6.md); no other order opens.
 
 ## Finite G8 prerequisite amendment
 
@@ -68,4 +71,4 @@ Fresh Reader task `01a04244-afb8-77c1-a18c-323dd5a05afb` returned `NO / NO` on t
 
 ## Final G5 candidate state
 
-The final causal Reader and independent Verifier are complete; G5 is closed as PASS WITH INHERITED G8/G12 REDS. Full G8 and G9 order is unchanged, with full G9 remaining after G8. G6 is the only active order and is pending a fresh semantic Reader. R18 remains FROZEN until Phase 2 + Phase 3 Golden PASS.
+The final causal Reader and independent Verifier are complete; G5 is closed as PASS WITH INHERITED G8/G12 REDS. Full G8 and G9 order is unchanged, with full G9 remaining after G8. G6 is the only active order and its bounded Builder authority is open for exactly one Builder under WO-GOLDEN-G6. R18 remains FROZEN until Phase 2 + Phase 3 Golden PASS.

@@ -1,12 +1,16 @@
 # WO-GOLDEN-G6 — Remove the false Claude production identity
 
-status: **DRAFT / FRESH SEMANTIC READER PENDING**
+status: **READER ACCEPTED YES / YES / BOUNDED BUILDER AUTHORITY OPEN**
 order-type: Golden Baseline Phase 2 bounded semantic group
 current-evidence-branch: `wo-golden-g2`
 future-builder-branch: `wo-golden-g6` (worktree only; no implementation is authorized in the current checkout)
 parent-group: G5 **CLOSED / PASS WITH INHERITED G8/G12 REDS**
 r18-authority: **FROZEN**
-builder-authority: **CLOSED UNTIL FRESH READER YES / YES**
+builder-authority: **OPEN — EXACTLY ONE BUILDER MAY EXECUTE THIS ORDER**
+reader-task: `01a0464f-cf3a-7ca2-9d94-415f7ca8252f`
+reader-amendment-sha: `4b773e2836e8fac752f584ea103dc7d6192ca43a`
+reader-amendment-tree: `3e7a581700a2d0852ead260a6fdb967b857a4ee3`
+reader-verdict: **YES / YES — all seven finite defects cured; no new ambiguity or scope expansion; no file changes**
 starting-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 starting-product-candidate: `0cd9f273e46fb0c8ca7d05847b1fd805b8817a65`
 starting-product-tree: `df9a4f11c421ed1c18418bbb8a73d0a5a756cd27`
@@ -31,18 +35,21 @@ skill are outside this order's product disposition.
 
 ## Authority and sequence
 
-The current checkout is evidence-only. A fresh semantic Reader must first answer
-YES / YES to both questions below against the exact starting SHAs and this
-bounded file boundary:
+The current checkout remains evidence-only. A fresh semantic Reader was required
+to answer YES / YES to both questions below against the exact starting SHAs and
+this bounded file boundary. Reader task
+`01a0464f-cf3a-7ca2-9d94-415f7ca8252f` re-read amendment
+`4b773e2836e8fac752f584ea103dc7d6192ca43a` (tree
+`3e7a581700a2d0852ead260a6fdb967b857a4ee3`) and returned **YES / YES**, with no
+new ambiguity or scope expansion and no file changes.
 
 1. Can every acceptance gate fail on the exact false-identity, inventory,
    saved-state, and no-launch defects named here?
 2. Does every deliverable have exactly one meaning, with no G7, G11, or G12
    work hidden inside G6?
 
-Until that Reader receipt is committed, no Builder may edit product, QA, package,
-or live documentation files. The provisional source-scope task is testimony for
-the Reader, not authority. After Reader YES / YES, one Builder may implement
+The amended Reader receipt is now committed. The provisional source-scope task
+is testimony for the Reader, not authority. Exactly one Builder may now implement
 only this order in a separate worktree, then one independent Verifier decides
 whether the candidate is accepted. Neither Builder nor Router self-verifies.
 

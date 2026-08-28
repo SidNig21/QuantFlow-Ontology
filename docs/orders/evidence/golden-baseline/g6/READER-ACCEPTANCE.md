@@ -1,16 +1,29 @@
 # G6 semantic Reader acceptance
 
-status: **FRESH SEMANTIC READER ROUND 1 — NO / NO; CORRECTED READER PENDING**
+status: **AMENDED SEMANTIC READER — YES / YES; BOUNDED BUILDER AUTHORITY OPEN**
 order: `docs/orders/WO-GOLDEN-G6.md`
 starting_evidence_head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 starting_product_candidate: `0cd9f273e46fb0c8ca7d05847b1fd805b8817a65`
 starting_product_tree: `df9a4f11c421ed1c18418bbb8a73d0a5a756cd27`
-reader_task: `01a0464f-cf3a-7ca2-9d94-415f7ca8252f`
-reader_authority: fresh semantic Reader against `f2df40e064a0d622ee58c74850e4955f6d664895`
-verdict: **NO / NO — seven finite order defects recorded below**
-builder_authority: **CLOSED until YES / YES**
+reader_task: `01a0464f-cf3a-7ca2-9d94-415f7ca8252f` (amended reread)
+reader_authority: fresh semantic Reader against amendment `4b773e2836e8fac752f584ea103dc7d6192ca43a`
+reader_amendment_sha: `4b773e2836e8fac752f584ea103dc7d6192ca43a`
+reader_amendment_tree: `3e7a581700a2d0852ead260a6fdb967b857a4ee3`
+verdict: **YES / YES**
+builder_authority: **OPEN — exactly one Builder may execute `WO-GOLDEN-G6.md`**
 provisional_source_scope_task: `01a04625-d2da-7ed1-b63e-48d7eabc4059` — testimony only
-corrected_reader_status: **PENDING; Builder remains closed**
+corrected_reader_status: **PASS / YES / YES; exactly one bounded Builder authorized; no G7/G11/G12/R18 work**
+
+## Amended Reader receipt
+
+Fresh semantic Reader task `01a0464f-cf3a-7ca2-9d94-415f7ca8252f` re-read this
+authority packet at amendment commit
+`4b773e2836e8fac752f584ea103dc7d6192ca43a` (tree
+`3e7a581700a2d0852ead260a6fdb967b857a4ee3`) and returned **YES / YES**.
+All seven finite defects from Round 1 were cured; the Reader reported no new
+ambiguity or scope expansion and made no file changes. This receipt opens only
+one Builder for `docs/orders/WO-GOLDEN-G6.md`; G5's inherited G8/G12 reds,
+G8/G9 ordering, R18 freeze, and every other boundary remain unchanged.
 
 ## Required Reader answers
 
@@ -45,8 +58,8 @@ The Reader must explicitly accept or reject the following finite choices:
 - the package proof is staging/inventory/inspection only, while G12 owns the
   full installer/platform/operations qualification.
 
-reader_notes: **Round 1 NO / NO; finite defects below**
-reader_verdict: **NO / NO**
+round_1_reader_notes: **Round 1 NO / NO; finite defects below**
+round_1_reader_verdict: **NO / NO**
 
 ## Round 1 finite defects
 
