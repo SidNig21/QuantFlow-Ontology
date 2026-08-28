@@ -1,6 +1,6 @@
 # WO-GOLDEN-G8 — Kernel, schema, Law-B, and proof-integrity repair
 
-status: **DRAFT / SEMANTIC READER PENDING**
+status: **READER ROUND 1 NO / NO — AMENDMENT REQUIRED / BUILDER CLOSED**
 order-type: Golden Baseline Phase 2 bounded Kernel/schema/proof-integrity group
 current-evidence-branch: `wo-golden-g2`
 parent-group: G7 **CLOSED / PASS WITH INHERITED REDS**
@@ -14,7 +14,10 @@ g7-verifier-verdict: **PASS WITH INHERITED REDS**
 phase-1-source-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-historical-denominators: `1,150 tracked files; 153 direct dependency declarations; 19 Electron package declarations/hooks; 40 bounded operational roots`
 current-g8-evaluated-denominator: `13 kernel-one-path offenders; 89 experimental lifecycle declarations; 1 inherited packaged result-observation failure shape; 1 Law-B write-path invariant`
-reader-authority: **OPEN FOR FRESH SEMANTIC READER ONLY**
+reader-round-1-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
+reader-round-1-authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
+reader-round-1-verdict: **NO / NO — eight finite order defects; same Reader must re-read**
+reader-authority: **OPEN FOR THE SAME SEMANTIC READER TO RE-READ ONLY**
 builder-authority: **CLOSED UNTIL FRESH READER YES / YES**
 g9-order: **UNCHANGED — full G9 remains after G8**
 r18-authority: **FROZEN**
@@ -56,6 +59,11 @@ The Phase-1 audit numbers are provenance only. G8 gates evaluate the frozen
 current set above, not a variable historical rescan. The 89 lifecycle
 declarations remain `experimental` under ADR-0004; G8 does not promote schema
 stability.
+
+Round 1 Reader disposition is recorded in
+`docs/orders/evidence/golden-baseline/g8/READER-ACCEPTANCE.md`. The order is
+not Builder-ready until all eight finite defects recorded there are cured and
+the same Reader returns `YES / YES`.
 
 ## Reader contract — exactly two questions
 
@@ -108,6 +116,34 @@ from each named path or by routing the observation through the existing
 Kernel-owned interface. It may not hide paths by broadening the allowlist,
 exclude a named offender, or weaken the scan. Any new offender is a stop.
 
+The following is the frozen, row-by-row disposition. The table is exhaustive:
+there is no blanket classification, wildcard repair, or variable subset. The
+current testimony proves no row is a real production Kernel truth violation;
+the named bait row is deliberately present to prove that the detector can
+catch one. A Builder may change a row only with a Reader-approved amendment.
+
+| ID | Exact path/offender | Semantic classification | Allowed G8 repair | Exact fail-capable red/green falsifier |
+| --- | --- | --- | --- | --- |
+| K1-01 | `packages/qf-kernel/src/r11a-deterministic-execution.test.ts` — `kernel.db` temp path construction | disposable fixture; not app truth | Rename only the disposable temp filename/config to a neutral generated name; preserve the live Kernel fixture and cleanup | `mode=K1-01`; isolated copy reintroduces the literal; clean preflight; red must report this exact path with `exit=1`, `result.ok=false`, `caught=true`, `bait_cleanup=true`, `bait_path_exists_after=false`, `process_delta=0`, `root_delta=0`; restore and require `restore_exit=0` |
+| K1-02 | `qa/gates/dev-dock-readiness.ts` — `QF_KERNEL_DB` child-process path | child-process-isolated `QF_KERNEL_DB` setup; not canonical truth | Keep the child boundary and env override; derive a neutral disposable filename/config | `mode=K1-02`; same row-specific fields and cleanup assertions as K1-01; the red must name K1-02, then exact restore must exit 0 |
+| K1-03 | `qa/gates/founder-steering.ts` — isolated DB path and readback | child-process-isolated setup plus read-only QA oracle | Preserve the spawned app and read-only oracle; rename only the isolated filename/config | `mode=K1-03`; bait red must name this path, prove `caught=true` and `result.ok=false`, and prove no durable/process/root residue; restore green |
+| K1-04 | `qa/gates/kernel-sole-writer-app.ts` — injected `kernel.db` bait literal | deliberate bait; no real DB write | Keep bait semantics but place the payload in an isolated generated fixture/fragment or encode construction so the clean source scan does not count its own bait | `mode=K1-04`; the detector must catch the reintroduced bait (`caught=true`, `result.ok=false`, exact path red), remove the bait with verified cleanup, then restore exit 0 |
+| K1-05 | `qa/gates/pre-r18-coherence.ts` — `QF_KERNEL_DB` isolated path and readback | child-process-isolated setup plus read-only QA oracle | Preserve the app boundary and oracle; use a neutral disposable filename/config | `mode=K1-05`; exact-path red, `caught=true`, `result.ok=false`, cleanup/process/root zero, restore exit 0 |
+| K1-06 | `qa/gates/r17-founder-kernel-compatibility.ts` — child-process temp DB path | child-process-isolated disposable temp DB | Preserve the live spawned-app proof; rename only the disposable filename/config | `mode=K1-06`; exact-path red with verified bait cleanup and `restore_exit=0` |
+| K1-07 | `qa/gates/r17-guided-technique-consumer.ts` — child-process temp DB path | child-process-isolated disposable temp DB | Preserve the live spawned-app proof; rename only the disposable filename/config | `mode=K1-07`; exact-path red with `caught=true`, `result.ok=false`, zero residue, restore exit 0 |
+| K1-08 | `qa/gates/research-director-delegation.ts` — isolated DB path and readback | child-process-isolated setup plus read-only QA oracle | Preserve Director child boundary and oracle; use a neutral disposable filename/config | `mode=K1-08`; exact-path red, caught/result assertions, verified cleanup, restore exit 0 |
+| K1-09 | `qa/gates/research-director-front-door.ts` — isolated DB path and readback | child-process-isolated setup plus read-only QA oracle; WMI inherited red remains G12 | Preserve the front-door proof and inherited-red ownership; rename only isolated filename/config | `mode=K1-09`; exact-path red and verified cleanup/restore; must not turn the inherited WMI red into G8 PASS |
+| K1-10 | `qa/gates/research-world-visible.ts` — isolated DB path and readback | child-process-isolated setup plus read-only QA oracle | Preserve visible-world assertions; rename only isolated filename/config | `mode=K1-10`; exact-path red, `caught=true`, `result.ok=false`, cleanup/process/root zero, restore exit 0 |
+| K1-11 | `qa/gates/team-composition-ui.ts` — multiple child-process paths/env overrides | child-process-isolated setup plus read-only QA oracle | Preserve each launch, env override, and cleanup; neutralize only disposable filenames/config | `mode=K1-11`; bait one named occurrence at a time and require exact-path red, caught/result proof, no residue, restore exit 0 |
+| K1-12 | `qa/gates/team-composition.ts` — child-process temp DB path | child-process-isolated setup plus disposable temp DB | Preserve the child-process proof and cleanup; rename only the disposable filename/config | `mode=K1-12`; exact-path red with caught/result and cleanup proof, then restore exit 0 |
+| K1-13 | `qa/gates/technique-outcome-loop.ts` — isolated DB path and readback | child-process-isolated setup plus read-only QA oracle | Preserve both launches and reopen/readback; use a neutral disposable filename/config | `mode=K1-13`; exact-path red, `caught=true`, `result.ok=false`, verified cleanup and restore exit 0 |
+
+For every row the clean control must pass before bait, the named bait must be
+inserted into an isolated copy rather than the shared checkout, and the same
+row must restore to the exact clean bytes. A red that merely reports a failed
+scan while `caught=false`, or a green that leaves the bait file/process/root,
+is a failed falsifier rather than acceptance.
+
 ### Schema and proof-integrity set
 
 - all `89` current lifecycle declarations remain experimental and must retain
@@ -120,6 +156,60 @@ exclude a named offender, or weaken the scan. Any new offender is a stop.
   five-key `source_work`, critic observation, Evaluation support, and the
   concrete Director result receipt before `result_return`; worker
   `turn=complete` alone is intermediate and never substitutes for that receipt.
+
+### Historical versus current accounting
+
+The historical Phase-1 denominator is exactly `1,150` tracked files, `153`
+direct dependency rows, `19` Electron package declarations/hooks, and `40`
+bounded operational roots. Those figures are provenance, not a G8 acceptance
+set. The current G7-to-G8 set is exactly `20` manifests, `109` direct
+dependency rows, and `15` lock roots for the dependency/protocol boundary,
+plus the `13` kernel-one-path rows and `89` lifecycle declarations above. G8
+must evaluate this frozen current set; it may not pass a no-op or variable
+subset by choosing historical numbers.
+
+The already-landed reconciliation is frozen and must be enumerated in the
+candidate ledger before any removal. The `44` net direct-dependency row
+reductions are `13 + 26 + 5`; G3's compensating one-row addition is recorded
+separately, so the arithmetic is not an operation count:
+
+| Historical source | Change already made by G1–G6 | Direct dependency accounting | Meaning |
+| --- | --- | ---: | --- |
+| Phase-1 baseline | Starting direct dependency rows | 153 | Historical provenance only |
+| G3 | Removed 14, added 1 | `153 - 13 = 140` | Net direct-dependency change |
+| G4 | Net removed 26 | `140 - 26 = 114` | Net direct-dependency change |
+| G5 | Removed 5 direct dependency rows | `114 - 5 = 109` | Net direct-dependency change |
+| G5 package policy | Removed one overrides entry | separate; not a direct dependency row | Historical package-policy provenance; never subtract from 153 |
+| G6 | No direct dependency change | `109 - 0 = 109` | Current frozen denominator |
+
+The lockfile side is separately frozen at `15` exact lock roots and `20`
+manifests, after the accepted G7 proof of six direct and ten expected lock
+removals. G8 may not silently re-count the historical audit or call a
+package/lock change complete: native packaging pins and full package
+requalification remain G12 work. If a G8 dependency removal necessarily
+changes its own manifest/lock closure, G8 must prove that exact focused
+consequence while leaving native pins and full package qualification to G12.
+
+### Literal candidate-ID ledger and decision rule
+
+Before source mutation, the Builder must copy the literal candidate-ID ledger
+from the current source and Phase-1 evidence into the G8 baseline artifact.
+The ledger must include every current candidate in the frozen set, including
+all 20 manifests, all 109 current direct dependency rows, all 15 lock roots,
+all 13 K1 rows, all 89 lifecycle declaration identities, all Law-B support
+write doors, and both packaged result modes. Every row ends in exactly one of
+`removed` or `retained`; no `pending`, no no-op, no unlisted item, and no
+variable subset is acceptable.
+
+Each ledger row must carry the exact current consumer/reachability proof,
+compatibility proof, QA proof, future-rung proof, and a binary
+`recreation_cheaper_than_retention` decision with its evidence. A removed
+candidate is permitted only when all four proofs are zero/closed and the
+ledger says recreation is cheaper than retention. A retained candidate must
+name its current consumer, compatibility contract, QA evidence, and future
+rung, and must say `recreation_cheaper_than_retention=false` with the reason.
+The ledger is a closed-world proof: a generated count, an unchanged source
+line, or an omitted candidate cannot substitute for a disposition.
 
 The G8 baseline must capture literal paths, bytes, and SHA-256 for the current
 Kernel/schema/proof files it evaluates. It must record the exact starting gate
@@ -153,6 +243,77 @@ assertions in `WO-GOLDEN-G5.md` remain constrained prerequisites. G8 may not
 edit the G9-owned `researchEvidenceByRunId` map, Report finalizer, Report
 schema/publication semantics, or any duplicate Report path.
 
+### Law-B support-write door inventory
+
+`qf_review_*` is Kernel-owned append-only support state, not a second truth
+store. The following inventory is the complete G8 review-write boundary at the
+current source. A private helper may write only while called by a Kernel action
+transaction. An exported Main wrapper outside `execute()` is not authorized by
+its name: it must either prove the exact Kernel-owned action call chain below or
+be repaired to dispatch through `kernelExecute`. Read-only projections may
+query these tables but may not write them.
+
+| Door | Observed support mutation | Permitted authority or required repair | Bypass falsifier |
+| --- | --- | --- | --- |
+| `ensureGovernedReviewSchema` in `packages/qf-kernel/src/governed-review.ts` | DDL for `qf_review_source_work`, `qf_review_task`, `qf_review_invocation`, `qf_review_attempt`, `qf_review_receipt`, `qf_review_publication` | Kernel bootstrap/schema initialization only; no renderer, preload, QA, or transport caller may use it as a domain writer | `law-bypass/schema-door`: make a non-Kernel caller invoke schema/write setup; G8 proof must red with caller and table, restore green |
+| `bindSourceWork` | Inserts immutable `qf_review_source_work` and appends the binding event | Permitted only as the Kernel-owned source-work action path; direct Main/QA call must be routed through `kernelExecute` or proven fixture-only and isolated | `law-bypass/source-work`: bypass the action dispatch; require `caught=true`, `result.ok=false`, no extra row, restore green |
+| `persistRefusal` | Inserts `qf_review_receipt` refusal row and event | Private helper under governed Kernel action transaction only | `law-bypass/refusal`: direct helper/bypass bait must red on exact receipt door, restore green |
+| `persistAttempt` | Inserts `qf_review_attempt` | Private helper under governed Kernel action transaction only; never a transport-side writer | `law-bypass/attempt`: direct write bait must red and leave no durable bait row after cleanup |
+| `admitGovernedReviewTask` | Inserts `qf_review_task` and its attempt/refusal support records | Kernel action implementation only, reached through `executeGovernedReviewTask`/`execute()` | `law-bypass/admission`: replace the action dispatch with a direct call; exact door red, then restore |
+| `deliverGovernedReviewTask` / `markGovernedDelivery` | Updates `qf_review_task`; inserts delivery `qf_review_receipt` | The helper is Kernel-owned; `kernelMarkGovernedDelivery` is an explicit Main adapter and must prove it is not a public bypass. If the call chain cannot prove action ownership, route it through `kernelExecute` | `law-bypass/delivery`: direct wrapper call or helper write outside the allowed chain must red with `to_role`/`to_session_id` context and restore green |
+| `failGovernedReviewCompletion` / `markGovernedCompletionFailed` | Marks task failed and inserts delivery receipt | Same rule as delivery; `kernelFailGovernedCriticCompletion` must be proven as an authorized Kernel adapter or repaired to action dispatch | `law-bypass/completion-failed`: direct wrapper bait must red, prove no unowned receipt, restore green |
+| `recordGovernedToolReceipt` | Inserts `qf_review_invocation` | Permitted only for the admitted critic action through the Kernel-owned receipt path; `kernelRecordGovernedToolReceipt` must not become a free SQLite writer | `law-bypass/invocation`: bypass receipt call must red on exact invocation door and restore |
+| `recordGovernedEvaluation` | Inserts `qf_review_publication`, updates invocation/task, inserts delivery receipt | Evaluation may publish only from independently supported exact source-work lineage. The action must remain `execute()`-owned; G8 proves the predicate but does not execute G9 Report semantics | `law-bypass/evaluation`: delete/forge the lineage guard in an isolated copy; exact refusal/result red, no Evaluation/Report publication, restore green |
+| `requestRevision` / `requestSecondCritic` | Delegates to governed admission and can create review support/task state | Permitted only as Kernel-owned action adapters; direct Main/QA invocation must be routed through `kernelExecute` or proven isolated fixture-only | `law-bypass/revision-or-second-critic`: direct adapter bait must red on caller and support row, restore green |
+| `kernelBindSourceWork`, `kernelRequestGovernedReview`, `kernelRequestRevision`, `kernelRequestSecondCritic` in `collab-electron/src/main/kernel.ts` | Main wrappers call the support mutators with `getKernelDb()` | Explicit adapters are allowed only when the exact call chain terminates in a Kernel action transaction; otherwise required repair is `kernelExecute` dispatch. No renderer/preload direct access | `law-bypass/main-adapter`: replace one wrapper call with a direct support write; exact wrapper red, restore green |
+| `kernelMarkGovernedDelivery`, `kernelContinueGovernedResearchResult`, `kernelRecordGovernedToolReceipt`, `kernelFailGovernedCriticCompletion` | Main wrappers/continuation call delivery, invocation, or failure mutators outside the visible `kernelExecute` wrapper | Each current caller must be classified in the Builder ledger as authorized Kernel adapter or repaired; continuation must not turn transport completion into a second writer | `law-bypass/main-continuation`: bait one call site, run packaged focused proof, require red before any extra support receipt and restore green |
+| `kernelRunGuidedResearch` / `kernelSeedVisibleResearchWorld` | Fixture/helper path calls `bindSourceWork`, `requestGovernedReview`, `markGovernedDelivery`, `recordGovernedToolReceipt`, `kernelRecordGovernedEvaluation`; `kernelSeedVisibleResearchWorld` also directly inserts a `links` row | Must be explicitly fixture-only and isolated if retained. If production-reachable, required repair is routing every durable mutation through `execute()`; G8 must not use this seam to execute G9 Report semantics | `law-bypass/fixture-door`: invoke the helper as a live path; direct `links` or `qf_review_*` bait must red, cleanup verified, restore green |
+| `kernelFinalizeResearchEvaluation` | Reads `qf_review_publication` after `resolve_hypothesis` and may reach Report finalization | G9 Report/result authority; G8 may assert the boundary and lineage refusal only. No G8 implementation or mutation of this function | `law-bypass/report-boundary`: attempt unsupported publication; refusal/no publication red is required, but the G8 receipt must label the semantic owner G9 |
+
+The support-door falsifier must identify the exact function/caller and table,
+prove the direct bypass was caught rather than merely producing a generic red,
+and prove no durable bait row or process/root residue survived. The standing
+rule remains: only an independently supported Evaluation lineage may publish a
+Report. G8 does not execute G9 semantics or redefine that predicate.
+
+### Internal command declaration-to-runtime join
+
+The Builder must join the generated `internalCommands` declaration to runtime
+coverage, not count source strings. Build either a derived handler map or an
+exact equality/completeness test whose declared set is the generated
+`internalCommands` and whose runtime set covers both
+`INTERNAL_TASK_ACTIONS` and `INTERNAL_APP_ACTIONS` plus the actual dispatch
+handlers. The proof must reject both a missing runtime handler and an
+undeclared runtime handler, with the exact action name in the receipt.
+
+The required `internal-command-completeness` falsifier removes one exact
+handler from the isolated runtime map while leaving `internalCommands`,
+`INTERNAL_TASK_ACTIONS`, and `INTERNAL_APP_ACTIONS` unchanged. The focused G8
+gate must exit `1` and record `declared_action`, `task_set_member`,
+`app_set_member`, `runtime_handler_present=false`, and `caught=true`; restoring
+the handler must exit `0`. A green generated declaration count without this
+join is not acceptance.
+
+### Executable 89-declaration lifecycle invariant
+
+`golden-g8-schema-lifecycle` must import the current schema and enumerate the
+literal declaration identities, not grep generated bytes. Its algorithm is
+fixed: flatten `schema.objects`, `schema.links`, and `schema.actions` in their
+declared order; assert the flattened length is exactly `89`; assert every
+identity `(kind, name)` is unique; assert every entry has
+`lifecycle === "experimental"`; assert the source set is exactly the 89
+declarations in `qf-kernel-schema/src/ontology/agent.ts`, `market.ts`, and
+`research.ts`; and print the sorted identity list and per-kind counts in the
+receipt. A missing, duplicate, extra, `active`, or otherwise promoted entry is
+red even when generated files happen to remain byte-equal.
+
+The promotion falsifier edits one exact source declaration's lifecycle from
+`experimental` to `active` in an isolated copy, runs the same executable
+invariant, and requires `exit=1`, `result.ok=false`, `caught=true`, and the
+exact `(kind, name)` in the receipt. Restoring that source byte must produce
+the exact 89 identities and `normal_rerun_exit=0`. The G8 proof does not
+promote any declaration or change the active-schema freeze.
+
 ## Required normal matrix
 
 The Builder, only after Reader `YES / YES`, records unedited output for the
@@ -169,6 +330,8 @@ bun qa/run.ts kernel-sole-writer-app
 bun qa/run.ts governed-review
 bun qa/run.ts hermes-first-turn-synthetic
 bun qa/run.ts golden-g7-protocol-dependencies
+bun qa/run.ts golden-g8-kernel-proof
+bun qa/run.ts golden-g8-schema-lifecycle
 cd qf-kernel-schema; bun test
 cd qf-kernel-schema; bun run generate
 bun run --cwd collab-electron build
@@ -181,38 +344,99 @@ The schema commands are required only to prove the generated agreement; golden
 artifacts are never hand-edited. The package build is a focused non-regression
 proof, not G8's full Windows package/operations qualification. G12 retains
 `package-inspect`, native pinning, signing, installer, and full package
-requalification. The G7 protocol/dependency gate is a non-regression check;
-G8 may not alter its accepted deletion boundary.
+requalification. The two `golden-g8-*` commands are bounded G8 deliverables:
+the Builder must register them before implementation evidence and the
+independent Verifier must run them. The G7 protocol/dependency gate is a
+non-regression check; G8 may not alter its accepted deletion boundary.
 
 ## Fail-capable falsifiers
 
 Each G8 gate must be tested in an isolated copy or virtual fixture: break the
 named thing, observe exit `1` and the exact defect, restore the exact bytes/set,
-then rerun the same assertion at exit `0`. At minimum the evidence must contain
-these finite pairs:
+then rerun the same assertion at exit `0`. The `kernel-one-path-offender`
+falsifier is especially strict: for each selected K1 row the receipt must
+prove `caught===true`, `result.ok===false`, the exact offender path, bait
+present before the run, bait removed after the run, `bait_path_exists_after===false`,
+`process_delta===0`, `root_delta===0`, and `restored===true` before recording
+`normal_rerun_exit===0`. A function that returns a red while
+`caught===false` is a failed falsifier, not a passing red.
 
-1. `kernel-one-path-offender`: reintroduce one exact forbidden database path
-   literal in a named offender copy; the real gate names that path red, then
-   restores green. The normal starting run must still enumerate all 13.
+The required finite pairs are:
+
+1. `kernel-one-path-offender`: run every K1 row's named bait in its own
+   isolated copy. The clean control passes; the exact path goes red with all
+   fields above; the exact bytes restore and the same check exits 0. The
+   normal starting run must enumerate all 13, not only the baited row.
 2. `kernel-direct-write`: add one direct durable SQLite write outside the
-   allowed Kernel owner; `kernel-sole-writer` or `kernel-sole-writer-app` must
-   reject it, then restore green.
-3. `law-bypass`: bypass `execute()` in the focused Kernel proof; the Law-B
-   assertion must reject the path, then restore green without weakening the
-   allowed transport exception.
-4. `schema-golden-drift`: alter one generated/source schema byte in an isolated
-   copy; the schema suite or byte comparison must turn red, then restore green.
-5. `missing-result-observation`: suppress the concrete Director result
-   observation; the packaged proof must fail before accepting `result_return`,
-   then restore green.
-6. `worker-complete-is-result`: substitute worker `turn=complete` for the
-   Director result receipt; the same proof must fail, then restore green.
-7. `malformed-activation`: exercise each existing missing-review-task,
-   mismatched-source-work, and substituted-result-artifact proof; each must
-   refuse before evaluation/report mutation and restore green.
+   allowed Kernel owner; `kernel-sole-writer` or the G8 proof must reject the
+   exact file/call site, prove `caught=true`, then restore green.
+3. `law-bypass`: bypass `execute()` at one support-write door in the inventory;
+   the proof must name the function, caller, table, `execute()` bypass, and
+   refuse the path before any unowned durable row. Restore green without
+   weakening the allowed Kernel adapter exception.
+4. `internal-command-completeness`: remove one runtime handler while leaving
+   generated `internalCommands` and both internal action sets unchanged; the
+   exact missing action must go red, then restore green.
+5. `schema-golden-drift`: alter one generated/source schema byte in an isolated
+   copy; byte agreement may go red, but the semantic lifecycle invariant below
+   must also be run. Restore exact bytes and green.
+6. `experimental-lifecycle-promotion`: enumerate all exactly `89` current
+   declarations from `qf-kernel-schema/src/ontology/{agent,market,research}.ts`,
+   assert exact identities are unique and every lifecycle is `experimental`,
+   then promote one exact declaration to `stable` in an isolated copy. The
+   executable invariant must exit 1 naming that declaration; restore the
+   declaration and require exit 0. Generated byte equality alone is
+   insufficient.
+7. `missing-result-observation`: run the packaged live mode with the real
+   Director notification suppressed at the transport boundary. Do not replace
+   the run with an in-memory receipt or hard-coded fixture. The live proof must
+   exit 1 before accepting `result_return`, name the expected Director
+   notification and exact transport identity, then restored live delivery must
+   exit 0.
+8. `worker-complete-is-result`: run the packaged live mode with worker
+   completion substituted for the expected Director result. The actual worker
+   completion must be observed, but the proof must still exit 1 because no
+   Director result receipt was observed; restoring the real Director result
+   must exit 0.
+9. `malformed-activation`: independently run `missing-review-task-id`,
+   `mismatched-source-work`, and `substituted-result-artifact-id`. Each receipt
+   must contain exact `red_exit=1`, refusal code, zero evaluation/report
+   mutations, `restored=true`, and exact `normal_rerun_exit=0`. `pending` is
+   not acceptance and no mode may stop at “restored pending.”
 
-No bait may use a hard-coded success, a mocked result, an invented session, or
-the source text alone. A proof that cannot turn red is not an acceptance gate.
+### Packaged live result identity and saved-state proof
+
+The two result-observation modes must launch the packaged live path and use the
+actual Director PTY and peer transport. The receipt must bind the first
+concrete result to `director_pty_id`, `to_role`, `to_session_id`,
+`from_role`, `from_session_id`, `message_id`, `task_id`, and `artifact_id`,
+and must show `boundary=result_return` after that exact receipt. The proof may
+record a separate worker completion, but may not use `captureFor()`'s merged
+terminal PTY, a generic terminal row, or any arbitrary result row as evidence
+of the Director result. The expected recipient is the exact Director role and
+session, not “some result was present.”
+
+`missing-result-observation` must suppress the real Director
+`qf.peer-notification.v1` notification while retaining the live Director PTY;
+`worker-complete-is-result` must substitute only the worker completion for that
+notification. Each mode must be independently red before restoration and
+green after restoration. Hard-coded/in-memory receipt fixtures are expressly
+non-evidence.
+
+The saved-state/consumer matrix is finite and limited to the G8-touched seams:
+
+| Seam | Exact saved record types/fields | Required readback assertion |
+| --- | --- | --- |
+| Session/research | `agent_session.id`, `agent_session.status`, `task.id`, `task.status`, `hypothesis.id`, `run.id`, `run.status`, `run.params.executor_session_id`, `artifact.id`, `artifact.kind`, `links.kind/from_id/to_id` | Reopen the isolated app and prove the exact Director/worker sessions, Task, Hypothesis, Run, result Artifact, and link lineage are unchanged and reread from Kernel |
+| Terminal/PTY | peer transport `message.id`, `message.from_role`, `message.to_role`, `message.from_session_id`, `message.to_session_id`, `message.message_kind`, `message.artifact_id`, plus the exact Director PTY identity | Reopen/read the exact recipient message and PTY identity; no merged capture or arbitrary row satisfies the result assertion |
+| Canvas/Dock | Only the G8-touched saved projection fields, if the focused proof changes them; otherwise record `untouched` | Do not claim all Canvas/Dock state; prove only that the G8 path did not mutate an untouched seam |
+| External CLI/host ACP | Only the exact G8-touched transport/session receipt fields and package result observation | Reopen/read the same exact transport identity and exit/result receipt; no credential, live-market, or unrelated host state is in scope |
+
+The same assertion must be run under each relevant bait: it must go red on
+the substituted/missing identity and return green after exact restoration. An
+isolated predecessor fixture must exercise the prior live state, reopen it,
+and prove the same record/field assertions. “All saved state preserved” is
+not a G8 claim for untouched seams.
 
 ## Saved-state and compatibility contract
 
