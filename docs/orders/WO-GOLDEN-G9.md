@@ -1,10 +1,10 @@
 # WO-GOLDEN-G9 — Report authority consolidation
 
-status: REPAIR REQUIRED — INDEPENDENT G9 VERIFIER FINITE FAIL; EXACTLY ONE SAME-ORDER REPAIR BUILDER OPEN
+status: FINAL SAME-ORDER REPAIR REQUIRED — FRESH READER NO / NO; EXACTLY ONE FINAL SAME-ORDER REPAIR BUILDER OPEN
 kind: Golden Baseline Phase 2 bounded Report/result-authority group
 owner: Router
 depends: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS
-build-authority: YES — exactly one bounded same-order G9 repair Builder for the eight recorded defects; no new Reader and no G10–G12/R18 work
+build-authority: YES — exactly one bounded final same-order G9 repair Builder for the five fresh Reader clarifications, preserving the eight recorded defects; no second Reader, no second Builder, and no G10–G12/R18 work
 reader-task: 01a0489e-04ea-71a1-8b6a-d0e151621103
 reader-round: FINAL
 reader-reviewed-authority: 8d78fb714998cc52d50538d6f9ea9a3323f75535
@@ -14,13 +14,17 @@ reader-round-1-authority: d6ab5ed66a18c9de23db047a4b41584acaaeec0e
 reader-round-1-tree: 8f94bf63b16bd74e5ef17461cc4f0d15477efc4f
 reader-round-2-authority: d6c0d7e91d726d8b5a33050f403efec87a3f1cd4
 reader-round-2-tree: 54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182
-builder-status: REPAIR OPEN — exactly one same-order G9 repair Builder under this order
+builder-status: FINAL REPAIR OPEN — exactly one same-order G9 repair Builder for the five fresh Reader clarifications under this order
 builder-starting-authority: 4ef49077b2b423601c02b043de82b34d231bb7f5
 builder-starting-tree: bdba7c9540122288866bed6fb4aa57952c6f025e
 builder-starting-evidence-head: f7e841ff3e075bd49ed70bf8da79c2409ca5c899
 builder-starting-evidence-tree: 69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f
-builder-candidate: none — repair Builder not yet run
-builder-evidence: none — repair Builder not yet run
+builder-candidate: 2167a5e6085095c12d4b844987f3ceaeaa78a135 — prior same-order repair candidate; final repair not yet run
+builder-candidate-tree: 15bbd9e3bcba80c4b35e6f32722dd9afc6390ab5
+builder-evidence: fab825cc0bb07c1440eb802038d5b1785c340398 — prior receipt-only repair evidence head; final repair not yet run
+builder-evidence-tree: f893ce21840d8d2caad5d908abebf2f1e8e4b5f2
+final-repair-starting-product: 2167a5e6085095c12d4b844987f3ceaeaa78a135 / tree 15bbd9e3bcba80c4b35e6f32722dd9afc6390ab5
+final-repair-starting-evidence: fab825cc0bb07c1440eb802038d5b1785c340398 / tree f893ce21840d8d2caad5d908abebf2f1e8e4b5f2 — read-only
 verifier-task: 01a048fb-7a31-7880-b64b-98275789a38d
 verifier-verdict: FINITE FAIL — exactly eight defects; no semantic scope/order change
 verifier-candidate: 4ef49077b2b423601c02b043de82b34d231bb7f5
@@ -29,7 +33,9 @@ verifier-evidence-head: f7e841ff3e075bd49ed70bf8da79c2409ca5c899
 verifier-evidence-tree: 69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f
 verifier-atlas-diff: WORSE — governed-review coverage indexed→partial; three expected persistence sites
 verifier-ratchet: HARD RED 0; repair must have no coverage regression
-reader-recheck: NOT REQUIRED — final Reader meaning, scope, and order remain accepted
+reader-recheck: COMPLETED — fresh Reader task 01a0496c-1f71-75f1-939e-d6f32f7c75b0 returned NO / NO on the repair proof boundary; one final same-order repair is authorized below
+reader-amendment-task: 01a0496c-1f71-75f1-939e-d6f32f7c75b0
+reader-amendment-verdict: NO / NO — five finite authority/evidence ambiguities; no new G9 product meaning or scope
 starting-authority: 754606932dfb23bd0a6e6f432937b1c2bc436739
 starting-product-candidate: 61abfa5b23553f86a5c2d95facdf0473310fc44
 starting-product-tree: 94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013
@@ -45,9 +51,11 @@ there is one clearly marked current answer for each Mission, Technique version,
 and point-in-time research state while older answers remain inspectable. The
 final Reader accepted all seven cumulative cures with no new ambiguity or scope
 expansion. The independent Verifier found eight finite implementation and
-evidence defects in the first candidate; this packet closes that Builder
-authority and opens exactly one same-order repair Builder. No Reader review is
-needed because meaning, scope, and dependency order are unchanged.
+evidence defects in the first candidate; that prior repair produced one
+candidate and receipt-only evidence, then the fresh Reader found five finite
+proof-boundary ambiguities. This packet opens exactly one final same-order
+repair Builder. The original G9 meaning, scope, and dependency order remain
+unchanged, and no second Reader or Builder is authorized.
 
 ## Authority and dependency order
 
@@ -137,8 +145,9 @@ Independent Verifier task `01a048fb-7a31-7880-b64b-98275789a38d` returned
 `bdba7c9540122288866bed6fb4aa57952c6f025e`) with evidence head
 `f7e841ff3e075bd49ed70bf8da79c2409ca5c899` (tree
 `69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`). The semantic contract was not
-rejected and no new Reader is required. The first Builder is closed for repair;
-only the same order's repair Builder may address these eight finite defects:
+rejected. At that point the first Builder was closed for repair and only the
+same order's repair Builder could address these eight finite defects; the
+fresh Reader amendment below now governs the final repair:
 
 | # | Verifier defect | bounded repair obligation |
 | ---: | --- | --- |
@@ -161,6 +170,63 @@ reds, and the G10–G12/R18 boundaries. The Atlas diff is currently **WORSE**
 because governed-review coverage changed indexed → partial with three expected
 persistence sites; the repair must remove that coverage regression. The Atlas
 ratchet remains `HARD RED 0` and must stay so.
+
+## Final same-order repair amendment — fresh Reader NO / NO
+
+The prior independent Verifier FINITE FAIL is recorded under task
+`01a048fb-7a31-7880-b64b-98275789a38d` and remains the bounded implementation
+and evidence baseline. Fresh Reader task
+`01a0496c-1f71-75f1-939e-d6f32f7c75b0` returned **NO / NO**: five finite
+authority/evidence meanings below were not explicit enough for a final
+independent verification. This is not a new G9 product meaning or scope.
+
+Exactly one final same-order G9 repair Builder is authorized from the prior
+repair product candidate `2167a5e6085095c12d4b844987f3ceaeaa78a135` / tree
+`15bbd9e3bcba80c4b35e6f32722dd9afc6390ab5`, with prior receipt-only evidence
+head `fab825cc0bb07c1440eb802038d5b1785c340398` / tree
+`f893ce21840d8d2caad5d908abebf2f1e8e4b5f2` read-only. The final Builder must
+preserve every existing G9 assertion and the prior eight-defect repair
+contract; no second Reader, second Builder, G8 reopening, or G10–G12/R18 work
+is authorized. A fresh independent Verifier remains the only authority that
+may decide PASS/FAIL.
+
+The final repair adds only these exact proof meanings:
+
+1. **Durable completion identity.** In the existing durable relation,
+   `task.completed.payload.input.result_artifact_id` must equal the frozen
+   `source_work.result_artifact_id`, and `source_work.run_id` must equal the
+   finalized `Run.id`. The deliberate wrong-artifact falsifier must turn red
+   before any Report, publication row, gates link, projection, or other
+   durable write; restoring the exact artifact must turn it green.
+2. **F10 actual Electron boundary.** F10 must invoke the actual Electron
+   executor boundary for `qf.research.run_kernel_falsifiers`; a helper-only or
+   source-pattern simulation is not proof. The deliberate stale-profile bait
+   must fail exactly with `unknown agent_definition_id: hermes-orchestrator`,
+   then restore the supported Director identity with the existing refusal and
+   cleanup assertions intact.
+3. **F02/F14 actual production callback.** F02 and F14 must invoke the actual
+   Electron `kernelFinalizeResearchEvaluation` production callback for current,
+   historical, and retry cases. Calling only a read helper is not proof; the
+   current/history identities and idempotent retry assertions remain required.
+4. **F12 existing full partition contract.** F12 retains the complete existing
+   five-field partition
+   `(mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of)` and
+   its deterministic per-partition winner from `created_at ASC,
+   source_work_key ASC`: the last row is current and earlier rows are explicit
+   history. No cross-context fold, tie-breaker, or deterministic-winner
+   assertion is relaxed.
+5. **Correct literal starting-manifest hash.** The final repair's new immutable
+   starting-manifest receipt must correct the `qf-atlas/atlas.json` Git-tree
+   blob hash from
+   `883d9980af940231cdd305bf236241dab768fe7490d8a59d6ace9af4e087bd` to
+   `883d9980af940231cdd305bf236241dab768fe7490dcd8a59d6ace9af4e087bd`.
+   The prior malformed receipt remains read-only; this authority amendment
+   does not authorize Atlas regeneration or a baseline/behavior change.
+
+All other G9 deliverables, falsifiers F01–F14, source-manifest/hash rules,
+evidence-only separation, Atlas ratchet requirement, G8 closure, and inherited
+G12 Windows/package/operations reds remain exactly as already stated. The
+inherited reds remain red and are never relabeled as G9 acceptance.
 
 ## Fixed semantic contract
 
