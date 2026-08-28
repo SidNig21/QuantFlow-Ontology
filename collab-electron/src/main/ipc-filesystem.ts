@@ -4,7 +4,6 @@ import { dirname, extname, join } from "node:path";
 import fm from "front-matter";
 import { workspaceRootMatch } from "@collab/shared/path-utils";
 import {
-  countTreeFiles,
   fsReadDir,
   fsReadFile,
   fsWriteFile,
@@ -65,14 +64,6 @@ export function registerFilesystemHandlers(
 ): void {
   ipcMain.handle("fs:readdir", (_event, path) =>
     fsReadDir(
-      path,
-      ctx.fileFilter() ?? undefined,
-      workspaceForFile(path, ctx.workspaces()) ?? undefined,
-    ),
-  );
-
-  ipcMain.handle("fs:count-files", (_event, path) =>
-    countTreeFiles(
       path,
       ctx.fileFilter() ?? undefined,
       workspaceForFile(path, ctx.workspaces()) ?? undefined,

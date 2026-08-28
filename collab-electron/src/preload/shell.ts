@@ -215,7 +215,6 @@ contextBridge.exposeInMainWorld("shellApi", {
     return () => ipcRenderer.removeListener("pref:changed", handler);
   },
 
-  openSettings: () => ipcRenderer.send("settings:open"),
   closeSettings: () => ipcRenderer.send("settings:close"),
   toggleSettings: () => ipcRenderer.send("settings:toggle"),
 
@@ -258,8 +257,6 @@ contextBridge.exposeInMainWorld("shellApi", {
     ipcRenderer.invoke("fs:is-directory", filePath),
 
   workspaceAdd: () => ipcRenderer.invoke("workspace:add"),
-  workspaceRemove: (index: number) =>
-    ipcRenderer.invoke("workspace:remove", index),
   workspaceList: () => ipcRenderer.invoke("workspace:list"),
 
   onWorkspaceAdded: (cb: (path: string) => void) => {
@@ -308,13 +305,9 @@ contextBridge.exposeInMainWorld("shellApi", {
     items: Array<{ id: string; label: string; enabled?: boolean }>,
   ) => ipcRenderer.invoke("context-menu:show", items),
 
-  openExternal: (url: string) => ipcRenderer.send("shell:open-external", url),
-
   trackEvent: (name: string, properties?: Record<string, unknown>) => {
     ipcRenderer.send("analytics:track-event", name, properties);
   },
-
-  getHomePath: (): string => ipcRenderer.sendSync("get-home-path"),
 
   ptyKillSession: (sessionId: string): Promise<void> =>
     ipcRenderer.invoke("pty:kill", { sessionId }),

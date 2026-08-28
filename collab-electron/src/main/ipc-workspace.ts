@@ -133,12 +133,6 @@ export function stopSingleWorkspaceServices(
   wsConfigMap.delete(path);
 }
 
-const LEGACY_FM_FIELDS = new Set([
-  "createdAt",
-  "modifiedAt",
-  "author",
-]);
-
 async function readTreeRecursive(
   dirPath: string,
   rootPath: string,
@@ -318,29 +312,6 @@ export function registerWorkspaceHandlers(
   });
 
   ipcMain.handle(
-    "workspace:remove",
-    (_event, index: number) => {
-      if (index < 0 || index >= appConfig.workspaces.length) {
-        return { workspaces: appConfig.workspaces };
-      }
-
-      const removedPath = appConfig.workspaces[index]!;
-      appConfig.workspaces.splice(index, 1);
-      saveConfig(appConfig);
-      trackEvent("workspace_removed");
-
-      stopSingleWorkspaceServices(removedPath);
-      ctx.forwardToWebview(
-        "nav",
-        "workspace-removed",
-        removedPath,
-      );
-
-      return { workspaces: appConfig.workspaces };
-    },
-  );
-
-  ipcMain.handle(
     "workspace:remove-by-path",
     (_event, path: string) => {
       const index = appConfig.workspaces.indexOf(path);
@@ -377,38 +348,4 @@ export function registerWorkspaceHandlers(
     },
   );
 
-  ipcMain.handle(
-    "workspace:update-frontmatter",
-    async (
-      _event,
-      filePath: string,
-      field: string,
-      value: unknown,
-    ): Promise<{ ok: boolean; retried?: boolean }> => {
-      const MAX_ATTEMPTS = 3;
-      for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-        const fileStat = await stat(filePath);
-        const expectedMtime = fileStat.mtime.toISOString();
-
-        const content = await readFile(filePath, "utf-8");
-        const parsed = fm<Record<string, unknown>>(content);
-        const attrs = { ...parsed.attributes, [field]: value };
-
-        for (const key of LEGACY_FM_FIELDS) {
-          delete attrs[key];
-        }
-
-        const yaml = Object.entries(attrs)
-          .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
-          .join("\n");
-        const output = `---\n${yaml}\n---\n${parsed.body}`;
-
-        const result = await fsWriteFile(filePath, output, expectedMtime);
-        if (result.ok) {
-          return { ok: true, retried: attempt > 0 };
-        }
-      }
-      return { ok: false };
-    },
-  );
 }

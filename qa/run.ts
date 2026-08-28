@@ -678,6 +678,17 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "golden-g7-protocol-dependencies",
+    description:
+      "G7: finite protocol/dependency disposition, exact shell:forward tunnel, lock closure, and retained runtime identity",
+    run: async () => {
+      const { runGoldenG7ProtocolDependenciesGate } = await import(
+        "./gates/golden-g7-protocol-dependencies.ts"
+      );
+      return runGoldenG7ProtocolDependenciesGate().ok;
+    },
+  },
+  {
     name: "golden-g4-retired-route",
     description:
       "G4: route-aware staged package closure admits native_tui/host_acp and rejects retired or unknown routes before mutation",

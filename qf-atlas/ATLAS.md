@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ 929de18c` on 2026-08-28 by
+> Generated from `wo-golden-g2 @ 847f881f` on 2026-08-28 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**49 of 49 findings have not been looked at.**
+**34 of 34 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 49 |
+| `undecided` | 34 |
 | `repair` | 0 |
 | `remove` | 0 |
 | `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 49 findings still need a decision.
+**Not all clear.** 34 findings still need a decision.
 
 ## The four hops
 
@@ -32,8 +32,8 @@ and it can die or cheat at any one of them:
 ```mermaid
 flowchart TD
   R["<b>1 · renderer</b><br/>29 surface subsystems<br/>calls a bridge method"]
-  P["<b>2 · preload</b><br/>3 bridges · 124 methods<br/>106 of them called"]
-  M["<b>3 · main</b><br/>124 IPC channels<br/>104 live · 11 unused · 5 dead"]
+  P["<b>2 · preload</b><br/>3 bridges · 111 methods<br/>106 of them called"]
+  M["<b>3 · main</b><br/>111 IPC channels<br/>104 live · 3 unused · 0 dead"]
   H{"<b>4 · is it governed?</b>"}
   E["<b>execute&#40;&#41;</b><br/>the only sanctioned write"]
   DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]
@@ -44,11 +44,9 @@ flowchart TD
   A["<b>ungoverned SQL</b><br/>amber evidence only<br/>not a proven breach"]
   H -->|"reaches-sql 2"| A
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
-  H -->|"writes-disk 8"| FS
+  H -->|"writes-disk 7"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
-  H -->|"read-only 90"| RO
-  U["<b>unknown</b><br/>module or handler coverage incomplete"]
-  H -->|"unknown 5"| U
+  H -->|"read-only 83"| RO
 
   QA["<b>QA · governance</b><br/>11 subsystems<br/>asserts the rules above"]
   SP["<b>Species · runtimes</b><br/>3 subsystems<br/>launched by path,<br/>not imported"]
@@ -63,7 +61,7 @@ flowchart TD
   classDef truth fill:#10243d,stroke:#3b82f6,color:#e6f0ff
   class E,RO good
   class FS bad
-  class A,U,QA,SP,SC gray
+  class A,QA,SP,SC gray
   class DB,R,P,M,H truth
 ```
 
@@ -86,9 +84,9 @@ handler that mutates state without `execute()` is cheating even when it works.
 | `write-door` | reaches `execute()`, the sole sanctioned mutation path | 19 |
 | `cheats` | reaches SQL outside `execute()` **and** a function on that path carries a current hard red | 0 |
 | `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 2 |
-| `writes-disk` | writes a file; never reaches the Kernel at all | 8 |
-| `unknown` | handler or module resolution coverage is incomplete; not claimed read-only | 5 |
-| `read-only` | no mutation seen | 90 |
+| `writes-disk` | writes a file; never reaches the Kernel at all | 7 |
+| `unknown` | handler or module resolution coverage is incomplete; not claimed read-only | 0 |
+| `read-only` | no mutation seen | 83 |
 
 #### Reaches ungoverned SQL, but not a hard red (6)
 
@@ -195,30 +193,30 @@ badge is not a score:
 | **PLAN** | `SG` | connected | covered | unproven | unproven |
 | **RECRUIT** | `SG` | connected | covered | unproven | unproven |
 | **ASSIGN** | `SG` | connected | covered | unproven | unproven |
-| **WATCH** | `-` | degraded | partial | unproven | unproven |
-| **STEER** | `G` | degraded | covered | unproven | unproven |
+| **WATCH** | `-` | broken | partial | unproven | unproven |
+| **STEER** | `G` | broken | covered | unproven | unproven |
 | **PUBLISH** | `SG` | connected | covered | unproven | unproven |
 | **REVIEW** | `G` | degraded | covered | unproven | unproven |
 | **REOPEN** | `SG` | connected | covered | unproven | unproven |
 | **LEARN** | `SG` | connected | covered | unproven | unproven |
-| **CLOSE** | `G` | degraded | covered | unproven | unproven |
+| **CLOSE** | `G` | broken | covered | unproven | unproven |
 
 Runtime and founder read `unproven` on every loop, and that is the honest state: no
 runtime trace and no founder-confirmation record exist in this repo. **Unproven with a
 stated reason is not a gap** — it is the difference between an unknown and a lie.
 
-### WATCH — degraded
+### WATCH — broken
 
 The operator can see work in flight: a PTY, then an agent session on top of it.
 
-- `agent:spawn` — **dead**: breaks at main
+- `agent:spawn` — **missing**: this channel is not registered anywhere in main — the loop names a wire that does not exist
 - nominated gate absent: windows-dock-species
 
-### STEER — degraded
+### STEER — broken
 
 Interrupt or redirect work in flight without losing the record of it.
 
-- `agent:cancel` — **dead**: breaks at main
+- `agent:cancel` — **missing**: this channel is not registered anywhere in main — the loop names a wire that does not exist
 
 ### REVIEW — degraded
 
@@ -226,11 +224,11 @@ The governed critic path. R15 shipped on this, and R16 renders it.
 
 - `qf:review:projection` — **unused**: breaks at renderer
 
-### CLOSE — degraded
+### CLOSE — broken
 
 Sessions and processes end cleanly, and nothing keeps running after the app closes.
 
-- `agent:kill` — **dead**: breaks at main
+- `agent:kill` — **missing**: this channel is not registered anywhere in main — the loop names a wire that does not exist
 
 A `gate` tier of `covered` means the nominated gate FILE is present. It never claims
 the gate passed — running it is out of scope for a sub-60-second check, and asserting a
@@ -256,15 +254,11 @@ and each window's own script — so this is a file-level graph, not a call graph
 Three buckets, because they call for three different actions. **Do not treat these as
 one list.**
 
-### Broken now — fix or remove (5)
+### Broken now — fix or remove (0)
 
 _these fail at runtime today_
 
-- `agent:cancel` — collab-electron/src/preload/universal.ts:656
-- `agent:kill` — collab-electron/src/preload/universal.ts:661
-- `agent:prompt` — collab-electron/src/preload/universal.ts:651
-- `agent:save-messages` — collab-electron/src/preload/universal.ts:666
-- `agent:spawn` — collab-electron/src/preload/universal.ts:646
+None.
 
 ### Removal candidate — static evidence only (4)
 
@@ -275,24 +269,16 @@ _registered in main, no static caller found; needs package + dynamic-caller proo
 - `browser:scroll` — collab-electron/src/main/ipc-browser.ts:133
 - `browser:wait` — collab-electron/src/main/ipc-browser.ts:147
 
-### Maybe later — do NOT delete on sight (11)
+### Maybe later — do NOT delete on sight (3)
 
 _works end to end, but nothing calls it yet_
 
 > `qf:review:projection` is in this bucket and is exactly what R16 needs to render
 > the Evaluation tile. Deleting this bucket wholesale would remove the next rung.
 
-- `openFolder() → dialog:open-folder` — collab-electron/src/preload/universal.ts:429
-- `openImageDialog() → dialog:open-image` — collab-electron/src/preload/universal.ts:305
-- `countFiles() → fs:count-files` — collab-electron/src/preload/universal.ts:260
-- `getHomePath() → get-home-path` — collab-electron/src/preload/shell.ts:317
 - `deleteConnectionsForTile() → qf:connections:deleteForTile` — collab-electron/src/preload/shell.ts:128
 - `getGovernedReviewProjection() → qf:review:projection` — collab-electron/src/preload/shell.ts:90
 - `permissionDecision() → qf:sessions:permissionDecision` — collab-electron/src/preload/universal.ts:157
-- `openSettings() → settings:open` — collab-electron/src/preload/shell.ts:218
-- `openExternal() → shell:open-external` — collab-electron/src/preload/shell.ts:311
-- `workspaceRemove() → workspace:remove` — collab-electron/src/preload/shell.ts:262
-- `updateFrontmatter() → workspace:update-frontmatter` — collab-electron/src/preload/universal.ts:314
 
 ## Write-door violations
 
@@ -399,9 +385,9 @@ asked before the change, when nothing is red yet.
 
 **222 of 223 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**522 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**523 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 299 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 300 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -448,7 +434,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (522 files)
+## Per-analyzer coverage (523 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -456,17 +442,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 518 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 267 | 0 | 3 | 0 | 252 |
-| `ipcPush` | 7 | 0 | 3 | 0 | 512 |
-| `persistence` | 23 | 26 | 0 | 0 | 473 |
-| `lifetime` | 5 | 56 | 0 | 0 | 461 |
-| `packaging` | 221 | 0 | 0 | 102 | 199 |
-| `ownership` | 19 | 0 | 0 | 334 | 169 |
-| `reach` | 220 | 3 | 0 | 299 | 0 |
+| `imports` | 519 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 267 | 0 | 3 | 0 | 253 |
+| `ipcPush` | 7 | 0 | 3 | 0 | 513 |
+| `persistence` | 23 | 26 | 0 | 0 | 474 |
+| `lifetime` | 5 | 56 | 0 | 0 | 462 |
+| `packaging` | 221 | 0 | 0 | 102 | 200 |
+| `ownership` | 19 | 0 | 0 | 334 | 170 |
+| `reach` | 220 | 3 | 0 | 300 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 299 files means those trees are
+failure — `reach: unsupported` on 300 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 102 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
@@ -476,32 +462,18 @@ manifests are not parsed, so ship status is genuinely unproven rather than assum
 **Unexplained undecided: 0.** This is the contract's
 target, and it is *not* the coverage number above — coverage counts analyzer cells,
 this counts findings nobody has ruled on that also fail to say why. Of the
-49 undecided findings, each carries a blocker:
+34 undecided findings, each carries a blocker:
 
 | Blocker | Findings | Meaning |
 |---|---:|---|
 | `founder-decision` | 19 | the code cannot say which answer is right — this needs your intent |
 | `ast-coverage` | 2 | the analyzer could not resolve this statically |
-| `package-proof` | 23 | a packaged or dynamically-loaded caller must be ruled out first |
+| `package-proof` | 8 | a packaged or dynamically-loaded caller must be ruled out first |
 | `product-defect` | 5 | a real runtime defect: fix the code and the finding goes away |
 
-**19 of 49 are waiting on you, not on the tool.**
+**19 of 34 are waiting on you, not on the tool.**
 Zero unknowns is not the goal and never was: forcing that number down buys fake
 certainty. Zero *unexplained* is the goal, and it is met.
-
-## Protocol variants (2)
-
-Electron runs two protocols on one channel name: `ipcMain.on` receives
-`ipcRenderer.send`, `ipcMain.handle` answers `ipcRenderer.invoke`. They do not
-overwrite each other, so registering both is **not** duplicate ownership.
-
-| Channel | Registered | Called via | Unused variant | Disposition |
-|---|---|---|---|---|
-| `pty:write` | invoke + send | send | invoke | **investigate** |
-| `pty:send-raw-keys` | invoke + send | send | invoke | **investigate** |
-
-`investigate` is not `delete`: a packaged or dynamically-loaded caller must be ruled
-out before the unused variant can be removed.
 
 ## Who owns what (6 contested of 10)
 

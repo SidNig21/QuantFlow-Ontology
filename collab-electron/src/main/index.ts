@@ -706,10 +706,6 @@ ipcMain.on("analytics:track-event", (_event, name, properties) => {
   trackEvent(name, properties);
 });
 
-ipcMain.on("get-home-path", (event) => {
-  event.returnValue = app.getPath("home");
-});
-
 ipcMain.handle("shell:get-view-config", () => {
   const preload = pathToFileURL(
     getPreloadPath("universal"),
@@ -787,12 +783,6 @@ function handlePtyWrite(
   pty.writeToSession(sessionId, data);
 }
 
-ipcMain.handle(
-  "pty:write",
-  (_event, { sessionId, data }: { sessionId: string; data: string }) =>
-    handlePtyWrite(sessionId, data),
-);
-
 ipcMain.on(
   "pty:write",
   (_event, { sessionId, data }: { sessionId: string; data: string }) => {
@@ -806,12 +796,6 @@ function handlePtySendRawKeys(
 ): void {
   pty.sendRawKeys(sessionId, data);
 }
-
-ipcMain.handle(
-  "pty:send-raw-keys",
-  (_event, { sessionId, data }: { sessionId: string; data: string }) =>
-    handlePtySendRawKeys(sessionId, data),
-);
 
 ipcMain.on(
   "pty:send-raw-keys",
@@ -878,8 +862,6 @@ function setSettingsOpen(open: boolean): void {
   settingsOpen = open;
   mainWindow.webContents.send("shell:settings", open ? "open" : "close");
 }
-
-ipcMain.on("settings:open", () => setSettingsOpen(true));
 
 const LOG_FN_BY_LEVEL: Record<number, (...args: unknown[]) => void> = {
   0: console.debug,

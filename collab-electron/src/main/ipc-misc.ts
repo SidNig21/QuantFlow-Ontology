@@ -3,7 +3,6 @@ import {
   dialog,
   Menu,
   Notification,
-  shell,
   type BrowserWindow,
 } from "electron";
 import * as gitReplay from "./git-replay";
@@ -30,50 +29,6 @@ interface IpcContext {
 export function registerMiscHandlers(
   ctx: IpcContext,
 ): void {
-  // Dialog: open folder
-  ipcMain.handle("dialog:open-folder", async () => {
-    const win = ctx.mainWindow();
-    if (!win) return null;
-    const result = await dialog.showOpenDialog(win, {
-      properties: ["openDirectory"],
-    });
-    if (result.canceled || result.filePaths.length === 0) {
-      return null;
-    }
-    return result.filePaths[0]!;
-  });
-
-  // Dialog: open image
-  ipcMain.handle("dialog:open-image", async () => {
-    const win = ctx.mainWindow();
-    if (!win) return null;
-    const result = await dialog.showOpenDialog(win, {
-      properties: ["openFile"],
-      filters: [
-        {
-          name: "Images",
-          extensions: [
-            "png",
-            "jpg",
-            "jpeg",
-            "gif",
-            "webp",
-            "bmp",
-            "tiff",
-            "tif",
-            "avif",
-            "heic",
-            "heif",
-          ],
-        },
-      ],
-    });
-    if (result.canceled || result.filePaths.length === 0) {
-      return null;
-    }
-    return result.filePaths[0]!;
-  });
-
   // Dialog: open any file (WO-006b demo publish lever)
   ipcMain.handle("dialog:open-file", async () => {
     const win = ctx.mainWindow();
@@ -142,14 +97,6 @@ export function registerMiscHandlers(
           callback: () => resolve(null),
         });
       });
-    },
-  );
-
-  // Open external URL
-  ipcMain.on(
-    "shell:open-external",
-    (_event, url: string) => {
-      if (/^https?:\/\//i.test(url)) shell.openExternal(url);
     },
   );
 

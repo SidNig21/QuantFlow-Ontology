@@ -160,7 +160,6 @@ export interface CollabApi {
 
   // File system (nav)
   readDir: (path: string) => Promise<DirEntry[]>;
-  countFiles: (path: string) => Promise<number>;
   trashFile: (path: string) => Promise<void>;
   createDir: (path: string) => Promise<void>;
   moveFile: (
@@ -206,8 +205,6 @@ export interface CollabApi {
     fileName: string,
     buffer: ArrayBuffer,
   ) => Promise<string>;
-  openImageDialog: () => Promise<string | null>;
-
   readTree: (params: {
     root: string;
   }) => Promise<TreeNode[]>;
@@ -220,12 +217,6 @@ export interface CollabApi {
   getWorkspaceGraph: (params: {
     workspacePath: string;
   }) => Promise<GraphData>;
-  updateFrontmatter: (
-    filePath: string,
-    field: string,
-    value: unknown,
-  ) => Promise<{ ok: boolean; retried?: boolean }>;
-
   // Wikilinks
   resolveWikilink: (
     target: string,
@@ -393,7 +384,6 @@ export interface CollabApi {
   ) => Unsubscribe;
 
   // Settings
-  openFolder: () => Promise<string | null>;
   close: () => void;
 
   // Context menu

@@ -256,8 +256,6 @@ contextBridge.exposeInMainWorld("api", {
   // Nav
   readDir: (path: string) =>
     ipcRenderer.invoke("fs:readdir", path),
-  countFiles: (path: string) =>
-    ipcRenderer.invoke("fs:count-files", path),
   trashFile: (path: string) =>
     ipcRenderer.invoke("fs:trash", path),
   createDir: (path: string) =>
@@ -301,22 +299,9 @@ contextBridge.exposeInMainWorld("api", {
       fileName,
       buffer,
     ),
-  openImageDialog: () =>
-    ipcRenderer.invoke("dialog:open-image"),
   getWorkspaceGraph: (
     params: { workspacePath: string },
   ) => ipcRenderer.invoke("workspace:get-graph", params),
-  updateFrontmatter: (
-    filePath: string,
-    field: string,
-    value: unknown,
-  ) =>
-    ipcRenderer.invoke(
-      "workspace:update-frontmatter",
-      filePath,
-      field,
-      value,
-    ),
   resolveWikilink: (target: string) =>
     ipcRenderer.invoke("wikilink:resolve", target),
   suggestWikilinks: (partial: string) =>
@@ -425,8 +410,6 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.invoke("theme:set", mode),
 
   // Settings
-  openFolder: () =>
-    ipcRenderer.invoke("dialog:open-folder"),
   showContextMenu: (
     items: Array<{
       id: string;
@@ -636,37 +619,6 @@ contextBridge.exposeInMainWorld("api", {
     };
   },
   // -- ACP agent --
-  agentSpawn: (
-    cwd: string,
-  ): Promise<{
-    sessionId: string;
-    resumed: boolean;
-    cachedMessages: unknown[];
-  }> =>
-    ipcRenderer.invoke("agent:spawn", { cwd }),
-
-  agentPrompt: (
-    sessionId: string, text: string,
-  ): Promise<void> =>
-    ipcRenderer.invoke("agent:prompt", { sessionId, text }),
-
-  agentCancel: (
-    sessionId: string,
-  ): Promise<void> =>
-    ipcRenderer.invoke("agent:cancel", { sessionId }),
-
-  agentKill: (
-    sessionId: string,
-  ): Promise<void> =>
-    ipcRenderer.invoke("agent:kill", { sessionId }),
-
-  agentSaveMessages: (
-    messages: unknown[],
-  ): Promise<void> =>
-    ipcRenderer.invoke(
-      "agent:save-messages", { messages },
-    ),
-
   onAgentUpdate: (
     cb: (params: unknown) => void,
   ) => {
