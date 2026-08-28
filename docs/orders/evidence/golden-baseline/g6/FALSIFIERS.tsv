@@ -7,3 +7,7 @@ f5-spawn-before-refusal	$env:QF_G6_FALSIFY="spawn-before-refusal"; bun qa/run.ts
 f6-workspace-identity	$env:QF_G6_FALSIFY="workspace-identity"; bun qa/run.ts dock-definition-launch	1	Remove-Item Env:QF_G6_FALSIFY -ErrorAction SilentlyContinue; bun qa/run.ts dock-definition-launch	0	RED_AND_RESTORED	Claude render identity bait rejected
 f7-hermes-resource-loss	$env:QF_G6_FALSIFY="hermes-resource-loss"; bun test collab-electron/scripts/package-lib/runtime-staging.test.ts	1	Remove-Item Env:QF_G6_FALSIFY -ErrorAction SilentlyContinue; bun test collab-electron/scripts/package-lib/runtime-staging.test.ts	0	RED_AND_RESTORED	retained Hermes package missing bait rejected
 f8-external-cli-seam	$env:QF_G6_FALSIFY="external-cli-seam"; bun qa/run.ts research-director-front-door	1	Remove-Item Env:QF_G6_FALSIFY -ErrorAction SilentlyContinue; bun qa/run.ts research-director-front-door	0	RED_AND_RESTORED	protected seam changed bait rejected; fixture restored
+# independent_verifier_task=01a04695-825e-7893-89fb-d0efb6ceec3c
+# candidate_sha=8dbc19162be9c42303fd79c3c942385a17726f31
+# candidate_tree=7cee1e3d8e8444d48c8048f344f44ef33db594e2
+# verifier_result=all 8 falsifiers exited 1, exact-clear restore reruns exited 0

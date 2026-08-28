@@ -25,3 +25,9 @@ atlas-check	atlas	bun qf-atlas/generate.mjs --check	0	0	PASS	current generated m
 atlas-ratchet	atlas	bun qf-atlas/ratchet.mjs	0	0	PASS	HARD RED 0 / unexplained coverage 0
 atlas-diff	atlas	bun qf-atlas/generate.mjs --diff 929de18c181f3d42eedede5b1ea3246108cc3a1d	0	0	PASS	mixed analyzer diff; no G6 product verdict
 atlas-falsify	atlas	node qf-atlas/falsify.mjs	0	1	INHERITED_RED	23 cases passed; pre-existing missing bait directory ENOENT
+# independent_verifier_task=01a04695-825e-7893-89fb-d0efb6ceec3c
+# candidate_sha=8dbc19162be9c42303fd79c3c942385a17726f31
+# candidate_tree=7cee1e3d8e8444d48c8048f344f44ef33db594e2
+# evidence_head=4e037c69268ffd4a62f0e9aa933686c6f8c3c93e
+# bounded_matrix=16 PASS / 3 INHERITED_RED; inherited owners: G8 kernel-one-path, G12 package-inspect and hermes-launch-policy
+# cleanup=all 35 verifier roots absent; no Bun/Electron process remains

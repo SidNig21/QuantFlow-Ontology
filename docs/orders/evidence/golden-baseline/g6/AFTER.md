@@ -2,7 +2,7 @@ The built-in Dock now ships only the real Hermes runtime, keeps deterministic pr
 
 # G6 Builder evidence after product candidate
 
-status: **BUILDER COMPLETE — INDEPENDENT VERIFICATION PENDING; NOT SELF-VERIFIED**
+status: **CLOSED — PASS WITH INHERITED G8/G12 REDS; INDEPENDENTLY VERIFIED**
 order: `docs/orders/WO-GOLDEN-G6.md`
 authority_head: `929de18c181f3d42eedede5b1ea3246108cc3a1d`
 starting_evidence_head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
@@ -10,6 +10,9 @@ starting_product_candidate: `0cd9f273e46fb0c8ca7d05847b1fd805b8817a65`
 candidate_sha: `8dbc19162be9c42303fd79c3c942385a17726f31`
 candidate_tree: `7cee1e3d8e8444d48c8048f344f44ef33db594e2`
 candidate_parent: `929de18c181f3d42eedede5b1ea3246108cc3a1d`
+evidence_head: `4e037c69268ffd4a62f0e9aa933686c6f8c3c93e`
+independent_verifier_task: `01a04695-825e-7893-89fb-d0efb6ceec3c`
+independent_verifier_verdict: **PASS WITH INHERITED G8/G12 REDS**
 branch: `wo-golden-g2` (user-directed existing checkout; no branch switch)
 
 ## Candidate boundary
@@ -119,8 +122,34 @@ WorkspaceGraph now renders the exact neutral label `Agent session`; stored sessi
 
 Starting G6 evidence recorded no Bun/Electron process and no G6-owned root; unrelated Codex Node processes existed. Final post-gate census recorded no Bun/Electron process, no G6-owned `qf-g6`, staging, Dock inventory, readiness, front-door, or gate root, and no cleanup residue. Native readiness reported `electron_process_started=true`, `repository_artifacts_mutated=false`, and exit 0. Native front-door reported `owned_process_tree_remaining=0 electron_processes_remaining=0 hermes_processes_remaining=0 roots_remaining=0 repository_tree_unchanged=true`.
 
-The following reds were present in the starting matrix and remain explicitly unowned by G6: `kernel-one-path` (13 existing literal offenders; G8-protected), `package-inspect.test.ts` (the same three Windows platform-fixture failures), `hermes-launch-policy` (WSL `E_ACCESSDENIED` while creating fake Hermes), and `node qf-atlas/falsify.mjs` (the existing bait harness attempts an `ENOENT` write beside missing `collab-electron/src/windows/agent-chat/src`). The G6 product gates themselves are green under native host access. The pre-edit Atlas stale check/ratchet red was repaired by generated output; post-candidate check/ratchet are green.
+The independent Verifier's bounded matrix was `16 PASS / 3 INHERITED_RED`; those three reds are never called PASS: `kernel-one-path` (13 existing literal offenders; G8-owned), `package-inspect.test.ts` (12 pass / 3 Windows platform-fixture failures; G12-owned), and `hermes-launch-policy` (WSL `E_ACCESSDENIED` while creating fake Hermes; G12-owned). The G6 product gates themselves are green under native host access. Atlas reported `HARD RED 0`; the Builder transcript's pre-edit stale-map and missing-bait-directory observations remain historical harness observations, not additional G6-owned acceptance reds.
+
+## Independent Verifier closure
+
+Independent Verifier task `01a04695-825e-7893-89fb-d0efb6ceec3c` inspected immutable
+candidate `8dbc19162be9c42303fd79c3c942385a17726f31` (tree
+`7cee1e3d8e8444d48c8048f344f44ef33db594e2`), against parent authority
+`929de18c181f3d42eedede5b1ea3246108cc3a1d` and evidence head
+`4e037c69268ffd4a62f0e9aa933686c6f8c3c93e`. The candidate-to-evidence diff is
+exactly the five G6 receipts in this directory: `AFTER.md`, `COMMANDS.tsv`,
+`FALSIFIERS.tsv`, `GROUP-ACCEPTANCE.md`, and `VERIFIER-ACCEPTANCE.md`.
+
+The Verifier independently confirmed exact P0/Q0 and P1/Q1 staging, four
+Hermes production profiles/eight production paths, six QA profiles/thirteen
+QA paths with exactly two qf-proof additions/five paths, the seven saved rows
+and seven-field comparison, the canonical Kernel size `1,175,552` and SHA-256
+`FD564B3A8E585FD38A7AAB758F58A7B3DA33B32C3DA77DB31BAA145C02D73F70`, saved
+Claude availability=false/nonlaunchability, zero session/link/process deltas
+on refusal, protected Hermes/front-door/Dock/Canvas/PTY/external-CLI behavior,
+and all eight falsifiers red then exact-clear restore green.
+
+Cleanup was independently observed: Atlas `HARD RED 0`, all 35 Verifier roots
+absent, and no Bun/Electron process remained. G6 closes as **PASS WITH INHERITED
+G8/G12 REDS** only; the inherited reds remain owned by G8/G12 and are not
+reclassified or repaired by G6.
 
 Judgment exercised: because the user explicitly directed work in the existing `wo-golden-g2` checkout, I preserved that branch and committed locally rather than creating a worktree or switching branches. Because the managed sandbox denied native process/build/index access, the affected proof commands were rerun with host permission; their outputs are recorded as native-host evidence, while the original sandbox permission failures remain inherited observations rather than product claims.
 
-No G6 closure is claimed. An independent Verifier must rerun the immutable candidate and decide acceptance.
+G6 is closed on the exact bounded result above. Full G8/G9 ordering and R18
+freeze remain unchanged; no G7/G11/G12 broad work or packaged release PASS is
+implied by this closure.
