@@ -1,12 +1,17 @@
 # WO-GOLDEN-G7 — Contract unconsumed protocol and direct dependencies
 
-status: **DRAFT / FRESH SEMANTIC READER PENDING**
+status: **FINAL SEMANTIC READER ACCEPTED YES / YES / EXACTLY ONE BOUNDED BUILDER OPEN**
 order-type: Golden Baseline Phase 2 bounded protocol/dependency group
 current-evidence-branch: `wo-golden-g2`
 future-builder-branch: `wo-golden-g7` (worktree only; no implementation is authorized in the current checkout)
 parent-group: G6 **CLOSED / PASS WITH INHERITED G8/G12 REDS**
 r18-authority: **FROZEN**
-builder-authority: **CLOSED UNTIL FRESH READER YES / YES**
+builder-authority: **OPEN — exactly one bounded G7 Builder under this order; no second Builder**
+final-reader-task: `01a046b4-c6e5-7d41-8983-dafbf408f4df`
+final-reader-authority-sha: `5ea8ddd8ab7b65f430198d16d21d7b28bd49945e`
+final-reader-authority-tree: `025dce3ad07b88e2d0d7a00c41df9d20ee2fa373`
+final-reader-verdict: **YES / YES**
+final-reader-result: **all five finite semantic defects cured; no files changed in recheck**
 starting-evidence-head: `4e037c69268ffd4a62f0e9aa933686c6f8c3c93e`
 starting-evidence-tree: `60242660d62d8a1da96233c286c56d0b6176a91e`
 starting-product-candidate: `8dbc19162be9c42303fd79c3c942385a17726f31`
@@ -39,11 +44,13 @@ unreachable closure after a declaration is removed.
 
 ## Authority and sequence
 
-G6 is independently closed at the exact candidate and evidence head above. A
-fresh semantic Reader must first answer YES / YES to the two questions below
-against this order, the frozen Phase-1 disposition, the G6 closure receipts, and
-the exact starting tree. Until that receipt is committed, no G7 Builder may edit
-source, tests, manifests, locks, QA, or generated output.
+G6 is independently closed at the exact candidate and evidence head above. The
+final semantic Reader task `01a046b4-c6e5-7d41-8983-dafbf408f4df` rechecked the
+corrected order and baseline at authority commit
+`5ea8ddd8ab7b65f430198d16d21d7b28bd49945e` (tree
+`025dce3ad07b88e2d0d7a00c41df9d20ee2fa373`) and returned **YES / YES** with no
+files changed. Its receipt binds the two questions below and opens exactly one
+bounded G7 Builder; the current checkout remains docs/evidence-only.
 
 1. Can every normal gate and falsifier fail on the exact live-protocol,
    dynamic-tunnel, package-closure, compatibility, and protected-current-seam
@@ -51,11 +58,11 @@ source, tests, manifests, locks, QA, or generated output.
 2. Does every deliverable have exactly one meaning, with G8/G9/G10/G11/G12,
    real Claude/R19, and R18 explicitly outside G7?
 
-After Reader YES / YES, exactly one Builder may implement only this order in a
-separate `wo-golden-g7` worktree. One independent Verifier then reruns the
-focused matrix against the immutable candidate. The current checkout remains
-docs/evidence-only. The provisional Atlas map and any prior source scan are
-testimony, not permission.
+Exactly one Builder may now implement only this order in a separate
+`wo-golden-g7` worktree. No second Builder may be opened. One independent
+Verifier then reruns the focused matrix against the immutable candidate. The
+current checkout remains docs/evidence-only. The provisional Atlas map and any
+prior source scan are testimony, not permission.
 
 ## Frozen denominator and starting testimony
 

@@ -1,12 +1,17 @@
 # G7 Reader baseline — literal denominator, protocol, state, and closure contract
 
-status: **AMENDED CONTRACT / FRESH SEMANTIC READER PENDING**
+status: **FINAL READER ACCEPTED YES / YES / EXACTLY ONE BOUNDED BUILDER OPEN**
 order: `docs/orders/WO-GOLDEN-G7.md`
 reader-defect-task: `01a046b4-c6e5-7d41-8983-dafbf408f4df`
 reader-approved-source: `8dbc19162be9c42303fd79c3c942385a17726f31`
 reader-approved-product-tree: `7cee1e3d8e8444d48c8048f344f44ef33db594e2`
 reader-approved-evidence-head: `4e037c69268ffd4a62f0e9aa933686c6f8c3c93e`
 phase-1-source: `5882ab2febf00f2c15a94c868c191420ed561bb4`
+final-reader-task: `01a046b4-c6e5-7d41-8983-dafbf408f4df`
+final-reader-authority-sha: `5ea8ddd8ab7b65f430198d16d21d7b28bd49945e`
+final-reader-authority-tree: `025dce3ad07b88e2d0d7a00c41df9d20ee2fa373`
+final-reader-verdict: **YES / YES**
+builder-authority: **OPEN — exactly one bounded G7 Builder under WO-GOLDEN-G7; no second Builder**
 
 This is a frozen evidence contract, not Builder authority. It records the
 finite set that a future G7 candidate must close. A blank, invented, or
