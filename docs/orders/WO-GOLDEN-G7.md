@@ -1,17 +1,24 @@
 # WO-GOLDEN-G7 — Contract unconsumed protocol and direct dependencies
 
-status: **FINAL SEMANTIC READER ACCEPTED YES / YES / EXACTLY ONE BOUNDED BUILDER OPEN**
+status: **CLOSED — PASS WITH INHERITED REDS**
 order-type: Golden Baseline Phase 2 bounded protocol/dependency group
 current-evidence-branch: `wo-golden-g2`
 future-builder-branch: `wo-golden-g7` (worktree only; no implementation is authorized in the current checkout)
 parent-group: G6 **CLOSED / PASS WITH INHERITED G8/G12 REDS**
 r18-authority: **FROZEN**
-builder-authority: **OPEN — exactly one bounded G7 Builder under this order; no second Builder**
+builder-authority: **CLOSED — immutable candidate independently verified**
 final-reader-task: `01a046b4-c6e5-7d41-8983-dafbf408f4df`
 final-reader-authority-sha: `5ea8ddd8ab7b65f430198d16d21d7b28bd49945e`
 final-reader-authority-tree: `025dce3ad07b88e2d0d7a00c41df9d20ee2fa373`
 final-reader-verdict: **YES / YES**
 final-reader-result: **all five finite semantic defects cured; no files changed in recheck**
+independent-verifier-task: `01a046fc-0548-7001-86be-78adaff82ce4`
+independent-verifier-verdict: **PASS WITH INHERITED REDS**
+candidate-sha: `ba2b489b7378426fab976267a58eaadc5ffdaf91`
+candidate-tree: `6de625faeb677ce0e18b38825f1f4e843e0a545a`
+candidate-parent-authority: `b422df42229bcd8c9510608ce60684e69b6021bd`
+verifier-evidence-head: `8f13495b24e995e69f43deadeeec72ff644e111a`
+verifier-evidence-tree: `39fcc664b03717dcbf9b9abdf4951152dc44bf93`
 starting-evidence-head: `4e037c69268ffd4a62f0e9aa933686c6f8c3c93e`
 starting-evidence-tree: `60242660d62d8a1da96233c286c56d0b6176a91e`
 starting-product-candidate: `8dbc19162be9c42303fd79c3c942385a17726f31`
@@ -49,8 +56,13 @@ final semantic Reader task `01a046b4-c6e5-7d41-8983-dafbf408f4df` rechecked the
 corrected order and baseline at authority commit
 `5ea8ddd8ab7b65f430198d16d21d7b28bd49945e` (tree
 `025dce3ad07b88e2d0d7a00c41df9d20ee2fa373`) and returned **YES / YES** with no
-files changed. Its receipt binds the two questions below and opens exactly one
-bounded G7 Builder; the current checkout remains docs/evidence-only.
+files changed. The one bounded Builder then produced candidate
+`ba2b489b7378426fab976267a58eaadc5ffdaf91` (tree
+`6de625faeb677ce0e18b38825f1f4e843e0a545a`). Independent Verifier task
+`01a046fc-0548-7001-86be-78adaff82ce4` accepted that candidate as **PASS WITH
+INHERITED REDS** at evidence head `8f13495b24e995e69f43deadeeec72ff644e111a`
+(tree `39fcc664b03717dcbf9b9abdf4951152dc44bf93`). G7 is closed; no further G7
+Builder authority is open.
 
 1. Can every normal gate and falsifier fail on the exact live-protocol,
    dynamic-tunnel, package-closure, compatibility, and protected-current-seam
@@ -58,11 +70,9 @@ bounded G7 Builder; the current checkout remains docs/evidence-only.
 2. Does every deliverable have exactly one meaning, with G8/G9/G10/G11/G12,
    real Claude/R19, and R18 explicitly outside G7?
 
-Exactly one Builder may now implement only this order in a separate
-`wo-golden-g7` worktree. No second Builder may be opened. One independent
-Verifier then reruns the focused matrix against the immutable candidate. The
-current checkout remains docs/evidence-only. The provisional Atlas map and any
-prior source scan are testimony, not permission.
+The independent Verifier's receipt is the closure authority. The current
+checkout remains docs/evidence-only for this Router closure. The provisional
+Atlas map and any prior source scan are testimony, not permission.
 
 ## Frozen denominator and starting testimony
 
@@ -480,8 +490,6 @@ Reader/owner instead of being waived.
 
 Read `START_HERE.md`, `docs/orders/NEXT.md`, `docs/orders/PROTOCOL.md`,
 ADR-0004, the frozen Phase-1 references named by G6, all five G6 closure
-receipts, `qf-atlas/ATLAS.md`, and this order. The Reader must record YES / YES
-or NO / NO with finite defects in
-`docs/orders/evidence/golden-baseline/g7/READER-ACCEPTANCE.md`. A YES / YES
-opens exactly one G7 Builder; it does not authorize G8, G9, G10, G11, G12,
-real Claude/R19, or R18.
+receipts, `qf-atlas/ATLAS.md`, and this order. The Reader acceptance and the
+independent Verifier receipt are historical G7 closure evidence. G7 does not
+authorize G8, G9, G10, G11, G12, real Claude/R19, or R18.

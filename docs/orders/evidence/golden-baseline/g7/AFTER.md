@@ -11,9 +11,18 @@ Plain language: the candidate removes only proven-unused connections and direct 
 | candidate parent | `b422df42229bcd8c9510608ce60684e69b6021bd` |
 | branch | `wo-golden-g2` |
 | rollback boundary | G6 `8dbc19162be9c42303fd79c3c942385a17726f31`, tree `7cee1e3d8e8444d48c8048f344f44ef33db594e2` |
-| semantic status | BUILDER PRODUCT CANDIDATE — not independently verified or closed |
+| semantic status | CLOSED — PASS WITH INHERITED REDS |
 
 The delegated instruction to use the existing checkout was followed; no branch switch, push, reset, or shared-history rewrite occurred.
+
+## Independent Verifier closure
+
+Independent Verifier task `01a046fc-0548-7001-86be-78adaff82ce4` inspected the
+immutable candidate and returned **PASS WITH INHERITED REDS** at evidence head
+`8f13495b24e995e69f43deadeeec72ff644e111a` (tree
+`39fcc664b03717dcbf9b9abdf4951152dc44bf93`). The candidate-to-evidence diff at
+that head is receipt-only, with `non_receipt=0`, and the Verifier worktree was
+clean. G7 closes without changing the candidate.
 
 ## Exact disposition
 
@@ -151,6 +160,31 @@ The candidate gate asserts and the focused tests preserve:
 - all 13 retained Hermes/qf-proof runtime resources and package references;
 - package/runtime identity without installer, signing, native pin, Windows qualification, R18, or G8–G12 work.
 
+### Frozen runtime/resource identity — description correction
+
+The retained actual runtime/resource set is exactly these 13 paths:
+
+```text
+species/hermes/dock-profiles.json
+species/hermes/launch.json
+species/hermes/packed/hermes.meta.json
+species/hermes/tools-allowlist.json
+species/hermes/packed/hermes.aospkg
+species/hermes/prompts/research-director.md
+species/hermes/prompts/worker.md
+species/hermes/prompts/critic.md
+tools/qf-proof-agent/dock-profiles.json
+tools/qf-proof-agent/launch.json
+tools/qf-proof-agent/packed/qf-proof-agent.meta.json
+tools/qf-proof-agent/packed/qf-proof-agent.aospkg
+tools/qf-proof-agent/packed/qf-proof-agent.mjs
+```
+
+The earlier frozen receipt omitted the live critic prompt
+`species/hermes/prompts/critic.md` from its description. This is a description
+correction only: the accepted 13-file actual-byte proof, byte identity, package
+references, and candidate product tree are unchanged.
+
 ## Normal matrix receipts
 
 | command | result |
@@ -158,7 +192,7 @@ The candidate gate asserts and the focused tests preserve:
 | `bun qa/run.ts repo-shape` | PASS |
 | `bun qa/run.ts doc-links` | PASS; 80 live documents |
 | `bun qa/run.ts rung-ladder` | PASS; 27 rungs, active R18 |
-| `bun qa/run.ts golden-g7-protocol-dependencies` | PASS; manifests=20, dependencyRows=103, lockRoots=15, ledgerRows=159, staticForwardChannels=20, runtimeResources=13 |
+| `bun qa/run.ts golden-g7-protocol-dependencies` | PASS; manifests=20, dependencyRows=103, lockRoots=15, ledgerRows=159, staticForwardChannels=20, runtimeResources=13; Verifier: 103 retained of 109, six direct removals, ten expected lock removals |
 | `bun qa/run.ts kernel-sole-writer-app` | PASS |
 | `bun qa/run.ts dock-production-inventory` | PASS |
 | `bun qa/run.ts golden-g5-consumer-census` | PASS |
@@ -177,14 +211,22 @@ The candidate gate asserts and the focused tests preserve:
 
 ## Falsifier receipts
 
-The seven named baits and all 23 shell-forward baits are recorded in `FALSIFIERS.tsv`. Every bait used a virtual/in-memory copy, returned exit 1 with the same acceptance assertion reporting the named defect, restored the exact source/set, cleared `QF_G7_FALSIFY`, and reran the normal gate at exit 0. No bait touched the checkout.
+All 30 named falsifier pairs are recorded in `FALSIFIERS.tsv`. Every pair
+returned red exit `1`, restored the exact source/set, and returned green exit
+`0`; the Verifier independently confirmed the pair counts. The set includes
+PTY send, `shell:forward`, all 20 static inner channels, and both dynamic
+sender/receiver families. No bait touched the checkout.
 
 ## Cleanup and ownership
 
 No G7-owned temporary root remains and no Bun/Electron process remains from the builder or gate runs. The thousands of pre-existing `qf-*` temp roots were inherited and were not deleted. No canonical Kernel database, user data, or second truth store was touched.
 
-Inherited reds remain outside G7: G8 `kernel-one-path`; G12 `package-inspect.test.ts` Windows fixture failures (12 pass / 3 fail); G12 Hermes launch policy WSL `E_ACCESSDENIED`; and the process-snapshot access red above. G7 did not repair, absorb, relabel, or close them.
+Inherited reds remain outside G7 and are never called PASS: G8
+`kernel-one-path` with the same 13 offenders; G12 `package-inspect.test.ts`
+Windows fixture failures (12 pass / 3 fail); G12 Hermes launch policy WSL
+`E_ACCESSDENIED`; and the inherited `research-director-front-door` Windows WMI
+process-snapshot access red. G7 did not repair, absorb, relabel, or close them.
 
 ## Judgment and semantic stop
 
-The order was silent about whether the existing checkout override should supersede stale worktree wording; the explicit delegated instruction named this checkout and no branch switch, so I followed that authority. I treated direct `clsx` removal as a declaration contraction, not a package deletion, because retained Mantine still reaches the lock entry. I stopped at the immutable G7 product candidate: no independent verification, G7 acceptance, closure, G8–G12 work, R18 work, native packaging work, or push.
+The order was silent about whether the existing checkout override should supersede stale worktree wording; the explicit delegated instruction named this checkout and no branch switch, so the Builder followed that authority. Direct `clsx` removal remained a declaration contraction, not a package deletion, because retained Mantine still reaches the lock entry. The independent Verifier stopped at the immutable candidate: no candidate repair, inherited-red repair, G8–G12 work, R18 work, native packaging work, or push.

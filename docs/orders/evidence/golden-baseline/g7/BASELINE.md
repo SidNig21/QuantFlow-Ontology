@@ -1,6 +1,6 @@
 # G7 Reader baseline — literal denominator, protocol, state, and closure contract
 
-status: **FINAL READER ACCEPTED YES / YES / EXACTLY ONE BOUNDED BUILDER OPEN**
+status: **CLOSED — PASS WITH INHERITED REDS**
 order: `docs/orders/WO-GOLDEN-G7.md`
 reader-defect-task: `01a046b4-c6e5-7d41-8983-dafbf408f4df`
 reader-approved-source: `8dbc19162be9c42303fd79c3c942385a17726f31`
@@ -11,7 +11,14 @@ final-reader-task: `01a046b4-c6e5-7d41-8983-dafbf408f4df`
 final-reader-authority-sha: `5ea8ddd8ab7b65f430198d16d21d7b28bd49945e`
 final-reader-authority-tree: `025dce3ad07b88e2d0d7a00c41df9d20ee2fa373`
 final-reader-verdict: **YES / YES**
-builder-authority: **OPEN — exactly one bounded G7 Builder under WO-GOLDEN-G7; no second Builder**
+builder-authority: **CLOSED — prior bounded G7 Builder complete; immutable candidate independently verified**
+independent-verifier-task: `01a046fc-0548-7001-86be-78adaff82ce4`
+independent-verifier-verdict: **PASS WITH INHERITED REDS**
+candidate-sha: `ba2b489b7378426fab976267a58eaadc5ffdaf91`
+candidate-tree: `6de625faeb677ce0e18b38825f1f4e843e0a545a`
+evidence-head: `8f13495b24e995e69f43deadeeec72ff644e111a`
+evidence-tree: `39fcc664b03717dcbf9b9abdf4951152dc44bf93`
+builder-authority-after-verification: **CLOSED — candidate independently verified**
 
 This is a frozen evidence contract, not Builder authority. It records the
 finite set that a future G7 candidate must close. A blank, invented, or

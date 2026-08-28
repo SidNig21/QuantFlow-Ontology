@@ -29,3 +29,4 @@ shell-forward:spawn-pending	1	shell:forward static channel missing=spawn-pending
 shell-forward:spawn-reconciled	1	shell:forward static channel missing=spawn-reconciled	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
 shell-forward:agent:${event.kind}	1	shell:forward dynamic agent family missing	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
 shell-forward:viewer:${workspacePath}	1	shell:forward dynamic viewer target missing	0	PASS manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+# independent_verifier_task=01a046fc-0548-7001-86be-78adaff82ce4; verdict=PASS WITH INHERITED REDS; falsifier_pairs=30; red_exit=1; restore_exit=0; candidate_to_evidence=receipt-only; non_receipt=0

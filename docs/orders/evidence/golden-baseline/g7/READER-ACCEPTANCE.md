@@ -1,6 +1,6 @@
 # G7 semantic Reader acceptance
 
-status: **FINAL SEMANTIC READER YES / YES — EXACTLY ONE BOUNDED BUILDER OPEN**
+status: **FINAL SEMANTIC READER YES / YES — G7 CLOSED AFTER INDEPENDENT VERIFICATION**
 order: `docs/orders/WO-GOLDEN-G7.md`
 starting_evidence_head: `4e037c69268ffd4a62f0e9aa933686c6f8c3c93e`
 starting_evidence_tree: `60242660d62d8a1da96233c286c56d0b6176a91e`
@@ -16,7 +16,14 @@ reader_recheck_tree: `025dce3ad07b88e2d0d7a00c41df9d20ee2fa373`
 reader_recheck_result: **no files changed**
 reader_verdict: **YES / YES**
 remaining_defect: **none**
-builder_authority: **OPEN — exactly one bounded G7 Builder under WO-GOLDEN-G7; no second Builder**
+builder_authority: **CLOSED — prior bounded G7 Builder complete; immutable candidate independently verified**
+independent_verifier_task: `01a046fc-0548-7001-86be-78adaff82ce4`
+independent_verifier_verdict: **PASS WITH INHERITED REDS**
+candidate_sha: `ba2b489b7378426fab976267a58eaadc5ffdaf91`
+candidate_tree: `6de625faeb677ce0e18b38825f1f4e843e0a545a`
+evidence_head: `8f13495b24e995e69f43deadeeec72ff644e111a`
+evidence_tree: `39fcc664b03717dcbf9b9abdf4951152dc44bf93`
+builder_authority_after_verification: **CLOSED — immutable candidate independently verified**
 parent_group: G6 **CLOSED / PASS WITH INHERITED G8/G12 REDS**
 g6_verifier_task: `01a04695-825e-7893-89fb-d0efb6ceec3c`
 g6_candidate_sha: `8dbc19162be9c42303fd79c3c942385a17726f31`
@@ -59,9 +66,11 @@ The prior first and second Reader NO / NO receipts remain historical only. The
 second round's sole accounting defect was cured before this final recheck; the
 other four finite defects were already cured and were not reopened or weakened.
 
-This final YES / YES opens exactly one bounded Builder under WO-GOLDEN-G7. The
-Builder must work in a separate `wo-golden-g7` worktree and may not edit the
-current checkout. It does not authorize G8–G12, real Claude/R19, or R18.
+This final YES / YES opened exactly one bounded Builder under WO-GOLDEN-G7 at
+the prior stage. That Builder is now closed by independent Verifier task
+`01a046fc-0548-7001-86be-78adaff82ce4`; no second Builder may open. The current
+checkout remains docs/evidence-only. This receipt does not authorize G8–G12,
+real Claude/R19, or R18.
 
 ## Finite semantic decisions
 
@@ -86,6 +95,6 @@ The Reader must explicitly accept or reject:
   unchanged.
 
 reader_notes: **Final semantic recheck at `5ea8ddd8` / `025dce3` returned YES /
-YES; all five finite defects are cured; exactly one bounded Builder authority
-opens. No G8–G12/R18 expansion.**
-reader_findings: **FINAL YES / YES recorded; exactly one bounded G7 Builder open**
+YES; all five finite defects were cured. Independent Verifier closure is
+recorded at `8f13495b` / `39fcc66`; no G8–G12/R18 expansion.**
+reader_findings: **FINAL YES / YES recorded; G7 subsequently closed by independent Verifier**
