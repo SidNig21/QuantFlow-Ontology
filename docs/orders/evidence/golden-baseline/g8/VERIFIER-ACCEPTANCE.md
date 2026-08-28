@@ -1,16 +1,16 @@
 # G8 independent Verifier receipt
 
-status: **FINAL VERIFIER FAIL — ONE PRE-EXISTING MECHANICAL TEST NONDETERMINISM; V-01 THROUGH V-04 PASS; G8 REPAIR-SURFACE NON-REGRESSION PASS; ONE TEST-ONLY REPAIR BUILDER OPEN**
+status: **CLOSED — PASS WITH INHERITED G9/G12 REDS**
 order: `docs/orders/WO-GOLDEN-G8.md`
-verifier_task: `01a04849-8218-7a21-8586-601ccc621e36`
-evidence_head: `9004224b1ed3e332446be2230eed2fc3e2a0ea24`
-evidence_tree: `f48c5bb560fab5a543366abecd501582170676ac`
-product_candidate: `6a26340162148118c84f0148638bd36a32a3af99`
-product_tree: `1b242d47035745f356eb0f3ff2ec9beda584eb7c`
-verdict: **FAIL**
+verifier_task: `01a0487e-4331-76e1-86ed-ef1b8db29e94`
+evidence_head: `754606932dfb23bd0a6e6f432937b1c2bc436739`
+evidence_tree: `b04a991ca98da1d57b8637a7fcd0738a4e41bd21`
+product_candidate: `61abfa5b23553f86a5c2d95facdf0473310fc44`
+product_tree: `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`
+verdict: **PASS WITH INHERITED G9/G12 REDS**
 v01_v04_status: **PASS — all four repaired defects held**
 g8_repair_surface_non_regression: **PASS**
-builder_authority: **OPEN — exactly one bounded test-only repair Builder**
+builder_authority: **CLOSED — final candidate independently verified**
 amendment_scope: **exactly the pre-existing mechanical test nondeterminism below; no other assertion, behavior, or boundary reopened**
 prior_verifier_evidence_head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
 prior_verifier_evidence_tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a`
@@ -95,3 +95,26 @@ The Builder brief is exact:
    non-regression checks, with no cleanup or boundary regression.
 4. Return a new immutable product candidate/evidence head and stop for a fresh
    independent Verifier. Do not start G9.
+
+## Final verification and G8 closeout
+
+The fresh independent Verifier task
+`01a0487e-4331-76e1-86ed-ef1b8db29e94` rechecked the bounded repair at product
+candidate `61abfa5b23553f86a5c2d95facdf0473310fc44` (tree
+`94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`) with evidence head
+`754606932dfb23bd0a6e6f432937b1c2bc436739` (tree
+`b04a991ca98da1d57b8637a7fcd0738a4e41bd21`). It returned
+**PASS WITH INHERITED G9/G12 REDS**.
+
+The independent result proved the old selector red, `30/30` repaired
+repetitions, qf-kernel `108/108`, governed-review `15/15`, live policy `9/9`,
+all G8/schema/K1/Law-B/G7/Atlas gates green, Atlas `HARD RED 0`, production
+byte equivalence outside the test-only repair, and zero worktree/process/root
+residue. The candidate-bound packaged receipt was reused under the unchanged
+product/configuration proof; no new packaged PASS is claimed.
+
+The inherited G9 `hermes-orchestrator` report-boundary red and G12
+Windows/package/operations reds remain explicitly unresolved and are not
+silently counted as G8 PASS. The one G8 Builder opened by the earlier
+amendment is now closed; G9 has no Builder authority until its fresh semantic
+Reader returns `YES / YES` and `NEXT.md` is rotated again.

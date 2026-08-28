@@ -1,4 +1,6 @@
-# G8 builder receipt — candidate and evidence
+# G8 final receipt — candidate, evidence, and independent verification
+
+status: **CLOSED — PASS WITH INHERITED G9/G12 REDS**
 
 Plain language: the research console now keeps its temporary proof data isolated, sends governed updates through one trusted route, and refuses incomplete result handoffs.
 
@@ -13,6 +15,16 @@ Plain language: the research console now keeps its temporary proof data isolated
 | product candidate | `6a26340162148118c84f0148638bd36a32a3af99` / tree `1b242d47035745f356eb0f3ff2ec9beda584eb7c` |
 | evidence commit | separate evidence-only commit; SHA/tree reported with the final handoff |
 | publication | not pushed; no branch switch or worktree/copy created |
+
+## Final independent verification identity
+
+| item | value |
+| --- | --- |
+| verifier task | `01a0487e-4331-76e1-86ed-ef1b8db29e94` |
+| verifier verdict | **PASS WITH INHERITED G9/G12 REDS** |
+| final product candidate | `61abfa5b23553f86a5c2d95facdf0473310fc44` / tree `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013` |
+| final evidence head | `754606932dfb23bd0a6e6f432937b1c2bc436739` / tree `b04a991ca98da1d57b8637a7fcd0738a4e41bd21` |
+| candidate/evidence relation | receipt-only evidence; product candidate unchanged |
 
 The amendment candidate contains only the two repaired QA gates and the three atlas artifacts generated from them. The two Reader-admitted source paths are retained unchanged at their frozen SHA-256 values below. `BEFORE.md`, `CANDIDATE-LEDGER.tsv`, `COMMANDS.tsv`, `FALSIFIERS.tsv`, and this receipt are reserved for the separate evidence-only commit.
 
@@ -105,3 +117,21 @@ The final candidate-bound gate reports `roots_remaining=0`, `leaked=[]`, and `re
 Where the amendment was silent, I treated the explicit ConPTY cursor-position frame as transport framing only when its line-ending/CSI shape was present and the repeated boundary byte matched; raw malformed spellings never receive fuzzy repair. I retained the two Reader-admitted source files byte-for-byte, kept the existing result/report and cleanup assertions intact, and left the inherited G9 report-boundary error outside this repair.
 
 This is a Builder evidence handoff, not group acceptance. The independent Verifier must rerun the matrix against the immutable candidate and decide whether G8 landed.
+
+## Final independent Verifier closeout
+
+The fresh independent Verifier task
+`01a0487e-4331-76e1-86ed-ef1b8db29e94` bound its decision to product
+candidate `61abfa5b23553f86a5c2d95facdf0473310fc44` (tree
+`94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`) and evidence head
+`754606932dfb23bd0a6e6f432937b1c2bc436739` (tree
+`b04a991ca98da1d57b8637a7fcd0738a4e41bd21`). It returned
+**PASS WITH INHERITED G9/G12 REDS**.
+
+Its independent evidence included the deterministic old-selector red,
+`30/30` repaired repetitions, qf-kernel `108/108`, governed-review `15/15`,
+live policy `9/9`, all G8/schema/K1/Law-B/G7/Atlas gates green, Atlas
+`HARD RED 0`, production byte-equivalence outside the authorized test repair,
+the reused candidate-bound packaged receipt, and zero worktree/process/owned
+root residue. The inherited G9 report-boundary red and G12
+Windows/package/operations reds remain reds and are not G8 acceptance.

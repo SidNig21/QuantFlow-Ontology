@@ -1,6 +1,6 @@
 # WO-GOLDEN-G8 — Kernel, schema, Law-B, and proof-integrity repair
 
-status: **FINAL VERIFIER FAIL — ONE PRE-EXISTING MECHANICAL TEST NONDETERMINISM; V-01 THROUGH V-04 PASS; ONE BOUNDED TEST-ONLY REPAIR BUILDER OPEN**
+status: **CLOSED — PASS WITH INHERITED G9/G12 REDS; FINAL TEST-ONLY REPAIR VERIFIED**
 order-type: Golden Baseline Phase 2 bounded Kernel/schema/proof-integrity group
 current-evidence-branch: `wo-golden-g2`
 parent-group: G7 **CLOSED / PASS WITH INHERITED REDS**
@@ -24,19 +24,19 @@ final-reader-authority: `baedcecd55b91dc3c5d951f969a2111d5cedf4d2`
 final-reader-tree: `33695d1ac5a53b56077bbf739d94e6e230d6533b`
 final-reader-verdict: **YES / YES — all Round 1 and Round 2 defects cured; no remaining defects**
 reader-authority: **CLOSED — fresh amendment Reader accepted exactly V-01 through V-04**
-independent-verifier-task: `01a04849-8218-7a21-8586-601ccc621e36`
-independent-verifier-verdict: **FAIL — one pre-existing mechanical test nondeterminism; V-01 through V-04 PASS; G8 repair-surface non-regression PASS**
-independent-verifier-evidence-head: `9004224b1ed3e332446be2230eed2fc3e2a0ea24`
-independent-verifier-evidence-tree: `f48c5bb560fab5a543366abecd501582170676ac`
-independent-verifier-product-candidate: `6a26340162148118c84f0148638bd36a32a3af99`
-independent-verifier-product-tree: `1b242d47035745f356eb0f3ff2ec9beda584eb7c`
+independent-verifier-task: `01a0487e-4331-76e1-86ed-ef1b8db29e94`
+independent-verifier-verdict: **PASS WITH INHERITED G9/G12 REDS — final test-only repair verified; all G8-owned gates green**
+independent-verifier-evidence-head: `754606932dfb23bd0a6e6f432937b1c2bc436739`
+independent-verifier-evidence-tree: `b04a991ca98da1d57b8637a7fcd0738a4e41bd21`
+independent-verifier-product-candidate: `61abfa5b23553f86a5c2d95facdf0473310fc44`
+independent-verifier-product-tree: `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`
 v01-v04-status: **PASS — no prior repair reopened**
 g8-repair-surface-non-regression: **PASS**
 prior-independent-verifier-evidence-head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
 prior-independent-verifier-evidence-tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a5`
 prior-independent-verifier-product-candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
 prior-independent-verifier-product-tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
-builder-authority: **OPEN — exactly one bounded G8 test-only repair Builder for `packages/qf-kernel/src/r15-governed-review.test.ts`**
+builder-authority: **CLOSED — final independent Verifier accepted the test-only repair; no later-group authority in this order**
 amendment-reader-task: `01a047ea-2e77-79e3-9052-47982b265786`
 amendment-reader-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
 amendment-reader-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
@@ -625,3 +625,27 @@ normal command and output, every red/restore-green bait transcript, schema
 generation status, process/root cleanup, and judgment calls. The independent
 Verifier decides G8; the Router then writes `GROUP-ACCEPTANCE.md` and
 `VERIFIER-ACCEPTANCE.md` and rotates `NEXT.md`.
+
+## Final closeout — fresh independent Verifier
+
+The fresh independent G8 Verifier task
+`01a0487e-4331-76e1-86ed-ef1b8db29e94` verified the test-only repair candidate
+`61abfa5b23553f86a5c2d95facdf0473310fc44` (tree
+`94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`) and the receipt-only evidence head
+`754606932dfb23bd0a6e6f432937b1c2bc436739` (tree
+`b04a991ca98da1d57b8637a7fcd0738a4e41bd21`). It returned
+**PASS WITH INHERITED G9/G12 REDS**.
+
+The Verifier independently reproduced the old same-millisecond selector red,
+observed `30/30` repaired repetitions, `108/108` qf-kernel tests,
+`15/15` governed-review tests, and `9/9` live policy tests. G8/schema/K1,
+Law-B, G7, and Atlas checks were green with Atlas `HARD RED 0`; production
+bytes/configuration were equivalent outside the authorized test repair; the
+candidate-bound packaged receipt was reused; and worktree, process, and owned
+root cleanup were zero. The old selector red and restored green transcript
+remain in [the repair receipt](evidence/golden-baseline/g8/REPAIR-BUILDER-RECEIPT.md).
+
+The inherited G9 `hermes-orchestrator` report-boundary red and G12
+Windows/package/operations reds remain explicitly red and are not counted as
+G8 PASS. G9 is the next semantic Reader-only door; G10–G12 and R18 remain
+outside this closeout.

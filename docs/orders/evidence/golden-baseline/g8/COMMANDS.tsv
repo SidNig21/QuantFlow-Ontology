@@ -39,3 +39,10 @@ candidate	bun qa/run.ts hermes-first-turn-synthetic	0	PASS; package identity can
 amendment-v01-v02-v04	bun qa/run.ts golden-g8-kernel-proof	0	PASS; V-04 live-root bait measured root_delta=1 then restored process_delta=0 root_delta=0; exact 13 K1 red/green; no residue
 amendment-v03	Get-FileHash -Algorithm SHA256 collab-electron/src/main/sidecar/server.ts; Get-FileHash -Algorithm SHA256 packages/qf-kernel/src/upgrade.ts	0	PASS; Reader-admitted pre/post SHA-256 unchanged; exactly two retained source paths; third_path=false
 amendment-candidate	git show --stat --oneline 6a26340162148118c84f0148638bd36a32a3af99	0	PASS; product candidate is exactly five bounded QA/atlas paths; candidate tree=1b242d47035745f356eb0f3ff2ec9beda584eb7c
+final-candidate	30x bun test src/r15-governed-review.test.ts (cwd=packages/qf-kernel)	0	PASS; 30/30 repaired repetitions; exact completion-failure receipt selected
+final-kernel	bun test (cwd=packages/qf-kernel)	0	PASS; 108/108
+final-governed-review	bun qa/run.ts governed-review	0	PASS; 15/15
+final-live-policy	bun qa/run.ts governed-review-live	0	PASS; 9/9
+final-independent-verifier	01a0487e-4331-76e1-86ed-ef1b8db29e94 against candidate 61abfa5b23553f86a5c2d95facdf0473310fc44	0	PASS WITH INHERITED G9/G12 REDS; candidate tree=94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013; evidence head=754606932dfb23bd0a6e6f432937b1c2bc436739; evidence tree=b04a991ca98da1d57b8637a7fcd0738a4e41bd21
+final-packaged-receipt	reuse candidate-bound packaged receipt from prior G8 verification	0	REUSED; product/configuration byte-equivalence proved; no packaged rerun claimed
+final-cleanup	independent final G8 Verifier worktree/process/root inspection	0	PASS; clean worktree, zero product processes, zero owned roots

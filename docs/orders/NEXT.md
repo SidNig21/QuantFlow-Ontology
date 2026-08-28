@@ -1,10 +1,10 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G7 CLOSED / G8 FINAL VERIFIER FAIL / TEST-ONLY REPAIR OPEN
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 CLOSED / G9 SEMANTIC READER PENDING
 
-status: G7 CLOSED / PASS WITH INHERITED REDS / G8 FINAL VERIFIER FAIL — ONE PRE-EXISTING MECHANICAL TEST NONDETERMINISM / ONE BOUNDED TEST-ONLY REPAIR BUILDER OPEN
+status: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS / G9 SEMANTIC READER PENDING — BUILDER CLOSED
 rotated-at: 2026-08-28
-rotated-by: Router after final G8 Verifier result
-active-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md)
-builder-authority: **OPEN — exactly one bounded G8 test-only repair Builder for the governed-review receipt selector; no later-group authority**
+rotated-by: Router after fresh final G8 Verifier result
+active-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md)
+builder-authority: **CLOSED — G9 fresh semantic Reader only; no G9 Builder authority**
 g8-reader-status: **AMENDMENT YES / YES — exact V-01 through V-04 accepted**
 g8-reader-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 g8-reader-authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
@@ -17,15 +17,16 @@ g8-amendment-reader-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
 g8-amendment-reader-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
 g8-amendment-reader-verdict: **YES / YES**
 g8-reader-acceptance: [Fresh amendment Reader acceptance](evidence/golden-baseline/g8/READER-ACCEPTANCE.md)
-g8-verifier-task: `01a04849-8218-7a21-8586-601ccc621e36`
-g8-verifier-verdict: **FAIL — one pre-existing mechanical test nondeterminism; V-01 through V-04 PASS; G8 repair-surface non-regression PASS**
-g8-evidence-head: `9004224b1ed3e332446be2230eed2fc3e2a0ea24`
-g8-evidence-tree: `f48c5bb560fab5a543366abecd501582170676ac`
-g8-product-candidate: `6a26340162148118c84f0148638bd36a32a3af99`
-g8-product-tree: `1b242d47035745f356eb0f3ff2ec9beda584eb7c`
+g8-verifier-task: `01a0487e-4331-76e1-86ed-ef1b8db29e94`
+g8-verifier-verdict: **PASS WITH INHERITED G9/G12 REDS — final test-only repair verified; all G8-owned gates green**
+g8-evidence-head: `754606932dfb23bd0a6e6f432937b1c2bc436739`
+g8-evidence-tree: `b04a991ca98da1d57b8637a7fcd0738a4e41bd21`
+g8-product-candidate: `61abfa5b23553f86a5c2d95facdf0473310fc44`
+g8-product-tree: `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`
 g8-v01-v04-status: **PASS — no prior repair reopened**
 g8-repair-surface-non-regression: **PASS**
-g8-verifier-acceptance: [G8 final Verifier FAIL](evidence/golden-baseline/g8/VERIFIER-ACCEPTANCE.md)
+g8-verifier-acceptance: [G8 final Verifier acceptance](evidence/golden-baseline/g8/VERIFIER-ACCEPTANCE.md)
+g8-group-acceptance: [G8 closed acceptance](evidence/golden-baseline/g8/GROUP-ACCEPTANCE.md)
 g8-prior-verifier-evidence-head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
 g8-prior-verifier-evidence-tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a`
 g8-prior-product-candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
@@ -34,8 +35,8 @@ g8-prior-builder-starting-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
 g8-prior-builder-starting-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
 g8-builder-starting-candidate: `6a26340162148118c84f0148638bd36a32a3af99`
 g8-builder-starting-tree: `1b242d47035745f356eb0f3ff2ec9beda584eb7c`
-g8-builder-scope: **exactly `packages/qf-kernel/src/r15-governed-review.test.ts`; mechanical receipt/invocation identity selection only**
-g8-builder-brief: **reproduce the old same-millisecond ambiguity fail-capably, select/assert the exact completion-failure receipt/invocation, run focused repeated green/non-regression, and produce a new immutable candidate/evidence head for fresh Verifier review**
+g8-builder-scope: **closed — exactly `packages/qf-kernel/src/r15-governed-review.test.ts`; mechanical receipt/invocation identity selection only**
+g8-builder-brief: **closed — fresh independent Verifier accepted the repaired candidate; no G9 work was absorbed**
 g8-builder-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md)
 g6-status: **CLOSED / PASS WITH INHERITED G8/G12 REDS**
 g6-verifier-task: `01a04695-825e-7893-89fb-d0efb6ceec3c`
@@ -87,20 +88,40 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G8 — Kernel/schema/Law-B/proof-integrity repair
+phase-2-active-group: G9 — bounded Report authority consolidation; semantic Reader pending; Builder closed
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
 g3-acceptance: [G3 CLOSED / ACCEPTED](evidence/golden-baseline/g3/GROUP-ACCEPTANCE.md)
 g2-acceptance: [G2 CLOSED / ACCEPTED](evidence/golden-baseline/g2/GROUP-ACCEPTANCE.md)
 g1-acceptance: [G1 CLOSED / ACCEPTED](evidence/golden-baseline/g1/GROUP-ACCEPTANCE.md)
-full-g9-authority: PARKED AFTER G8
-full-g8-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md)
-full-g9-order: UNCHANGED — remains after G8
+full-g9-authority: SEMANTIC READER PENDING AFTER G8
+full-g8-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md) — CLOSED
+full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — SEMANTIC READER PENDING; BUILDER CLOSED
+g9-reader-status: **PENDING — no Reader task assigned; no Builder authority**
+g9-starting-authority: `754606932dfb23bd0a6e6f432937b1c2bc436739`
+g9-starting-product-candidate: `61abfa5b23553f86a5c2d95facdf0473310fc44`
+g9-starting-product-tree: `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`
+g9-starting-evidence-tree: `b04a991ca98da1d57b8637a7fcd0738a4e41bd21`
+g9-reader-scaffold: [G9 Reader scaffold](evidence/golden-baseline/g9/READER-ACCEPTANCE.md)
 r18-authority: FROZEN UNTIL PHASE 2 + PHASE 3 GOLDEN PASS
 protected-main: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 
 ## Current handoff
+
+Current routing: G8 is closed at candidate
+`61abfa5b23553f86a5c2d95facdf0473310fc44` with evidence head
+`754606932dfb23bd0a6e6f432937b1c2bc436739`, under fresh independent Verifier
+task `01a0487e-4331-76e1-86ed-ef1b8db29e94`, with verdict **PASS WITH INHERITED
+G9/G12 REDS**. G9 is the only next semantic Reader packet; its Builder door is
+closed until a fresh Reader returns `YES / YES` and this file is rotated again.
+The exact G9 starting product/evidence trees and bounded source census are in
+[WO-GOLDEN-G9](WO-GOLDEN-G9.md) and its [Reader scaffold](evidence/golden-baseline/g9/READER-ACCEPTANCE.md).
+The inherited G9 report-boundary red and G12 Windows/package/operations reds
+remain red and are not acceptance.
+
+The remaining paragraphs in this handoff preserve historical G5–G8 routing
+receipts; the authority fields above and this paragraph govern current state.
 
 R0–R17 and Pre-R18 remain **CLOSED / ACCEPTED**. G1–G5 are independently closed, with G5 recorded as **PASS WITH INHERITED G8/G12 REDS**. Full G9 remains after G8. G8 owns the inherited missing packaged Director-result observation; G12 owns the inherited Windows EACCES/orphan-root cleanup red and the broader package/operations qualification.
 
