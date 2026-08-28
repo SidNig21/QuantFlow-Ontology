@@ -231,11 +231,12 @@ and `40` bounded operational roots. They are not the current G7 gate
 denominators. G7 evaluates the frozen current set: exactly `20` tracked
 `package.json` manifests, exactly `109` rows in their current
 `dependencies`/`devDependencies`/`optionalDependencies`/`peerDependencies`
-sections, and exactly `15` tracked `bun.lock` roots. The 44-row reconciliation
-from Phase 1 is `G3 -13 + 1`, `G4 -26`, `G5 -6`, `G6 0`, with G1/G2 `0`, for
-`-45 + 1 = -44`; `153 - 44 = 109`. The G5 override is historical package
-policy accounting and is not a current root. The exact paths and accounting
-are frozen in
+sections, and exactly `15` tracked `bun.lock` roots. The direct-row
+reconciliation from Phase 1 is `G3 -14 + 1 = -13`, `G4 -26`, `G5 -5`, and
+`G6 0`, with G1/G2 `0`: `153 - 13 - 26 - 5 = 109`. The removed G5 override
+is separate historical package-policy provenance; it was not one of the 153
+direct-dependency rows and is not a current root. The exact paths and
+accounting are frozen in
 `docs/orders/evidence/golden-baseline/g7/BASELINE.md`.
 
 The finite candidate universe is literal and immutable at this starting

@@ -33,15 +33,16 @@ The 44-row change is reconciled, not inferred from a count:
 | --- | --- | ---: |
 | G1 | none | 0 |
 | G2 | none | 0 |
-| G3 | added `qa/fixtures/lifecycle-command/package.json` and `bun.lock`; removed the two `species/critic-mock` roots and the `tools/qf-peer-bus` root | -13 + 1 = -12 |
+| G3 | added `qa/fixtures/lifecycle-command/package.json` and `bun.lock`; removed the two `species/critic-mock` roots and the `tools/qf-peer-bus` root | -14 + 1 = -13 |
 | G4 | removed `qa/gates/agent-path`, `qa/gates/dock-registry`, and `tools/runtime-proof` manifest/lock roots; modified the collab manifest/lock | -26 |
-| G5 | modified the collab manifest/lock; removed two ACP dependencies, three Assistant UI dependencies, and one Assistant UI override row | -6 |
+| G5 | modified the collab manifest/lock; removed two ACP dependencies and three Assistant UI dependencies; the removed Assistant UI override is separate policy provenance | -5 direct rows |
 | G6 | removed `species/claude-code/package.json`; no lock or dependency row | 0 |
-| **total** | **G1–G6 path history reconciled above** | **-45 + 1 = -44; 153 - 44 = 109** |
+| **total** | **G1–G6 path history reconciled above** | **153 - 13 - 26 - 5 = 109** |
 
-The G5 override is included in the historical row accounting because it was a
-package policy declaration. The current 109 count is only the four current
-dependency sections (`dependencies`, `devDependencies`,
+The removed G5 `@assistant-ui/store` override is historical package-policy
+provenance only. It was not one of the Phase-1 153 direct-dependency rows and
+is excluded from the arithmetic above. The current 109 count is only the four
+current dependency sections (`dependencies`, `devDependencies`,
 `optionalDependencies`, `peerDependencies`); there is no current override
 row. G1–G6 history is not a G7 candidate subset and cannot be silently
 recounted.
@@ -85,8 +86,10 @@ Lock roots
   G6 no lockfile change
 ```
 
-The listed rows total 13 removed plus 1 added in G3, 26 removed in G4, and 6
-removed in G5: 45 removed and 1 added, exactly the net 44-row reduction.
+The listed direct rows total 14 removed plus 1 added in G3 (net -13), 26
+removed in G4 (net -26), and 5 removed in G5 (net -5); G6 is net 0. Therefore
+`153 - 13 - 26 - 5 = 109`. The G5 override is listed separately and does not
+alter the direct-dependency denominator.
 
 The exact current manifest paths are:
 
