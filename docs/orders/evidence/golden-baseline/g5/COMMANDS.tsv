@@ -4,13 +4,14 @@ g5-normal-saved-state	normal	bun qa/run.ts golden-g5-saved-state	0	0	C:\tmp\qf-g
 g5-normal-retired-route	normal	bun qa/run.ts golden-g4-retired-route	0	0	C:\tmp\qf-g5-baseline-cd0a240\g5\normal-03-golden-g4-retired-route.log
 g5-normal-dock-launch	normal	bun qa/run.ts dock-definition-launch	0	0	C:\tmp\qf-g5-baseline-cd0a240\g5\normal-04-dock-definition-launch.log
 g5-normal-hermes-policy	normal	bun qa/run.ts hermes-launch-policy	0	0	C:\tmp\qf-g5-baseline-cd0a240\g5\normal-05-hermes-launch-policy.log
-g5-normal-hermes-synthetic	inherited-g8-red	bun qa/run.ts hermes-first-turn-synthetic	0	1	C:\tmp\qf-g5-normal-hermes-first-turn-synthetic.log
+g5-normal-hermes-synthetic	inherited-g12-cleanup-red	bun qa/run.ts hermes-first-turn-synthetic	0	1	C:\tmp\qf-g5-repair-20260827\21-hermes-first-turn-synthetic-inherited-g8-red.log
 g5-normal-kernel-sole-writer	normal	bun qa/run.ts kernel-sole-writer-app	0	0	C:\tmp\qf-g5-baseline-cd0a240\kernel-sole-writer-app.log
 g5-normal-electron-build	normal	bun run --cwd collab-electron build	0	0	C:\tmp\qf-g5-baseline-cd0a240\collab-electron-build-correct.log
 responder-focused	changed-surface	bun test collab-electron/cli/qf-hermes-synthetic-responder.test.ts	0	0	C:\tmp\qf-g5-responder-test-3.log
 kernel-focused	changed-surface	bun test collab-electron/src/main/governed-review.test.ts --test-name-pattern "R17 guided research rejects duplicate nested strategy_id before Run creation"	0	0	C:\tmp\qf-g5-kernel-falsifier.log
 ontology-focused	changed-surface	bun test collab-electron/src/main/ontology-gateway.test.ts	0	0	C:\tmp\qf-g5-focused-ontology-gateway.log
 supporting-runtime	changed-surface	bun test collab-electron/src/main/governed-review.test.ts collab-electron/src/main/native-tui-orchestration.test.ts collab-electron/src/main/peer-notification.test.ts collab-electron/src/main/peer-role-registry.test.ts	0	0	C:\tmp\qf-g5-supporting-runtime-tests.log
+transport-predicate	changed-surface	bun test collab-electron/src/main/peer-delivery.test.ts	0	0	Codex Builder task 01a04617-2cd5-7a42-bae8-bdab09648337 (reported 1/1; durable output unavailable)
 lifecycle-old-red	falsifier	bun test collab-electron/src/main/agent-host-lifecycle.test.ts	1	1	C:\tmp\qf-g5-agent-host-lifecycle-old-red.log
 lifecycle-new-green	changed-surface	bun test collab-electron/src/main/agent-host-lifecycle.test.ts	0	0	C:\tmp\qf-g5-agent-host-lifecycle-new-green.log
 f1-stale-opener	falsifier	$env:QF_G5_FALSIFY="stale-opener"; bun qa/run.ts golden-g5-consumer-census	1	1	C:\tmp\qf-g5-falsifier-pairs-20260827\01-stale-opener-falsifier.log
@@ -25,3 +26,5 @@ f5-saved-state-loss	falsifier	$env:QF_G5_FALSIFY="saved-state-loss"; bun qa/run.
 f5-saved-state-loss-restore	restore	bun qa/run.ts golden-g5-saved-state	0	0	C:\tmp\qf-g5-falsifier-pairs-20260827\05-saved-state-loss-normal.log
 f6-obsolete-fallback	falsifier	$env:QF_G5_FALSIFY="obsolete-fallback"; bun qa/run.ts golden-g5-saved-state	1	1	C:\tmp\qf-g5-falsifier-pairs-20260827\06-obsolete-fallback-falsifier.log
 f6-obsolete-fallback-restore	restore	bun qa/run.ts golden-g5-saved-state	0	0	C:\tmp\qf-g5-falsifier-pairs-20260827\06-obsolete-fallback-normal.log
+g5-repair-hermes-safe-compile	changed-surface	bun build qa/gates/hermes-research.ts --target bun --outdir C:\tmp\qf-g5-repair-20260827-hermes-compile	0	0	C:\tmp\qf-g5-repair-20260827\22-hermes-gate-correction-safe-compile.log
+g5-repair-hermes-in-memory	changed-surface	bun -e $script	0	0	C:\tmp\qf-g5-repair-20260827\23-hermes-result-matcher-in-memory-proof.log

@@ -1,22 +1,26 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G5 SEMANTIC PREREQUISITE READ
+# NEXT — R18 GOLDEN BASELINE HOLD / G5 CANDIDATE PENDING INDEPENDENT VERIFIER
 
-status: G4 CLOSED / G5 SECOND TRANSPORT READER NO / NO — FINAL FINITE REREAD REQUIRED
-rotated-at: 2026-08-26
-rotated-by: Router after G5 Reader YES/YES and frozen starting matrix
+status: G4 CLOSED / G5 CANDIDATE / PENDING INDEPENDENT VERIFIER
+rotated-at: 2026-08-27
+rotated-by: Router after final causal Reader YES/YES and immutable candidate freeze
 active-order: [WO-GOLDEN-G5](WO-GOLDEN-G5.md)
-builder-authority: **CLOSED PENDING FINAL FRESH READER YES / YES ON CAUSAL TRANSPORT CONTRACT**
+builder-authority: **CLOSED — immutable product candidate pending one fresh independent Verifier**
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
 g5-reader-verdict: **YES / YES**
 g5-finite-reread-after: `5248031`
 g5-finite-reread-task: `01a04034-6afb-73a3-9f0e-6419fa5f76ec`
 g5-finite-reread-verdict: **NO / NO — AUTHORITY 5248031; superseded by final fresh finite Reader below**
-g5-final-finite-reader-verdict: **YES / YES**
+g5-final-finite-reader-verdict: **YES / YES — superseded by final causal Reader below**
 program-decision: [ADR-0004](../adr/0004-repository-golden-baseline.md)
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
-g5-final-closure-reader-task: 01a0420e-ba89-7111-8832-4fa1928e23b9
-g5-final-closure-reader-authority: 5a3c02e3c35feaf9901606de0faba030bcb87f14
+g5-final-closure-reader-task: 01a0426f-d4bf-7413-b974-643f935131d8
+g5-final-closure-reader-authority: cc8d73173b58cca11ddfd9c4d0a561cc79dbf268
 g5-final-closure-reader-verdict: **YES / YES**
+g5-candidate-sha: `0cd9f273e46fb0c8ca7d05847b1fd805b8817a65`
+g5-candidate-tree: `df9a4f11c421ed1c18418bbb8a73d0a5a756cd27`
+g5-candidate-parent: `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268`
+g5-candidate-status: **CANDIDATE / PENDING INDEPENDENT VERIFIER**
 phase-2-active-group: G5 — Legacy ACP and unconsumed renderers
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
@@ -25,6 +29,8 @@ g3-acceptance: [G3 CLOSED / ACCEPTED](evidence/golden-baseline/g3/GROUP-ACCEPTAN
 g2-acceptance: [G2 CLOSED / ACCEPTED](evidence/golden-baseline/g2/GROUP-ACCEPTANCE.md)
 g1-acceptance: [G1 CLOSED / ACCEPTED](evidence/golden-baseline/g1/GROUP-ACCEPTANCE.md)
 full-g9-authority: PARKED AFTER G8
+full-g8-order: UNCHANGED
+full-g9-order: UNCHANGED — remains after G8
 r18-authority: FROZEN UNTIL PHASE 2 + PHASE 3 GOLDEN PASS
 protected-main: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 
@@ -36,7 +42,7 @@ G4 closed at `2d491f20a030b9ac0b476846535f2ecc71239af1`. The G5 semantic Reader 
 
 The frozen starting matrix records both new G5 selectors as absent/red; G4 retired-route, Dock launch, Hermes launch-policy, Kernel sole-writer, and the real Electron build are green. `hermes-first-turn-synthetic` is pre-existing red because its readiness assertion still names retired `hermes-orchestrator` while production authority requires `hermes-research-director`. This is an authorized mechanical stale-selector repair: change only that readiness assertion, prove old red/new green, and do not rewrite later synthetic fixture identifiers without separate evidence.
 
-The fresh semantic Reader task `01a04034-6afb-73a3-9f0e-6419fa5f76ec` returned `NO / NO` against authority `5248031` with finite defects. The accepted G5 deletion diff remains preserved but is not a candidate. The final fresh semantic Reader now returns **YES / YES** on the finite result-delivery contract in [WO-GOLDEN-G5](WO-GOLDEN-G5.md#final-fresh-reader-result-delivery-contract): `closeAgentSessionRow` currently admits native-TUI teardown after `complete_task` without checking undelivered addressed results; the fixed trace is orchestrator PTY registration sequence 2, explicit teardown unregister sequence 7, exact result queue/lookup sequence 8 with `pushed_at=NULL`, then non-causal PTY exit. The later Builder may edit only `collab-electron/src/main/agent-host.ts` teardown admission and `collab-electron/src/main/agent-host-lifecycle.test.ts`. The invariant is that a native-TUI recipient is not unregistered or killed while an addressed delegated result remains undelivered; teardown is allowed after durable `pushed_at` acknowledgment or with no outstanding result. The proof is old-red/new-green lifecycle falsifier, normal `bun qa/run.ts hermes-first-turn-synthetic`, unchanged G5 matrix, trace-disabled inertness, and `processes=0 roots_remaining=0 leaked=[]`. The actual Director receipt must precede `result_return`; worker `turn=complete` remains intermediate only. No fallback, fake completion, resurrection, timeout/cleanup weakening, G8/G9 reorder, or other G5 scope change is open.
+The fresh semantic Reader task `01a04034-6afb-73a3-9f0e-6419fa5f76ec` returned `NO / NO` against authority `5248031` with finite defects; that historical candidate was superseded. The final causal Reader task `01a0426f-d4bf-7413-b974-643f935131d8` returned **YES / YES** against authority `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268` on the bounded result-delivery contract in [WO-GOLDEN-G5](WO-GOLDEN-G5.md#final-fresh-reader-result-delivery-contract): `closeAgentSessionRow` admitted native-TUI teardown after `complete_task` without checking undelivered addressed results; the fixed trace is orchestrator PTY registration sequence 2, explicit teardown unregister sequence 7, exact result queue/lookup sequence 8 with `pushed_at=NULL`, then non-causal PTY exit. The Builder froze the repair as immutable candidate `0cd9f273e46fb0c8ca7d05847b1fd805b8817a65` (tree `df9a4f11c421ed1c18418bbb8a73d0a5a756cd27`, parent `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268`). The invariant is that a native-TUI recipient is not unregistered or killed while an addressed delegated result remains undelivered; teardown is allowed after durable `pushed_at` acknowledgment or with no outstanding result. The actual Director receipt must precede `result_return`; worker `turn=complete` remains intermediate only. Builder work is closed; one fresh independent Verifier remains.
 
 ## Finite G8 prerequisite amendment
 
@@ -48,8 +54,12 @@ Full G8 remains in its original order; full G9 remains after G8. This amendment 
 
 The final packaged synthetic rerun reaches Director, recruited worker, durable Run/Artifact, critic launch, activation, and exact four-tool discovery, then records no critic read/Evaluation/Report. Source adjudication assigns this unchanged failure shape to G8 proof integrity rather than G5 deletion or lifecycle behavior. Under the founder's standing Golden throughput clarification, [the final G5 closure adjudication](WO-GOLDEN-G5.md#final-closure-adjudication-after-the-g8-owned-packaged-red) may close G5 only after one fresh semantic Reader returns `YES / YES` and one fresh independent Verifier proves the exact bounded non-regression contract. Fresh semantic Reader task `01a0420e-ba89-7111-8832-4fa1928e23b9` returned `YES / YES` against authority `5a3c02e3c35feaf9901606de0faba030bcb87f14` with no defects. Builder authority is now limited to evidence-only finalization; no product or gate repair is open.
 
-Independent Verifier task `01a0422d-95b8-7143-9022-6ce8bdb7993b` rejected candidate `37d0caad99f99bbf02295a9b2d0a9a72522ca019` only because `agent-host.ts` and its lifecycle test directly import SQLite, violating `kernel-sole-writer-app`. [The finite transport-ownership amendment](WO-GOLDEN-G5.md#independent-verifier-defect--transport-ownership-seam) moves the pending-result read behind the existing `peer-delivery.ts` transport owner and requires a fresh semantic Reader before any repair. No Builder authority is open.
+Independent Verifier task `01a0422d-95b8-7143-9022-6ce8bdb7993b` rejected candidate `37d0caad99f99bbf02295a9b2d0a9a72522ca019` only because `agent-host.ts` and its lifecycle test directly import SQLite, violating `kernel-sole-writer-app`. [The historical transport-ownership amendment](WO-GOLDEN-G5.md#independent-verifier-defect--transport-ownership-seam) moved the undelivered-result read behind the existing `peer-delivery.ts` transport owner; its pre-repair Reader requirement was superseded by the final causal Reader recorded above. No Builder authority is open for product edits.
 
-Fresh Reader task `01a0423b-f35d-7de1-8508-db6f921f25dc` returned `NO / NO` on that first amendment. [The corrected finite contract](WO-GOLDEN-G5.md#reader-defects-after-e5b5e84) now binds exact error semantics, non-Kernel transport ownership, pattern-specific test exception, all teardown paths, and fail-capable falsifiers. Builder authority remains closed pending a new fresh Reader.
+Fresh Reader task `01a0423b-f35d-7de1-8508-db6f921f25dc` returned `NO / NO` on that first amendment. [The corrected finite contract](WO-GOLDEN-G5.md#reader-defects-after-e5b5e84) now binds exact error semantics, non-Kernel transport ownership, pattern-specific test exception, all teardown paths, and fail-capable falsifiers. That historical contract was superseded by the final causal Reader recorded above.
 
-Fresh Reader task `01a04244-afb8-77c1-a18c-323dd5a05afb` returned `NO / NO` on the second contract. [The final causal contract](WO-GOLDEN-G5.md#reader-defects-after-07186ed) removes contradictory false cases, centralizes the guard into two causal sites, makes each lifecycle path fail-capable, and adds an exact Director-notification-before-result-return assertion with reordering falsifier. Builder authority remains closed pending one final fresh Reader.
+Fresh Reader task `01a04244-afb8-77c1-a18c-323dd5a05afb` returned `NO / NO` on the second contract. [The final causal contract](WO-GOLDEN-G5.md#reader-defects-after-07186ed) removes contradictory false cases, centralizes the guard into two causal sites, makes each lifecycle path fail-capable, and adds an exact Director-notification-before-result-return assertion with reordering falsifier. That historical contract was superseded by final Reader task `01a0426f-d4bf-7413-b974-643f935131d8`, which returned YES / YES against authority `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268`.
+
+## Final G5 candidate state
+
+The final causal Reader is YES / YES, the Builder is closed, and the immutable product candidate is pending one fresh independent Verifier. Full G8 and G9 order is unchanged, with full G9 remaining after G8. R18 remains FROZEN until Phase 2 + Phase 3 Golden PASS.

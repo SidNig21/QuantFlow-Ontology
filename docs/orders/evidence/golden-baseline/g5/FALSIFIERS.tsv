@@ -5,3 +5,6 @@ f3-host-acp	golden-g5-consumer-census	host-acp	1	1	YES	0	C:\tmp\qf-g5-falsifier-
 f4-dependency-closure	golden-g5-consumer-census	dependency-closure	1	1	YES	0	C:\tmp\qf-g5-falsifier-pairs-20260827\04-dependency-closure-falsifier.log
 f5-saved-state-loss	golden-g5-saved-state	saved-state-loss	1	1	YES	0	C:\tmp\qf-g5-falsifier-pairs-20260827\05-saved-state-loss-falsifier.log
 f6-obsolete-fallback	golden-g5-saved-state	obsolete-fallback	1	1	YES	0	C:\tmp\qf-g5-falsifier-pairs-20260827\06-obsolete-fallback-falsifier.log
+f7-hermes-result-matcher	hermes-result-matcher-in-memory	missing|duplicate|task-mismatch|artifact-mismatch|later	0	0	YES	N/A	C:\tmp\qf-g5-repair-20260827\23-hermes-result-matcher-in-memory-proof.log
+f8-old-impossible-matcher	hermes-result-matcher-in-memory	old-QF_SYNTHETIC-delivery_received	0	0	YES	N/A	C:\tmp\qf-g5-repair-20260827\23-hermes-result-matcher-in-memory-proof.log
+f9-result-ordering	hermes-result-matcher-in-memory	result-receipt-after-result_return	0	0	YES	N/A	C:\tmp\qf-g5-repair-20260827\23-hermes-result-matcher-in-memory-proof.log
