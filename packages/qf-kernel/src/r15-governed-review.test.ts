@@ -85,7 +85,43 @@ function readReceipt(taskId: string, tool: string, args: Record<string, unknown>
   recordGovernedToolReceipt(db!, { invocation_id: `${tool}-${sequence}`, session_id: "critic", task_id: taskId, tool_name: tool, arguments: args, result: { ok: true }, broker_sequence: sequence }, trace);
 }
 
+function selectCompletionFailureReceipts(receipts: ReadonlyArray<{ id: string; payload: string }>): Array<{ id: string; payload: string }> {
+  return receipts.filter(({ payload }) => {
+    const parsed = JSON.parse(payload) as { outcome?: string; phase?: string; reason_code?: string };
+    return parsed.outcome === "failed" && parsed.phase === "completion" && parsed.reason_code === "CRITIC_RETURNED_WITHOUT_EVALUATION";
+  });
+}
+
 describe("R15 governed review", () => {
+  test("same-millisecond receipt ordering is a fail-capable ambiguity reproduction", () => {
+    db = openKernel(":memory:");
+    const rows = db.query(`
+      WITH receipts(id, payload, created_at) AS (
+        VALUES
+          ('receipt-delivered-ffffffff', '{"outcome":"delivered"}', '2026-08-28T00:00:00.000Z'),
+          ('receipt-completion-failed-00000000', '{"outcome":"failed","phase":"completion","reason_code":"CRITIC_RETURNED_WITHOUT_EVALUATION"}', '2026-08-28T00:00:00.000Z')
+      )
+      SELECT id, payload
+      FROM receipts
+    `).all() as Array<{ id: string; payload: string }>;
+    const selected = db.query(`
+      WITH receipts(id, payload, created_at) AS (
+        VALUES
+          ('receipt-delivered-ffffffff', '{"outcome":"delivered"}', '2026-08-28T00:00:00.000Z'),
+          ('receipt-completion-failed-00000000', '{"outcome":"failed","phase":"completion","reason_code":"CRITIC_RETURNED_WITHOUT_EVALUATION"}', '2026-08-28T00:00:00.000Z')
+      )
+      SELECT id, payload
+      FROM receipts
+      ORDER BY created_at DESC, id DESC
+      LIMIT 1
+    `).get() as { id: string; payload: string };
+    expect(selected.id).toBe("receipt-delivered-ffffffff");
+    expect(JSON.parse(selected.payload)).toMatchObject({ outcome: "delivered" });
+    const exact = selectCompletionFailureReceipts(rows);
+    expect(exact).toHaveLength(1);
+    expect(exact[0]!.id).toBe("receipt-completion-failed-00000000");
+  });
+
   test("freezes the tuple, requires exact reads, canonicalizes findings, and publishes supports", () => {
     const f = fixture();
     readReceipt(f.taskId, "qf_hypothesis_get", { id: f.hypothesisId }, 1);
@@ -161,7 +197,9 @@ describe("R15 governed review", () => {
     });
     expect((db!.query("SELECT status FROM task WHERE id = ?").get(f.taskId) as { status: string }).status).toBe("cancelled");
     expect((db!.query("SELECT status FROM task WHERE id = 'source-task'").get() as { status: string }).status).toBe("open");
-    const receipt = db!.query("SELECT payload FROM qf_review_receipt WHERE task_id = ? ORDER BY created_at DESC, id DESC LIMIT 1").get(f.taskId) as { payload: string };
+    const completionFailureReceipts = selectCompletionFailureReceipts(db!.query("SELECT id, payload FROM qf_review_receipt WHERE task_id = ? AND kind = 'delivery_receipt'").all(f.taskId) as Array<{ id: string; payload: string }>);
+    expect(completionFailureReceipts).toHaveLength(1);
+    const receipt = completionFailureReceipts[0]!;
     expect(JSON.parse(receipt.payload)).toMatchObject({
       outcome: "failed",
       phase: "completion",
