@@ -1,0 +1,38 @@
+phase	command	exit	result
+freeze	bun qa/run.ts repo-shape	0	PASS
+freeze	bun qa/run.ts doc-links	0	PASS (81 live documents)
+freeze	bun qa/run.ts rung-ladder	0	PASS (27 rungs; active=R18)
+freeze	bun qa/run.ts kernel-one-path	1	FAIL (exactly 13 named offenders)
+freeze	bun qa/run.ts kernel-sole-writer	0	PASS
+freeze	bun qa/run.ts kernel-sole-writer-app	0	PASS
+freeze	bun qa/run.ts governed-review	0	PASS (14 focused tests)
+freeze	bun qa/run.ts hermes-first-turn-synthetic	1	INHERITED Windows Electron/Vite access denied
+freeze	bun qa/run.ts golden-g7-protocol-dependencies	0	PASS (manifests=20 dependencyRows=103 lockRoots=15)
+freeze	bun qa/run.ts golden-g8-kernel-proof	1	No gate named
+freeze	bun qa/run.ts golden-g8-schema-lifecycle	1	No gate named
+freeze	bun test (cwd=qf-kernel-schema)	0	179 pass 0 fail 615 expect
+freeze	bun run generate (cwd=qf-kernel-schema)	0	generated artifacts unchanged
+freeze	bun run --cwd collab-electron build	1	INHERITED Windows Electron/Vite access denied
+freeze	bun qf-atlas/generate.mjs --check	0	PASS
+freeze	bun qf-atlas/ratchet.mjs	0	PASS (HARD RED 0; unexplained coverage 0)
+freeze	git diff --check	0	PASS
+changed	bun test (cwd=packages/qf-kernel)	0	107 pass 0 fail 415 expect
+changed	bun run typecheck (cwd=packages/qf-kernel)	0	exit 0
+changed	bun test cli/qf-hermes-synthetic-responder.test.ts src/main/collaboration-gateway.test.ts src/main/peer-notification.test.ts src/main/peer-delivery.test.ts src/main/sidecar/wsl-env.test.ts (cwd=collab-electron)	0	21 pass 0 fail 148 expect
+changed	bun qa/run.ts golden-g8-kernel-proof	0	PASS; exact 13 K1 red/green; internal missing/undeclared red/green; Law-B bypass red/green
+changed	bun qa/run.ts golden-g8-schema-lifecycle	0	PASS; exact total=89 objects=23 links=23 actions=43; golden drift and active-promotion red/green
+changed	bun qa/run.ts kernel-one-path	0	PASS; zero offenders after repair
+changed	bun qa/run.ts kernel-sole-writer	0	PASS
+changed	bun qa/run.ts kernel-sole-writer-app	0	PASS
+changed	bun qa/run.ts governed-review	0	PASS; 14 focused tests
+changed	bun qa/run.ts repo-shape	0	PASS
+changed	bun qa/run.ts doc-links	0	PASS; 81 live documents
+changed	bun qa/run.ts rung-ladder	0	PASS; 27 rungs; active=R18
+changed	bun qa/run.ts golden-g7-protocol-dependencies	0	PASS; manifests=20 dependencyRows=103 lockRoots=15 ledgerRows=159 staticForwardChannels=20 runtimeResources=13
+changed	bun test (cwd=qf-kernel-schema)	0	179 pass 0 fail 615 expect
+changed	bun run generate (cwd=qf-kernel-schema)	0	generated artifacts match committed golden output
+changed	bun run --cwd collab-electron build	0	Native Windows Electron build completed; Vite main=390 preload=2 renderer=7783
+changed	bun qf-atlas/generate.mjs --check	0	PASS; current map
+changed	bun qf-atlas/ratchet.mjs	0	PASS; baseline=3 HARD RED=0 unexplained=0 AMBER=20 undecided=31
+changed	git diff --check	0	PASS; only expected CRLF replacement warnings
+candidate	bun qa/run.ts hermes-first-turn-synthetic	0	PASS; package identity candidate=b20966dc8ec86193de8af092df45248fbeb3fc1b; roots_remaining=0 leaked=[] remainingGateOwnedProcesses=0
