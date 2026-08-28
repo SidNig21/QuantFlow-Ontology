@@ -1,15 +1,16 @@
 # G6 semantic Reader acceptance
 
-status: **PENDING FRESH SEMANTIC READER**
+status: **FRESH SEMANTIC READER ROUND 1 — NO / NO; CORRECTED READER PENDING**
 order: `docs/orders/WO-GOLDEN-G6.md`
 starting_evidence_head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 starting_product_candidate: `0cd9f273e46fb0c8ca7d05847b1fd805b8817a65`
 starting_product_tree: `df9a4f11c421ed1c18418bbb8a73d0a5a756cd27`
-reader_task: **PENDING**
-reader_authority: **PENDING**
-verdict: **PENDING — must be YES / YES or NO / NO with finite defects**
+reader_task: `01a0464f-cf3a-7ca2-9d94-415f7ca8252f`
+reader_authority: fresh semantic Reader against `f2df40e064a0d622ee58c74850e4955f6d664895`
+verdict: **NO / NO — seven finite order defects recorded below**
 builder_authority: **CLOSED until YES / YES**
 provisional_source_scope_task: `01a04625-d2da-7ed1-b63e-48d7eabc4059` — testimony only
+corrected_reader_status: **PENDING; Builder remains closed**
 
 ## Required Reader answers
 
@@ -44,5 +45,35 @@ The Reader must explicitly accept or reject the following finite choices:
 - the package proof is staging/inventory/inspection only, while G12 owns the
   full installer/platform/operations qualification.
 
-reader_notes: **PENDING**
-reader_verdict: **PENDING**
+reader_notes: **Round 1 NO / NO; finite defects below**
+reader_verdict: **NO / NO**
+
+## Round 1 finite defects
+
+The fresh Reader found these file-level defects; they are recorded here as the
+required amendment target, not as chat-only guidance:
+
+1. `qa/gates/dock-definition-launch.ts` was outside the allowed boundary, and
+   its cold-safe child environment dropped `QF_G6_FALSIFY`; add the wrapper and
+   require it to forward only that variable while preserving normal `HOME`/
+   `PATH` isolation. Bind all three dock-definition falsifiers to fail and
+   restore through the wrapper.
+2. `g6-generic-cli` was in `STARTING-MATRIX.tsv` but its exact normal command
+   was absent from the required matrix; add the command and a named byte/
+   behavior-preservation assertion for the legitimate generic external CLI seam.
+3. The runtime counts did not enumerate the complete staged sets or distinguish
+   control files from manifest-referenced runtime files; define exact production
+   and QA sets, exact equality, and named resource baits.
+4. The order said `resolveDefinitionRuntime` reports unavailable, but the actual
+   semantics are resolver throw, availability projection catch with
+   `available=false`, then launchable Dock filtering.
+5. “Founder state” was broader than measured evidence; bound it to canonical
+   Kernel hash/size, the seven named `agent_definition` fields for all seven
+   rows, and refusal-relevant row/link/session counts only.
+6. “Direct spawn” did not name the entrypoint; bind it to
+   `qf:sessions:spawn` resolving before `admitAndStartSession`, with zero new
+   session/link/process, and explicitly exclude precreated-session paths.
+7. WorkspaceGraph’s hard-coded `Claude Code` identity and historical lineage
+   disposition were underspecified; require the exact neutral `Agent session`
+   projection and preservation of `sessionId`, `definition_id`, `spawned_from`,
+   and stored display/definition identity where present.

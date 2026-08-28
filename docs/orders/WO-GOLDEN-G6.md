@@ -61,9 +61,9 @@ The G6 semantic denominator is finite:
 
 | surface | measured starting state | required end state |
 | --- | --- | --- |
-| production Dock | 6 definitions / 13 runtime files: Hermes 4 / 8, Claude 2 / 5 | Hermes only: 4 definitions / 8 runtime files |
-| QA Dock/staging | 9 profiles / 19 runtime files, including Claude QA and qf-proof | Hermes plus generic qf-proof only: 6 profiles / 13 runtime files |
-| saved Kernel | 7 `agent_definition` rows; 2 Claude rows and 5 Hermes rows | exactly the same 7 rows and founder state; no delete, migration, or blocklist |
+| production Dock | 6 definitions; the exact 13-path starting set is `P0` below | 4 definitions; the exact Hermes-only `P1` set is below |
+| QA Dock/staging | 9 profiles; the exact 19-path starting set is `Q0` below | 6 profiles; the exact Hermes-plus-qf-proof `Q1` set is below |
+| saved Kernel | 7 `agent_definition` rows; 2 Claude rows and 5 Hermes rows | the measured hash/size, seven named fields per row, and refusal counts below; no delete, migration, or blocklist |
 | dependency/lockfile | no Claude/Anthropic dependency in `collab-electron/bun.lock` | no dependency or lockfile change |
 | Phase-1 source census | 187 / 187 tracked files; aggregate SHA above | remeasure after candidate; historical/evidence bytes unchanged |
 
@@ -73,6 +73,101 @@ The saved rows are the exact rows recorded in
 `hermes-orchestrator`, `hermes-research-director`, `hermes-worker`, and
 `hermes-worker-2`. The two saved Claude rows retain their old `definition_id`,
 role, `package_ref`, profile, and metadata references after package removal.
+
+### Exact staged path sets
+
+These are the complete relative POSIX path sets copied by the G6 runtime
+staging contract. They are set-equality contracts, not file-count shorthand.
+`Control` means a byte-inspected discovery/launch/inventory file; it is not an
+executable runtime resource. `Manifest-referenced runtime` means a package,
+entrypoint module, or profile prompt resource named by the retained manifest or
+launch contract. Every actual staged path must belong to exactly one of the
+listed subsets, and the sorted actual set must equal the required set exactly.
+
+Starting production controls `P0C`:
+
+```text
+species/hermes/dock-profiles.json
+species/hermes/launch.json
+species/hermes/packed/hermes.meta.json
+species/hermes/tools-allowlist.json
+species/claude-code/dock-profiles.json
+species/claude-code/launch.json
+species/claude-code/packed/claude-code.meta.json
+```
+
+Starting production manifest-referenced runtime resources `P0R`:
+
+```text
+species/hermes/packed/hermes.aospkg
+species/hermes/prompts/research-director.md
+species/hermes/prompts/worker.md
+species/hermes/prompts/critic.md
+species/claude-code/packed/claude-code.aospkg
+species/claude-code/packed/claude-code.mjs
+```
+
+The starting production set is `P0 = P0C ∪ P0R`, exactly the 13 paths above.
+Starting QA additions are controls `Q0C`:
+
+```text
+tools/qf-proof-agent/dock-profiles.json
+tools/qf-proof-agent/launch.json
+tools/qf-proof-agent/packed/qf-proof-agent.meta.json
+species/claude-code/qa-dock-profiles.json
+```
+
+and manifest-referenced runtime resources `Q0R`:
+
+```text
+tools/qf-proof-agent/packed/qf-proof-agent.aospkg
+tools/qf-proof-agent/packed/qf-proof-agent.mjs
+```
+
+The starting QA set is `Q0 = P0 ∪ Q0C ∪ Q0R`, exactly the 19 paths above.
+
+Required production controls `P1C` are exactly:
+
+```text
+species/hermes/dock-profiles.json
+species/hermes/launch.json
+species/hermes/packed/hermes.meta.json
+species/hermes/tools-allowlist.json
+```
+
+Required production manifest-referenced runtime resources `P1R` are exactly:
+
+```text
+species/hermes/packed/hermes.aospkg
+species/hermes/prompts/research-director.md
+species/hermes/prompts/worker.md
+species/hermes/prompts/critic.md
+```
+
+The required production set is `P1 = P1C ∪ P1R`, exactly those eight Hermes
+paths. Required QA additions are controls `Q1C`:
+
+```text
+tools/qf-proof-agent/dock-profiles.json
+tools/qf-proof-agent/launch.json
+tools/qf-proof-agent/packed/qf-proof-agent.meta.json
+```
+
+and manifest-referenced runtime resources `Q1R`:
+
+```text
+tools/qf-proof-agent/packed/qf-proof-agent.aospkg
+tools/qf-proof-agent/packed/qf-proof-agent.mjs
+```
+
+The required QA set is `Q1 = P1 ∪ Q1C ∪ Q1R`, exactly those 13 paths. The
+production and QA assertions must separately compare controls and runtime
+resources, then compare the complete union. The exact production-resource bait
+is `species/claude-code/packed/claude-code.aospkg`: inserting it into a
+temporary production staging root must fail set equality. Removing the retained
+`species/hermes/packed/hermes.aospkg`, or inserting
+`tools/qf-proof-agent/packed/qf-proof-agent.mjs` into production, must also
+fail the named missing/QA-leak assertion.
 
 ## Required semantic disposition
 
@@ -137,8 +232,16 @@ qa/gates/dock-definition-launch/run.ts
 qa/gates/dock-production-inventory.ts
 qa/gates/kernel-one-path.ts
 qa/gates/research-director-front-door.ts
+qa/gates/dock-definition-launch.ts
 qa/run.ts
 ```
+
+`qa/gates/dock-definition-launch.ts` remains the cold-safe wrapper. Its normal
+child environment remains exactly the isolated `HOME` and `PATH`; when a G6
+falsifier is requested, it forwards only the exact `QF_G6_FALSIFY` value in
+addition to those two variables. It must not pass the ambient environment or
+drop the bait variable. The three dock-definition falsifiers below therefore
+run through this wrapper and are part of the same fail/restore contract.
 
 The Builder may modify only these seven current product/contract documents to
 remove direct false present-tense built-in claims, with no broad G11 rewrite:
@@ -181,21 +284,49 @@ Kernel-backed path:
 2. QA staging contains only Hermes and generic qf-proof profiles. The qf-proof
    package remains deterministic and explicitly QA-only; it is not added to the
    production inventory.
-3. All seven saved `agent_definition` rows and founder state remain byte/value
-   identical. No database write, migration, deletion, hardcoded ID blocklist,
+3. Founder-state preservation has the exact measured scope below: the canonical
+   Kernel file hash and byte size, the seven named `agent_definition` fields for
+   each of the seven frozen rows, and the row/link/session counts relevant to the
+   refusal proof. No database write, migration, deletion, hardcoded ID blocklist,
    or alternate UI availability store is introduced.
-4. For each saved Claude row, `resolveDefinitionRuntime` reports unavailable
-   because its package/metadata cannot resolve. The definitions list may expose
-   that deterministic `availability=false` projection, while the launchable
-   Catalog/Dock excludes the row.
-5. A direct spawn attempt for either saved Claude row refuses before creation of
-   a new `AgentSession`, `spawned_from` link, runtime callback, or OS process.
-   A pending UI notification is not a durable session and does not satisfy the
-   launch contract. Existing historical sessions and lineage may retain the old
-   display identity.
+4. `resolveDefinitionRuntime` throws when a saved Claude row's package or
+   metadata is missing. `getDockDefinitionAvailability` catches that resolver
+   error and emits `available=false`; the `qf:definitions:list` projection
+   carries that availability result; `launchableDockDefinitions` excludes rows
+   unless `availability.available === true`.
+5. The refusal proof invokes `qf:sessions:spawn`, which resolves the definition
+   before calling `admitAndStartSession`. Either saved Claude row must refuse
+   before a new `AgentSession`, `spawned_from` link, runtime callback, or OS
+   process exists. A pending UI notification is not a durable session. The
+   precreated-session path is explicitly outside this refusal assertion because
+   it starts with an existing session/link; it may not be used to satisfy it.
 6. Hermes launch, generic qf-proof QA participation, PTY/terminal behavior,
    Canvas navigation, and generic external CLI integration remain current and
    tested. No real Claude/R19 path is claimed.
+7. WorkspaceGraph replaces the hard-coded production identity with the exact
+   neutral projection label `Agent session`. This label is render-only. Saved
+   sessions retain exact `sessionId`, `definition_id`, `spawned_from`, and any
+   stored display/definition identity already present; an unavailable historical
+   row may be projected as `Agent session`, but Kernel history is never rewritten.
+
+### Exact founder-state comparison scope
+
+The phrase “founder state” means only these measured comparisons, not every
+table or field in the database:
+
+- SHA-256 and byte size of the canonical
+  `C:\Users\rybow\.quantflow\kernel.db` before and after the candidate;
+- for each of the seven frozen row IDs, the seven `agent_definition` fields
+  `name`, `role`, `package_ref`, `system_prompt_ref`, `runtime_profile`,
+  `capability_groups`, and `display_name` (the row `id` only matches the row and
+  is not counted as one of the seven fields);
+- before/after counts of all `agent_session` rows, all `links` rows, and
+  `spawned_from` links around each saved-fake spawn attempt, plus the attempted
+  row/link identity and OS process count. The refusal delta for each is zero.
+
+The final receipt must print these exact comparisons and must not claim that
+unmeasured tables, columns, event history, or unrelated founder files are byte
+identical.
 
 The saved-state proof must use a read-only copy or in-memory fixture when a
 test needs to exercise the missing package. It must not mutate the canonical
@@ -220,6 +351,7 @@ bun qa/run.ts research-director-front-door
 bun test collab-electron/src/main/dock-profiles.test.ts
 bun test collab-electron/scripts/package-lib/runtime-staging.test.ts
 bun test collab-electron/scripts/package-lib/package-inspect.test.ts
+bun test collab-electron/src/main/integrations.test.ts
 bun qa/run.ts hermes-launch-policy
 bun qa/run.ts golden-g4-retired-route
 bun qa/run.ts golden-g5-consumer-census
@@ -237,6 +369,14 @@ Full installer, platform, userData, signing, and operations requalification is
 G12-owned. G8/G9 remain in their existing order. G6 must not open G7, G11, or
 G12 broad work, and must not claim a packaged release PASS from this matrix.
 
+The generic CLI row is mandatory. Its named assertion is
+`generic-external-cli-seam-preservation`: the command above must pass, and the
+pre/post SHA-256 bytes of the protected integration/PTY/Canvas/viewer seam
+must match exactly. The behavior proof must continue to cover the existing
+user-owned external CLI IDs and install/uninstall/status behavior; those IDs do
+not constitute a built-in Dock runtime and must not be removed or relabeled by
+G6.
+
 ## Fail-capable falsifiers
 
 Each falsifier runs in an isolated temporary fixture or an explicit gate bait
@@ -245,18 +385,28 @@ the corresponding normal selector to exit zero. An unexpectedly green falsifier
 or a failed restore fails G6. The exact bait names are part of the gate contract:
 
 ```text
-$env:QF_G6_FALSIFY="production-claude-manifest"; bun qa/run.ts dock-production-inventory
-$env:QF_G6_FALSIFY="qa-fixture-leak"; bun qa/run.ts dock-production-inventory
-$env:QF_G6_FALSIFY="package-claude-resource"; bun qa/run.ts dev-dock-readiness
-$env:QF_G6_FALSIFY="saved-claude-launchable"; bun qa/run.ts dock-definition-launch
-$env:QF_G6_FALSIFY="spawn-before-refusal"; bun qa/run.ts dock-definition-launch
-$env:QF_G6_FALSIFY="workspace-identity"; bun qa/run.ts dock-definition-launch
-$env:QF_G6_FALSIFY="hermes-resource-loss"; bun test collab-electron/scripts/package-lib/runtime-staging.test.ts
-$env:QF_G6_FALSIFY="external-cli-seam"; bun qa/run.ts research-director-front-door
+$env:QF_G6_FALSIFY="production-claude-manifest"; bun qa/run.ts dock-production-inventory  # exit 1; clear variable; rerun exit 0
+$env:QF_G6_FALSIFY="qa-fixture-leak"; bun qa/run.ts dock-production-inventory  # exit 1; clear variable; rerun exit 0
+$env:QF_G6_FALSIFY="package-claude-resource"; bun qa/run.ts dev-dock-readiness  # exit 1; clear variable; rerun exit 0
+$env:QF_G6_FALSIFY="saved-claude-launchable"; bun qa/run.ts dock-definition-launch  # wrapper forwards bait; exit 1; clear; rerun exit 0
+$env:QF_G6_FALSIFY="spawn-before-refusal"; bun qa/run.ts dock-definition-launch  # wrapper forwards bait; exit 1; clear; rerun exit 0
+$env:QF_G6_FALSIFY="workspace-identity"; bun qa/run.ts dock-definition-launch  # wrapper forwards bait; exit 1; clear; rerun exit 0
+$env:QF_G6_FALSIFY="hermes-resource-loss"; bun test collab-electron/scripts/package-lib/runtime-staging.test.ts  # exit 1; clear variable; rerun exit 0
+$env:QF_G6_FALSIFY="external-cli-seam"; bun qa/run.ts research-director-front-door  # exit 1; clear variable; rerun exit 0
 ```
 
+The three falsifiers routed through `qa/gates/dock-definition-launch.ts` are
+bound exactly as follows: `saved-claude-launchable` must fail if the unavailable
+saved row is admitted to the launchable projection; `spawn-before-refusal` must
+fail if `qf:sessions:spawn` creates a new session/link/process before refusing;
+and `workspace-identity` must fail if WorkspaceGraph renders the hard-coded
+Claude identity. For each, the wrapper-forwarded command exits `1`; the runner
+then executes `Remove-Item Env:QF_G6_FALSIFY -ErrorAction SilentlyContinue`,
+reruns the same command with no bait, and records exit `0`.
+
 The falsifier implementation may be added only inside the existing listed
-selectors and must exercise the real assertions. It may not hardcode success,
+selectors and the listed cold-safe wrapper, and must exercise the real
+assertions. It may not hardcode success,
 replace a package with a fixture that is not inspected, weaken the refusal
 boundary, or create a second source of truth. After each case, clear the
 environment variable, verify the source/package fixture is restored, and rerun

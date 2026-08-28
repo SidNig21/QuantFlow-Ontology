@@ -5,7 +5,7 @@ rotated-at: 2026-08-27
 rotated-by: Router after independent G5 verification
 active-order: [WO-GOLDEN-G6](WO-GOLDEN-G6.md)
 builder-authority: **CLOSED — G6 semantic Reader only; no G6 Builder authority**
-g6-reader-status: **PENDING FRESH SEMANTIC READER**
+g6-reader-status: **PENDING CORRECTED FRESH SEMANTIC READER** (Round 1 task `01a0464f-cf3a-7ca2-9d94-415f7ca8252f` returned NO / NO; seven finite defects recorded in the G6 Reader receipt)
 g6-provisional-source-scope-task: 01a04625-d2da-7ed1-b63e-48d7eabc4059 (measured testimony only; not semantic approval)
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
