@@ -1,11 +1,13 @@
 # G8 semantic Reader acceptance
 
-status: **READER ROUND 1 NO / NO — EIGHT FINITE ORDER DEFECTS; BUILDER CLOSED**
+status: **READER ROUND 2 NO / NO — ONE FINITE ORDER DEFECT; BUILDER CLOSED**
 order: `docs/orders/WO-GOLDEN-G8.md`
 reader_task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 reader_round: `1`
 reader_authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
 reader_verdict: **NO / NO**
+reader_round_2_authority: `d6e68c8997bc28eb3a68e211737429ec64ab02b7`
+reader_round_2_verdict: **NO / NO**
 builder_authority: **CLOSED**
 same_reader_reread: **REQUIRED AFTER THIS ORDER-ONLY AMENDMENT**
 
@@ -64,14 +66,31 @@ same_reader_reread: **REQUIRED AFTER THIS ORDER-ONLY AMENDMENT**
    assert every lifecycle remained `experimental`, or prove a one-declaration
    promotion bait went red and restored green.
 
+## Reader Round 2
+
+The same Reader re-read the order at authority commit
+`d6e68c8997bc28eb3a68e211737429ec64ab02b7` and returned **NO / NO** with one
+remaining finite defect:
+
+1. The lifecycle promotion falsifier used a target outside the schema's
+   allowed values in the finite-pair list, while the executable invariant
+   correctly used `experimental` → `active`. The schema permits only
+   `experimental` and `active`; the authority and receipt wording must use
+   `active` everywhere.
+
+The eight Round 1 defects are otherwise cured. This correction changes only
+order/evidence wording; Builder authority remains closed and the same Reader
+must re-read again.
+
 ## Amendment disposition
 
-This Reader receipt is historical authority for the eight defects only. The
-order-only amendment adds the exhaustive K1 disposition table, detector-catch
-fields, Law-B door inventory and bypass, generated-command/runtime join,
-packaged live identity/modes, finite saved-state predecessor matrix, exact
-malformed restoration receipts, and executable 89-declaration lifecycle
-invariant. No product, test, or gate code is changed by this receipt, no G8
-Builder authority opens, G9/G10/G11/G12 remain outside scope, and R18 remains
-frozen. The same Reader must re-read the amended order before any Builder door
-can open.
+This Reader receipt is historical authority for the eight Round 1 defects and
+the one Round 2 wording defect. The order-only amendment adds the exhaustive
+K1 disposition table, detector-catch fields, Law-B door inventory and bypass,
+generated-command/runtime join, packaged live identity/modes, finite
+saved-state predecessor matrix, exact malformed restoration receipts, and
+executable 89-declaration lifecycle invariant, with the promotion target
+corrected to `active`. No product, test, or gate code is changed by this
+receipt, no G8 Builder authority opens, G9/G10/G11/G12 remain outside scope,
+and R18 remains frozen. The same Reader must re-read the corrected order
+before any Builder door can open.

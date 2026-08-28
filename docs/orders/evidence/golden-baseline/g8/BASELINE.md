@@ -1,6 +1,6 @@
 # G8 Reader baseline — Kernel, schema, Law-B, and proof-integrity contract
 
-status: **READER ROUND 1 NO / NO — EIGHT FINITE DEFECTS / BUILDER CLOSED**
+status: **READER ROUND 2 NO / NO — ONE FINITE DEFECT / BUILDER CLOSED**
 order: `docs/orders/WO-GOLDEN-G8.md`
 starting_authority: `8f13495b24e995e69f43deadeeec72ff644e111a`
 starting_evidence_tree: `39fcc664b03717dcbf9b9abdf4951152dc44bf93`
@@ -16,6 +16,8 @@ current_dependency_boundary: `20 manifests; 109 direct dependency rows; 15 lock 
 reader_round_1_task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 reader_round_1_authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
 reader_round_1_verdict: **NO / NO — eight finite order defects**
+reader_round_2_authority: `d6e68c8997bc28eb3a68e211737429ec64ab02b7`
+reader_round_2_verdict: **NO / NO — one finite lifecycle promotion-target wording defect**
 reader_authority: **OPEN FOR THE SAME SEMANTIC READER TO RE-READ ONLY**
 builder_authority: **CLOSED**
 g9_order: **UNCHANGED — full G9 remains after G8**
