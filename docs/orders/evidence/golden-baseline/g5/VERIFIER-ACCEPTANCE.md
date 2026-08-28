@@ -1,15 +1,28 @@
 # G5 independent verification
 
-status: PENDING INDEPENDENT VERIFIER
+status: PASS WITH INHERITED G8/G12 REDS
+verified-at: 2026-08-27
+independent_verifier_task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 candidate_sha: 0cd9f273e46fb0c8ca7d05847b1fd805b8817a65
+candidate_tree: df9a4f11c421ed1c18418bbb8a73d0a5a756cd27
 candidate_predecessor: cc8d73173b58cca11ddfd9c4d0a561cc79dbf268
+evidence_head: bd3135edfe7004b140874fd2dcbef16ddb433540
 reader_task: 01a0426f-d4bf-7413-b974-643f935131d8
 reader_verdict: YES / YES
 reader_authority: cc8d73173b58cca11ddfd9c4d0a561cc79dbf268
+verdict: G5-owned matrix PASS; inherited G8/G12 reds reproduced exactly; packaged command not PASS
+packaged_log: C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log
+product_config_diff_exit: 0
+process_state: no Bun/Electron process; two pre-existing WSL hosts only
+root_state: x0W0CL and Fz8BQs remain untouched; verifier run recorded roots_remaining=1 and leaked=[x0W0CL]
 
-The independent Verifier must inspect immutable candidate 0cd9f273e46fb0c8ca7d05847b1fd805b8817a65, tree df9a4f11c421ed1c18418bbb8a73d0a5a756cd27, parent cc8d73173b58cca11ddfd9c4d0a561cc79dbf268, and rerun only the bounded G5 proof matrix plus the inherited packaged observation as authorized. It must prove exact accepted deletion preservation, all G5 normal selectors and six falsifier/restore pairs, and no changed product bytes beyond the preserved repair.
+The independent Verifier inspected immutable candidate `0cd9f273e46fb0c8ca7d05847b1fd805b8817a65`, tree `df9a4f11c421ed1c18418bbb8a73d0a5a756cd27`, parent `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268`, at evidence head `bd3135edfe7004b140874fd2dcbef16ddb433540`. It proved exact accepted deletion preservation, all G5 normal selectors and six falsifier/restore pairs, changed-surface transport/lifecycle/kernel/Hermes proofs, immutable responder bytes, no product/config diff, and clean G5-owned process/root state. Every G5-owned proof passed.
 
-## Independent Verifier matrix
+The one packaged `bun qa/run.ts hermes-first-turn-synthetic` reproduction exited 1 at the durable log above. It reached the Director, recruited worker, durable Run/Artifact, critic launch/activation, transport task/artifact checks, and `result_return` wait, then observed zero concrete Director `[QuantFlow RESULT for <task_id> from worker]` receipts before `result_return`. That inherited proof-integrity red belongs to G8. Cleanup then recorded the inherited Windows EACCES/orphan pty-sidecar/root red owned by G12; the verifier did not clean either root. The packaged command is not a PASS.
+
+G5 is therefore closed as PASS WITH INHERITED G8/G12 REDS. The standing Golden out-of-group rule applies because the inherited failure shape is exact and all G5-owned non-regression proof is green. Any earlier or different failure, G5 regression, unknown/duplicate session, or unowned leak would fail closure.
+
+## Independent Verifier matrix proved
 
 - Dedicated transport predicate: `bun test collab-electron/src/main/peer-delivery.test.ts`; the Builder reported 1/1 green in task `01a04617-2cd5-7a42-bae8-bdab09648337`, but no durable output path is available, so no log is invented.
 - Dedicated lifecycle proof: `bun test collab-electron/src/main/agent-host-lifecycle.test.ts`, with separate old-red and new-green receipts. The known combined Bun mock-contamination invocation is not an accepted matrix command.
@@ -20,4 +33,4 @@ The independent Verifier must inspect immutable candidate 0cd9f273e46fb0c8ca7d05
 - Cleanup ownership: verify no G5-owned process/root leak with processes=0, roots_remaining=0, leaked=[] on the fresh candidate matrix; separately verify the preserved EACCES/orphan pty-sidecar/root is the pre-existing G12-owned Windows operations red and do not clean or terminate it. The preserved prior packaged run has roots_remaining=1 and one leaked root, so it is not a PASS and must not be rewritten as roots_remaining=0.
 - Authority: the standing Golden rule permits assignment of that named out-of-group pre-existing red when current-group non-regression is independently proved; any earlier/different failure or G5 regression fails.
 
-The Verifier must not repair the candidate, weaken assertions or cleanup, claim the packaged chain PASS, run Atlas, push, or reorder G8/G9. This receipt is intentionally pending; the Builder does not self-verify.
+The Verifier did not repair the candidate, weaken assertions or cleanup, claim the packaged chain PASS, run Atlas, push, or reorder G8/G9. The Router records closure here; the Builder did not self-verify.

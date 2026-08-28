@@ -4,7 +4,7 @@ g5-normal-saved-state	normal	bun qa/run.ts golden-g5-saved-state	0	0	C:\tmp\qf-g
 g5-normal-retired-route	normal	bun qa/run.ts golden-g4-retired-route	0	0	C:\tmp\qf-g5-baseline-cd0a240\g5\normal-03-golden-g4-retired-route.log
 g5-normal-dock-launch	normal	bun qa/run.ts dock-definition-launch	0	0	C:\tmp\qf-g5-baseline-cd0a240\g5\normal-04-dock-definition-launch.log
 g5-normal-hermes-policy	normal	bun qa/run.ts hermes-launch-policy	0	0	C:\tmp\qf-g5-baseline-cd0a240\g5\normal-05-hermes-launch-policy.log
-g5-normal-hermes-synthetic	inherited-g12-cleanup-red	bun qa/run.ts hermes-first-turn-synthetic	0	1	C:\tmp\qf-g5-repair-20260827\21-hermes-first-turn-synthetic-inherited-g8-red.log
+g5-normal-hermes-synthetic	inherited-g8-g12-red	bun qa/run.ts hermes-first-turn-synthetic	0	1	C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log
 g5-normal-kernel-sole-writer	normal	bun qa/run.ts kernel-sole-writer-app	0	0	C:\tmp\qf-g5-baseline-cd0a240\kernel-sole-writer-app.log
 g5-normal-electron-build	normal	bun run --cwd collab-electron build	0	0	C:\tmp\qf-g5-baseline-cd0a240\collab-electron-build-correct.log
 responder-focused	changed-surface	bun test collab-electron/cli/qf-hermes-synthetic-responder.test.ts	0	0	C:\tmp\qf-g5-responder-test-3.log

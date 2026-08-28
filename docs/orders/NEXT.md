@@ -1,10 +1,12 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G5 CANDIDATE PENDING INDEPENDENT VERIFIER
+# NEXT — R18 GOLDEN BASELINE HOLD / G5 CLOSED / G6 SEMANTIC READER PENDING
 
-status: G4 CLOSED / G5 CANDIDATE / PENDING INDEPENDENT VERIFIER
+status: G5 CLOSED / G6 SEMANTIC READER PENDING
 rotated-at: 2026-08-27
-rotated-by: Router after final causal Reader YES/YES and immutable candidate freeze
-active-order: [WO-GOLDEN-G5](WO-GOLDEN-G5.md)
-builder-authority: **CLOSED — immutable product candidate pending one fresh independent Verifier**
+rotated-by: Router after independent G5 verification
+active-order: [WO-GOLDEN-G6](WO-GOLDEN-G6.md)
+builder-authority: **CLOSED — G6 semantic Reader only; no G6 Builder authority**
+g6-reader-status: **PENDING FRESH SEMANTIC READER**
+g6-provisional-source-scope-task: 01a04625-d2da-7ed1-b63e-48d7eabc4059 (measured testimony only; not semantic approval)
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
 g5-reader-verdict: **YES / YES**
@@ -20,8 +22,12 @@ g5-final-closure-reader-verdict: **YES / YES**
 g5-candidate-sha: `0cd9f273e46fb0c8ca7d05847b1fd805b8817a65`
 g5-candidate-tree: `df9a4f11c421ed1c18418bbb8a73d0a5a756cd27`
 g5-candidate-parent: `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268`
-g5-candidate-status: **CANDIDATE / PENDING INDEPENDENT VERIFIER**
-phase-2-active-group: G5 — Legacy ACP and unconsumed renderers
+g5-candidate-status: **CLOSED / PASS WITH INHERITED G8/G12 REDS**
+g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
+g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
+g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
+g5-packaged-exit: 1 (packaged command is not PASS)
+phase-2-active-group: G6 — false Claude production identity
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -34,15 +40,15 @@ full-g9-order: UNCHANGED — remains after G8
 r18-authority: FROZEN UNTIL PHASE 2 + PHASE 3 GOLDEN PASS
 protected-main: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 
-## Checkpoint
+## Current handoff
 
-R0–R17 and Pre-R18 remain **CLOSED / ACCEPTED**. G1–G4 are independently accepted. Full G9 remains after G8. G8 owns the frozen `kernel-market-lineage` red; G12 owns the frozen Electron `userData`, Windows package/typecheck, and operations reds.
+R0–R17 and Pre-R18 remain **CLOSED / ACCEPTED**. G1–G5 are independently closed, with G5 recorded as **PASS WITH INHERITED G8/G12 REDS**. Full G9 remains after G8. G8 owns the inherited missing packaged Director-result observation; G12 owns the inherited Windows EACCES/orphan-root cleanup red and the broader package/operations qualification.
 
-G4 closed at `2d491f20a030b9ac0b476846535f2ecc71239af1`. The G5 semantic Reader accepted the amended order at `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`. The order-only commits after `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806` leave product/config bytes unchanged.
+G4 closed at `2d491f20a030b9ac0b476846535f2ecc71239af1`. G5 closed at evidence head `bd3135edfe7004b140874fd2dcbef16ddb433540` against immutable product candidate `0cd9f273e46fb0c8ca7d05847b1fd805b8817a65` (tree `df9a4f11c421ed1c18418bbb8a73d0a5a756cd27`); the product/config diff was empty.
 
-The frozen starting matrix records both new G5 selectors as absent/red; G4 retired-route, Dock launch, Hermes launch-policy, Kernel sole-writer, and the real Electron build are green. `hermes-first-turn-synthetic` is pre-existing red because its readiness assertion still names retired `hermes-orchestrator` while production authority requires `hermes-research-director`. This is an authorized mechanical stale-selector repair: change only that readiness assertion, prove old red/new green, and do not rewrite later synthetic fixture identifiers without separate evidence.
+The independent G5 Verifier task `01a04624-d75d-7c12-a35d-2fdf105962f6` proved every G5-owned normal selector and falsifier green, the exact preserved deletion boundary, changed-surface proofs, product/config identity, and clean G5-owned process/root state. Its one packaged reproduction exited 1 at `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`: zero concrete Director result receipts before `result_return` (G8) and the inherited EACCES/orphan root (G12). The fresh `x0W0CL` and prior `Fz8BQs` roots remain untouched; no Bun/Electron process remains. The packaged command is not PASS.
 
-The fresh semantic Reader task `01a04034-6afb-73a3-9f0e-6419fa5f76ec` returned `NO / NO` against authority `5248031` with finite defects; that historical candidate was superseded. The final causal Reader task `01a0426f-d4bf-7413-b974-643f935131d8` returned **YES / YES** against authority `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268` on the bounded result-delivery contract in [WO-GOLDEN-G5](WO-GOLDEN-G5.md#final-fresh-reader-result-delivery-contract): `closeAgentSessionRow` admitted native-TUI teardown after `complete_task` without checking undelivered addressed results; the fixed trace is orchestrator PTY registration sequence 2, explicit teardown unregister sequence 7, exact result queue/lookup sequence 8 with `pushed_at=NULL`, then non-causal PTY exit. The Builder froze the repair as immutable candidate `0cd9f273e46fb0c8ca7d05847b1fd805b8817a65` (tree `df9a4f11c421ed1c18418bbb8a73d0a5a756cd27`, parent `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268`). The invariant is that a native-TUI recipient is not unregistered or killed while an addressed delegated result remains undelivered; teardown is allowed after durable `pushed_at` acknowledgment or with no outstanding result. The actual Director receipt must precede `result_return`; worker `turn=complete` remains intermediate only. Builder work is closed; one fresh independent Verifier remains.
+The fresh semantic Reader task `01a04034-6afb-73a3-9f0e-6419fa5f76ec` returned `NO / NO` against authority `5248031` with finite defects; that historical candidate was superseded. The final causal Reader task `01a0426f-d4bf-7413-b974-643f935131d8` returned **YES / YES** against authority `cc8d73173b58cca11ddfd9c4d0a561cc79dbf268`; the independent Verifier then closed G5 under the exact bounded result-delivery and inherited-red contract recorded in [G5 verifier acceptance](evidence/golden-baseline/g5/VERIFIER-ACCEPTANCE.md). G5 Builder authority is closed. G6 is Reader-only pending.
 
 ## Finite G8 prerequisite amendment
 
@@ -62,4 +68,4 @@ Fresh Reader task `01a04244-afb8-77c1-a18c-323dd5a05afb` returned `NO / NO` on t
 
 ## Final G5 candidate state
 
-The final causal Reader is YES / YES, the Builder is closed, and the immutable product candidate is pending one fresh independent Verifier. Full G8 and G9 order is unchanged, with full G9 remaining after G8. R18 remains FROZEN until Phase 2 + Phase 3 Golden PASS.
+The final causal Reader and independent Verifier are complete; G5 is closed as PASS WITH INHERITED G8/G12 REDS. Full G8 and G9 order is unchanged, with full G9 remaining after G8. G6 is the only active order and is pending a fresh semantic Reader. R18 remains FROZEN until Phase 2 + Phase 3 Golden PASS.

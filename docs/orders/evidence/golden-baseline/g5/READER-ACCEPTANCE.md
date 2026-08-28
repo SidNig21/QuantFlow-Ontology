@@ -28,4 +28,4 @@ atlas_identity_before: preserved baseline qf-atlas current — 417 files, 126 ch
 atlas_identity_after: not run by Builder; no Atlas mutation
 rollback_boundary: f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806
 user_data_deletion: NONE
-independent_verifier: required and pending at the immutable candidate; Builder does not self-verify
+independent_verifier: completed in task 01a04624-d75d-7c12-a35d-2fdf105962f6; closure recorded as PASS WITH INHERITED G8/G12 REDS; Builder did not self-verify
