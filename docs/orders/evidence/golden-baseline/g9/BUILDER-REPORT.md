@@ -11,7 +11,8 @@ This candidate makes research Reports come only from independently supported res
 - Product candidate: `4ef49077b2b423601c02b043de82b34d231bb7f5`
 - Product candidate tree: `bdba7c9540122288866bed6fb4aa57952c6f025e`
 - Product commit: `Implement G9 report authority`
-- Evidence head: recorded after the receipt-only commit below
+- Evidence head: `4f7753b9ccbaf71f65f7657f4c939f4fcec7519f`
+- Evidence head tree: `9ed30a7279f90fb6d9bb44709d2603387981a1a0`
 
 The candidate is the immutable product commit. The starting manifest and matrix
 were frozen before mutation in the adjacent receipt files. No schema golden,
