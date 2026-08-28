@@ -1,10 +1,10 @@
 # WO-GOLDEN-G9 — Report authority consolidation
 
-status: FINAL SAME-ORDER REPAIR REQUIRED — FRESH READER NO / NO; EXACTLY ONE FINAL SAME-ORDER REPAIR BUILDER OPEN
+status: CLOSED — PASS WITH G12 INHERITED RED
 kind: Golden Baseline Phase 2 bounded Report/result-authority group
 owner: Router
 depends: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS
-build-authority: YES — exactly one bounded final same-order G9 repair Builder for the five fresh Reader clarifications, preserving the eight recorded defects; no second Reader, no second Builder, and no G10–G12/R18 work
+build-authority: CLOSED — final same-order repair independently verified; no further G9 Builder authority
 reader-task: 01a0489e-04ea-71a1-8b6a-d0e151621103
 reader-round: FINAL
 reader-reviewed-authority: 8d78fb714998cc52d50538d6f9ea9a3323f75535
@@ -14,25 +14,25 @@ reader-round-1-authority: d6ab5ed66a18c9de23db047a4b41584acaaeec0e
 reader-round-1-tree: 8f94bf63b16bd74e5ef17461cc4f0d15477efc4f
 reader-round-2-authority: d6c0d7e91d726d8b5a33050f403efec87a3f1cd4
 reader-round-2-tree: 54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182
-builder-status: FINAL REPAIR OPEN — exactly one same-order G9 repair Builder for the five fresh Reader clarifications under this order
+builder-status: CLOSED — final same-order repair independently verified
 builder-starting-authority: 4ef49077b2b423601c02b043de82b34d231bb7f5
 builder-starting-tree: bdba7c9540122288866bed6fb4aa57952c6f025e
 builder-starting-evidence-head: f7e841ff3e075bd49ed70bf8da79c2409ca5c899
 builder-starting-evidence-tree: 69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f
-builder-candidate: 2167a5e6085095c12d4b844987f3ceaeaa78a135 — prior same-order repair candidate; final repair not yet run
-builder-candidate-tree: 15bbd9e3bcba80c4b35e6f32722dd9afc6390ab5
-builder-evidence: fab825cc0bb07c1440eb802038d5b1785c340398 — prior receipt-only repair evidence head; final repair not yet run
-builder-evidence-tree: f893ce21840d8d2caad5d908abebf2f1e8e4b5f2
+builder-candidate: 3c17e5d380fd267270cbacf851999cc98bf30638 — accepted final closure candidate
+builder-candidate-tree: d380c7b4655c53cd6e51de0c2112ae99885f0e3d
+builder-evidence: 83311bf0be15c0d18d102072e1528c4b5432cde2 — accepted closure evidence head
+builder-evidence-tree: 0bba13e124565cfa5052aa79a0d47da2b4bc9c1f
 final-repair-starting-product: 2167a5e6085095c12d4b844987f3ceaeaa78a135 / tree 15bbd9e3bcba80c4b35e6f32722dd9afc6390ab5
 final-repair-starting-evidence: fab825cc0bb07c1440eb802038d5b1785c340398 / tree f893ce21840d8d2caad5d908abebf2f1e8e4b5f2 — read-only
-verifier-task: 01a048fb-7a31-7880-b64b-98275789a38d
-verifier-verdict: FINITE FAIL — exactly eight defects; no semantic scope/order change
-verifier-candidate: 4ef49077b2b423601c02b043de82b34d231bb7f5
-verifier-candidate-tree: bdba7c9540122288866bed6fb4aa57952c6f025e
-verifier-evidence-head: f7e841ff3e075bd49ed70bf8da79c2409ca5c899
-verifier-evidence-tree: 69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f
-verifier-atlas-diff: WORSE — governed-review coverage indexed→partial; three expected persistence sites
-verifier-ratchet: HARD RED 0; repair must have no coverage regression
+verifier-task: 01a049f8-9f87-7ec3-854c-4dca0d01b1f8
+verifier-verdict: PASS WITH G12 INHERITED RED
+verifier-candidate: 3c17e5d380fd267270cbacf851999cc98bf30638
+verifier-candidate-tree: d380c7b4655c53cd6e51de0c2112ae99885f0e3d
+verifier-evidence-head: 83311bf0be15c0d18d102072e1528c4b5432cde2
+verifier-evidence-tree: 0bba13e124565cfa5052aa79a0d47da2b4bc9c1f
+verifier-atlas-diff: PASS — current; no coverage regression
+verifier-ratchet: HARD RED 0
 reader-recheck: COMPLETED — fresh Reader task 01a0496c-1f71-75f1-939e-d6f32f7c75b0 returned NO / NO on the repair proof boundary; one final same-order repair is authorized below
 reader-amendment-task: 01a0496c-1f71-75f1-939e-d6f32f7c75b0
 reader-amendment-verdict: NO / NO — five finite authority/evidence ambiguities; no new G9 product meaning or scope
@@ -44,6 +44,12 @@ accepted-trajectory-prerequisite: 4a12b948746c108bae3143d5982decd50a6957e9
 rollback-boundary: 61abfa5b23553f86a5c2d95facdf0473310fc44
 evidence-directory: docs/orders/evidence/golden-baseline/g9/
 
+accepted-product-candidate: 3c17e5d380fd267270cbacf851999cc98bf30638
+accepted-product-tree: d380c7b4655c53cd6e51de0c2112ae99885f0e3d
+accepted-evidence-head: 83311bf0be15c0d18d102072e1528c4b5432cde2
+accepted-evidence-tree: 0bba13e124565cfa5052aa79a0d47da2b4bc9c1f
+group-acceptance: [G9 closed acceptance](evidence/golden-baseline/g9/GROUP-ACCEPTANCE.md)
+
 ## Plain-language outcome
 
 A research answer becomes a durable Report only after an independent review, and
@@ -53,15 +59,17 @@ final Reader accepted all seven cumulative cures with no new ambiguity or scope
 expansion. The independent Verifier found eight finite implementation and
 evidence defects in the first candidate; that prior repair produced one
 candidate and receipt-only evidence, then the fresh Reader found five finite
-proof-boundary ambiguities. This packet opens exactly one final same-order
-repair Builder. The original G9 meaning, scope, and dependency order remain
-unchanged, and no second Reader or Builder is authorized.
+proof-boundary ambiguities. That historical packet opened exactly one final
+same-order repair Builder. The original G9 meaning, scope, and dependency
+order remain unchanged; the repair is now closed and no further G9 Reader or
+Builder is authorized.
 
 ## Authority and dependency order
 
 ADR-0004 assigns G9 one current Report/result authority after G8. The founder
 dependency is G8 → G9; G12 Windows/package qualification and R18 remain later.
-This order does not reopen G8 or authorize G10, G11, G12, or R18.
+G9 did not reopen G8 or authorize G11, G12, or R18. The current `NEXT.md`
+rotation opens only the Reader-pending G10 order; it does not reopen G9.
 
 The accepted minimum prerequisite already changed ordinary completion output to a
 trajectory Artifact and preserved the Kernel refusal for a Report without
@@ -119,7 +127,7 @@ The same Reader task `01a0489e-04ea-71a1-8b6a-d0e151621103` returned
 `9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`). The Reader confirmed that the
 five Round 1 cures and two Round 2 cures are all finite, fail-capable, and
 unambiguous, with no new defect or scope expansion. The accepted contract is
-the exact contract below; this verdict opens exactly one G9 Builder and no
+the exact contract below; this verdict opened the former G9 Builder and no
 other Builder authority.
 
 | cumulative cure | accepted proof obligation |
@@ -180,15 +188,15 @@ and evidence baseline. Fresh Reader task
 authority/evidence meanings below were not explicit enough for a final
 independent verification. This is not a new G9 product meaning or scope.
 
-Exactly one final same-order G9 repair Builder is authorized from the prior
+The former final same-order G9 repair Builder was authorized from the prior
 repair product candidate `2167a5e6085095c12d4b844987f3ceaeaa78a135` / tree
 `15bbd9e3bcba80c4b35e6f32722dd9afc6390ab5`, with prior receipt-only evidence
 head `fab825cc0bb07c1440eb802038d5b1785c340398` / tree
 `f893ce21840d8d2caad5d908abebf2f1e8e4b5f2` read-only. The final Builder must
 preserve every existing G9 assertion and the prior eight-defect repair
-contract; no second Reader, second Builder, G8 reopening, or G10–G12/R18 work
-is authorized. A fresh independent Verifier remains the only authority that
-may decide PASS/FAIL.
+contract; no second Reader or Builder was authorized. The independent closure
+Verifier has now decided the result recorded in the final closure section;
+G10–G12/R18 boundaries remain separately owned.
 
 The final repair adds only these exact proof meanings:
 

@@ -1,10 +1,26 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 CLOSED / G9 FINAL SAME-ORDER REPAIR OPEN
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 READER PENDING
 
-status: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS / G9 PRIOR VERIFIER FINITE FAIL + FRESH READER NO / NO / EXACTLY ONE FINAL SAME-ORDER REPAIR BUILDER OPEN
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 READER PENDING
 rotated-at: 2026-08-28
-rotated-by: Router after fresh G9 Reader NO / NO on the final repair proof boundary
-active-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md)
-builder-authority: **OPEN — exactly one final same-order G9 repair Builder for five finite Reader clarifications, preserving the eight prior Verifier defects; no second Reader, no second Builder, and no G10–G12/R18 work**
+rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
+active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
+builder-authority: **CLOSED — G10 Reader YES / YES required before one bounded G10 Builder; no G10 mutation is authorized yet**
+g10-status: **READER PENDING — Current Canvas/Mission/runtime coherence**
+g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
+g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; Reader must return YES / YES**
+g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
+g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
+g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
+g10-starting-evidence-tree: `0bba13e124565cfa5052aa79a0d47da2b4bc9c1f`
+g9-status: **CLOSED / PASS WITH G12 INHERITED RED**
+g9-accepted-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
+g9-accepted-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
+g9-accepted-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
+g9-accepted-evidence-tree: `0bba13e124565cfa5052aa79a0d47da2b4bc9c1f`
+g9-acceptance: [G9 closed acceptance](evidence/golden-baseline/g9/GROUP-ACCEPTANCE.md)
+g9-independent-verifier-task: `01a049f8-9f87-7ec3-854c-4dca0d01b1f8`
+g9-independent-verifier-verdict: **PASS WITH G12 INHERITED RED**
+g9-inherited-red: **G12 open — launcher PID 30512 exited 0; packaged QuantFlow.exe PID 17316 and descendant Node PIDs 30836, 20836, 30096 survived; roots_remaining=0; leaked=[]**
 g8-reader-status: **AMENDMENT YES / YES — exact V-01 through V-04 accepted**
 g8-reader-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 g8-reader-authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
@@ -88,16 +104,16 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G9 — bounded Report authority consolidation; prior independent Verifier FINITE FAIL plus fresh Reader NO / NO; exactly one final same-order repair Builder open
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Reader pending; no Builder authority
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
 g3-acceptance: [G3 CLOSED / ACCEPTED](evidence/golden-baseline/g3/GROUP-ACCEPTANCE.md)
 g2-acceptance: [G2 CLOSED / ACCEPTED](evidence/golden-baseline/g2/GROUP-ACCEPTANCE.md)
 g1-acceptance: [G1 CLOSED / ACCEPTED](evidence/golden-baseline/g1/GROUP-ACCEPTANCE.md)
-full-g9-authority: FINAL SEMANTIC READER YES / YES AFTER G8; PRIOR INDEPENDENT VERIFIER FINITE FAIL; FRESH READER NO / NO; EXACTLY ONE FINAL SAME-ORDER REPAIR BUILDER OPEN
+full-g9-authority: CLOSED — final semantic Reader YES / YES and independent closure Verifier PASS WITH G12 INHERITED RED
 full-g8-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md) — CLOSED
-full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — PRIOR VERIFIER FINITE FAIL + FRESH READER NO / NO; EXACTLY ONE FINAL SAME-ORDER REPAIR BUILDER OPEN
+full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — CLOSED / PASS WITH G12 INHERITED RED
 g9-reader-status: **FINAL YES / YES — all seven cumulative defects cured; no new ambiguity or scope expansion**
 g9-reader-task: `01a0489e-04ea-71a1-8b6a-d0e151621103`
 g9-reader-round: FINAL
@@ -108,24 +124,24 @@ g9-reader-round-1-authority: `d6ab5ed66a18c9de23db047a4b41584acaaeec0e`
 g9-reader-round-1-tree: `8f94bf63b16bd74e5ef17461cc4f0d15477efc4f`
 g9-reader-round-2-authority: `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4`
 g9-reader-round-2-tree: `54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182`
-g9-builder-status: **FINAL REPAIR OPEN — exactly one same-order G9 repair Builder for five fresh Reader clarifications; all eight prior Verifier defects remain binding**
+g9-builder-status: **CLOSED — final same-order repair independently verified; no further G9 Builder authority**
 g9-builder-starting-authority: `4ef49077b2b423601c02b043de82b34d231bb7f5`
 g9-builder-starting-tree: `bdba7c9540122288866bed6fb4aa57952c6f025e`
 g9-builder-starting-evidence-head: `f7e841ff3e075bd49ed70bf8da79c2409ca5c899`
 g9-builder-starting-evidence-tree: `69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`
 g9-builder-starting-matrix: **REPAIR-BUILDER-BRIEF.md: prior 19-row G9 matrix and R1–R9 remain binding; final repair must add the five fresh Reader clarifications and corrected literal Git-tree-byte source manifest**
 g9-builder-surface: **REPAIR-BUILDER-BRIEF.md only: governed-review.ts, execute.ts, Electron kernel.ts, report-authority.ts, directly caused focused tests/fixtures; generated Atlas/evidence only**
-g9-verifier-task: `01a048fb-7a31-7880-b64b-98275789a38d`
-g9-verifier-verdict: **FINITE FAIL — exactly eight defects; accepted Reader meaning/scope/order unchanged**
-g9-verifier-candidate: `4ef49077b2b423601c02b043de82b34d231bb7f5`
-g9-verifier-candidate-tree: `bdba7c9540122288866bed6fb4aa57952c6f025e`
-g9-verifier-evidence-head: `f7e841ff3e075bd49ed70bf8da79c2409ca5c899`
-g9-verifier-evidence-tree: `69ffb780e692ae5cdbd532bbc3dba5b6b4006e6f`
-g9-verifier-atlas-diff: **WORSE — governed-review indexed→partial; three expected persistence sites**
-g9-verifier-ratchet: **HARD RED 0; repair must have no coverage regression**
-g9-reader-recheck: **COMPLETED — fresh Reader task 01a0496c-1f71-75f1-939e-d6f32f7c75b0 returned NO / NO; one final same-order repair is authorized**
-g9-reader-amendment-task: `01a0496c-1f71-75f1-939e-d6f32f7c75b0`
-g9-reader-amendment-verdict: **NO / NO — five finite authority/evidence ambiguities; no new G9 product meaning or scope**
+g9-verifier-task: `01a049f8-9f87-7ec3-854c-4dca0d01b1f8`
+g9-verifier-verdict: **PASS WITH G12 INHERITED RED**
+g9-verifier-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
+g9-verifier-candidate-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
+g9-verifier-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
+g9-verifier-evidence-tree: `0bba13e124565cfa5052aa79a0d47da2b4bc9c1f`
+g9-verifier-atlas-diff: **PASS — current; no coverage regression**
+g9-verifier-ratchet: **HARD RED 0**
+g9-reader-recheck: **HISTORICAL — prior final-repair boundary NO / NO; superseded by accepted closure Verifier**
+g9-reader-amendment-task: `01a0496c-1f71-75f1-939e-d6f32f7c75b0` (historical)
+g9-reader-amendment-verdict: **HISTORICAL NO / NO — five finite authority/evidence ambiguities; superseded by accepted closure**
 g9-final-repair-product-candidate: `2167a5e6085095c12d4b844987f3ceaeaa78a135`
 g9-final-repair-product-tree: `15bbd9e3bcba80c4b35e6f32722dd9afc6390ab5`
 g9-final-repair-evidence-head: `fab825cc0bb07c1440eb802038d5b1785c340398`
@@ -135,12 +151,37 @@ g9-starting-product-candidate: `61abfa5b23553f86a5c2d95facdf0473310fc44`
 g9-starting-product-tree: `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`
 g9-starting-evidence-tree: `b04a991ca98da1d57b8637a7fcd0738a4e41bd21`
 g9-reader-scaffold: [G9 final Reader acceptance](evidence/golden-baseline/g9/READER-ACCEPTANCE.md)
-g9-verifier-acceptance: [G9 independent Verifier finite-fail receipt](evidence/golden-baseline/g9/VERIFIER-ACCEPTANCE.md)
+g9-verifier-acceptance: [G9 independent closure Verifier receipt](evidence/golden-baseline/g9/CLOSURE-VERIFIER-ACCEPTANCE.md)
 g9-repair-brief: [G9 same-order repair Builder brief](evidence/golden-baseline/g9/REPAIR-BUILDER-BRIEF.md)
 r18-authority: FROZEN UNTIL PHASE 2 + PHASE 3 GOLDEN PASS
 protected-main: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 
 ## Current handoff
+
+G9 is closed at accepted product candidate
+`3c17e5d380fd267270cbacf851999cc98bf30638` (tree
+`d380c7b4655c53cd6e51de0c2112ae99885f0e3d`) with receipt-only evidence head
+`83311bf0be15c0d18d102072e1528c4b5432cde2` (tree
+`0bba13e124565cfa5052aa79a0d47da2b4bc9c1f`). Independent Verifier task
+`01a049f8-9f87-7ec3-854c-4dca0d01b1f8` returned **PASS WITH G12 INHERITED
+RED** after confirming the two compile-boundary repairs, generated Atlas
+projection, focused checks, exact Git-tree hashes, and clean state. The G9
+closeout is recorded in [G9 closed acceptance](evidence/golden-baseline/g9/GROUP-ACCEPTANCE.md).
+
+The exact inherited G12 packaged shutdown survivor remains open and red:
+launcher PID `30512` exited `0`; packaged `QuantFlow.exe` PID `17316` and
+descendant Node PIDs `30836`, `20836`, and `30096` survived;
+`roots_remaining=0` and `leaked=[]`. G10 must preserve this ownership and may
+not repair, relabel, or absorb it.
+
+G10 is now the sole active Phase-2 order. Its bounded Reader-pending packet is
+[WO-GOLDEN-G10](WO-GOLDEN-G10.md): explicit ordinary/mission/full-lineage
+Canvas views and return, no submit/reopen hiding, real runtime liveness with
+separate session/work/recovery axes, truthful existing relations, and the five
+G7-routed Canvas/browser calls. No G10 Builder is authorized until the fresh
+Reader answers the two exact questions in its Reader brief **YES / YES**.
+
+## Historical G9-open handoff (superseded)
 
 Current routing: G8 is closed at candidate
 `61abfa5b23553f86a5c2d95facdf0473310fc44` with evidence head
@@ -169,7 +210,7 @@ read-only; no second Reader or Builder is authorized. The exact packet is in
 inherited G9 report-boundary red and G12 Windows/package/operations reds remain
 red and are not acceptance.
 
-## Final same-order G9 repair boundary
+## Historical final same-order G9 repair boundary (superseded by closure)
 
 The prior independent Verifier FINITE FAIL is task
 `01a048fb-7a31-7880-b64b-98275789a38d`. Fresh Reader task
