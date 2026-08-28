@@ -1,13 +1,16 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 READER PENDING
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 READER AMENDMENT REQUIRED
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 READER PENDING
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 READER NO / NO — AMENDMENT REREAD REQUIRED
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **CLOSED — G10 Reader YES / YES required before one bounded G10 Builder; no G10 mutation is authorized yet**
-g10-status: **READER PENDING — Current Canvas/Mission/runtime coherence**
+builder-authority: **CLOSED — same G10 Reader must reread the finite amendments and return YES / YES before one bounded G10 Builder; no G10 mutation is authorized yet**
+g10-status: **READER NO / NO — six finite amendments recorded; same Reader reread required**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; Reader must return YES / YES**
+g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
+g10-reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
+g10-reader-verdict: **NO / NO — six finite amendments required; same Reader reread of amended WO-GOLDEN-G10 and NEXT.md is required**
 g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
@@ -178,8 +181,50 @@ G10 is now the sole active Phase-2 order. Its bounded Reader-pending packet is
 [WO-GOLDEN-G10](WO-GOLDEN-G10.md): explicit ordinary/mission/full-lineage
 Canvas views and return, no submit/reopen hiding, real runtime liveness with
 separate session/work/recovery axes, truthful existing relations, and the five
-G7-routed Canvas/browser calls. No G10 Builder is authorized until the fresh
-Reader answers the two exact questions in its Reader brief **YES / YES**.
+G7-routed Canvas/browser calls. No G10 Builder is authorized until the same
+Reader rereads the amended packet and answers the two exact questions in its
+Reader brief **YES / YES**.
+
+### G10 finite Reader amendments — same Reader reread required
+
+The fresh semantic Reader task `01a04a11-0b55-79b3-b6c0-55285177dd55` returned
+**NO / NO** at authority `43e0c779e4b255624eefd021716d2afe5245020e`. The six
+finite amendments are now binding in [WO-GOLDEN-G10](WO-GOLDEN-G10.md):
+
+1. Canvas modes are explicit: `ORDINARY_CANVAS` means research projection
+   inactive with every pre-existing non-research tile container present,
+   visible, not `aria-hidden="true"`, and pointer-enabled; `CURRENT_MISSION`
+   and `FULL_LINEAGE` are explicit modes; `Back to world` restores
+   `ORDINARY_CANVAS`; `DEFAULT` is not an alias; F01–F03 assert these DOM
+   predicates before and after submission and cold reopen.
+2. Runtime liveness is a read-only Main-owned observation keyed by exact
+   `agent_session.id` from the live-session registry; Dock, Canvas, and Inspect
+   receive one shared snapshot; only `live=true` establishes Runtime `running`;
+   the proof covers `native_tui` and `host_acp`, or names an exact exclusion and
+   renders it exactly `Not recorded`.
+3. `Technique` means ontology type `strategy`; producer/output means exact
+   `produces` tuples; the fixture freezes the sorted `(kind, from_id, to_id)` set
+   from an independent Kernel query and F06 names the removed tuple; missing
+   display text is exactly `Not recorded`.
+4. F07–F10 traverse
+   `canvas.browserX → Main canvas RPC → canvas:rpc-request → shell renderer → shell preload → browser:* Main IPC` and prove, respectively, known-value
+   evaluate, URL/title/loading info, observable scroll change, and load
+   completion or timeout. `focusAgentSession(id)` must focus the existing
+   terminal tile whose `sessionId` equals `id`; removal needs a new G10 Reader
+   amendment authorizing the paired G7-gate change and replacement behavior.
+5. The named gate is
+   `qa/gates/golden-g10-canvas-runtime.ts`, invoked by
+   `bun qa/run.ts golden-g10-canvas-runtime`. F12 has two concrete baits: a
+   renderer-side durable domain write and a second durable Canvas/Mission store;
+   each must make the gate red and return green after exact restore.
+6. F14 is split into F14a durable close/reopen identity and F14b owned-process/
+   root cleanup. F14b captures the pre-run census and requires only the G10-
+   owned delta to reach `processes=0`, `roots_remaining=0`, and `leaked=[]`;
+   inherited G12 PIDs `30512`, `17316`, `30836`, `20836`, and `30096` remain
+   untouched and unchanged.
+
+The same Reader must reread the amended G10 order and this handoff and return
+**YES / YES**. Until then, the Builder door remains closed.
 
 ## Historical G9-open handoff (superseded)
 

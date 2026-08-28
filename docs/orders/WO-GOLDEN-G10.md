@@ -1,10 +1,14 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: READER PENDING — bounded order drafted; no Builder authority
+status: READER AMENDMENT REQUIRED — bounded order amended after finite Reader NO / NO; no Builder authority
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **NO — a fresh independent Reader must return YES / YES before one bounded G10 Builder may start**
+build-authority: **NO — the same Reader must reread this amended order and return YES / YES before one bounded G10 Builder may start**
+reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
+reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
+reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
+reader-reread: **REQUIRED — the same Reader must reread this amended order and NEXT.md and return YES / YES; no substitute Reader or Builder is authorized**
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-disposition: Current Canvas/Mission/runtime coherence group from the audited Phase-2 disposition
 accepted-g9-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
@@ -41,7 +45,7 @@ product with named health defects. The surgical Phase-2 plan assigns G10:
 4. liveness from real runtime observation, with persisted session, work, and
    recovery axes kept distinct;
 5. existing Mission/Task/Dataset/Technique/producer relations projected rather
-   than rendered as `NOT RECORDED`; and
+   than rendered as `Not recorded`; and
 6. deterministic current-workflow and full-lineage views of the same Kernel
    truth.
 
@@ -62,6 +66,14 @@ open G12 red: launcher PID `30512` exited `0`; packaged `QuantFlow.exe` PID
 
 ### A — Ordinary Canvas and explicit Mission view
 
+The Canvas modes are finite and explicit. `ORDINARY_CANVAS` means the research
+projection is inactive; every pre-existing non-research tile container remains
+present, visually visible, not `aria-hidden="true"`, and pointer-enabled.
+`CURRENT_MISSION` and `FULL_LINEAGE` are explicit projection modes.
+`Back to world` restores `ORDINARY_CANVAS`; `DEFAULT` is not an alias for any of these
+modes. F01–F03 must assert these exact DOM predicates before and after
+submission and cold reopen.
+
 The current path may call `researchWorldController.reveal` immediately after
 submission and may make the Mission projection behave as an exclusive layer.
 G10 must make the Mission/current-workflow and full-lineage projections explicit
@@ -78,8 +90,16 @@ The view state is ephemeral and may reset to the ordinary workspace.
 
 ### B — Truthful participant/runtime axes
 
+Runtime liveness is a read-only Main-owned observation keyed by the exact
+`agent_session.id`, backed by the live-session registry. Dock, Canvas, and
+Inspect receive the same observation snapshot. `live=true` is the only
+condition that may establish Runtime `running`; persisted status, terminal text,
+and elapsed time never establish liveness. The proof covers both `native_tui`
+and `host_acp`; if either is excluded, the order must name that exact exclusion
+and render its runtime result exactly `Not recorded`.
+
 Use the existing participant projection contract or one pure equivalent shared
-by Dock and Canvas. `agent_session.status` supplies the persisted Session axis;
+by Dock, Canvas, and Inspect. `agent_session.status` supplies the persisted Session axis;
 the current runtime observation supplies Runtime liveness; Task ownership and
 review state supply Work; profile availability and process state supply
 Recovery. A persisted `running` session without a live process must not render
@@ -95,9 +115,15 @@ across Dock, Canvas, Task, and terminal surfaces.
 
 ### C — Existing relation projection
 
+`Technique` means ontology type `strategy`; producer/output relations mean exact
+`produces` tuples. The G10 fixture freezes the sorted
+`(kind, from_id, to_id)` relation set from an independent Kernel query, and F06
+names the exact tuple removed for its deliberate break. Missing display text is
+exactly `Not recorded`, including capitalization.
+
 When the Kernel contains a Mission, Task, Dataset, Technique, producer, output,
 or existing semantic link, the current Canvas/Dock/inspect projection must show
-that fact and its identity. `NOT RECORDED` remains valid only when the relevant
+that fact and its identity. `Not recorded` remains valid only when the relevant
 source fact is genuinely absent or unrecognized. No relation is reconstructed
 from terminal text, display position, CSS, timing, or a second UI graph.
 
@@ -108,12 +134,17 @@ does not obscure or contradict the accepted projection.
 
 ### D — Five routed Canvas/browser calls
 
-The exact G7-routed rows are the existing calls `browserEvaluate`, `browserInfo`,
-`browserScroll`, `browserWait`, and `focusAgentSession`. The Builder must prove
-each current Canvas call through its intended renderer/preload/Main boundary,
-or remove only the exact broken call with its paired type/bridge/handler and a
-documented current-consumer proof. Static absence alone is not deletion proof;
-no unrelated browser or protocol surface may be contracted here.
+The exact G7-routed rows are the existing calls `browserEvaluate`,
+`browserInfo`, `browserScroll`, `browserWait`, and `focusAgentSession`.
+F07–F10 must traverse the full path
+`canvas.browserX → Main canvas RPC → canvas:rpc-request → shell renderer → shell preload → browser:* Main IPC`, with operation-specific results: `evaluate`
+returns a known value, `info` returns URL/title/loading, `scroll` changes
+observable page scroll, and `wait` observes load completion or timeout.
+`focusAgentSession(id)` must focus the existing terminal tile whose
+`sessionId` equals `id`. It may not be removed in G10 unless a new G10 Reader
+amendment also authorizes the paired G7-gate amendment and defines replacement
+agent-node behavior. Static absence alone is not deletion proof; no unrelated
+browser or protocol surface may be contracted here.
 
 ## Allowed surface
 
@@ -140,7 +171,9 @@ and only for a named defect above:
   `collab-electron/src/main/canvas-rpc.ts`, and the paired preload/type surface
   only for the five routed calls;
 - focused tests/fixtures for the named behavior;
-- one registered focused G10 QA gate and its directly caused evidence; and
+- the named `golden-g10-canvas-runtime` QA gate at
+  `qa/gates/golden-g10-canvas-runtime.ts`, invoked by
+  `bun qa/run.ts golden-g10-canvas-runtime`, and its directly caused evidence; and
 - generated Atlas projections caused solely by these edits.
 
 The current routed `focusAgentSession` row is recorded at
@@ -191,11 +224,14 @@ The normal proof must show:
 5. live, starting, stopped, unavailable, closed, and unassigned cases are
    distinguished using real runtime observations and persisted facts;
 6. existing Mission/Task/Dataset/Technique/producer links are shown and genuine
-   missing facts alone produce `NOT RECORDED`;
+   missing facts alone produce exactly `Not recorded`;
 7. current and full-lineage views preserve the accepted G9 Report hierarchy,
    current/historical markers, exact ids, and read-only Kernel agreement;
-8. all five routed Canvas/browser calls either work through the actual boundary
-   or have an exact paired removal proof with no broken current caller;
+8. `browserEvaluate`, `browserInfo`, `browserScroll`, and `browserWait` each
+   traverse the full renderer/preload/Main path with their named result;
+   `focusAgentSession(id)` focuses the existing terminal tile whose
+   `sessionId` equals `id`; no routed row is removed without a new G10 Reader
+   amendment authorizing the paired G7 change and replacement behavior;
 9. `no-canvas-domain-writes` and the relevant Kernel write-path checks stay
    green; and
 10. the isolated G10 run ends with actual owned process/root cleanup at zero.
@@ -210,25 +246,30 @@ does not observe owned state is not acceptance.
 
 | id | deliberate break | required red | restored green |
 | --- | --- | --- | --- |
-| F01 | re-enable exclusive Mission hiding after submit | ordinary workspace/terminal tiles become unreachable or submission cannot return through the existing Canvas path | Mission view is explicit and ordinary workspace remains reachable |
-| F02 | remove or neutralize the real return action | the current Mission view cannot return to the ordinary workspace without a refresh or destructive write | labeled return restores ordinary Canvas with unchanged Kernel ids |
-| F03 | reintroduce latest-world auto-reveal during cold reopen | reopen silently enters the exclusive Mission layer or hides ordinary tiles | reopen starts in the ordinary workspace and deliberate Mission navigation works |
-| F04 | derive Runtime `running` from persisted session status while no process is live | a dead process is rendered `running`, or Dock and Canvas disagree | Runtime is `running` only for a live observation and other axes remain separate |
-| F05 | remove or corrupt one shared participant-projection input | the same participant gets contradictory Dock/Canvas role, runtime, work, recovery, Task, output, or Mission binding | both consumers show the same values for the same `agent_session.id` |
-| F06 | drop one existing Mission/Task/Dataset/Technique/producer relation from projection resolution | a relation present in the isolated Kernel renders `NOT RECORDED` or the wrong id | existing links project exactly; only absent facts use the honest fallback |
-| F07 | break `browserEvaluate` at its current Canvas boundary | the actual current call does not reach its intended paired boundary and the focused assertion exits `1` | the unchanged call reaches the intended boundary and exits `0`, or its exact paired removal proof is green |
-| F08 | break `browserInfo` at its current Canvas boundary | same as F07 for `browserInfo` | same as F07 for `browserInfo` |
-| F09 | break `browserScroll` at its current Canvas boundary | same as F07 for `browserScroll` | same as F07 for `browserScroll` |
-| F10 | break `browserWait` at its current Canvas boundary | same as F07 for `browserWait` | same as F07 for `browserWait` |
-| F11 | break `focusAgentSession` at its current Canvas boundary | the actual focus path cannot focus the named session or reports success without doing so | the focus path works or its exact paired removal proof is green |
-| F12 | add a renderer-side domain write or second durable Canvas/Mission store in an isolated copy | `no-canvas-domain-writes` or the relevant write-path gate exits `1` before acceptance | the copy is restored and the real projection path remains green |
+| F01 | re-enable exclusive Mission hiding after submit | under `ORDINARY_CANVAS`, a pre-existing non-research tile container is absent, visually hidden, `aria-hidden="true"`, or not pointer-enabled, or submission cannot return through the existing Canvas path | `CURRENT_MISSION` is explicit and the exact ordinary-container DOM predicates remain true after return |
+| F02 | remove or neutralize the real `Back to world` action | the current Mission view cannot restore `ORDINARY_CANVAS` without a refresh or destructive write, or any exact ordinary-container DOM predicate is false | labeled `Back to world` restores `ORDINARY_CANVAS` with unchanged Kernel ids and the exact ordinary-container predicates |
+| F03 | reintroduce latest-world auto-reveal during cold reopen | cold reopen does not start in `ORDINARY_CANVAS`, silently enters an exclusive Mission layer, or hides ordinary tiles | reopen starts in `ORDINARY_CANVAS`, the exact ordinary-container DOM predicates hold, and deliberate Mission navigation works |
+| F04 | derive Runtime `running` from persisted session status while no process is live | a dead process is rendered `running`, or Dock, Canvas, and Inspect disagree for the exact `agent_session.id` | Runtime is `running` only for a live-session-registry observation and all three consumers receive the same snapshot |
+| F05 | remove or corrupt one shared participant-projection input | the same participant gets contradictory Dock/Canvas/Inspect role, runtime, work, recovery, Task, output, or Mission binding | all three consumers show the same values for the same `agent_session.id` |
+| F06 | drop the exact frozen `(kind, from_id, to_id)` `produces` tuple named by the independent-Kernel fixture from projection resolution | the tuple present in the isolated Kernel renders `Not recorded` or the wrong id | existing `strategy`/`produces` links project exactly; only absent facts use exactly `Not recorded` |
+| F07 | break `browserEvaluate` at any link in its current Canvas boundary | `canvas.browserEvaluate` does not traverse the full named path or does not return the known value | the unchanged call traverses the full named path and returns the known value |
+| F08 | break `browserInfo` at any link in its current Canvas boundary | `canvas.browserInfo` does not traverse the full named path or does not return URL/title/loading | the unchanged call traverses the full named path and returns URL/title/loading |
+| F09 | break `browserScroll` at any link in its current Canvas boundary | `canvas.browserScroll` does not traverse the full named path or does not change observable page scroll | the unchanged call traverses the full named path and changes observable page scroll |
+| F10 | break `browserWait` at any link in its current Canvas boundary | `canvas.browserWait` does not traverse the full named path or does not observe load completion or timeout | the unchanged call traverses the full named path and observes load completion or timeout |
+| F11 | break `focusAgentSession` at its current Canvas boundary | `focusAgentSession(id)` cannot focus the existing terminal tile whose `sessionId` equals `id`, or reports success without doing so | the unchanged focus path focuses that exact terminal tile; removal requires the separately named G10 Reader amendment |
+| F12a | add a renderer-side durable domain write in an isolated copy | `golden-g10-canvas-runtime` or `no-canvas-domain-writes` exits `1` on the added write | the write is removed, the same gate exits `0`, and the real projection path remains green |
+| F12b | add a second durable Canvas/Mission store in an isolated copy | `golden-g10-canvas-runtime` exits `1` on the second store | the second store is removed, the same gate exits `0`, and the real projection path remains green |
 | F13 | substitute a current Report/history id or marker in the view fixture | the read-only Kernel comparison catches disagreement with accepted G9 current/history truth | current/historical Report and Artifact markers match the persisted G9 projection |
-| F14 | skip close/reopen or fabricate runtime cleanup in the focused gate | the gate fails because durable ids or actual owned process/root state cannot be independently observed | close/reopen identity and `roots_remaining=0`, `leaked=[]` are observed |
+| F14a | skip close/reopen or substitute a new id in the focused gate | close/reopen does not independently preserve the same durable Mission/session ids | close/reopen independently observes the same durable ids |
+| F14b | fabricate runtime cleanup or count the inherited G12 survivor as G10-owned | the gate fails because the pre-run process/root census and G10-owned delta are not independently observed, or the inherited survivor is changed | only the G10-owned delta reaches `processes=0`, `roots_remaining=0`, and `leaked=[]`; inherited G12 PIDs `30512`, `17316`, `30836`, `20836`, and `30096` remain untouched and unchanged |
 
 The F07–F11 cases must be individually named in the evidence; one aggregate
-browser assertion is insufficient. If a routed row is removed rather than
-repaired, its red must prove the current broken call and its green must prove
-the paired contract is absent without leaving an active caller.
+browser assertion is insufficient. F12a and F12b each require their own red and
+restored-green transcript. F14a and F14b must separately prove identity and
+owned-delta cleanup. F07–F10 green requires the full current call path and
+operation-specific result; `focusAgentSession` green requires the exact terminal
+tile. A routed-row removal requires the separate G10 Reader amendment stated in
+section D.
 
 ## Evidence and close
 
@@ -237,7 +278,8 @@ The Builder report must open with one plain-language sentence and bind:
 - accepted G9 starting candidate/tree and final G10 candidate/tree;
 - literal starting and changed/untracked manifests with Git-tree-byte SHA-256;
 - every normal command, output, and exit code;
-- one red and one restored-green transcript for F01–F14;
+- one red and one restored-green transcript for F01–F11, F12a, F12b, F13,
+  F14a, and F14b;
 - renderer, preload, Main, Kernel, DOM, and independent read-only comparison
   receipts;
 - ordinary/mission/full-lineage navigation, close/reopen, runtime-axis, and
@@ -270,3 +312,8 @@ Answer exactly these questions:
 
 The Reader returns **YES / YES** only if both answers are unambiguous. Any
 ambiguity opens no Builder; it becomes a finite amendment to this order.
+
+The Reader task `01a04a11-0b55-79b3-b6c0-55285177dd55` returned **NO / NO** at
+authority `43e0c779e4b255624eefd021716d2afe5245020e` with the six finite
+amendments now incorporated above. The same Reader must reread this amended
+order and `NEXT.md` and return **YES / YES** before any G10 Builder starts.
