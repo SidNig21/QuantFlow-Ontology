@@ -203,7 +203,7 @@ async function clickDockCard(cdp: AppRpc, role: string, adapter = "Hermes", dupl
 
 async function runHermesFailureProof(env: NodeJS.ProcessEnv): Promise<{ pendingVisibleMs: number; sessionRowsAdded: number }> {
   const temp = mkdtempSync(join(PROOF_RESOURCES, ".qf-team-composition-ui-failure-"));
-  const dbPath = join(temp, "kernel.db");
+  const dbPath = join(temp, "qf-kernel-store.sqlite");
   const appDir = join(temp, "app");
   const child = spawn(ELECTRON, ["--disable-gpu", BUILT_MAIN], {
     cwd: COLLAB,
@@ -259,7 +259,7 @@ async function waitForSpawnReconciled(cdp: AppRpc, beforePending: number, timeou
 
 async function runDelayFalsification(env: NodeJS.ProcessEnv): Promise<Result> {
   const temp = mkdtempSync(join(PROOF_RESOURCES, ".qf-team-composition-ui-delay-"));
-  const dbPath = join(temp, "kernel.db");
+  const dbPath = join(temp, "qf-kernel-store.sqlite");
   const appDir = join(temp, "app");
   const child = spawn(ELECTRON, ["--disable-gpu", BUILT_MAIN], {
     cwd: COLLAB,
@@ -292,7 +292,7 @@ export async function runTeamCompositionUiGate(): Promise<Result> {
   await runBuild();
   const failureReceipt = falsify === "" ? await runHermesFailureProof(process.env) : null;
   const temp = mkdtempSync(join(PROOF_RESOURCES, ".qf-team-composition-ui-"));
-  const dbPath = join(temp, "kernel.db");
+  const dbPath = join(temp, "qf-kernel-store.sqlite");
   const appDir = join(temp, "app");
   const appOutput: string[] = [];
   const child = spawn(ELECTRON, ["--disable-gpu", BUILT_MAIN], {

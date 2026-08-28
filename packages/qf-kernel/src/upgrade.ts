@@ -539,17 +539,22 @@ function expectedD1(): StructureSnapshot {
   if (!d1Snapshot) {
     const current = expectedCurrent();
     d1Snapshot = {
-      tables: predecessorTables(current.tables),
-      linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
-      schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta).filter(
+      tables: tablesWithoutR17(predecessorTables(current.tables)),
+      linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds).filter(
+        (kind) => !["grades_ticket", "grades_run", "grades_strategy", "grades_run_result"].includes(kind),
+      ),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutTaskActions(current.schemaMeta).filter(
         ([typeName, kind]) =>
           kind !== "action" ||
           ![
             "ingest_market_batch",
             "register_venue",
             "schedule_market_event",
+            "clarify_task",
+            "redirect_task",
+            "record_strategy_outcome",
           ].includes(typeName),
-      ),
+      )),
     };
   }
   return d1Snapshot;
@@ -562,13 +567,13 @@ function expectedMarketIngest(): StructureSnapshot {
   if (!marketIngestSnapshot) {
     const current = expectedCurrent();
     marketIngestSnapshot = {
-      tables: predecessorTables(current.tables),
-      linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
-      schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta).filter(
+      tables: tablesWithoutR17(predecessorTables(current.tables)),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutTaskActions(current.schemaMeta).filter(
         ([typeName, kind]) =>
           kind !== "action" ||
           !["register_venue", "schedule_market_event"].includes(typeName),
-      ),
+      )),
     };
   }
   return marketIngestSnapshot;
@@ -581,9 +586,9 @@ function expectedMarketContext(): StructureSnapshot {
   if (!marketContextSnapshot) {
     const current = expectedCurrent();
     marketContextSnapshot = {
-      tables: predecessorTables(current.tables),
-      linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
-      schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta),
+      tables: tablesWithoutR17(predecessorTables(current.tables)),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutTaskActions(current.schemaMeta)),
     };
   }
   return marketContextSnapshot;
@@ -596,11 +601,11 @@ function expectedCapabilityGrants(): StructureSnapshot {
   if (!capabilityGrantsSnapshot) {
     const current = expectedCurrent();
     capabilityGrantsSnapshot = {
-      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(
+      tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(
         tablesWithoutTaskDelegation(tablesWithoutTaskStatus(current.tables)),
-      ))),
-      linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
-      schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta),
+      )))),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutTaskActions(current.schemaMeta)),
     };
   }
   return capabilityGrantsSnapshot;
@@ -613,11 +618,11 @@ function expectedTaskStatus(): StructureSnapshot {
   if (!taskStatusSnapshot) {
     const current = expectedCurrent();
     taskStatusSnapshot = {
-      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables)))),
-      linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
-      schemaMeta: schemaMetaWithoutConnectionActions(
+      tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables))))),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutConnectionActions(
         schemaMetaWithoutTaskDelegation(current.schemaMeta),
-      ),
+      )),
     };
   }
   return taskStatusSnapshot;
@@ -630,9 +635,9 @@ function expectedConnectionActions(): StructureSnapshot {
   if (!connectionActionsSnapshot) {
     const current = expectedCurrent();
     connectionActionsSnapshot = {
-      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables)))),
-      linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
-      schemaMeta: schemaMetaWithoutTaskDelegation(current.schemaMeta),
+      tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables))))),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutTaskDelegation(current.schemaMeta)),
     };
   }
   return connectionActionsSnapshot;
@@ -646,11 +651,11 @@ function expectedTaskDelegation(): StructureSnapshot {
   if (!taskDelegationSnapshot) {
     const current = expectedCurrent();
     taskDelegationSnapshot = {
-      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)))),
-      linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
-      schemaMeta: schemaMetaWithoutDeterministicExecution(
+      tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables))))),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutIndependentCritic(current.linkKinds)),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutDeterministicExecution(
         schemaMetaWithoutIndependentCritic(current.schemaMeta),
-      ),
+      )),
     };
   }
   return taskDelegationSnapshot;

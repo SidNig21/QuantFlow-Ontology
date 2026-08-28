@@ -428,7 +428,7 @@ describe("R11a deterministic local execution", () => {
 
     for (const { name, mutate } of cases) {
       const dir = mkdtempSync(join(tmpdir(), `qf-r16-${name}-`));
-      const path = join(dir, "kernel.db");
+      const path = join(dir, "qf-kernel-store.sqlite");
       const seeded = new Database(path);
       try {
         seeded.exec(readFileSync(PRE_D1_SQL, "utf8"));

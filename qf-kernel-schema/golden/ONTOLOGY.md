@@ -851,7 +851,7 @@ Own the governed review Task lifecycle mutation for Kernel-internal admission an
 - **lifecycle:** `experimental`
 - **internal-only:** `true`
 - **input:**
-- `operation` — Internal governed review Task operation.
+- `operation` — Internal governed review Task operation; every support write is dispatched through this action.
 - `action_kind` — Governed admission mode; required for admission.
 - `source_task_id` — Immutable source Task id for governed admission.
 - `source_work` — Kernel-frozen source-work tuple supplied by the public adapter.
@@ -862,6 +862,14 @@ Own the governed review Task lifecycle mutation for Kernel-internal admission an
 - `outcome` — Host delivery outcome for the governed review Task.
 - `reason_code` — Stable failure code when a running critic cannot complete its Evaluation.
 - `message` — Non-secret operator-readable completion failure message.
+- `invocation_id` — Stable broker invocation id for one governed critic tool receipt.
+- `session_id` — Admitted critic session that produced the tool receipt.
+- `task_id` — Governed review Task id that owns the tool receipt.
+- `tool_name` — Exact governed critic tool name recorded by the Kernel.
+- `arguments` — JSON object of tool arguments; never a second receipt store.
+- `result` — Tool result payload recorded in the governed invocation receipt.
+- `success` — Whether the governed tool call succeeded; omitted means success.
+- `broker_sequence` — Positive broker sequence that orders this receipt within the critic session.
 
 ### `publish_artifact`
 

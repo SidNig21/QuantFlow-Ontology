@@ -531,7 +531,7 @@ async function cleanupProcessSet(live: LiveCase, deadlineAt: number, label: stri
 
 async function spawnOwnedLaunch(root: string, activity: LaunchActivity): Promise<LiveCase> {
   const stores = join(root, "stores");
-  const kernelDb = join(stores, "kernel.db");
+  const kernelDb = join(stores, "qf-kernel-store.sqlite");
   const artifactRoot = join(stores, "artifacts");
   const appRoot = join(root, "app-root");
   mkdirSync(artifactRoot, { recursive: true });

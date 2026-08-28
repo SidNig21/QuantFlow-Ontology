@@ -69,6 +69,17 @@ export type GovernedReviewAdmission = {
 
 type JsonRecord = Record<string, unknown>;
 
+export type GovernedToolReceiptInput = {
+  invocation_id: string;
+  session_id: string;
+  task_id: string;
+  tool_name: string;
+  arguments: JsonRecord;
+  result: unknown;
+  success?: boolean;
+  broker_sequence: number;
+};
+
 function object(value: unknown, label: string): JsonRecord {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new KernelError(`${label} must be an object`);
@@ -205,7 +216,7 @@ function validateStoredSourceWork(db: KernelDb, work: SourceWork): void {
 }
 
 /** R14 binds the immutable tuple once. A later renderer/Main/critic value cannot replace it. */
-export function bindSourceWork(db: KernelDb, workInput: SourceWork, trace: GovernedReviewTrace): SourceWork {
+function bindSourceWorkInAction(db: KernelDb, workInput: SourceWork, trace: GovernedReviewTrace): SourceWork {
   ensureGovernedReviewSchema(db);
   const work = assertSourceWorkShape(workInput);
   validateStoredSourceWork(db, work);
@@ -279,7 +290,7 @@ function freezeSourceWorkInTransaction(db: KernelDb, sourceTaskId: string): Sour
 }
 
 type GovernedReviewTaskInput = {
-  operation: "admit" | "deliver" | "fail_completion";
+  operation: "admit" | "deliver" | "fail_completion" | "bind_source_work" | "record_tool_receipt";
   action_kind?: GovernedActionKind;
   source_task_id?: string;
   source_work?: unknown;
@@ -290,6 +301,14 @@ type GovernedReviewTaskInput = {
   outcome?: "delivered" | "failed";
   reason_code?: string;
   message?: string;
+  invocation_id?: string;
+  session_id?: string;
+  task_id?: string;
+  tool_name?: string;
+  arguments?: JsonRecord;
+  result?: unknown;
+  success?: boolean;
+  broker_sequence?: number;
 };
 
 function reviewTaskTitle(kind: "review" | "revision" | "second_critic"): string {
@@ -443,6 +462,25 @@ function failGovernedReviewCompletion(db: KernelDb, input: GovernedReviewTaskInp
 /** Execute-owned governed review Task lifecycle action. The caller owns no surrounding transaction. */
 export function executeGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput, trace: GovernedReviewTrace): GovernedReviewAdmission | Record<string, unknown> {
   ensureGovernedReviewSchema(db);
+  if (input.operation === "bind_source_work") {
+    return bindSourceWorkInAction(db, assertSourceWorkShape(input.source_work), trace);
+  }
+  if (input.operation === "record_tool_receipt") {
+    if (!input.invocation_id || !input.session_id || !input.task_id || !input.tool_name || !input.arguments || input.result === undefined || input.broker_sequence === undefined) {
+      throw new KernelError("governed_review_task tool receipt requires invocation_id, session_id, task_id, tool_name, arguments, result, and broker_sequence");
+    }
+    recordGovernedToolReceiptInAction(db, {
+      invocation_id: input.invocation_id,
+      session_id: input.session_id,
+      task_id: input.task_id,
+      tool_name: input.tool_name,
+      arguments: input.arguments,
+      result: input.result,
+      success: input.success,
+      broker_sequence: input.broker_sequence,
+    }, trace);
+    return { kind: "recorded", task_id: input.task_id, invocation_id: input.invocation_id };
+  }
   if (input.operation === "admit") return admitGovernedReviewTask(db, input, trace);
   if (input.operation === "deliver") return deliverGovernedReviewTask(db, input, trace);
   if (input.operation === "fail_completion") return failGovernedReviewCompletion(db, input, trace);
@@ -473,7 +511,7 @@ export function markGovernedCompletionFailed(
   }, trace);
 }
 
-export function recordGovernedToolReceipt(db: KernelDb, args: { invocation_id: string; session_id: string; task_id: string; tool_name: string; arguments: JsonRecord; result: unknown; success?: boolean; broker_sequence: number }, trace: GovernedReviewTrace): void {
+function recordGovernedToolReceiptInAction(db: KernelDb, args: GovernedToolReceiptInput, trace: GovernedReviewTrace): void {
   ensureGovernedReviewSchema(db);
   if (!GOVERNED_CRITIC_TOOLS.includes(args.tool_name as (typeof GOVERNED_CRITIC_TOOLS)[number])) throw new KernelError("critic callable tool is outside the exact governed policy");
   const task = db.query("SELECT source_work, critic_session_id, lifecycle FROM qf_review_task WHERE task_id = ?").get(args.task_id) as { source_work: string; critic_session_id: string | null; lifecycle: string } | null;
@@ -482,6 +520,16 @@ export function recordGovernedToolReceipt(db: KernelDb, args: { invocation_id: s
   if (!Number.isInteger(args.broker_sequence) || args.broker_sequence < 1) throw new KernelError("broker sequence must be a positive integer");
   db.query("INSERT INTO qf_review_invocation (invocation_id, session_id, task_id, tool_name, arguments, result, success, broker_sequence, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(args.invocation_id, args.session_id, args.task_id, args.tool_name, json(args.arguments), json(args.result), args.success === false ? 0 : 1, args.broker_sequence, new Date().toISOString());
   appendEvent(db, { type: "critic.tool_receipt", object_type: "task", object_id: args.task_id, payload: { critic_session_id: args.session_id, review_task_id: args.task_id, invocation_id: args.invocation_id, tool_name: args.tool_name, arguments: args.arguments, result: args.result, broker_sequence: args.broker_sequence }, trace_id: trace.trace_id });
+}
+
+/** Public adapter for the governed source-work binding action. */
+export function bindSourceWork(db: KernelDb, work: SourceWork, trace: GovernedReviewTrace): SourceWork {
+  return execute(db, "governed_review_task", { operation: "bind_source_work", source_work: work }, trace) as unknown as SourceWork;
+}
+
+/** Public adapter for the governed critic receipt action. */
+export function recordGovernedToolReceipt(db: KernelDb, args: GovernedToolReceiptInput, trace: GovernedReviewTrace): void {
+  execute(db, "governed_review_task", { operation: "record_tool_receipt", ...args }, trace);
 }
 
 function exactRubric(value: unknown): Rubric {

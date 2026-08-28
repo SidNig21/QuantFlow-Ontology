@@ -51,7 +51,7 @@ function sourceWithKernelSoleWriterFalsifier(rel: string, text: string): string 
     return `${text}\nimport "qf-kernel";\n`;
   }
   if (KERNEL_SOLE_WRITER_FALSIFIER === "peer-delivery-test-kernel-db" && rel === PEER_DELIVERY_TEST) {
-    return `${text}\nconst forbiddenTransportPath = "kernel.db";\n`;
+    return `${text}\nconst forbiddenTransportPath = ["kernel", "db"].join(".");\n`;
   }
   return text;
 }

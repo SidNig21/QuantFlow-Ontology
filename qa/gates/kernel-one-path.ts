@@ -120,15 +120,15 @@ function walk(dir: string, out: string[]): void {
   }
 }
 
-export function checkKernelOnePath(): { ok: boolean; offenders: string[] } {
+export function checkKernelOnePath(scanRoot = REPO_ROOT): { ok: boolean; offenders: string[] } {
   const files: string[] = [];
-  walk(REPO_ROOT, files);
+  walk(scanRoot, files);
 
   // Coverage floor. Walk swallows missing roots; empty files → PASS with no
   // allowlist check. Must always see the Kernel package this gate protects.
   const MIN_FILES = 200;
   const sawKernelPackage = files.some((f) =>
-    relative(REPO_ROOT, f).split("\\").join("/").startsWith("packages/qf-kernel/src/"),
+    relative(scanRoot, f).split("\\").join("/").startsWith("packages/qf-kernel/src/"),
   );
   if (files.length < MIN_FILES || !sawKernelPackage) {
     console.error(
@@ -141,7 +141,7 @@ export function checkKernelOnePath(): { ok: boolean; offenders: string[] } {
   const offenders: string[] = [];
 
   for (const full of files) {
-    const rel = relative(REPO_ROOT, full).split("\\").join("/");
+    const rel = relative(scanRoot, full).split("\\").join("/");
     if (isAllowed(rel)) continue;
     let text: string;
     try {

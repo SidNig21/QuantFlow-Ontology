@@ -260,30 +260,39 @@ export function executeSecondOpinion(db: KernelDb, input: Record<string, unknown
   return tx();
 }
 
-export function executeInternalTaskAction(db: KernelDb, command: string, input: Record<string, unknown>, trace: TrustedExecutionContext): TaskGovernanceResult {
-  switch (command) {
-    case "clarify_task":
-    case "redirect_task": return executeTaskSteering(db, command, input, trace);
-    case "record_task_steering_delivery": return executeTaskSteeringDelivery(db, input, trace);
-    case "record_task_steering_refusal": return executeTaskSteeringRefusal(db, input, trace);
-    case "record_task_cancel_outcome": return executeTaskCancelOutcome(db, input, trace);
-    case "request_second_opinion": return executeSecondOpinion(db, input, trace);
-    case "governed_review_task": return executeGovernedReviewTask(db, input as Parameters<typeof executeGovernedReviewTask>[1], trace) as unknown as TaskGovernanceResult;
-    default: throw new KernelError(`Unknown internal command "${command}"`);
-  }
-}
-
 const actionByName = new Map(schema.actions.map((action) => [action.name, action]));
-const INTERNAL_TASK_ACTIONS = new Set([
-  "clarify_task",
-  "redirect_task",
-  "record_task_steering_delivery",
-  "record_task_steering_refusal",
-  "record_task_cancel_outcome",
-  "request_second_opinion",
-  "governed_review_task",
-]);
-const INTERNAL_APP_ACTIONS = new Set(["record_strategy_outcome"]);
+type InternalTaskActionHandler = (db: KernelDb, input: Record<string, unknown>, trace: TrustedExecutionContext) => TaskGovernanceResult;
+type InternalAppActionHandler = (db: KernelDb, input: Record<string, unknown>, trace: TrustedExecutionContext) => ObjectExecuteResult;
+
+/** Runtime implementations for every schema action marked internal and task-owned. */
+export const internalTaskActionHandlers: Readonly<Record<string, InternalTaskActionHandler>> = {
+  clarify_task: (db, input, trace) => executeTaskSteering(db, "clarify_task", input, trace),
+  redirect_task: (db, input, trace) => executeTaskSteering(db, "redirect_task", input, trace),
+  record_task_steering_delivery: (db, input, trace) => executeTaskSteeringDelivery(db, input, trace),
+  record_task_steering_refusal: (db, input, trace) => executeTaskSteeringRefusal(db, input, trace),
+  record_task_cancel_outcome: (db, input, trace) => executeTaskCancelOutcome(db, input, trace),
+  request_second_opinion: (db, input, trace) => executeSecondOpinion(db, input, trace),
+  governed_review_task: (db, input, trace) => executeGovernedReviewTask(db, input as Parameters<typeof executeGovernedReviewTask>[1], trace) as unknown as TaskGovernanceResult,
+};
+
+/** Runtime implementations for every schema action marked internal and app-owned. */
+export const internalAppActionHandlers: Readonly<Record<string, InternalAppActionHandler>> = {
+  record_strategy_outcome: (db, input, trace) => recordStrategyOutcome(db, { action: "record_strategy_outcome", object_type: "artifact", event: "ticket.observed" }, input, trace),
+};
+
+/** The complete internal command handler surface used by the G8 completeness proof. */
+export const internalCommandHandlers: Readonly<Record<string, (db: KernelDb, input: Record<string, unknown>, trace: TrustedExecutionContext) => unknown>> = {
+  ...internalTaskActionHandlers,
+  ...internalAppActionHandlers,
+};
+export const INTERNAL_TASK_ACTIONS = new Set(Object.keys(internalTaskActionHandlers));
+export const INTERNAL_APP_ACTIONS = new Set(Object.keys(internalAppActionHandlers));
+
+export function executeInternalTaskAction(db: KernelDb, command: string, input: Record<string, unknown>, trace: TrustedExecutionContext): TaskGovernanceResult {
+  const handler = internalTaskActionHandlers[command];
+  if (!handler) throw new KernelError(`Unknown internal command "${command}"`);
+  return handler(db, input, trace);
+}
 
 function objectId(cmd: TransitionCommand, input: Record<string, unknown>): string {
   const key = transitionIdFields[cmd.type];
@@ -527,7 +536,9 @@ export function execute<C extends string>(
     return executeInternalTaskAction(db, command, validatedInput, trace) as unknown as ExecuteResultFor<C>;
   }
   if (INTERNAL_APP_ACTIONS.has(command)) {
-    return recordStrategyOutcome(db, { action: command, object_type: "artifact", event: "ticket.observed" }, validatedInput, trace) as ExecuteResultFor<C>;
+    const handler = internalAppActionHandlers[command];
+    if (!handler) throw new KernelError(`Unknown internal app command "${command}"`);
+    return handler(db, validatedInput, trace) as ExecuteResultFor<C>;
   }
 
   if (command === "reassign_task" || command === "cancel_task") {

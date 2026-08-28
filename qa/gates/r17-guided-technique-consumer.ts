@@ -28,7 +28,7 @@ async function launch(root: string, kernelDb: string, artifactRoot: string, appR
 async function closeLive(live: Live): Promise<void> { if (live.child.exitCode === null) await rpcCall(live.endpoint, "app.shutdown", {}).catch(() => {}); await waitForExit(live.child, 2_000).catch(() => {}); const after = await processSnapshot(); for (const row of ownedProcessRows(after, live.owned)) await terminateOwnedProcessTree(row.pid); assert(ownedProcessRows(await processSnapshot(), live.owned).length === 0, "owned process remains"); }
 
 export async function runR17GuidedTechniqueConsumerGate(): Promise<{ ok: boolean }> {
-  const root = mkdtempSync(join(tmpdir(), "qf-r17-guided-")); const kernelDb = join(root, "kernel.db"); const artifactRoot = join(root, "artifacts"); const appRoot = join(root, "app"); let live: Live | null = null; let ok = false;
+  const root = mkdtempSync(join(tmpdir(), "qf-r17-guided-")); const kernelDb = join(root, "qf-kernel-store.sqlite"); const artifactRoot = join(root, "artifacts"); const appRoot = join(root, "app"); let live: Live | null = null; let ok = false;
   const falsifier = process.env.QF_R17_GUIDED_FALSIFIER ?? "";
   assert(falsifier === "" || /^[1-8]$/.test(falsifier), "QF_R17_GUIDED_FALSIFIER must be empty or one of 1..8");
   try {

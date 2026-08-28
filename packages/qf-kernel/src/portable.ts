@@ -65,7 +65,16 @@ export {
   TASK_REFUSAL_MESSAGES,
   type TaskRefusalCode,
 } from "./errors.ts";
-export { eventCount, execute } from "./execute.ts";
+export {
+  eventCount,
+  execute,
+  executeInternalTaskAction,
+  INTERNAL_APP_ACTIONS,
+  INTERNAL_TASK_ACTIONS,
+  internalAppActionHandlers,
+  internalCommandHandlers,
+  internalTaskActionHandlers,
+} from "./execute.ts";
 export type {
   ExecuteResult,
   ExecuteResultFor,
@@ -97,6 +106,7 @@ export {
   type GovernedActionKind,
   type GovernedReviewAdmission,
   type GovernedReviewTrace,
+  type GovernedToolReceiptInput,
   type Rubric,
   type SourceWork,
 } from "./governed-review.ts";

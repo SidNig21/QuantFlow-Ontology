@@ -689,6 +689,28 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "golden-g8-kernel-proof",
+    description:
+      "G8: exact Kernel one-path dispositions, internal runtime-handler completeness, and Law-B support-write authority",
+    run: async () => {
+      const { runGoldenG8KernelProofGate } = await import(
+        "./gates/golden-g8-kernel-proof.ts"
+      );
+      return (await runGoldenG8KernelProofGate()).ok;
+    },
+  },
+  {
+    name: "golden-g8-schema-lifecycle",
+    description:
+      "G8: exact 89-object/link/action experimental lifecycle and promotion falsifier",
+    run: async () => {
+      const { runGoldenG8SchemaLifecycleGate } = await import(
+        "./gates/golden-g8-schema-lifecycle.ts"
+      );
+      return (await runGoldenG8SchemaLifecycleGate()).ok;
+    },
+  },
+  {
     name: "golden-g4-retired-route",
     description:
       "G4: route-aware staged package closure admits native_tui/host_acp and rejects retired or unknown routes before mutation",

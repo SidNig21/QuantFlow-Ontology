@@ -22,15 +22,10 @@ import {
   type LinkRow,
   type TraceContext,
   type TrustedExecutionContext,
-  bindSourceWork,
+  type GovernedReviewAdmission,
+  type GovernedToolReceiptInput,
   freezeSourceWork,
   governedReviewProjection,
-  markGovernedCompletionFailed,
-  markGovernedDelivery,
-  recordGovernedToolReceipt,
-  requestGovernedReview,
-  requestRevision,
-  requestSecondCritic,
   type SourceWork,
 } from "qf-kernel/portable";
 import { schema } from "qf-kernel-schema";
@@ -317,7 +312,10 @@ export function peerBusNotify(
     body: input.body,
   });
   const messageId = crypto.randomUUID();
-  const delivered = process.env.QF_PEER_DELIVERY !== "off";
+  const resultFalsifier = process.env.QF_HERMES_SYNTHETIC_RESULT_FALSIFY;
+  const suppressResult = input.kind === "result" &&
+    (resultFalsifier === "missing-result-observation" || resultFalsifier === "worker-complete-is-result");
+  const delivered = !suppressResult && process.env.QF_PEER_DELIVERY !== "off";
   const db = openPeerBus(path);
   try {
     if (delivered) {
@@ -629,7 +627,7 @@ export function kernelExecute<C extends string>(
 }
 
 export function kernelBindSourceWork(work: SourceWork): SourceWork {
-  return bindSourceWork(getKernelDb(), work, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  return kernelExecute("governed_review_task", { operation: "bind_source_work", source_work: work }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) as unknown as SourceWork;
 }
 
 export function kernelFreezeSourceWork(sourceTaskId: string): SourceWork {
@@ -637,11 +635,11 @@ export function kernelFreezeSourceWork(sourceTaskId: string): SourceWork {
 }
 
 export function kernelRequestGovernedReview(sourceTaskId: string, attemptId: string, criticSessionId: string | null) {
-  return requestGovernedReview(getKernelDb(), sourceTaskId, attemptId, criticSessionId, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  return kernelExecute("governed_review_task", { operation: "admit", action_kind: "request_review", source_task_id: sourceTaskId, attempt_id: attemptId, critic_session_id: criticSessionId }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) as unknown as GovernedReviewAdmission;
 }
 
 export function kernelMarkGovernedDelivery(reviewTaskId: string, outcome: "delivered" | "failed"): void {
-  markGovernedDelivery(getKernelDb(), reviewTaskId, outcome, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  kernelExecute("governed_review_task", { operation: "deliver", review_task_id: reviewTaskId, outcome }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
 }
 
 export type GovernedResearchContinuationInput = {
@@ -722,8 +720,8 @@ export async function kernelContinueGovernedResearchResult(
   };
 }
 
-export function kernelRecordGovernedToolReceipt(args: Parameters<typeof recordGovernedToolReceipt>[1]): void {
-  recordGovernedToolReceipt(getKernelDb(), args, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+export function kernelRecordGovernedToolReceipt(args: GovernedToolReceiptInput): void {
+  kernelExecute("governed_review_task", { operation: "record_tool_receipt", ...args }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
 }
 
 export function kernelGovernedReviewContextForSession(sessionId: string): { taskId: string; sourceWork: SourceWork } | null {
@@ -779,13 +777,12 @@ export function kernelFailGovernedCriticCompletion(
   reasonCode: string,
   message: string,
 ): void {
-  markGovernedCompletionFailed(
-    getKernelDb(),
-    reviewTaskId,
-    reasonCode,
+  kernelExecute("governed_review_task", {
+    operation: "fail_completion",
+    review_task_id: reviewTaskId,
+    reason_code: reasonCode,
     message,
-    { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
-  );
+  }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
 }
 
 export function kernelRecordGovernedEvaluation(input: Record<string, unknown>, actorSessionId: string): Record<string, unknown> {
@@ -793,11 +790,11 @@ export function kernelRecordGovernedEvaluation(input: Record<string, unknown>, a
 }
 
 export function kernelRequestRevision(work: SourceWork, evaluationId: string, attemptId: string) {
-  return requestRevision(getKernelDb(), work, evaluationId, attemptId, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  return kernelExecute("governed_review_task", { operation: "admit", action_kind: "request_revision", source_task_id: work.source_task_id, source_work: work, triggering_evaluation_id: evaluationId, attempt_id: attemptId }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) as unknown as GovernedReviewAdmission;
 }
 
 export function kernelRequestSecondCritic(work: SourceWork, evaluationId: string, attemptId: string, criticSessionId: string | null) {
-  return requestSecondCritic(getKernelDb(), work, evaluationId, attemptId, criticSessionId, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  return kernelExecute("governed_review_task", { operation: "admit", action_kind: "second_critic", source_task_id: work.source_task_id, source_work: work, triggering_evaluation_id: evaluationId, attempt_id: attemptId, critic_session_id: criticSessionId }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) as unknown as GovernedReviewAdmission;
 }
 
 export function kernelGovernedReviewProjection(sourceTaskId: string): Record<string, unknown> | null {
@@ -1283,9 +1280,10 @@ export function kernelSeedVisibleResearchWorld(input: {
   const persistedRun = input.runId ? kernelGetObject("run", input.runId) : null;
   const persistedRunParams = persistedRun ? jsonRecord(persistedRun.params) : {};
   const executorSessionId = String(persistedRunParams.executor_session_id ?? input.executorSessionId);
-  for (const [sessionId, definitionId, label] of [[input.directorSessionId, "hermes-research-director", "R17 fixture director"], [executorSessionId, "hermes-worker", "R17 fixture executor"], [input.criticSessionId, "hermes-critic", "R17 fixture critic"]] as const) {
+  for (const [sessionId, definitionId, label, actorSessionId] of [[input.directorSessionId, "hermes-research-director", "R17 fixture director", null], [executorSessionId, "hermes-worker", "R17 fixture executor", input.directorSessionId], [input.criticSessionId, "hermes-critic", "R17 fixture critic", input.directorSessionId]] as const) {
     if (!kernelGetObject("agent_session", sessionId)) {
-      kernelExecute("create_agent_session", { session_id: sessionId, agent_definition_id: definitionId, label }, trace());
+      const sessionTrace = actorSessionId ? { ...trace(), actor_session_id: actorSessionId } : trace();
+      kernelExecute("create_agent_session", { session_id: sessionId, agent_definition_id: definitionId, label }, sessionTrace);
       kernelExecute("start_agent_session", { session_id: sessionId }, trace());
     }
   }
@@ -1300,9 +1298,8 @@ export function kernelSeedVisibleResearchWorld(input: {
   const selectedStrategyId = process.env.QF_R17_FALSIFY_STRATEGY === "1"
     ? String(kernelListStrategyVersions().find((row) => Number(row.version) === 1)?.strategy_id ?? "")
     : input.strategyId;
-  const db = getKernelDb();
-  if (!db.query("SELECT 1 FROM links WHERE kind = 'delegates_to' AND from_id = ? AND to_id = ?").get(input.directorSessionId, executorSessionId)) {
-    db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'delegates_to', ?, ?, ?)").run(crypto.randomUUID(), input.directorSessionId, executorSessionId, new Date().toISOString());
+  if (!kernelGetLinks(input.directorSessionId, { kind: "delegates_to" }).some((link) => link.to_id === executorSessionId)) {
+    throw new Error("R16 fixture requires a Kernel-owned director-to-executor delegation link");
   }
   const existingRun = input.runId ? kernelGetObject("run", input.runId) : null;
   const existingParams = existingRun ? jsonRecord(existingRun.params) : {};
@@ -1326,18 +1323,18 @@ export function kernelSeedVisibleResearchWorld(input: {
     result_artifact_id: resultArtifactId,
     executor_session_id: executorSessionId,
   };
-  bindSourceWork(getKernelDb(), work, trace());
+  kernelBindSourceWork(work);
   const attemptId = `r16-review-${input.nonce}`;
-  const admitted = requestGovernedReview(getKernelDb(), taskId, attemptId, input.criticSessionId, trace());
+  const admitted = kernelRequestGovernedReview(taskId, attemptId, input.criticSessionId);
   if (admitted.kind !== "admitted" || !admitted.review_task_id) throw new Error("R16 fixture review admission did not produce a review Task");
-  markGovernedDelivery(getKernelDb(), admitted.review_task_id, "delivered", trace());
+  kernelMarkGovernedDelivery(admitted.review_task_id, "delivered");
   const reads = [
     ["qf_hypothesis_get", { id: input.hypothesisId }, 1],
     ["qf_run_get", { id: run.object_id }, 2],
     ["qf_artifact_get", { id: resultArtifactId }, 3],
   ] as const;
   for (const [toolName, args, sequence] of reads) {
-    recordGovernedToolReceipt(getKernelDb(), {
+    kernelRecordGovernedToolReceipt({
       invocation_id: `r16-${input.nonce}-${sequence}`,
       session_id: input.criticSessionId,
       task_id: admitted.review_task_id,

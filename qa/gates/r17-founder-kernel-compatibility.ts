@@ -112,7 +112,7 @@ function expectShapeRefused(path: string, mutate: (raw: Database) => void): void
 
 export async function runR17FounderKernelCompatibilityGate(): Promise<{ ok: boolean }> {
   const root = mkdtempSync(join(tmpdir(), "qf-r17-compat-"));
-  const path = join(root, "kernel.db");
+  const path = join(root, "qf-kernel-store.sqlite");
   try {
     createPreR17Fixture(path);
     const beforeRaw = new Database(path);

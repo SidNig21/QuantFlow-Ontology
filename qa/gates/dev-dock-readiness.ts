@@ -182,7 +182,7 @@ function baseEnvironment(root: string, resourceRoot: string = REPO): NodeJS.Proc
     QF_UI_PROOF_RESOURCE_ROOT: resourceRoot,
     QF_APP_ROOT: appRoot,
     QF_APP_DIR: join(appRoot, "app"),
-    QF_KERNEL_DB: join(appRoot, "kernel.db"),
+    QF_KERNEL_DB: join(appRoot, "qf-kernel-store.sqlite"),
     QF_PEER_BUS_DB: join(appRoot, "peer-bus.db"),
     QF_ARTIFACT_ROOT: join(appRoot, "artifacts"),
   };

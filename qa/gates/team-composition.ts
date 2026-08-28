@@ -83,7 +83,7 @@ function assertProductionDockContract(): void {
 
 export async function runTeamCompositionGate(): Promise<{ ok: boolean }> {
   const temp = mkdtempSync(join(tmpdir(), "qf-team-composition-"));
-  const dbPath = join(temp, "kernel.db");
+  const dbPath = join(temp, "qf-kernel-store.sqlite");
   try {
     assertProductionDockContract();
     let db = openKernel(dbPath, { create: true });

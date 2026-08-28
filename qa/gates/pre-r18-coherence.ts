@@ -719,7 +719,7 @@ async function assertRelationshipInspect(live: Live, link: { kind: string; from_
 }
 
 async function runLiveR17C14Proof(falsifier: Falsifier | null = null): Promise<boolean> {
-  const oracle = readOracle(); await buildOnce(); const root = resolve(mkdtempSync(join(tmpdir(), "qf-pre-r18-coherence-"))); const kernelDb = join(root, "stores", "kernel.db"); const artifactRoot = join(root, "stores", "artifacts"); const appRoot = join(root, "app-root"); mkdirSync(artifactRoot, { recursive: true }); let live: Live | null = null;
+  const oracle = readOracle(); await buildOnce(); const root = resolve(mkdtempSync(join(tmpdir(), "qf-pre-r18-coherence-"))); const kernelDb = join(root, "stores", "qf-kernel-store.sqlite"); const artifactRoot = join(root, "stores", "artifacts"); const appRoot = join(root, "app-root"); mkdirSync(artifactRoot, { recursive: true }); let live: Live | null = null;
   try {
     live = await launch(root, kernelDb, artifactRoot, appRoot);
     await captureState(live, "01-empty-workspace");

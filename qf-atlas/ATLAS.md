@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ 847f881f` on 2026-08-28 by
+> Generated from `wo-golden-g2 @ c7cc7f4a` on 2026-08-28 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**34 of 34 findings have not been looked at.**
+**31 of 31 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 34 |
+| `undecided` | 31 |
 | `repair` | 0 |
 | `remove` | 0 |
 | `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 34 findings still need a decision.
+**Not all clear.** 31 findings still need a decision.
 
 ## The four hops
 
@@ -290,7 +290,7 @@ the door. Generated schema SQL is included.
 | | |
 |---|---|
 | derivation state | `partial` |
-| dispatcher found at | `packages/qf-kernel/src/execute.ts:464` |
+| dispatcher found at | `packages/qf-kernel/src/execute.ts:473` |
 | actions mapped | 17 of 43 |
 | door files | `create.ts`, `deterministic-execution.ts`, `execute.ts`, `market-context.ts`, `market-ingest.ts`, `pipeline.ts` |
 
@@ -312,7 +312,7 @@ The question is not "does this file contain INSERT". It is **can production doma
 state reach this SQL without first entering a governed action?** Domain tables come
 from the generated schema; reachability follows call sites and the Kernel command table.
 
-**0 confirmed at `high` confidence**, 10 more at `medium`,
+**0 confirmed at `high` confidence**, 7 more at `medium`,
 2 unknown (gray — not counted as debt).
 
 The split matters. A `high` row is a domain-truth write reached from outside a governed
@@ -326,16 +326,13 @@ weaker claim, and it should not be read as the same kind of defect.
 
 | File | Table | Verb | Kind | Reach | Confidence |
 |---|---|---|---|---|---|
-| `collab-electron/src/main/kernel.ts` | `links` | INSERT INTO | domain-truth | unknown | medium |
 | `collab-electron/src/main/updater/update-manager.ts` | `check` | UPDATE | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_publication` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | INSERT INTO | non-domain-store | bypass | medium |
 
 ### Before you edit these
 
@@ -343,19 +340,6 @@ Everything that imports the file, directly or transitively. This is what breaks 
 change is wrong. **`atlas.json` carries this for every file** — 222 of
 223 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
-
-`collab-electron/src/main/kernel.ts` — **8 files depend on it**, it imports 7
-
-```
-  collab-electron/src/main/index.ts
-  collab-electron/src/main/ipc.ts
-  collab-electron/src/main/ontology-gateway.ts
-  collab-electron/src/main/host-native-tui.ts
-  collab-electron/src/main/agent-host.ts
-  collab-electron/src/main/connections-ipc.ts
-  collab-electron/src/main/ipc-kernel.ts
-  collab-electron/src/main/host-acp-turn.ts
-```
 
 `collab-electron/src/main/updater/update-manager.ts` — **2 files depend on it**, it imports 1
   · wires: `update:check`, `update:download`, `update:getStatus`, `update:install`
@@ -385,16 +369,16 @@ asked before the change, when nothing is red yet.
 
 **222 of 223 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**523 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**525 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 300 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 302 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
 | File | Dependents | Imports | Wires |
 |---|---:|---:|---:|
+| `packages/qf-kernel/src/trace.ts` | 52+ | 1 | 0 |
 | `collab-electron/src/main/file-filter.ts` | 51+ | 2 | 0 |
-| `packages/qf-kernel/src/trace.ts` | 51+ | 1 | 0 |
 | `packages/qf-kernel/src/registry-drift.ts` | 50+ | 0 | 0 |
 | `packages/qf-kernel/src/upgrade.ts` | 50+ | 3 | 0 |
 | `collab-electron/src/main/files.ts` | 48+ | 2 | 0 |
@@ -414,7 +398,7 @@ prevent a clean architectural result.
 | File | Coverage | SQL in text | SQL resolved |
 |---|---|---:|---:|
 | `packages/qf-kernel/src/upgrade.ts` | partial | 7 | 5 |
-| `collab-electron/src/main/kernel.ts` | partial | 8 | 7 |
+| `collab-electron/src/main/kernel.ts` | partial | 7 | 6 |
 | `packages/qf-kernel/src/db.ts` | partial | 1 | 0 |
 | `collab-electron/src/main/env.d.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/host-acp-bridge.ts` | unindexed | 0 | 0 |
@@ -430,11 +414,12 @@ prevent a clean architectural result.
 | `tools/qf-proof-agent/scripts/pack-agent.mjs` | unindexed | 0 | 0 |
 | …4 more | | | see `atlas.json` |
 
-> `kernel.ts`
-> is in this table, so the confirmed-violation count above is a **floor**, not a
-> total: it was computed from a partial read of the very file the finding concerns.
+> **No file carrying a confirmed violation is in this table.** Every file with a
+> confirmed finding was fully read, so the violation count is a total rather than a
+> floor. The gaps above are in files that carry no confirmed finding — they still
+> prevent a clean architectural result, because a gap cannot be called compliant.
 
-## Per-analyzer coverage (523 files)
+## Per-analyzer coverage (525 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -442,17 +427,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 519 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 267 | 0 | 3 | 0 | 253 |
-| `ipcPush` | 7 | 0 | 3 | 0 | 513 |
-| `persistence` | 23 | 26 | 0 | 0 | 474 |
-| `lifetime` | 5 | 56 | 0 | 0 | 462 |
-| `packaging` | 221 | 0 | 0 | 102 | 200 |
-| `ownership` | 19 | 0 | 0 | 334 | 170 |
-| `reach` | 220 | 3 | 0 | 300 | 0 |
+| `imports` | 521 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 267 | 0 | 3 | 0 | 255 |
+| `ipcPush` | 7 | 0 | 3 | 0 | 515 |
+| `persistence` | 23 | 26 | 0 | 0 | 476 |
+| `lifetime` | 5 | 56 | 0 | 0 | 464 |
+| `packaging` | 221 | 0 | 0 | 102 | 202 |
+| `ownership` | 19 | 0 | 0 | 334 | 172 |
+| `reach` | 220 | 3 | 0 | 302 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 300 files means those trees are
+failure — `reach: unsupported` on 302 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 102 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
@@ -462,16 +447,16 @@ manifests are not parsed, so ship status is genuinely unproven rather than assum
 **Unexplained undecided: 0.** This is the contract's
 target, and it is *not* the coverage number above — coverage counts analyzer cells,
 this counts findings nobody has ruled on that also fail to say why. Of the
-34 undecided findings, each carries a blocker:
+31 undecided findings, each carries a blocker:
 
 | Blocker | Findings | Meaning |
 |---|---:|---|
-| `founder-decision` | 19 | the code cannot say which answer is right — this needs your intent |
+| `founder-decision` | 16 | the code cannot say which answer is right — this needs your intent |
 | `ast-coverage` | 2 | the analyzer could not resolve this statically |
 | `package-proof` | 8 | a packaged or dynamically-loaded caller must be ruled out first |
 | `product-defect` | 5 | a real runtime defect: fix the code and the finding goes away |
 
-**19 of 34 are waiting on you, not on the tool.**
+**16 of 31 are waiting on you, not on the tool.**
 Zero unknowns is not the goal and never was: forcing that number down buys fake
 certainty. Zero *unexplained* is the goal, and it is met.
 
@@ -504,7 +489,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 573
 - `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 507
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 395
-- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 601
+- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 599
 
 ### Exact task delivery
 
@@ -512,17 +497,17 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/execute.ts** — UPDATE task at line 121
 - **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 640
-- **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 647
-- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 511
+- **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 695
+- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 509
 - `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 81
 
 ### Research review / publication
 
 2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 630
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 678
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1318
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 639
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 637
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 228
@@ -533,10 +518,10 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 359
 - **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 531
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 565
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 613
 - **packages/qf-kernel/src/strategy-outcome.ts** — INSERT INTO artifact at line 195
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentTrajectoryArtifact() at line 32
-- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 123
+- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 118
 - `packages/qf-kernel/src/resolve-artifact-root.ts` — exports resolveArtifactRoot() at line 25
 
 **`strong` is structural** — the file mutates the responsibility's table or owns its

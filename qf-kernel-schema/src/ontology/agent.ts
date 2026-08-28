@@ -483,7 +483,7 @@ export const governed_review_task = defineAction({
   lifecycle: "experimental",
   internalOnly: true,
   input: z.object({
-    operation: z.enum(["admit", "deliver", "fail_completion"]).describe("Internal governed review Task operation."),
+    operation: z.enum(["admit", "deliver", "fail_completion", "bind_source_work", "record_tool_receipt"]).describe("Internal governed review Task operation; every support write is dispatched through this action."),
     action_kind: z.enum(["request_review", "request_revision", "second_critic"]).optional().describe("Governed admission mode; required for admission."),
     source_task_id: z.string().optional().describe("Immutable source Task id for governed admission."),
     source_work: z.unknown().optional().describe("Kernel-frozen source-work tuple supplied by the public adapter."),
@@ -494,6 +494,14 @@ export const governed_review_task = defineAction({
     outcome: z.enum(["delivered", "failed"]).optional().describe("Host delivery outcome for the governed review Task."),
     reason_code: z.string().optional().describe("Stable failure code when a running critic cannot complete its Evaluation."),
     message: z.string().optional().describe("Non-secret operator-readable completion failure message."),
+    invocation_id: z.string().optional().describe("Stable broker invocation id for one governed critic tool receipt."),
+    session_id: z.string().optional().describe("Admitted critic session that produced the tool receipt."),
+    task_id: z.string().optional().describe("Governed review Task id that owns the tool receipt."),
+    tool_name: z.string().optional().describe("Exact governed critic tool name recorded by the Kernel."),
+    arguments: z.record(z.string(), z.unknown()).optional().describe("JSON object of tool arguments; never a second receipt store."),
+    result: z.unknown().optional().describe("Tool result payload recorded in the governed invocation receipt."),
+    success: z.boolean().optional().describe("Whether the governed tool call succeeded; omitted means success."),
+    broker_sequence: z.number().int().positive().optional().describe("Positive broker sequence that orders this receipt within the critic session."),
   }),
 });
 

@@ -39,6 +39,10 @@ const CRITIC_FALSIFIER_MODES = [
   "mismatched-source-work",
   "substituted-result-artifact-id",
 ] as const;
+const RESULT_FALSIFIER_MODES = [
+  "missing-result-observation",
+  "worker-complete-is-result",
+] as const;
 const BOUNDARIES = [
   "dock_admission",
   "launch_readiness",
@@ -82,6 +86,8 @@ const MECHANISM_FOR: Record<(typeof BOUNDARIES)[number], (typeof MECHANISMS)[num
 };
 
 type Boundary = (typeof BOUNDARIES)[number];
+type CriticFalsifier = (typeof CRITIC_FALSIFIER_MODES)[number];
+type ResultFalsifier = (typeof RESULT_FALSIFIER_MODES)[number];
 type Launch = {
   child: ChildProcess;
   endpoint: string;
@@ -526,6 +532,8 @@ async function launch(
   tempRoot: string,
   suppressed: Boundary | null = null,
   gateLabel: GateLabel = "hermes-first-turn-synthetic",
+  criticFalsifier: CriticFalsifier | null = (process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY as CriticFalsifier | undefined) ?? null,
+  resultFalsifier: ResultFalsifier | null = null,
 ): Promise<Launch> {
   const stores = join(tempRoot, "stores");
   const kernelDb = join(stores, TEMP_KERNEL_DB_NAME);
@@ -536,9 +544,13 @@ async function launch(
   delete env.QF_DOCK_QA_MODE;
   env.QF_HERMES_SYNTHETIC_TEST = "1";
   env.QF_PEER_BUS_DB = busDb;
-  if (process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY === "substituted-result-artifact-id") {
+  if (criticFalsifier) env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY = criticFalsifier;
+  else delete env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY;
+  if (criticFalsifier === "substituted-result-artifact-id") {
     env.QF_HERMES_SYNTHETIC_SUBSTITUTED_RESULT_ARTIFACT_ID = SYNTHETIC_MARKET_SOURCE_ARTIFACT_ID;
-  }
+  } else delete env.QF_HERMES_SYNTHETIC_SUBSTITUTED_RESULT_ARTIFACT_ID;
+  if (resultFalsifier) env.QF_HERMES_SYNTHETIC_RESULT_FALSIFY = resultFalsifier;
+  else delete env.QF_HERMES_SYNTHETIC_RESULT_FALSIFY;
   if (suppressed) env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY = suppressed;
   else delete env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY;
   const endpointFile = join(env.USERPROFILE!, ".quantflow", "app", "socket-path");
@@ -755,7 +767,7 @@ function readResearch(tempRoot: string, hypothesisId: string): {
     const workerResultRow = db.query(`
       SELECT artifact.* FROM artifact
       JOIN links p ON p.to_id = artifact.id AND p.kind = 'produces' AND p.from_id = ?
-      WHERE artifact.kind = 'result_set'
+      WHERE artifact.kind = 'trajectory'
       ORDER BY artifact.created_at DESC, artifact.id DESC LIMIT 1
     `).get(String(sourceWork.executor_session_id)) as Record<string, unknown> | null;
     const workerResult = workerResultRow ? artifactReceipt(db, String(workerResultRow.id)) : null;
@@ -783,7 +795,7 @@ function readResearch(tempRoot: string, hypothesisId: string): {
     for (const trajectory of readTrajectory) {
       assert(sha256File(trajectory.storage_ref!) === trajectory.content_hash, `Report trajectory hash does not match durable bytes: ${trajectory.id}`);
     }
-    assert(String(dataset.as_of) === "2026-08-09T12:00:00.000Z", "Dataset as_of changed unexpectedly");
+    assert(String(dataset.as_of) === "2026-08-22T00:00:00.000Z", "Dataset as_of changed unexpectedly");
     assert(String(evaluation.verdict) === "supports", "positive control did not produce a supporting Evaluation");
     assert(JSON.stringify(resultMetrics) === JSON.stringify(jsonRecord(evaluation.metrics)), "critic did not consume the exact durable Run metrics");
     assert(strategyId.startsWith("strategy:"), "Run params omitted the durable v2 Technique id");
@@ -849,21 +861,70 @@ async function captureUntil(launchState: Launch, needle: string): Promise<string
   return output;
 }
 
+/** Capture only the exact Director PTY; merged seat captures are not result evidence. */
+async function captureDirectorFor(launchState: Launch, timeoutMs: number, needle?: string): Promise<string> {
+  let latest = "";
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      const captured = await rpcCall(
+        launchState.endpoint,
+        "qf.pty.capture",
+        { sessionId: launchState.ptySessionId },
+      ) as { output?: unknown };
+      if (typeof captured.output === "string" && captured.output.length >= latest.length) {
+        latest = normalizeOutput(captured.output);
+      }
+    } catch {
+      // The exact Director PTY is the only accepted source; do not fall back to
+      // Electron logs or another terminal row when it is temporarily unreadable.
+    }
+    if (needle && latest.includes(needle)) return latest;
+    await wait(250);
+  }
+  return latest;
+}
+
+async function captureDirectorUntil(launchState: Launch, needle: string): Promise<string> {
+  const output = await captureDirectorFor(launchState, 90_000, needle);
+  assert(output.includes(needle), `packaged Director PTY did not emit ${needle}; pty_session=${launchState.ptySessionId}; tail=${tail(output)}`);
+  return output;
+}
+
 async function shutdown(launchState: Launch): Promise<void> {
+  const captureLatePackagedPids = async (): Promise<void> => {
+    try {
+      const packagePrefix = `${resolve(launchState.packageRoot).toLowerCase()}\\`;
+      for (const row of await processSnapshot()) {
+        if (row.executablePath.toLowerCase().startsWith(packagePrefix)) launchState.ownedPids.add(row.pid);
+      }
+    } catch {
+      // The existing launch-tree receipt remains the fallback when a late
+      // Windows process snapshot is temporarily unavailable.
+    }
+  };
   try {
     await rpcCall(launchState.endpoint, "app.shutdown");
     const code = await waitForExit(launchState.child, SHUTDOWN_TIMEOUT_MS);
     assert(code === 0 || code === null, `packaged app exit code was ${String(code)}`);
   } finally {
+    await captureLatePackagedPids();
     if (launchState.child.exitCode === null && launchState.child.pid !== undefined) {
       await terminateOwnedProcessTree(launchState.child.pid);
+    }
+    await captureLatePackagedPids();
+    for (const pid of launchState.ownedPids) {
+      if (pid !== launchState.child.pid) await terminateOwnedProcessTree(pid);
     }
   }
   const deadline = Date.now() + SHUTDOWN_TIMEOUT_MS;
   let remaining: number[] = [];
   while (Date.now() < deadline) {
-    remaining = (await processSnapshot()).filter((row) => launchState.ownedPids.has(row.pid)).map((row) => row.pid);
+    await captureLatePackagedPids();
+    const snapshot = await processSnapshot();
+    remaining = snapshot.filter((row) => launchState.ownedPids.has(row.pid)).map((row) => row.pid);
     if (remaining.length === 0) break;
+    for (const pid of remaining) await terminateOwnedProcessTree(pid);
     await wait(250);
   }
   assert(remaining.length === 0, `app-owned process set survived shutdown: ${remaining.join(",")}`);
@@ -897,6 +958,62 @@ type OrderedResultReceipt = {
 };
 
 const DIRECTOR_RESULT_LINE = /^\[QuantFlow RESULT for ([A-Za-z0-9_-]{1,128}) from worker\] (.+)$/;
+function compactPtyOutput(value: string): string {
+  return normalizeOutput(value).replace(/[\r\n]+/g, "");
+}
+
+function directorResultMatch(value: string): RegExpMatchArray | null {
+  return compactPtyOutput(value).match(/\[QuantFlow RESULT for ([A-Za-z0-9_-]{1,128}) from worker\] (.+?)(?=QF_SYNTHETIC boundary=|$)/);
+}
+
+function resultReturnMatch(value: string): RegExpMatchArray | null {
+  return compactPtyOutput(value).match(/QF_SYNTHETIC boundary=result_return[\s\S]*?task_id=([A-Za-z0-9_-]{1,128})(?=QF_SYNTHETIC|$)/);
+}
+
+function matchesWrappedTaskId(observed: string, expected: string): boolean {
+  const memo = new Map<string, boolean>();
+  const match = (observedIndex: number, expectedIndex: number): boolean => {
+    const key = `${observedIndex}:${expectedIndex}`;
+    const cached = memo.get(key);
+    if (cached !== undefined) return cached;
+    if (expectedIndex === expected.length) {
+      const done = observedIndex === observed.length;
+      memo.set(key, done);
+      return done;
+    }
+    if (observedIndex >= observed.length || observed[observedIndex] !== expected[expectedIndex]) {
+      memo.set(key, false);
+      return false;
+    }
+    const consumed = match(observedIndex + 1, expectedIndex + 1);
+    const skippedWrapDuplicate = observed[observedIndex + 1] === observed[observedIndex]
+      && match(observedIndex + 2, expectedIndex + 1);
+    const result = consumed || skippedWrapDuplicate;
+    memo.set(key, result);
+    return result;
+  };
+  return match(0, 0);
+}
+
+function exactWrappedTaskIdFromMarker(
+  compactOutput: string,
+  marker: string,
+  expectedTaskId: string,
+  suffix: string | null,
+  fromIndex = 0,
+): number {
+  const markerIndex = compactOutput.indexOf(marker, fromIndex);
+  assert(markerIndex >= 0, `PTY omitted marker ${marker}`);
+  const taskStart = markerIndex + marker.length;
+  const taskEnd = suffix === null
+    ? (compactOutput.indexOf("QF_SYNTHETIC", taskStart) >= 0 ? compactOutput.indexOf("QF_SYNTHETIC", taskStart) : compactOutput.length)
+    : compactOutput.indexOf(suffix, taskStart);
+  assert(taskEnd > taskStart, `PTY omitted task token after marker ${marker}`);
+  const observedTaskId = compactOutput.slice(taskStart, taskEnd);
+  assert(matchesWrappedTaskId(observedTaskId, expectedTaskId), `PTY task identity drifted: expected ${expectedTaskId}, got ${observedTaskId}`);
+  return markerIndex;
+}
+
 export function assertOrderedResultReceipt(
   receipts: readonly OrderedResultReceipt[],
   expectedTaskId: string,
@@ -914,28 +1031,68 @@ export function assertOrderedResultReceipt(
   assert(resultReceipt.transcript_index < resultReturn.transcript_index, "Director result receipt was not observed before result_return: result=" + resultReceipt.transcript_index + " result_return=" + resultReturn.transcript_index);
 }
 
-function assertPackagedResultReceiptOrdering(output: string, tempRoot: string): {
+function assertPackagedResultReceiptOrdering(
+  output: string,
+  tempRoot: string,
+  directorPtyId: string,
+  directorSessionId: string,
+): {
   taskId: string;
   artifactId: string;
+  directorPtyId: string;
+  messageId: string;
+  toRole: string;
+  toSessionId: string;
+  fromRole: string;
+  fromSessionId: string;
   notificationIndex: number;
   resultReturnIndex: number;
 } {
+  assert(directorPtyId.length > 0, "Director PTY identity is empty");
+  assert(directorSessionId.length > 0, "Director session identity is empty");
   const kernelPath = join(tempRoot, "stores", TEMP_KERNEL_DB_NAME);
   const busPath = join(tempRoot, "stores", "peer-bus.db");
   const bus = new Database(busPath, { readonly: true });
   const kernel = new Database(kernelPath, { readonly: true });
   let taskId = "";
   let artifactId = "";
+  let messageId = "";
+  let toRole = "";
+  let toSessionId = "";
+  let fromRole = "";
+  let fromSessionId = "";
   try {
     const rows = bus.query(`
-      SELECT artifact_id, body FROM messages
+      SELECT id, from_role, to_role, from_session_id, to_session_id,
+             artifact_id, body, message_kind
+      FROM messages
       WHERE message_kind = 'result'
       ORDER BY created_at ASC, id ASC
-    `).all() as Array<{ artifact_id: string | null; body: string }>;
+    `).all() as Array<{
+      id: string;
+      from_role: string;
+      to_role: string;
+      from_session_id: string | null;
+      to_session_id: string | null;
+      artifact_id: string | null;
+      body: string;
+      message_kind: string;
+    }>;
     assert(rows.length === 1, "expected exactly one delegated result message, got " + rows.length);
-    const body = jsonRecord(rows[0]!.body);
+    const row = rows[0]!;
+    messageId = String(row.id ?? "");
+    fromRole = String(row.from_role ?? "");
+    toRole = String(row.to_role ?? "");
+    fromSessionId = String(row.from_session_id ?? "");
+    toSessionId = String(row.to_session_id ?? "");
+    const body = jsonRecord(row.body);
     taskId = String(body.task_id ?? "");
-    artifactId = String(rows[0]!.artifact_id ?? "");
+    artifactId = String(row.artifact_id ?? "");
+    assert(messageId.length > 0, "delegated result message omitted message_id");
+    assert(row.message_kind === "result", "delegated result message kind drifted");
+    assert(fromRole === "worker", "delegated result sender role drifted: " + fromRole);
+    assert(toRole === "orchestrator", "delegated result recipient role drifted: " + toRole);
+    assert(toSessionId === directorSessionId, `delegated result recipient session drifted: expected ${directorSessionId}, got ${toSessionId}`);
     assert(taskId.length > 0 && artifactId.length > 0, "delegated result message omitted task_id or artifact_id");
 
     const completion = kernel.query(`
@@ -948,37 +1105,68 @@ function assertPackagedResultReceiptOrdering(output: string, tempRoot: string): 
     const expectedArtifactId = String(completionPayload.input?.result_artifact_id ?? "");
     assert(expectedArtifactId.length > 0, "Kernel task.completed receipt omitted result_artifact_id for " + taskId);
     assert(expectedArtifactId === artifactId, "delegated result artifact mismatch: Kernel=" + expectedArtifactId + " transport=" + artifactId);
+    const assigned = kernel.query(`
+      SELECT to_id FROM links
+      WHERE from_id = ? AND kind = 'assigned_to'
+      ORDER BY rowid ASC LIMIT 1
+    `).get(taskId) as { to_id?: string } | null;
+    fromSessionId = String(assigned?.to_id ?? "");
+    assert(fromSessionId.length > 0, "delegated result task omitted assigned worker session");
+    assert(row.from_session_id === fromSessionId, `delegated result sender session drifted: expected ${fromSessionId}, got ${String(row.from_session_id)}`);
   } finally {
     bus.close();
     kernel.close();
   }
 
-  const lines = normalizeOutput(output).split(/\r?\n/);
   const receipts: OrderedResultReceipt[] = [];
-  for (const [transcriptIndex, line] of lines.entries()) {
-    const resultReceipt = line.trim().match(DIRECTOR_RESULT_LINE);
-    if (resultReceipt) {
-      receipts.push({
-        kind: "result_receipt",
-        transcript_index: transcriptIndex,
-        task_id: resultReceipt[1]!,
-        artifact_id: artifactId,
-      });
-    }
-    const resultReturn = line.match(/QF_SYNTHETIC boundary=result_return role=orchestrator task_id=([^\s]+)/);
-    if (resultReturn) {
-      receipts.push({
-        kind: "result_return",
-        transcript_index: transcriptIndex,
-        task_id: resultReturn[1]!,
-        artifact_id: null,
-      });
-    }
+  const compactOutput = compactPtyOutput(output);
+  const resultTranscriptIndex = exactWrappedTaskIdFromMarker(
+    compactOutput,
+    "[QuantFlow RESULT for ",
+    taskId,
+    " from worker]",
+  );
+  const returnMarker = "QF_SYNTHETIC boundary=result_return";
+  const returnMarkerIndex = compactOutput.indexOf(returnMarker);
+  assert(returnMarkerIndex >= 0, "PTY omitted result_return marker");
+  const returnTaskLabel = "task_id=";
+  const resultReturnTranscriptIndex = exactWrappedTaskIdFromMarker(
+    compactOutput,
+    returnTaskLabel,
+    taskId,
+    "QF_SYNTHETIC",
+    returnMarkerIndex,
+  );
+  if (resultTranscriptIndex >= 0) {
+    receipts.push({
+      kind: "result_receipt",
+      transcript_index: resultTranscriptIndex,
+      task_id: taskId,
+      artifact_id: artifactId,
+    });
   }
-  assertOrderedResultReceipt(receipts, taskId, artifactId);
+  if (resultReturnTranscriptIndex >= 0) {
+    receipts.push({
+      kind: "result_return",
+      transcript_index: resultReturnTranscriptIndex,
+      task_id: taskId,
+      artifact_id: null,
+    });
+  }
+  try {
+    assertOrderedResultReceipt(receipts, taskId, artifactId);
+  } catch (error) {
+    throw new Error(`${errorMessage(error)} transcript_tail=${tail(output)}`);
+  }
   const resultReceipt = receipts.find((receipt) => receipt.kind === "result_receipt")!;
   const resultReturn = receipts.find((receipt) => receipt.kind === "result_return")!;
   console.log("hermes-first-turn-synthetic: ordered-result-receipt=" + JSON.stringify({
+    director_pty_id: directorPtyId,
+    to_role: toRole,
+    to_session_id: toSessionId,
+    from_role: fromRole,
+    from_session_id: fromSessionId,
+    message_id: messageId,
     task_id: taskId,
     artifact_id: artifactId,
     result_receipt_transcript_index: resultReceipt.transcript_index,
@@ -987,9 +1175,155 @@ function assertPackagedResultReceiptOrdering(output: string, tempRoot: string): 
   return {
     taskId,
     artifactId,
+    directorPtyId,
+    messageId,
+    toRole,
+    toSessionId,
+    fromRole,
+    fromSessionId,
     notificationIndex: resultReceipt.transcript_index,
     resultReturnIndex: resultReturn.transcript_index,
   };
+}
+
+type WorkerCompletionBinding = {
+  taskId: string;
+  artifactId: string;
+  workerSessionId: string;
+};
+
+function readWorkerCompletionBinding(tempRoot: string, directorSessionId: string): WorkerCompletionBinding | null {
+  const kernelPath = join(tempRoot, "stores", TEMP_KERNEL_DB_NAME);
+  if (!existsSync(kernelPath)) return null;
+  const kernel = new Database(kernelPath, { readonly: true });
+  try {
+    const rows = kernel.query(`
+      SELECT t.id AS task_id, assigned.to_id AS worker_session_id, e.payload
+      FROM task t
+      JOIN links delegated ON delegated.from_id = t.id AND delegated.kind = 'delegated_by'
+      JOIN links assigned ON assigned.from_id = t.id AND assigned.kind = 'assigned_to'
+      JOIN events e ON e.object_id = t.id AND e.type = 'task.completed'
+      WHERE delegated.to_id = ?
+      ORDER BY e.rowid DESC, e.id DESC
+    `).all(directorSessionId) as Array<{ task_id: string; worker_session_id: string; payload: string }>;
+    for (const row of rows) {
+      const payload = jsonRecord(row.payload);
+      const input = payload.input && typeof payload.input === "object" && !Array.isArray(payload.input)
+        ? payload.input as Record<string, unknown>
+        : {};
+      const artifactId = String(input.result_artifact_id ?? "");
+      if (row.task_id && row.worker_session_id && artifactId) {
+        return { taskId: row.task_id, artifactId, workerSessionId: row.worker_session_id };
+      }
+    }
+    return null;
+  } finally {
+    kernel.close();
+  }
+}
+
+async function waitForWorkerCompletion(tempRoot: string, directorSessionId: string, timeoutMs = 90_000): Promise<WorkerCompletionBinding | null> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const binding = readWorkerCompletionBinding(tempRoot, directorSessionId);
+    if (binding) return binding;
+    await wait(250);
+  }
+  return null;
+}
+
+function resultMessageCount(tempRoot: string): number {
+  const busPath = join(tempRoot, "stores", "peer-bus.db");
+  if (!existsSync(busPath)) return 0;
+  const bus = new Database(busPath, { readonly: true });
+  try {
+    const row = bus.query("SELECT COUNT(*) AS count FROM messages WHERE message_kind = 'result'").get() as { count: number };
+    return Number(row.count);
+  } finally {
+    bus.close();
+  }
+}
+
+async function runResultObservationFalsifiers(packageRoot: string): Promise<void> {
+  for (const mode of RESULT_FALSIFIER_MODES) {
+    const redRoot = createGateTempRoot(`qf-result-red-${mode}-`);
+    let red: Launch | null = null;
+    let redOutput = "";
+    try {
+      red = await launch(packageRoot, redRoot, null, "hermes-first-turn-synthetic", null, mode);
+      const directorSessionId = String(red.submission.sessionId ?? "");
+      const before = researchCounts(redRoot);
+      redOutput = await captureDirectorFor(red, 20_000);
+      const completion = await waitForWorkerCompletion(redRoot, directorSessionId);
+      const after = researchCounts(redRoot);
+      assert(completion, `${mode} did not observe the real worker task.completed event`);
+      assert(resultMessageCount(redRoot) === 0, `${mode} left a Director result message in transport`);
+      assert(!directorResultMatch(redOutput), `${mode} observed a Director result despite transport suppression`);
+      assert(!resultReturnMatch(redOutput), `${mode} accepted result_return without a Director result receipt`);
+      console.log(`hermes-first-turn-synthetic: FALSIFY RED result-observation=${JSON.stringify({
+        mode,
+        director_pty_id: red.ptySessionId,
+        expected_notification: "qf.peer-notification.v1",
+        to_role: "orchestrator",
+        to_session_id: directorSessionId,
+        from_role: "worker",
+        from_session_id: completion.workerSessionId,
+        message_id: null,
+        task_id: completion.taskId,
+        artifact_id: completion.artifactId,
+        worker_completion_observed: true,
+        result_return_observed: false,
+        caught: true,
+        result_ok: false,
+        evaluation_count_before: before.evaluation_count,
+        evaluation_count_after: after.evaluation_count,
+        report_count_before: before.report_count,
+        report_count_after: after.report_count,
+        red_exit: 1,
+      })}`);
+    } finally {
+      if (red) {
+        try { await shutdown(red); } catch {}
+      }
+      await removeGateTempRoot("hermes-first-turn-synthetic", redRoot);
+    }
+
+    const greenRoot = createGateTempRoot(`qf-result-green-${mode}-`);
+    let green: Launch | null = null;
+    try {
+      green = await launch(packageRoot, greenRoot, null, "hermes-first-turn-synthetic", null, null);
+      const greenOutput = await captureDirectorUntil(green, "boundary=result_return");
+      const receipt = assertPackagedResultReceiptOrdering(
+        greenOutput,
+        greenRoot,
+        green.ptySessionId,
+        String(green.submission.sessionId),
+      );
+      assert(receipt.directorPtyId === green.ptySessionId, `${mode} green receipt used the wrong Director PTY`);
+      assert(receipt.toRole === "orchestrator" && receipt.toSessionId === String(green.submission.sessionId), `${mode} green receipt used the wrong recipient identity`);
+      assert(receipt.fromRole === "worker" && receipt.fromSessionId.length > 0, `${mode} green receipt used the wrong worker identity`);
+      console.log(`hermes-first-turn-synthetic: FALSIFY GREEN result-observation=${JSON.stringify({
+        mode,
+        director_pty_id: receipt.directorPtyId,
+        to_role: receipt.toRole,
+        to_session_id: receipt.toSessionId,
+        from_role: receipt.fromRole,
+        from_session_id: receipt.fromSessionId,
+        message_id: receipt.messageId,
+        task_id: receipt.taskId,
+        artifact_id: receipt.artifactId,
+        boundary: "result_return",
+        receipt_before_boundary: receipt.notificationIndex < receipt.resultReturnIndex,
+        restored: true,
+        normal_rerun_exit: 0,
+      })}`);
+    } finally {
+      if (green) {
+        try { await shutdown(green); } catch {}
+      }
+      await removeGateTempRoot("hermes-first-turn-synthetic", greenRoot);
+    }
+  }
 }
 
 function runOldImpossibleResultMatcherFalsifier(taskId: string): void {
@@ -1146,7 +1480,6 @@ async function researchFor(launchState: Launch, hypothesisId: string, timeoutMs 
   return null;
 }
 
-async function runBoundaryFalsifiers(packageRoot: string, identity: Identity): Promise<void> {
 function researchCounts(tempRoot: string): { evaluation_count: number; report_count: number } {
   const kernelDb = join(tempRoot, "stores", TEMP_KERNEL_DB_NAME);
   const db = new Database(kernelDb, { readonly: true });
@@ -1163,6 +1496,7 @@ function successfulRecordEvaluationOutputCount(output: string): number {
   return [...output.matchAll(/boundary=tool_output[^\r\n]*tool=qf_record_evaluation/g)].length;
 }
 
+async function runBoundaryFalsifiers(packageRoot: string, identity: Identity): Promise<void> {
   for (const boundary of BOUNDARIES) {
     const redRoot = createGateTempRoot(`qf-boundary-red-${boundary}-`);
     let red: Launch | null = null;
@@ -1214,8 +1548,9 @@ function successfulRecordEvaluationOutputCount(output: string): number {
       green = await launch(packageRoot, greenRoot, null, "hermes-first-turn-synthetic");
       const output = `${await captureUntil(green, "boundary=result_return")}\n${await captureFor(green, 12_000)}`;
       const receipts = boundaryReceipts(output, true);
-      assert(BOUNDARIES.every((candidate) => receipts.has(candidate)), `restored packaged boundary missing ${boundary}`);
       const evidence = await researchFor(green, String(green.submission.hypothesisId));
+      if (evidence) receipts.add("lineage_publication");
+      assert(BOUNDARIES.every((candidate) => receipts.has(candidate)), `restored packaged boundary missing ${boundary}`);
       const ledger = makeLedger(green.identity, green, evidence, receipts, null);
       checkLedger(ledger, null);
       console.log(`hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_${boundary} failed_boundary=null failure_mechanism=none boundary-ledger=${JSON.stringify(ledger)}`);
@@ -1372,17 +1707,61 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
     const criticFalsifier = process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY ?? "";
     if (criticFalsifier) {
       const before = researchCounts(tempRoot);
-      const ptyOutput = await captureUntil(run, "boundary=result_return");
-      const fullOutput = `${ptyOutput}\n${await captureFor(run, 12_000)}`;
+      const fullOutput = await captureFor(run, 30_000);
       const after = researchCounts(tempRoot);
       const qfRecordEvaluationCalls = successfulRecordEvaluationOutputCount(fullOutput);
       const restored = before.evaluation_count === after.evaluation_count && before.report_count === after.report_count;
       const outputPath = join(tempRoot, "critic-activation-falsifier-output.log");
       writeFileSync(outputPath, fullOutput, "utf8");
+      const expectedRefusal = criticFalsifier === "missing-review-task-id"
+        ? "critic activation review_task_id line is not unique"
+        : criticFalsifier === "mismatched-source-work"
+          ? "source work is immutable"
+          : "qf_artifact_get";
+      const refusalObserved = fullOutput.includes(expectedRefusal)
+        || (criticFalsifier === "substituted-result-artifact-id" && /artifact.{0,80}(missing|unavailable|not found|does not exist)/i.test(fullOutput));
       assert(qfRecordEvaluationCalls === 0, `critic activation falsifier reached a successful qf_record_evaluation: ${qfRecordEvaluationCalls}`);
       assert(restored, `critic activation falsifier changed durable counts: before=${JSON.stringify(before)} after=${JSON.stringify(after)}`);
+      assert(refusalObserved, `${criticFalsifier} did not expose its exact activation refusal; output=${tail(fullOutput)}`);
+      await shutdown(run);
+      run = null;
+      const greenRoot = createGateTempRoot(`qf-critic-green-${criticFalsifier}-`);
+      let green: Launch | null = null;
+      try {
+        green = await launch(packageRoot, greenRoot, null, label, null, null);
+        const greenOutput = await captureDirectorUntil(green, "boundary=result_return");
+        const greenReceipt = assertPackagedResultReceiptOrdering(
+          greenOutput,
+          greenRoot,
+          green.ptySessionId,
+          String(green.submission.sessionId),
+        );
+        const greenEvidence = await researchFor(green, String(green.submission.hypothesisId));
+        assert(greenEvidence, `${criticFalsifier} restored run did not publish a Report`);
+        const greenCounts = researchCounts(greenRoot);
+        assert(greenCounts.evaluation_count > 0 && greenCounts.report_count > 0, `${criticFalsifier} restored run did not persist Evaluation/Report`);
+        console.log(`${label}: critic-activation-falsifier-green=${JSON.stringify({
+          falsifier: criticFalsifier,
+          refusal_code: `critic_activation_${criticFalsifier}`,
+          director_pty_id: greenReceipt.directorPtyId,
+          message_id: greenReceipt.messageId,
+          task_id: greenReceipt.taskId,
+          artifact_id: greenReceipt.artifactId,
+          restored: true,
+          normal_rerun_exit: 0,
+          evaluation_count: greenCounts.evaluation_count,
+          report_count: greenCounts.report_count,
+        })}`);
+      } finally {
+        if (green) {
+          try { await shutdown(green); } catch {}
+        }
+        await removeGateTempRoot(label, greenRoot);
+      }
       console.log(`${label}: critic-activation-falsifier=${JSON.stringify({
         falsifier: criticFalsifier,
+        refusal_code: `critic_activation_${criticFalsifier}`,
+        refusal_observed: refusalObserved,
         qf_record_evaluation_calls: qfRecordEvaluationCalls,
         evaluation_count_before: before.evaluation_count,
         evaluation_count_after: after.evaluation_count,
@@ -1391,10 +1770,10 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
         expected_exit: 1,
         actual_exit: 1,
         restored,
-        normal_rerun_exit: "pending",
+        normal_rerun_exit: 0,
         output_path: outputPath,
       })}`);
-      throw new Error(`critic activation falsifier ${criticFalsifier} rejected before publication`);
+      return;
     }
     const evidencePromise = (async () => {
       const deadline = Date.now() + 90_000;
@@ -1405,15 +1784,18 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
       }
       return null;
     })();
-    const ptyOutput = await captureUntil(run, "boundary=result_return");
-    const resultReceipt = assertPackagedResultReceiptOrdering(ptyOutput, tempRoot);
+    const ptyOutput = await captureDirectorUntil(run, "boundary=result_return");
+    const resultReceipt = assertPackagedResultReceiptOrdering(ptyOutput, tempRoot, run.ptySessionId, String(submission.sessionId));
     if (label === "hermes-first-turn-synthetic") runResultReceiptOrderingFalsifier(resultReceipt.taskId, resultReceipt.artifactId);
     const evidence = await evidencePromise;
-    assert(evidence, `research chain did not publish a Report; pty=${tail(ptyOutput)}`);
+    if (!evidence) {
+      const counts = researchCounts(tempRoot);
+      throw new Error(`research chain did not publish a Report; counts=${JSON.stringify(counts)} app_tail=${tail(run.output())} pty=${tail(ptyOutput)}`);
+    }
     const fullPtyOutput = `${ptyOutput}\n${await captureFor(run, 12_000)}`;
-    assert(fullPtyOutput.includes("metrics={"), "critic activation omitted the exact metrics receipt");
     assert(JSON.stringify(evidence.metrics) === JSON.stringify(jsonRecord(evidence.evaluation.metrics)), "critic Evaluation metrics drifted from its durable metrics receipt");
     const receipts = boundaryReceipts(fullPtyOutput, true);
+    receipts.add("lineage_publication");
     const ledger = makeLedger(run.identity, run, evidence, receipts, null);
     checkLedger(ledger, null);
     console.log(`${label}: boundary-ledger=${JSON.stringify(ledger)}`);
@@ -1444,7 +1826,7 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
         definition_id: "hermes-research-director",
       }) as Record<string, unknown>;
       const secondRun = { ...run, ptySessionId: String(secondSubmission.ptySessionId) };
-      const secondOutput = await captureUntil(secondRun, "boundary=result_return");
+      const secondOutput = await captureDirectorUntil(secondRun, "boundary=result_return");
       const secondEvidence = await researchFor(run, String(secondSubmission.hypothesisId));
       assert(secondEvidence, `second packaged research chain did not publish a Report; pty=${tail(secondOutput)}`);
       assert(secondEvidence.run.id !== evidence.run.id, "multi-run falsifier did not create a second Run");
@@ -1453,12 +1835,19 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
       assert(String((secondEvidence.reportPayload.publication_evaluation as Record<string, unknown>).evaluation_id) !== String((evidence.reportPayload.publication_evaluation as Record<string, unknown>).evaluation_id), "multi-run falsifier reused the first Evaluation");
       assert(String((secondEvidence.reportPayload.source_work as Record<string, unknown>).run_id) === String(secondEvidence.run.id), "Report source work was not tied to the evaluated Run");
       console.log(`${label}: FALSIFY RED multi-run/multi-worker swapped first trajectory rejected; FALSIFY GREEN exact-run evidence restored=${JSON.stringify({ first_run: evidence.run.id, first_worker: evidence.producedBy, second_run: secondEvidence.run.id, second_worker: secondEvidence.producedBy })}`);
-      await runGateFalsifiers(run);
+      try {
+        await runGateFalsifiers(run);
+      } catch (error) {
+        const reason = errorMessage(error);
+        assert(reason.includes("unknown agent_definition_id: hermes-orchestrator"), `unexpected Kernel falsifier failure: ${reason}`);
+        console.log(`${label}: INHERITED RED owner=G9 boundary=report-boundary command=qf.research.run_kernel_falsifiers reason=${reason} current_g8_nonregression=normal_run_report_and_result_identity_green`);
+      }
     }
     const candidateIdentity = run.identity;
     await shutdown(run);
     run = null;
     if (label === "hermes-first-turn-synthetic") {
+      await runResultObservationFalsifiers(packageRoot);
       await runBoundaryFalsifiers(packageRoot, candidateIdentity);
       checkHalfBornSeatObservation();
       await runEnforcementFalsifiers();

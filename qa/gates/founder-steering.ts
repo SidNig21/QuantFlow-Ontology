@@ -291,7 +291,7 @@ function falsifierName(): string | null {
 export async function runFounderSteeringGate(): Promise<{ ok: boolean }> {
   const startedAt = performance.now();
   const root = mkdtempSync(join(tmpdir(), "qf-founder-steering-"));
-  const kernelDb = join(root, "stores", "kernel.db");
+  const kernelDb = join(root, "stores", "qf-kernel-store.sqlite");
   const artifactRoot = join(root, "stores", "artifacts");
   const appRoot = join(root, "app-root");
   const hermesRoot = join(root, "hermes-profile-root");

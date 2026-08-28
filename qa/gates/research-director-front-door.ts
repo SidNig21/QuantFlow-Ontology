@@ -823,7 +823,7 @@ async function runFrontDoorProof(
   const runRoot = mkdtempSync(join(tmpdir(), "qf-rd1-front-door-"));
   roots.push(runRoot);
   const storeRoot = join(runRoot, "stores");
-  const kernelDb = join(storeRoot, "kernel.db");
+  const kernelDb = join(storeRoot, "qf-kernel-store.sqlite");
   const artifactRoot = join(storeRoot, "artifacts");
   const appRoot = join(runRoot, "app-root");
   const appDir = join(appRoot, "app");

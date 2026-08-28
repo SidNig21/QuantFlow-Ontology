@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "847f881f",
+    "commit": "c7cc7f4a",
     "generatedAt": "2026-08-28",
-    "filesScanned": 404,
+    "filesScanned": 406,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "f9c1ea6c6be0bd49"
+    "fingerprint": "3271c7c6de78f434"
   },
   "stats": {
     "live": 104,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 111,
-      "indexed": 1113,
+      "indexed": 1115,
       "downgradedFromCheats": 21,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 15,
@@ -307,9 +307,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 523
+      "files": 525
     },
-    "coverageFiles": 523,
+    "coverageFiles": 525,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -340,7 +340,7 @@
     },
     "unexplainedCoverage": 0,
     "stripCandidates": 7,
-    "violations": 10,
+    "violations": 7,
     "governanceUnknown": 2,
     "legacyLeads": 9,
     "nodes": 99,
@@ -348,11 +348,11 @@
     "loopsTotal": 8,
     "unreaped": 2,
     "conditionalReap": 0,
-    "undecided": 34,
+    "undecided": 31,
     "allClear": false,
     "decisions": {
-      "total": 34,
-      "undecided": 34,
+      "total": 31,
+      "undecided": 31,
       "keep": 0,
       "repair": 0,
       "remove": 0,
@@ -362,7 +362,7 @@
     },
     "unexplainedUndecided": 0,
     "blockers": {
-      "founder-decision": 19,
+      "founder-decision": 16,
       "ast-coverage": 2,
       "package-proof": 8,
       "product-defect": 5
@@ -1600,29 +1600,29 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 59.1,
+      "kb": 59.9,
       "x": -0.23,
       "z": 1.3,
-      "status": "alert",
+      "status": "gray",
       "spawns": 0,
       "writes": 7,
-      "dml": 8,
+      "dml": 7,
       "executes": 3,
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 59.1,
+          "kb": 59.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 7,
-          "dml": 8,
+          "dml": 7,
           "dmlLines": [
-            250,
-            285,
-            286,
-            287,
-            288,
-            325
+            245,
+            280,
+            281,
+            282,
+            283,
+            323
           ],
           "executes": 3
         }
@@ -1632,15 +1632,15 @@
         {
           "kind": "outside-write-door",
           "scope": "product",
-          "what": "8 SQL statements outside execute()",
+          "what": "7 SQL statements outside execute()",
           "where": "collab-electron/src/main/kernel.ts",
           "lines": [
-            250,
-            285,
-            286,
-            287,
-            288,
-            325
+            245,
+            280,
+            281,
+            282,
+            283,
+            323
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -2010,7 +2010,7 @@
       "id": "2:collab-electron/src/main/sidecar",
       "layer": 2,
       "name": "sidecar/",
-      "kb": 35.3,
+      "kb": 35.5,
       "x": 1.24,
       "z": -0.45,
       "status": "ok",
@@ -2021,7 +2021,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/sidecar/server.ts",
-          "kb": 22.6,
+          "kb": 22.8,
           "spawns": 4,
           "spawnsLive": 1,
           "writes": 1,
@@ -2969,7 +2969,7 @@
       "id": "0:packages/qf-kernel/src::execute",
       "layer": 0,
       "name": "execute.ts",
-      "kb": 31.6,
+      "kb": 32.8,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -2980,7 +2980,7 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/execute.ts",
-          "kb": 31.6,
+          "kb": 32.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3004,31 +3004,31 @@
       "id": "0:packages/qf-kernel/src::governed",
       "layer": 0,
       "name": "governed-review.ts",
-      "kb": 42.6,
+      "kb": 44.4,
       "x": -0.23,
       "z": 1.3,
       "status": "alert",
       "spawns": 0,
       "writes": 1,
       "dml": 27,
-      "executes": 5,
+      "executes": 7,
       "files": [
         {
           "path": "packages/qf-kernel/src/governed-review.ts",
-          "kb": 42.6,
+          "kb": 44.4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
           "dml": 27,
           "dmlLines": [
-            101,
-            106,
-            121,
-            134,
+            112,
+            117,
+            132,
             145,
-            152
+            156,
+            163
           ],
-          "executes": 5
+          "executes": 7
         }
       ],
       "strip": [],
@@ -3039,12 +3039,12 @@
           "what": "27 SQL statements outside execute()",
           "where": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            101,
-            106,
-            121,
-            134,
+            112,
+            117,
+            132,
             145,
-            152
+            156,
+            163
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -3205,7 +3205,7 @@
       "id": "0:packages/qf-kernel/src::upgrade",
       "layer": 0,
       "name": "upgrade.ts",
-      "kb": 42.3,
+      "kb": 42.9,
       "x": -1.24,
       "z": 0.45,
       "status": "gray",
@@ -3216,7 +3216,7 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/upgrade.ts",
-          "kb": 42.3,
+          "kb": 42.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3225,9 +3225,9 @@
             54,
             189,
             197,
-            840,
-            841,
-            845
+            845,
+            846,
+            850
           ],
           "executes": 0
         }
@@ -3240,12 +3240,12 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 857.5,
+      "kb": 896.4,
       "x": 0,
       "z": 0,
       "status": "ice",
       "spawns": 80,
-      "writes": 37,
+      "writes": 44,
       "dml": 19,
       "executes": 49,
       "files": [
@@ -3261,7 +3261,7 @@
         },
         {
           "path": "qa/gates/hermes-research.ts",
-          "kb": 80.4,
+          "kb": 96.8,
           "spawns": 4,
           "spawnsLive": 2,
           "writes": 1,
@@ -3331,7 +3331,7 @@
         },
         {
           "path": "qa/gates/team-composition-ui.ts",
-          "kb": 24,
+          "kb": 24.1,
           "spawns": 5,
           "spawnsLive": 5,
           "writes": 0,
@@ -3407,6 +3407,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/golden-g8-kernel-proof.ts",
+          "kb": 14.2,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 5,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/windows-installer.ts",
           "kb": 12.8,
           "spawns": 4,
@@ -3418,7 +3428,7 @@
         },
         {
           "path": "qa/gates/r17-guided-technique-consumer.ts",
-          "kb": 11.5,
+          "kb": 11.6,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -3521,6 +3531,16 @@
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/golden-g8-schema-lifecycle.ts",
+          "kb": 8.1,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 2,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -4204,7 +4224,7 @@
       "id": "5:qa::run",
       "layer": 5,
       "name": "qa/run.ts",
-      "kb": 36.8,
+      "kb": 37.5,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -4215,7 +4235,7 @@
       "files": [
         {
           "path": "qa/run.ts",
-          "kb": 36.8,
+          "kb": 37.5,
           "spawns": 3,
           "spawnsLive": 2,
           "writes": 0,
@@ -4568,7 +4588,7 @@
       "id": "1:qf-kernel-schema/src/ontology",
       "layer": 1,
       "name": "ontology/",
-      "kb": 63.6,
+      "kb": 64.6,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -4589,7 +4609,7 @@
         },
         {
           "path": "qf-kernel-schema/src/ontology/agent.ts",
-          "kb": 21.6,
+          "kb": 22.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -6120,7 +6140,7 @@
       "id": "0:residue",
       "layer": 0,
       "name": "35 small modules*",
-      "kb": 80.5,
+      "kb": 80.9,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6223,7 +6243,7 @@
         },
         {
           "path": "packages/qf-kernel/src/index.ts",
-          "kb": 3,
+          "kb": 3.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -6233,7 +6253,7 @@
         },
         {
           "path": "packages/qf-kernel/src/portable.ts",
-          "kb": 3,
+          "kb": 3.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -7729,7 +7749,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "execute() via requestGovernedReview"
+              "detail": "execute() via kernelExecute"
             }
           ],
           "breakAt": null
@@ -7757,7 +7777,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "execute() via requestRevision"
+              "detail": "execute() via kernelExecute"
             }
           ],
           "breakAt": null
@@ -7785,7 +7805,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "execute() via requestSecondCritic"
+              "detail": "execute() via kernelExecute"
             }
           ],
           "breakAt": null
@@ -8125,10 +8145,10 @@
       "path": "collab-electron/src/main/kernel.ts",
       "status": "partial",
       "indexedFns": 75,
-      "sqlInText": 8,
-      "sqlIndexed": 7,
+      "sqlInText": 7,
+      "sqlIndexed": 6,
       "sqlUnrecognised": 0,
-      "why": "8 SQL site(s) in the text, 7 resolved into a function. The unresolved ones are invisible to governance analysis."
+      "why": "7 SQL site(s) in the text, 6 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
       "path": "packages/qf-kernel/src/db.ts",
@@ -9015,7 +9035,7 @@
     {
       "path": "packages/qf-kernel/src/execute.ts",
       "status": "indexed",
-      "indexedFns": 29,
+      "indexedFns": 37,
       "sqlInText": 7,
       "sqlIndexed": 7,
       "sqlUnrecognised": 0
@@ -9031,7 +9051,7 @@
     {
       "path": "packages/qf-kernel/src/governed-review.ts",
       "status": "indexed",
-      "indexedFns": 38,
+      "indexedFns": 40,
       "sqlInText": 27,
       "sqlIndexed": 27,
       "sqlUnrecognised": 0
@@ -9961,6 +9981,14 @@
       "status": "out-of-scope"
     },
     {
+      "path": "qa/gates/golden-g8-kernel-proof.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/golden-g8-schema-lifecycle.ts",
+      "status": "out-of-scope"
+    },
+    {
       "path": "qa/gates/governed-review.ts",
       "status": "out-of-scope"
     },
@@ -10521,7 +10549,7 @@
     "dispatcherFiles": [
       {
         "file": "packages/qf-kernel/src/execute.ts",
-        "line": 464
+        "line": 473
       }
     ],
     "implementations": {
@@ -10726,7 +10754,7 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelAssertSessionMayClose() at line 601"
+            "exports kernelAssertSessionMayClose() at line 599"
           ],
           "strong": [],
           "weight": "weak"
@@ -10812,14 +10840,14 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "UPDATE task at line 647"
+            "UPDATE task at line 695"
           ],
           "weight": "strong"
         },
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelListTaskAssignments() at line 511"
+            "exports kernelListTaskAssignments() at line 509"
           ],
           "strong": [],
           "weight": "weak"
@@ -10902,13 +10930,13 @@
         {
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [
-            "exports ensureGovernedReviewSchema() at line 99",
-            "exports executeGovernedReviewTask() at line 444",
-            "exports requestGovernedReview() at line 452"
+            "exports ensureGovernedReviewSchema() at line 110",
+            "exports executeGovernedReviewTask() at line 463",
+            "exports requestGovernedReview() at line 490"
           ],
           "strong": [
-            "INSERT INTO evaluation at line 630",
-            "UPDATE evaluation at line 642"
+            "INSERT INTO evaluation at line 678",
+            "UPDATE evaluation at line 690"
           ],
           "weight": "strong"
         },
@@ -10923,9 +10951,9 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelRequestGovernedReview() at line 639",
-            "exports kernelGovernedReviewContextForSession() at line 729",
-            "exports kernelGovernedReviewNextSequence() at line 739"
+            "exports kernelRequestGovernedReview() at line 637",
+            "exports kernelGovernedReviewContextForSession() at line 727",
+            "exports kernelGovernedReviewNextSequence() at line 737"
           ],
           "strong": [],
           "weight": "weak"
@@ -10990,7 +11018,7 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "INSERT INTO artifact at line 565"
+            "INSERT INTO artifact at line 613"
           ],
           "weight": "strong"
         },
@@ -11013,7 +11041,7 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports getArtifactRoot() at line 123"
+            "exports getArtifactRoot() at line 118"
           ],
           "strong": [],
           "weight": "weak"
@@ -14811,7 +14839,7 @@
       "ownership": "indexed",
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "1 of 8 SQL site(s) are not inside a named function, so no call path can be traced",
+        "persistence": "1 of 7 SQL site(s) are not inside a named function, so no call path can be traced",
         "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
@@ -19933,6 +19961,56 @@
       "unexplained": []
     },
     {
+      "path": "qa/gates/golden-g8-kernel-proof.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "qa/gates/golden-g8-schema-lifecycle.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
       "path": "qa/gates/governed-review.test.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -23670,41 +23748,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 519,
+      "indexed": 521,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 253,
+      "not-applicable": 255,
       "indexed": 267,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 513,
+      "not-applicable": 515,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 474,
+      "not-applicable": 476,
       "partial": 26,
       "indexed": 23
     },
     "lifetime": {
-      "not-applicable": 462,
+      "not-applicable": 464,
       "partial": 56,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 200,
+      "not-applicable": 202,
       "unsupported": 102,
       "indexed": 221
     },
     "ownership": {
-      "not-applicable": 170,
+      "not-applicable": 172,
       "unsupported": 334,
       "indexed": 19
     },
     "reach": {
-      "unsupported": 300,
+      "unsupported": 302,
       "indexed": 220,
       "partial": 3
     }
@@ -26430,9 +26508,10 @@
       "importers": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "packages/qf-kernel/src/governed-review.ts"
       ],
-      "importerCount": 3,
+      "importerCount": 4,
       "imports": [
         "qf-kernel-schema/src/schema.ts",
         "qf-kernel-schema/src/commands.ts",
@@ -31279,12 +31358,12 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "packages/qf-kernel/src/create.ts",
         "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts"
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -31348,11 +31427,11 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts"
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -31510,11 +31589,11 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts"
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -31606,6 +31685,7 @@
       "transitiveDependents": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "packages/qf-kernel/src/pipeline.ts",
         "qa/gates/artifact-root/run.ts",
         "qa/gates/boot-reconcile/run.ts",
@@ -31652,6 +31732,7 @@
       "directDependents": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "packages/qf-kernel/src/governed-review.ts"
       ],
       "transitiveDependents": [
@@ -31685,13 +31766,12 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
+        "qa/run.ts",
         "packages/qf-kernel/src/create.ts",
         "packages/qf-kernel/src/execute.ts",
-        "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts"
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -31800,11 +31880,11 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "packages/qf-kernel/src/governed-review.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts"
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -31963,6 +32043,7 @@
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/governed-review.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "packages/qf-kernel/src/pipeline.ts",
         "qa/gates/artifact-root/run.ts",
         "qa/gates/boot-reconcile/run.ts",
@@ -31993,8 +32074,7 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts",
-        "qa/run.ts"
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32047,11 +32127,11 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts"
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32108,12 +32188,12 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "packages/qf-kernel/src/governed-review.ts",
         "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts"
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32171,11 +32251,11 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "packages/qf-kernel/src/governed-review.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
-        "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts"
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32227,20 +32307,13 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "packages/qf-kernel/src/governed-review.ts",
         "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
         "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts",
-        "collab-electron/src/main/index.ts",
-        "collab-electron/src/main/ipc.ts",
-        "collab-electron/src/main/ontology-gateway.ts",
-        "collab-electron/src/main/host-native-tui.ts",
-        "collab-electron/src/main/agent-host.ts",
-        "collab-electron/src/main/connections-ipc.ts",
-        "collab-electron/src/main/ipc-kernel.ts",
-        "collab-electron/src/main/host-acp-turn.ts"
+        "tools/qf-bovada-football/src/index.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32731,6 +32804,7 @@
       "transitiveDependents": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "packages/qf-kernel/src/governed-review.ts",
         "packages/qf-kernel/src/create.ts",
         "qa/gates/artifact-root/run.ts",
@@ -32817,6 +32891,7 @@
         "collab-electron/src/main/kernel.ts",
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/governed-review.ts",
+        "qa/gates/golden-g8-kernel-proof.ts",
         "collab-electron/scripts/package-verify.ts",
         "qa/gates/bovada-football/run.ts",
         "qa/gates/package-closure/lazy-loader.ts",
@@ -38385,8 +38460,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -38398,9 +38473,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -38453,10 +38526,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -38510,10 +38583,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -38623,7 +38696,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -38666,8 +38739,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -38681,9 +38754,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -38736,10 +38807,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -38776,10 +38847,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -38880,7 +38951,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -38923,8 +38994,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -38938,9 +39009,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -39029,10 +39098,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -39078,10 +39147,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -39182,7 +39251,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -39559,8 +39628,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": "kernelExecute",
         "diskFile": "collab-electron/src/main/kernel.ts",
         "dmlAll": [],
@@ -39576,13 +39645,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
-          "packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -39635,10 +39698,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -39675,10 +39738,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -39783,168 +39846,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -39982,7 +39883,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -40505,8 +40406,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": "kernelEnsureSampleResearchDataset",
         "diskFile": "collab-electron/src/main/kernel.ts",
         "dmlAll": [],
@@ -40522,9 +40423,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -40595,10 +40494,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -40646,10 +40545,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -40750,7 +40649,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -40793,8 +40692,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": "kernelExecute",
         "diskFile": "collab-electron/src/main/kernel.ts",
         "dmlAll": [],
@@ -40812,13 +40711,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
-          "packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -40871,10 +40764,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -40911,10 +40804,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -41019,168 +40912,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -41218,7 +40949,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -41341,8 +41072,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": "kernelExecute",
         "diskFile": "collab-electron/src/main/kernel.ts",
         "dmlAll": [],
@@ -41373,13 +41104,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
-          "packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -41483,10 +41208,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -41559,10 +41284,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -41684,168 +41409,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -41883,7 +41446,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -42032,7 +41595,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "execute() via requestGovernedReview"
+          "detail": "execute() via kernelExecute"
         }
       ],
       "registeredAt": {
@@ -42047,7 +41610,7 @@
       },
       "hop4": {
         "kind": "write-door",
-        "viaDoor": "requestGovernedReview",
+        "viaDoor": "kernelExecute",
         "viaDml": "ensureGovernedReviewSchema",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
@@ -42084,9 +41647,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -42127,24 +41688,6 @@
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "execute",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/index.ts",
-              "packages/qf-kernel/src/execute.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "execute",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/index.ts",
-              "packages/qf-kernel/src/execute.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -42226,6 +41769,95 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "requireTrace",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/trace.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "extractCreationEnvelope",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/links.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeCreation",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/create.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executePipeline",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/pipeline.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "handler",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/bovada-capture-rpc.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "transaction",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "run",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "appendEvent",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/events.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "parse",
             "from": "collab-electron/src/main/runtime-adapter.ts",
             "candidates": [
@@ -42238,6 +41870,106 @@
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
               "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "handler",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/bovada-capture-rpc.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "assertDurableOntologyReadReceipt",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           }
@@ -42288,7 +42020,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "execute() via requestRevision"
+          "detail": "execute() via kernelExecute"
         }
       ],
       "registeredAt": {
@@ -42303,7 +42035,7 @@
       },
       "hop4": {
         "kind": "write-door",
-        "viaDoor": "requestRevision",
+        "viaDoor": "kernelExecute",
         "viaDml": "ensureGovernedReviewSchema",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
@@ -42332,9 +42064,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -42342,15 +42072,6 @@
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "execute",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/index.ts",
-              "packages/qf-kernel/src/execute.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -42413,8 +42134,113 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "requireTrace",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/trace.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "extractCreationEnvelope",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/links.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeCreation",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/create.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executePipeline",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/pipeline.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "handler",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/bovada-capture-rpc.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "transaction",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "run",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "appendEvent",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/events.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
             "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "handler",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/bovada-capture-rpc.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts",
               "collab-electron/src/main/peer-role-registry.ts"
@@ -42423,25 +42249,84 @@
           },
           {
             "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "parse",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "name": "all",
+            "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
+              "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "parse",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "assertDurableOntologyReadReceipt",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           }
@@ -42492,7 +42377,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "execute() via requestSecondCritic"
+          "detail": "execute() via kernelExecute"
         }
       ],
       "registeredAt": {
@@ -42507,7 +42392,7 @@
       },
       "hop4": {
         "kind": "write-door",
-        "viaDoor": "requestSecondCritic",
+        "viaDoor": "kernelExecute",
         "viaDml": "ensureGovernedReviewSchema",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
@@ -42541,9 +42426,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -42584,24 +42467,6 @@
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "execute",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/index.ts",
-              "packages/qf-kernel/src/execute.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "execute",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/index.ts",
-              "packages/qf-kernel/src/execute.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -42683,8 +42548,16 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "requireTrace",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/trace.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts",
               "collab-electron/src/main/peer-role-registry.ts"
@@ -42692,18 +42565,74 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "name": "extractCreationEnvelope",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/links.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeCreation",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/create.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executePipeline",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/pipeline.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "handler",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/bovada-capture-rpc.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "transaction",
+            "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "parse",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "name": "run",
+            "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "appendEvent",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/events.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -42720,6 +42649,106 @@
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
               "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "handler",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/bovada-capture-rpc.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "assertDurableOntologyReadReceipt",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/ontology-read-receipt.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           }
@@ -42786,8 +42815,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -42802,9 +42831,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -42928,10 +42955,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -43010,10 +43037,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -43114,7 +43141,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -43157,8 +43184,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -43174,9 +43201,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -43265,10 +43290,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -43309,7 +43334,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -43546,8 +43571,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -43564,9 +43589,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -43704,10 +43727,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -43744,10 +43767,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -43848,7 +43871,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -43891,8 +43914,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "orchestrateNativeTuiAdmission",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -43919,8 +43942,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -44014,7 +44036,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -44057,8 +44079,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "trace",
-        "dmlFile": "collab-electron/src/main/kernel.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": "kernelExecute",
         "diskFile": "collab-electron/src/main/kernel.ts",
         "dmlAll": [],
@@ -44085,16 +44107,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "collab-electron/src/main/kernel.ts::trace",
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
-          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
-          "packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion",
-          "packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -44192,10 +44205,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -44291,10 +44304,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -44450,168 +44463,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -44649,7 +44500,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to collab-electron/src/main/kernel.ts::trace, packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -44692,8 +44543,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "recordStrategyOutcome",
-        "dmlFile": "packages/qf-kernel/src/strategy-outcome.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": "kernelExecute",
         "diskFile": "collab-electron/src/main/kernel.ts",
         "dmlAll": [
@@ -44722,12 +44573,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -44788,10 +44634,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -44836,10 +44682,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -44976,168 +44822,6 @@
               "collab-electron/src/main/launcher-readiness.ts",
               "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
               "tools/qf-proof-agent/src/qf-proof-agent.mjs"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -45347,8 +45031,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "trace",
-        "dmlFile": "collab-electron/src/main/kernel.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": "kernelExecute",
         "diskFile": "collab-electron/src/main/kernel.ts",
         "dmlAll": [],
@@ -45373,16 +45057,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "collab-electron/src/main/kernel.ts::trace",
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
-          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
-          "packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion",
-          "packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -45435,10 +45110,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -45508,10 +45183,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -45616,168 +45291,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -45815,7 +45328,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to collab-electron/src/main/kernel.ts::trace, packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -45858,8 +45371,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "trace",
-        "dmlFile": "collab-electron/src/main/kernel.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": "kernelExecute",
         "diskFile": "collab-electron/src/main/kernel.ts",
         "dmlAll": [],
@@ -45897,16 +45410,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "collab-electron/src/main/kernel.ts::trace",
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
-          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
-          "packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion",
-          "packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -45995,10 +45499,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -46140,10 +45644,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -46265,168 +45769,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -46464,7 +45806,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to collab-electron/src/main/kernel.ts::trace, packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -46507,8 +45849,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "trace",
-        "dmlFile": "collab-electron/src/main/kernel.ts",
+        "viaDml": "appendEvent",
+        "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": "kernelExecute",
         "diskFile": "collab-electron/src/main/kernel.ts",
         "dmlAll": [],
@@ -46532,16 +45874,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "collab-electron/src/main/kernel.ts::trace",
-          "packages/qf-kernel/src/events.ts::appendEvent",
-          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
-          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
-          "packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion",
-          "packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt",
-          "packages/qf-kernel/src/strategy-outcome.ts::link",
-          "packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome"
+          "packages/qf-kernel/src/events.ts::appendEvent"
         ],
         "unresolvedCallees": [
           {
@@ -46594,10 +45927,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "recordStrategyOutcome",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/strategy-outcome.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -46667,10 +46000,10 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeGovernedReviewTask",
+            "name": "handler",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
-              "packages/qf-kernel/src/governed-review.ts"
+              "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -46775,168 +46108,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -46974,7 +46145,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to collab-electron/src/main/kernel.ts::trace, packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::failGovernedReviewCompletion, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, packages/qf-kernel/src/strategy-outcome.ts::link, packages/qf-kernel/src/strategy-outcome.ts::recordStrategyOutcome, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -50494,36 +49665,6 @@
   ],
   "persistence": [
     {
-      "id": "persistence:collab-electron/src/main/kernel.ts:kernelSeedVisibleResearchWorld:links:insert-into",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "kernelSeedVisibleResearchWorld",
-      "table": "links",
-      "verb": "INSERT INTO",
-      "persistence": "domain-truth",
-      "sourceClass": "product",
-      "reachability": "unknown",
-      "governance": "violation",
-      "confidence": "medium",
-      "reachProof": {
-        "corroborated": false,
-        "hops": 0,
-        "path": [],
-        "why": "no AST call path with a supporting module edge reaches kernelSeedVisibleResearchWorld from an app file within 5 hops"
-      },
-      "blocker": "ast-coverage",
-      "why": "App code writes the domain table `links` directly. The Kernel is the sole writer; this SQL sits outside the Kernel package entirely. No corroborated production reach: no AST call path with a supporting module edge reaches kernelSeedVisibleResearchWorld from an app file within 5 hops.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "collab-electron/src/main/kernel.ts",
-          "lines": [
-            1305
-          ]
-        }
-      ]
-    },
-    {
       "id": "persistence:collab-electron/src/main/updater/update-manager.ts:error:check:update",
       "classification": "governance-violation",
       "disposition": "repair",
@@ -50554,43 +49695,6 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:bindSourceWork:qf_review_source_work:insert-into",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "bindSourceWork",
-      "table": "qf_review_source_work",
-      "verb": "INSERT INTO",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "bypass",
-      "governance": "violation",
-      "confidence": "medium",
-      "reachProof": {
-        "corroborated": true,
-        "hops": 1,
-        "path": [
-          {
-            "from": "collab-electron/src/main/kernel.ts:1329",
-            "fn": "kernelSeedVisibleResearchWorld",
-            "calls": "bindSourceWork"
-          }
-        ],
-        "alternatives": 1,
-        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
-      },
-      "blocker": null,
-      "why": "Writes `qf_review_source_work`, a table absent from the generated schema, reachable from outside the write door.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            216
-          ]
-        }
-      ]
-    },
-    {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
       "classification": "governance-violation",
       "disposition": "repair",
@@ -50607,17 +49711,17 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:209",
-            "fn": "bindSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:236",
+            "fn": "freezeSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1329",
-            "fn": "kernelSeedVisibleResearchWorld",
-            "calls": "bindSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:634",
+            "fn": "kernelFreezeSourceWork",
+            "calls": "freezeSourceWork"
           }
         ],
-        "alternatives": 6,
+        "alternatives": 1,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -50627,7 +49731,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            134
+            145
           ]
         }
       ]
@@ -50649,17 +49753,17 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:209",
-            "fn": "bindSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:236",
+            "fn": "freezeSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1329",
-            "fn": "kernelSeedVisibleResearchWorld",
-            "calls": "bindSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:634",
+            "fn": "kernelFreezeSourceWork",
+            "calls": "freezeSourceWork"
           }
         ],
-        "alternatives": 6,
+        "alternatives": 1,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -50669,7 +49773,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            121
+            132
           ]
         }
       ]
@@ -50691,17 +49795,17 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:209",
-            "fn": "bindSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:236",
+            "fn": "freezeSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1329",
-            "fn": "kernelSeedVisibleResearchWorld",
-            "calls": "bindSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:634",
+            "fn": "kernelFreezeSourceWork",
+            "calls": "freezeSourceWork"
           }
         ],
-        "alternatives": 6,
+        "alternatives": 1,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -50711,7 +49815,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            152
+            163
           ]
         }
       ]
@@ -50733,17 +49837,17 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:209",
-            "fn": "bindSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:236",
+            "fn": "freezeSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1329",
-            "fn": "kernelSeedVisibleResearchWorld",
-            "calls": "bindSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:634",
+            "fn": "kernelFreezeSourceWork",
+            "calls": "freezeSourceWork"
           }
         ],
-        "alternatives": 6,
+        "alternatives": 1,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -50753,7 +49857,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            145
+            156
           ]
         }
       ]
@@ -50775,17 +49879,17 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:209",
-            "fn": "bindSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:236",
+            "fn": "freezeSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1329",
-            "fn": "kernelSeedVisibleResearchWorld",
-            "calls": "bindSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:634",
+            "fn": "kernelFreezeSourceWork",
+            "calls": "freezeSourceWork"
           }
         ],
-        "alternatives": 6,
+        "alternatives": 1,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -50795,7 +49899,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            101
+            112
           ]
         }
       ]
@@ -50817,17 +49921,17 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:209",
-            "fn": "bindSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:236",
+            "fn": "freezeSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1329",
-            "fn": "kernelSeedVisibleResearchWorld",
-            "calls": "bindSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:634",
+            "fn": "kernelFreezeSourceWork",
+            "calls": "freezeSourceWork"
           }
         ],
-        "alternatives": 6,
+        "alternatives": 1,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -50837,44 +49941,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            106
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:recordGovernedToolReceipt:qf_review_invocation:insert-into",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "recordGovernedToolReceipt",
-      "table": "qf_review_invocation",
-      "verb": "INSERT INTO",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "bypass",
-      "governance": "violation",
-      "confidence": "medium",
-      "reachProof": {
-        "corroborated": true,
-        "hops": 1,
-        "path": [
-          {
-            "from": "collab-electron/src/main/kernel.ts:1340",
-            "fn": "kernelSeedVisibleResearchWorld",
-            "calls": "recordGovernedToolReceipt"
-          }
-        ],
-        "alternatives": 1,
-        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
-      },
-      "blocker": null,
-      "why": "Writes `qf_review_invocation`, a table absent from the generated schema, reachable from outside the write door.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            483
+            117
           ]
         }
       ]
@@ -50949,10 +50016,10 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            285,
-            286,
-            287,
-            288
+            280,
+            281,
+            282,
+            283
           ]
         }
       ]
@@ -50977,7 +50044,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            325
+            323
           ]
         }
       ]
@@ -51002,7 +50069,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            360
+            358
           ]
         }
       ]
@@ -51704,7 +50771,32 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            376
+            395
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:bindSourceWorkInAction:qf_review_source_work:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "bindSourceWorkInAction",
+      "table": "qf_review_source_work",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Internal implementation: every caller of bindSourceWorkInAction() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            227
           ]
         }
       ]
@@ -51729,7 +50821,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            399
+            418
           ]
         }
       ]
@@ -51754,7 +50846,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            395
+            414
           ]
         }
       ]
@@ -51779,7 +50871,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            436
+            455
           ]
         }
       ]
@@ -51804,7 +50896,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            420
+            439
           ]
         }
       ]
@@ -51829,7 +50921,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            565
+            613
           ]
         }
       ]
@@ -51854,7 +50946,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            264
+            275
           ]
         }
       ]
@@ -51879,7 +50971,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            258
+            269
           ]
         }
       ]
@@ -51904,7 +50996,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            630
+            678
           ]
         }
       ]
@@ -51929,7 +51021,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            642
+            690
           ]
         }
       ]
@@ -51954,9 +51046,9 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            632,
-            633,
-            640
+            680,
+            681,
+            688
           ]
         }
       ]
@@ -51981,7 +51073,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            626
+            674
           ]
         }
       ]
@@ -52006,7 +51098,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            644
+            692
           ]
         }
       ]
@@ -52031,7 +51123,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            639
+            687
           ]
         }
       ]
@@ -52056,7 +51148,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            649
+            697
           ]
         }
       ]
@@ -52081,7 +51173,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            646
+            694
           ]
         }
       ]
@@ -52106,7 +51198,32 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            647
+            695
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:recordGovernedToolReceiptInAction:qf_review_invocation:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "recordGovernedToolReceiptInAction",
+      "table": "qf_review_invocation",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Internal implementation: every caller of recordGovernedToolReceiptInAction() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            521
           ]
         }
       ]
@@ -52331,7 +51448,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            848
+            853
           ]
         }
       ]
@@ -52356,7 +51473,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            841
+            846
           ]
         }
       ]
@@ -52381,7 +51498,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            845
+            850
           ]
         }
       ]
@@ -52406,7 +51523,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            847
+            852
           ]
         }
       ]
@@ -52431,7 +51548,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            864
+            869
           ]
         }
       ]
@@ -52499,15 +51616,15 @@
     {
       "kind": "outside-write-door",
       "scope": "product",
-      "what": "8 SQL statements outside execute()",
+      "what": "7 SQL statements outside execute()",
       "where": "collab-electron/src/main/kernel.ts",
       "lines": [
-        250,
-        285,
-        286,
-        287,
-        288,
-        325
+        245,
+        280,
+        281,
+        282,
+        283,
+        323
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -52517,12 +51634,12 @@
       "what": "27 SQL statements outside execute()",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "lines": [
-        101,
-        106,
-        121,
-        134,
+        112,
+        117,
+        132,
         145,
-        152
+        156,
+        163
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -52715,12 +51832,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "b422df42",
+      "commit": "847f881f",
       "generatedAt": "2026-08-28"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "847f881f",
+      "commit": "c7cc7f4a",
       "generatedAt": "2026-08-28"
     },
     "verdict": "better",
@@ -52986,28 +52103,10 @@
   },
   "decisions": [
     {
-      "id": "persistence:collab-electron/src/main/kernel.ts:kernelSeedVisibleResearchWorld:links:insert-into",
-      "kind": "persistence",
-      "what": "links insert into",
-      "where": "collab-electron/src/main/kernel.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
-    },
-    {
       "id": "persistence:collab-electron/src/main/updater/update-manager.ts:error:check:update",
       "kind": "persistence",
       "what": "check update",
       "where": "collab-electron/src/main/updater/update-manager.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:bindSourceWork:qf_review_source_work:insert-into",
-      "kind": "persistence",
-      "what": "qf_review_source_work insert into",
-      "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
       "verdict": "undecided"
@@ -53061,15 +52160,6 @@
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
       "kind": "persistence",
       "what": "qf_review_task create table if not exists",
-      "where": "packages/qf-kernel/src/governed-review.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:recordGovernedToolReceipt:qf_review_invocation:insert-into",
-      "kind": "persistence",
-      "what": "qf_review_invocation insert into",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
