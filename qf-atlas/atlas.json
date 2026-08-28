@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "d6ab5ed6",
+    "commit": "d6c0d7e9",
     "generatedAt": "2026-08-28",
     "filesScanned": 406,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -51832,12 +51832,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "75460693",
+      "commit": "d6ab5ed6",
       "generatedAt": "2026-08-28"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "d6ab5ed6",
+      "commit": "d6c0d7e9",
       "generatedAt": "2026-08-28"
     },
     "verdict": "better",

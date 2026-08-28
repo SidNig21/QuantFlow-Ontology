@@ -1,14 +1,17 @@
 # WO-GOLDEN-G9 — Report authority consolidation
 
-status: AMENDMENT REQUIRED — READER NO / NO; BUILDER CLOSED
+status: AMENDMENT REQUIRED — READER ROUND 2 NO / NO; BUILDER CLOSED
 kind: Golden Baseline Phase 2 bounded Report/result-authority group
 owner: Router
 depends: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS
 build-authority: NO — fresh Reader only; Builder opens only after Reader YES/YES and NEXT.md rotation
 reader-task: 01a0489e-04ea-71a1-8b6a-d0e151621103
-reader-reviewed-authority: d6ab5ed66a18c9de23db047a4b41584acaaeec0e
-reader-reviewed-tree: 8f94bf63b16bd74e5ef17461cc4f0d15477efc4f
-reader-verdict: NO / NO — exactly five finite defects; Builder remains closed
+reader-round: 2
+reader-reviewed-authority: d6c0d7e91d726d8b5a33050f403efec87a3f1cd4
+reader-reviewed-tree: 54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182
+reader-verdict: NO / NO — exactly two finite ambiguities; prior five preserved; Builder remains closed
+reader-round-1-authority: d6ab5ed66a18c9de23db047a4b41584acaaeec0e
+reader-round-1-tree: 8f94bf63b16bd74e5ef17461cc4f0d15477efc4f
 starting-authority: 754606932dfb23bd0a6e6f432937b1c2bc436739
 starting-product-candidate: 61abfa5b23553f86a5c2d95facdf0473310fc44
 starting-product-tree: 94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013
@@ -22,8 +25,9 @@ evidence-directory: docs/orders/evidence/golden-baseline/g9/
 A research answer becomes a durable Report only after an independent review, and
 there is one clearly marked current answer for each Mission, Technique version,
 and point-in-time research state while older answers remain inspectable. The
-semantic Reader found five finite omissions in the packet; this amendment binds
-their exact cures without opening implementation authority.
+Round 1 Reader found five finite omissions, and Round 2 found two remaining
+ambiguities; this packet binds both amendment sets without opening
+implementation authority.
 
 ## Authority and dependency order
 
@@ -44,14 +48,14 @@ unknown agent_definition_id: hermes-orchestrator.
 G9 owns resolving that proof identity without adding a retired production
 profile.
 
-The semantic Reader task
+The semantic Reader Round 1 review
 `01a0489e-04ea-71a1-8b6a-d0e151621103` returned **NO / NO** against authority
 `d6ab5ed66a18c9de23db047a4b41584acaaeec0e` (tree
 `8f94bf63b16bd74e5ef17461cc4f0d15477efc4f`). The five finite defects and their
 bounded cures are recorded below. This is a Router evidence amendment only;
 the Builder remains closed until the same Reader reviews the amended packet.
 
-## Reader NO / NO amendment — exactly five finite defects
+## Reader Round 1 NO / NO amendment — exactly five finite defects preserved
 
 | # | finite defect found by Reader | bounded cure now required |
 | ---: | --- | --- |
@@ -63,6 +67,22 @@ the Builder remains closed until the same Reader reviews the amended packet.
 
 Only these five omissions are amended. G8 remains closed; the accepted
 trajectory prerequisite, G10/G11/G12 boundaries, and R18 freeze remain intact.
+
+## Reader Round 2 NO / NO amendment — exactly two finite ambiguities
+
+The same Reader task
+`01a0489e-04ea-71a1-8b6a-d0e151621103` returned Round 2 **NO / NO** against
+amendment `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4` (tree
+`54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182`). The prior five cures remain
+binding; only these two finite ambiguities are added:
+
+| # | finite ambiguity | bounded cure now required |
+| ---: | --- | --- |
+| 1 | the legacy fold order was not explicitly scoped inside each authority context | partition rows by the complete canonical five-field key first, then apply `created_at ASC, source_work_key ASC` within each partition; F12 seeds cross-key rows varying Mission, `strategy_id`, Technique version, Dataset, and research/as-of state and proves no fold |
+| 2 | the finalizer contract treated current and historical Report ids as the same role | a historical/superseded Evaluation returns its own persisted historical Report id; only the current supported Evaluation must equal `current_report_id`/current projection, with F14 fail-capable current-vs-historical agreement and idempotent retries for each |
+
+Only these two Round 2 ambiguities are amended. No prior requirement is relaxed,
+G8 is not reopened, and G10/G11/G12/R18 boundaries remain frozen.
 
 ## Fixed semantic contract
 
@@ -123,23 +143,30 @@ same persisted trajectory after process restart.
 
 ### Legacy publication upgrade and finalizer return contract
 
-Existing `qf_review_publication` rows are upgraded in a preflight/read phase
-ordered exactly by `created_at ASC, source_work_key ASC`; `source_work_key` is
-the existing stable primary-key identity and is the tie-breaker. Folding in that
-order makes the last row current and every earlier row explicit superseded
-history. The upgrade seeds multiple legacy rows, proves the expected
-current/superseded chain, and resolves every row before entering one transaction.
-An unresolvable row is a hard red and leaves all legacy rows and durable state
-unchanged; partial migration is not accepted.
+Existing `qf_review_publication` rows are first partitioned by the complete
+canonical five-field authority key, exactly
+`(mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of)`. No
+row from one partition may fold into another, even when four fields or the
+Technique version match. Within each partition, the preflight/read phase orders
+exactly by `created_at ASC, source_work_key ASC`; `source_work_key` is the
+existing stable primary-key identity and is the tie-breaker. Folding in that
+partition-local order makes the last row current and every earlier row explicit
+superseded history. The upgrade seeds multiple rows in multiple partitions,
+proves each expected current/superseded chain, and resolves every row before
+entering one transaction. An unresolvable row is a hard red and leaves all
+legacy rows and durable state unchanged; partial migration is not accepted.
 
-`kernelFinalizeResearchEvaluation(evaluationId)` is a read/resolve consumer. For
-a supporting Evaluation it returns the persisted Report Artifact id from
-`qf_review_publication`, not a newly written file id or `null`. The returned id
-must equal `evaluation.publication_report_id`, the target of the Evaluation’s
-`gates` link, and the projection’s `current_report_id`/current marker. A retry
-after close/reopen returns the same id and creates zero additional Report
-Artifacts, publication rows, or gates links. Rejected or inconclusive results
-continue to return `reportArtifactId: null` without publishing.
+`kernelFinalizeResearchEvaluation(evaluationId)` is a read/resolve consumer.
+For the current supported Evaluation it returns the persisted current Report
+Artifact id from `qf_review_publication`, and that id must equal
+`evaluation.publication_report_id`, the target of the Evaluation’s `gates` link,
+and the projection’s `current_report_id`/current marker. For a historical or
+superseded Evaluation it returns that Evaluation’s own persisted historical
+Report Artifact id, which must appear in the projection history and must not be
+required to equal `current_report_id`. Current and historical retries after
+close/reopen each return their same persisted id and create zero additional
+Report Artifacts, publication rows, or gates links. Rejected or inconclusive
+results continue to return `reportArtifactId: null` without publishing.
 
 ## Current measured denominator
 
@@ -175,7 +202,7 @@ defect, not permission to create a new ontology type.
 | collab-electron/src/main/kernel.ts | volatile map and duplicate Electron finalizer | remove map write/read and duplicate file/Report write; finalizer reads durable truth only and returns the persisted Report id |
 | packages/qf-kernel/src/execute.ts | validates the existing `complete_task` durable worker/result graph | resolve exactly one `task.completed` event candidate; zero/multiple/mismatched candidates hard-red |
 | collab-electron/src/main/index.ts | two finalizer consumers, including the synthetic proof path | retain one callback contract; fix only stale identity and durable result forwarding |
-| collab-electron/src/main/research-world-projection.ts | projects publication rows as a current map | read durable current plus explicit history and agree with finalizer Report id; never infer current from arrival order |
+| collab-electron/src/main/research-world-projection.ts | projects publication rows as a current map | read durable current plus explicit history; current finalizer id agrees with `current_report_id`, historical finalizer id agrees with its history row; never infer current from arrival order |
 | collab-electron/src/windows/shell/src/research-world.js | renders current/history markers and Report stage | projection-only update only if required by durable fields |
 | collab-electron/src/main/agent-artifact-writer.ts and agent-host.ts | accepted trajectory writer and live consumer | read-only census; no Report relabel |
 | qa/gates/hermes-research.ts | inherited packaged/synthetic proof consumer | resolve retired hermes-orchestrator identity; retain refusal and exact red/green proof |
@@ -231,9 +258,12 @@ objects or links:
 - keep `strategy_id` distinct from `strategy_version`; same-version different-
   strategy contexts retain separate current rows;
 - keep rejects/inconclusive evaluations from changing current authority; and
-- deterministically upgrade supported existing rows in `created_at ASC,
+- partition legacy rows by the complete five-field key before ordering;
+- deterministically upgrade each partition in `created_at ASC,
   source_work_key ASC` order, with an unresolvable row a hard red and no partial
-  migration.
+  migration; and
+- keep rows from different Mission, `strategy_id`, Technique version, Dataset,
+  or as-of partitions from ever folding into one history chain.
 
 The current Decision Set is the current Report Artifact under the existing
 ontology. Superseded Reports remain queryable and visibly historical.
@@ -243,10 +273,13 @@ ontology. Superseded Reports remain queryable and visibly historical.
 Make the research-world projection derive current_report_id and report_ids from
 persisted current/superseded publication state. Current receives PUBLISHED REPORT
 and CURRENT AUTHORITY; prior rows receive HISTORICAL and never current authority.
-`kernelFinalizeResearchEvaluation` returns the same persisted Report id that the
+`kernelFinalizeResearchEvaluation` returns the persisted Report id for the
+requested Evaluation: the current supported Evaluation’s id agrees with the
 publication row, Evaluation `publication_report_id`, Evaluation `gates` link,
-and projection current marker all identify. Close/reopen and a retry must return
-the same ids, context key, bytes, links, and selection with zero duplicate
+and projection `current_report_id`; a historical/superseded Evaluation’s id
+agrees with its own publication/gates row and projection history entry, not
+necessarily current_report_id. Close/reopen and a retry for each role must
+return the same id, context key, bytes, links, and selection with zero duplicate
 publication rows, Reports, or gates links.
 
 ### E — Resolve the inherited G9 proof boundary
@@ -275,9 +308,11 @@ root, exercise the real production seams and prove:
 8. exactly one completed-task trajectory is resolved, and zero/multiple/
    mismatched candidates hard-red;
 9. close/reopen and process-memory loss preserve the same result and context;
-10. finalizer, publication, gates, projection, and retry agree on one persisted
-    Report id;
-11. legacy upgrade ordering and all-row atomic failure are deterministic;
+10. current and historical finalizers return their own persisted Report ids;
+    current agrees with current_report_id, historical agrees with its history
+    row, and each retry is idempotent;
+11. legacy upgrade partitions by the complete five-field key, then orders and
+    folds deterministically with all-row atomic failure;
 12. the production census finds one successful Report publication transition; and
 13. owned roots and processes clean to zero.
 
@@ -335,9 +370,10 @@ pending restore, or unexplained inherited red is not acceptance.
 | F08 projection-swap | swap current/history selection or markers in an isolated projection fixture | exact current id, history ids, and markers disagree; exits 1 | current/history project from persisted relation |
 | F09 restart-memory | in an isolated fixture reintroduce map-only lookup or remove the durable binding, then clear/close/reopen before finalization | restart exits 1 with the exact missing-binding failure (`Run lacks exact worker evidence binding: <run_id>` or the exact cardinality binding error); no guessed Report | restored durable binding survives restart and returns the exact persisted trajectory, Report id, hashes, and context |
 | F10 stale-profile-boundary | restore hermes-orchestrator in the synthetic report-boundary executor | exact unknown-agent error red; no G9 PASS | current supported Director identity; refusal/cleanup green |
-| F11 replay-duplicate | allow a second publication or finalizer retry for exact source work | duplicate current/report/publication/gates identity or a returned id differing from persisted truth is caught; exits 1 | one exact publication, one current row, one persisted returned Report id, and zero duplicate rows/links |
-| F12 legacy-upgrade-order | seed multiple legacy rows, including equal `created_at`, then use arrival order or reverse the stable-ID tie-breaker | expected current/superseded chain differs from `created_at ASC, source_work_key ASC`; exits 1 | multiple rows fold deterministically in that order, with the last row current and all earlier rows explicit history |
+| F11 replay-duplicate | allow a second publication or current/historical finalizer retry for exact source work | duplicate current/report/publication/gates identity or a returned id differing from the requested persisted truth is caught; exits 1 | one exact publication, one current row, each requested Evaluation returns its own persisted Report id, and zero duplicate rows/links |
+| F12 legacy-upgrade-order | seed multiple legacy rows, including equal `created_at`, with cross-key variants changing Mission, `strategy_id`, Technique version, Dataset, and research/as-of state, then use a global arrival order or reverse the stable-ID tie-breaker | rows from different keys fold into one chain, or a partition’s result differs from `created_at ASC, source_work_key ASC`; exits 1 | partition first by all five fields, then fold each partition deterministically with the last row current and all earlier rows explicit history |
 | F13 legacy-upgrade-atomicity | seed one unresolvable legacy row among resolvable rows and permit migration to start before preflight completes | unresolvable row is not a hard red or any earlier row is partially upgraded; exits 1 | the whole upgrade aborts before mutation, leaves every legacy row unchanged, and reports no partial migration |
+| F14 finalizer-current-history-id | in separate current and historical cases, return `current_report_id` for a historical Evaluation or a historical id for the current supported Evaluation; omit one retry guard for either case | either current-vs-historical publication/gates/projection agreement case disagrees, or either role’s retry creates a duplicate; exits 1 | current supported returns current_report_id/current projection, historical returns its own history id, and each role retries idempotently with zero duplicates |
 
 The normal gate must preserve the G8 distinction that worker completion or a
 generic terminal row is not a Director result receipt. G9 does not change G8.
