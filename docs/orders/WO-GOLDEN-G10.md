@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: READER ACCEPTED — ROUND-3 YES / YES; exactly one bounded G10 Builder open; independent Verifier required afterward
+status: REPAIR AUTHORIZED — adjudication C + D; exactly one same-meaning fixture/driver-only repair Builder open; independent Verifier required afterward
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **YES — exactly one bounded G10 Builder is authorized under this accepted order; one independent Verifier must follow and decide G10; no second Builder or scope expansion**
+build-authority: **YES — exactly one same-meaning G10 fixture/driver-only repair Builder is authorized under this accepted order; one independent Verifier must follow; no product/Kernel change or scope expansion**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
@@ -16,6 +16,12 @@ reader-round-3-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-round-3-authority: `4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`
 reader-round-3-verdict: **YES / YES — all prior amendments remain intact; exactly one bounded G10 Builder is authorized and one independent Verifier must follow**
 reader-round-3-reread: **SATISFIED — same Reader reread this order and NEXT.md at the Round-3 authority above**
+adjudication-task: `01a04b3c-4db1-7a93-b618-21890b79bb26`
+adjudication-authority: `222af07635e4566eb66b802cbcc3750be828d001`
+adjudication-result: **C + D — fixture/driver sequencing plus cleanup mechanics; not a product or Kernel regression**
+adjudication-failed-twice: **the same R16 "Kernel-owned director-to-executor delegation link" assertion failed twice**
+repair-authority: **ONE same-meaning fixture/driver-only repair; existing acceptance meaning and every F01–F14 assertion remain unchanged**
+repair-surface: **only the existing `qa/gates/golden-g10-canvas-runtime.ts` fixture/driver and directly caused G10 evidence; no product file**
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-disposition: Current Canvas/Mission/runtime coherence group from the audited Phase-2 disposition
 accepted-g9-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
@@ -370,3 +376,42 @@ sole-writer law, and every frozen allowlist and falsifier contract. After that
 one Builder, exactly one independent Verifier must rerun the accepted G10
 gates and decide PASS/FAIL; Router is not the Verifier, and no second Builder
 or scope expansion is authorized.
+
+## Round-4 finite adjudication and repair authority
+
+The final read-only adjudication from task
+`01a04b3c-4db1-7a93-b618-21890b79bb26`, against authority
+`222af07635e4566eb66b802cbcc3750be828d001`, classified the same R16
+`Kernel-owned director-to-executor delegation link` assertion failure, which
+occurred twice, as **C + D**. **C** is fixture/driver sequencing: the driver
+observes after Director runtime admission but before the Director-owned
+recruitment completion receipt. **D** is an R16 setup/precondition violation:
+the fixture pre-spawned worker and critic with actorless `qf.dock.spawn`, so
+the chosen executor could not acquire a Director-owned delegation link. The
+adjudication does not support a product or Kernel regression; the cleanup
+finding is mechanical gate-owned temp-root handling.
+
+Exactly one same-meaning fixture/driver-only repair Builder is authorized:
+
+1. Wait for and select the exact executor created by a Director-owned trusted
+   `create_agent_session` boundary with `actor_session_id` equal to the
+   Director session id, and require durable `agent_session.created` plus
+   `delegates_to` evidence. If deterministic synthetic mode cannot recruit,
+   seed that exact executor through the existing trusted Kernel action with
+   the Director actor. Do not accept an actorless or merely pre-spawned
+   executor as the R16 executor.
+2. Remove actorless `qf.dock.spawn` worker/critic prerequisite behavior from
+   the R16 fixture path only. Do not change product `qf.dock.spawn` behavior
+   or any other Main, preload, renderer, or Kernel path.
+3. In `finally`, after the owned-process census, unconditionally remove only
+   the literal G10-owned temp root created by this run, using a bounded retry.
+   This cleanup is mechanical and must not target, relabel, or count the
+   inherited G12 state.
+
+This repair changes no product code, Kernel semantics, assertion, acceptance
+meaning, G12 ownership, or other Golden group. It does not reopen G11 or R18,
+does not add a new store or writer, and does not authorize any second Builder.
+The existing dirty Builder diff is preserved as read-only context for this
+Router amendment; this docs-only commit does not alter or stage it. A fresh
+independent Verifier, not the repair Builder or Router, must decide G10 after
+the one repair.

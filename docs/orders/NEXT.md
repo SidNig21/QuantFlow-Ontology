@@ -1,11 +1,11 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 BUILDER OPEN / INDEPENDENT VERIFIER REQUIRED
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 REPAIR BUILDER OPEN / INDEPENDENT VERIFIER REQUIRED
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 BUILDER OPEN — ROUND-3 READER YES / YES
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 REPAIR BUILDER OPEN — C + D ADJUDICATION
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **OPEN — exactly one bounded G10 Builder is authorized under WO-GOLDEN-G10; one independent Verifier must follow; no second Builder or scope expansion**
-g10-status: **BUILDER OPEN — Round-3 Reader YES / YES; exactly one bounded G10 Builder; independent Verifier required afterward**
+builder-authority: **OPEN — exactly one same-meaning G10 fixture/driver-only repair Builder is authorized under WO-GOLDEN-G10; one independent Verifier must follow; no product/Kernel change or scope expansion**
+g10-status: **REPAIR BUILDER OPEN — C + D adjudication; fixture/driver sequencing plus cleanup mechanics; independent Verifier required afterward**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
@@ -16,6 +16,10 @@ g10-reader-round-2-verdict: **NO / NO — exact gate-registration file, live sna
 g10-reader-round-3-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 g10-reader-round-3-authority: `4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`
 g10-reader-round-3-verdict: **YES / YES — prior amendments accepted; exactly one bounded G10 Builder open; one independent Verifier required afterward**
+g10-adjudication-task: `01a04b3c-4db1-7a93-b618-21890b79bb26`
+g10-adjudication-authority: `222af07635e4566eb66b802cbcc3750be828d001`
+g10-adjudication-result: **C + D — fixture/driver sequencing plus cleanup mechanics; not a product or Kernel regression**
+g10-repair-authority: **ONE same-meaning fixture/driver-only repair; existing acceptance meaning and every F01–F14 assertion remain unchanged**
 g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
@@ -112,7 +116,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Round-3 Reader YES / YES; exactly one Builder open; independent Verifier required afterward; no second Builder
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; C + D repair only; exactly one fixture/driver-only repair Builder open; independent Verifier required afterward; no second Builder
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -187,10 +191,10 @@ G10 is now the sole active Phase-2 order. Its bounded accepted packet is
 Canvas views and return, no submit/reopen hiding, real runtime liveness with
 separate session/work/recovery axes, truthful existing relations, and the five
 G7-routed Canvas/browser calls. The same Reader's Round-3 reread has answered
-the two exact questions in its Reader brief **YES / YES**. Exactly one bounded
-G10 Builder is authorized under this accepted order; one independent Verifier
-must follow and decide G10, and no second Builder or scope expansion is
-authorized.
+the two exact questions in its Reader brief **YES / YES**. The current bounded
+work is exactly one same-meaning fixture/driver-only repair under the C + D
+adjudication below; one independent Verifier must follow, and no product/Kernel
+change, second Builder, or scope expansion is authorized.
 
 ### G10 finite Reader amendments — same Reader reread required
 
@@ -277,6 +281,40 @@ authority, exact G12 survivor ownership, the G11 boundary, the R18 freeze, the
 Kernel sole-writer law, and every accepted allowlist and falsifier boundary.
 One independent Verifier, not Router or the Builder, must follow and decide
 G10 PASS/FAIL. No second Builder or G10 scope expansion is authorized.
+
+### G10 C + D adjudication — one same-meaning repair Builder open
+
+The final read-only adjudication from task
+`01a04b3c-4db1-7a93-b618-21890b79bb26`, against authority
+`222af07635e4566eb66b802cbcc3750be828d001`, found the same R16
+`Kernel-owned director-to-executor delegation link` assertion failed twice.
+It classified the failure as **C + D**: fixture/driver sequencing observed
+before the Director-owned recruitment completion boundary, and the R16
+fixture violated setup preconditions by pre-spawning worker and critic with
+actorless `qf.dock.spawn`. This is not a product or Kernel regression; the
+remaining cleanup finding is mechanical G10 temp-root handling.
+
+Exactly one same-meaning fixture/driver-only repair is authorized, limited to
+the existing `qa/gates/golden-g10-canvas-runtime.ts` fixture/driver and
+directly caused G10 evidence:
+
+1. Wait for and select the exact executor created by a Director-owned trusted
+   `create_agent_session` boundary with `actor_session_id` equal to the
+   Director session id, with durable `agent_session.created` and `delegates_to`
+   evidence. If deterministic synthetic mode cannot recruit, seed that exact
+   executor through the existing trusted Kernel action with the Director actor.
+2. Remove actorless `qf.dock.spawn` worker/critic prerequisite behavior from
+   the R16 fixture path only; do not change product `qf.dock.spawn` behavior.
+3. In `finally`, after the owned-process census, unconditionally remove only
+   the literal G10-owned temp root created by this run with a bounded retry;
+   exclude inherited G12 state entirely.
+
+The repair changes no product code, Kernel semantics, assertion, acceptance
+meaning, G12 ownership, or other Golden group. Existing F01–F14 assertions
+remain binding. The existing dirty Builder diff is preserved as read-only
+context and is not altered or staged by this Router docs-only amendment. One
+independent Verifier, not Router or the repair Builder, must decide G10 after
+this one repair; no second Builder is authorized.
 
 ## Historical G9-open handoff (superseded)
 
