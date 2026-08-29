@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: G10 F06 TWO-ARTIFACT PROJECTION READER HOLD — fresh Reader YES / YES required before one bounded Builder
+status: G10 F06 GATE-CONSUMER READER HOLD — same fresh Reader YES / YES required before one bounded Builder
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **HOLD — no Builder edit is authorized until a fresh semantic Reader returns YES / YES on the two-artifact projection/cardinality contract; after that approval exactly one bounded repair/proof is authorized only in `collab-electron/src/main/research-world-projection.ts` and `collab-electron/src/main/research-world.test.ts` as specified below; no F06 gate change, no Kernel/renderer/cable-model change, no other surface, and one fresh independent Verifier must follow**
+build-authority: **HOLD — no Builder edit is authorized until the same fresh semantic Reader task `01a04c5b-5104-7a10-a31b-4a28c4c0a340` rereads this amendment and returns YES / YES on the existing real pointer/Inspect F06 consumer path; after that approval exactly one bounded gate-only proof edit is authorized only in `qa/gates/golden-g10-canvas-runtime.ts`; no product/projection repair, no Kernel/renderer/cable-model change, no other surface, and one fresh independent Verifier must follow**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
@@ -38,13 +38,13 @@ ordinary-adjudication-authority: `f2ce7505ff53be883a78f4d463b0cb745c11aab1`
 ordinary-adjudication-classification: **A primary — G10 cold-launch ordinary-Canvas product defect; D secondary — gate boundary-label ambiguity; accepted meaning unchanged**
 ordinary-adjudication-result: **the app is internally ordinary but the DOM never publishes `ORDINARY_CANVAS` on cold launch because `hydrateSaved()` is conditional on saved state; the direct Main RPC does not invoke the Dock Mission reveal callback**
 ordinary-repair-authority: **HISTORICAL/RETAINED — prior ordinary-Canvas repair is complete for this adjudication; no current ordinary repair is authorized**
-ordinary-repair-surface: **HISTORICAL/RETAINED — the current F06 amendment narrows all active repair authority to the two named projection/test files below**
+ordinary-repair-surface: **HISTORICAL/RETAINED — prior ordinary-Canvas repair remains read-only; the current F06 renderer-receipt amendment narrows all active repair authority to the gate file below**
 browser-adjudication-task: `01a04baf-2dc7-7a70-95df-0e9405405048`
 browser-adjudication-authority: `52a914206d9c4cb7d23dcc60ed31e50641cfaf6c`
 browser-adjudication-classification: **C primary — fixture/setup defect; D secondary — diagnostic label only; no product defect or G10 meaning change**
 browser-adjudication-result: **the gate used a blocked `data:` URL, so the DOM tile existed but no real browser webview or webContentsId was created; readiness is Main `!isLoading` or `did-finish-load`**
 browser-repair-authority: **HISTORICAL/RETAINED — prior browser-gate repair is complete for this adjudication; no current browser repair is authorized**
-browser-repair-surface: **HISTORICAL/RETAINED — the current F06 amendment does not authorize the browser gate or any timeout/policy change**
+browser-repair-surface: **HISTORICAL/RETAINED — prior browser-readiness repair remains read-only; the current F06 authority is limited to the receipt consumer proof in the gate file below, with no timeout/policy change**
 mission-adjudication-task: `01a04bca-ad71-7b60-a475-5f014858cd5e`
 mission-adjudication-authority: `58757be642f81d03c810449e9c8aebfa1d24bc02`
 mission-adjudication-classification: **C primary — fixture/call/timing defect; D secondary — diagnostic label only; Mission/Kernel projection healthy and no meaning change**
@@ -68,11 +68,17 @@ mission-reopen-reader-verdict: **YES / YES — repeated reopening of the active 
 mission-reopen-classification: **A primary — G10 product projection defect; the prior generic `RPC timeout: app.ui.evaluate` was D insufficient diagnostics and is not a product defect finding**
 f06-adjudication-task: `01a04c4c-afc5-72e1-b554-6c45a46482e9`
 f06-adjudication-authority: `a7a98ceec20140581b7eb72cfaa783564dc367f9`
-f06-classification: **A primary — G10 product projection defect; D secondary — old R16 cardinality wording; not B, C, or E**
+f06-classification: **HISTORICAL/RETAINED — A primary — G10 product projection defect; D secondary — old R16 cardinality wording; projection repair is now retained/proven by focused 14-object/16-link tests**
 f06-canonical-produces-invariant: **Run → result_set Artifact; Executor AgentSession → worker trajectory Artifact; Critic AgentSession → findings Artifact; no Task → Artifact producer relation**
-f06-durable-missing-tuple: **the Kernel contains `produces(synthetic-worker-37085aa4-a3bc-4c0e-af2b-cb4cce231066, af5da2f0d1b98edcf6e90df9246094a1a7665ccaa03dc8489083c14b4393d7c5)`; the read-only projection omits that exact tuple from `world.links`**
-f06-reader-requirement: **REQUIRED — a fresh semantic Reader must return YES / YES on the two-artifact projection/cardinality contract before any Builder edit; no Builder authority exists before that verdict**
-f06-repair-authority: **HELD PENDING READER — after fresh Reader YES / YES, exactly one bounded projection repair and expectation update are authorized in the two named files below, with one fresh independent Verifier afterward**
+f06-durable-missing-tuple: **HISTORICAL/REPAIRED — the Kernel contains `produces(synthetic-worker-37085aa4-a3bc-4c0e-af2b-cb4cce231066, af5da2f0d1b98edcf6e90df9246094a1a7665ccaa03dc8489083c14b4393d7c5)`; focused tests prove 14 objects/16 links and retain that exact tuple in the read-only projection**
+f06-renderer-receipt-adjudication-task: `01a04c68-4710-7fe3-9b92-2a1267d85013`
+f06-renderer-receipt-adjudication-authority: `58c7aecc72e0b7704b190773de536a0d83d620f9`
+f06-renderer-receipt-classification: **D primary — gate/consumer-boundary ambiguity; distinct from the earlier A-primary projection assertion, so the same-assertion-twice stop is not reached**
+f06-renderer-receipt-result: **the real pointer/Inspect consumer path is required before asserting the exact Run→result_set Artifact `.qf-world-relation` row; `run=true`, `relation=false`, `missing=true` is not a new projection failure**
+f06-reader-task: `01a04c5b-5104-7a10-a31b-4a28c4c0a340`
+f06-reader-requirement: **REQUIRED — the same fresh semantic Reader task `01a04c5b-5104-7a10-a31b-4a28c4c0a340` must reread this amendment and return YES / YES on the two-artifact projection/cardinality and real pointer/Inspect consumer-path contract before any Builder edit; no Builder authority exists before that verdict**
+f06-repair-authority: **HELD PENDING READER — after the same Reader returns YES / YES, exactly one bounded F06 gate-only proof edit is authorized in `qa/gates/golden-g10-canvas-runtime.ts`, with one fresh independent Verifier afterward**
+f06-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; no projection, product, Kernel, renderer, cable-model, or other file edit is authorized by this current amendment**
 diagnostic-adjudication-task: `01a04c1c-ae43-7dd0-a773-4d6961fa9e4f`
 diagnostic-adjudication-authority: `8c6c2df0910fa6c777df19cd15cd8dd245f10c66`
 diagnostic-adjudication-classification: **HISTORICAL/SUPERSEDED — D primary — insufficient diagnostics; C was only a conditional mechanical F11 hypothesis; A, B, and E were unsupported**
@@ -900,7 +906,7 @@ required. One fresh independent Verifier—not the Builder or Router—must deci
 G10 after the repair and proof. No candidate/evidence commit or G11 work is
 authorized.
 
-## Current F06 two-artifact projection/cardinality adjudication — Reader required before Builder
+## Historical F06 two-artifact projection/cardinality adjudication — projection repair retained; superseded by renderer-receipt hold
 
 The fresh read-only F06 adjudication task
 `01a04c4c-afc5-72e1-b554-6c45a46482e9`, against current authority
@@ -928,9 +934,9 @@ The durable Kernel tuple is present; the projected `world.links` tuple is
 missing. Canvas cables and relation rows remain projections, not relation
 truth.
 
-The current Builder is held. Before any implementation, a fresh semantic
-Reader must return **YES / YES** on the two-artifact projection/cardinality
-contract. Only after that verdict authorize exactly these bounded files:
+That prior projection Builder was held pending a Reader and is now superseded
+as the active surface by the renderer-receipt consumer-boundary hold below.
+The projection repair is retained and must not be reopened by this amendment.
 
 1. `collab-electron/src/main/research-world-projection.ts`: include the exact
    already-durable tuple
@@ -949,12 +955,59 @@ the existing lineage substitution and durable-link-removal refusals unchanged:
 substituting the Run result-set or removing the durable executor→trajectory
 link must still refuse admission before review mutation.
 
-For this amendment, any broader G10 standing surface is narrowed to exactly
+For that prior amendment, any broader G10 standing surface was narrowed to exactly
 `collab-electron/src/main/research-world-projection.ts` and
 `collab-electron/src/main/research-world.test.ts`, and no Builder edit is
-authorized before the fresh Reader YES / YES. Explicitly forbidden are any
+authorized under the prior Reader gate. Its explicit exclusions remain binding;
+the current renderer-receipt amendment below supersedes only the active repair
+surface. Explicitly forbidden were any
 F06 gate change, new relation truth, Kernel data/state/schema/write change,
 `kernel-ledger.js`, renderer or Canvas cable-model change, G9/G12/R18 change,
 selector or timeout change, weakened assertion, cleanup change, other Golden
 group, other file, or scope expansion. One fresh independent Verifier—not the
 Builder or Router—must decide G10 after the accepted Reader, repair, and proof.
+
+## Current F06 renderer-receipt consumer adjudication — same Reader reread required before Builder
+
+The fresh read-only renderer-receipt adjudication task
+`01a04c68-4710-7fe3-9b92-2a1267d85013`, against authority
+`58c7aecc72e0b7704b190773de536a0d83d620f9`, found that the focused projection
+repair is retained and proven by focused tests showing `14` objects and `16`
+links, including the exact durable executor-session→trajectory tuple. The
+current F06 red receipt `{run:true, relation:false, missing:true}` is **D
+primary — gate/consumer-boundary ambiguity**, distinct from the earlier
+A-primary projection assertion; the same-assertion-twice stop is not reached.
+
+The existing real consumer path is the authority: select the exact Run tile
+with the real pointer path, require Inspect to be visible, then assert the
+exact Run→`result_set` Artifact `.qf-world-relation` row using the unchanged
+`kind`, `from_id`, and `to_id` values from the independent Kernel-vs-
+`world.links` F06 oracle. The `missing:true` receipt is an unrelated
+`Not recorded` field and is not evidence that the durable relation is absent.
+
+The current Builder is held. The same fresh semantic Reader task
+`01a04c5b-5104-7a10-a31b-4a28c4c0a340` must reread this amendment and return
+**YES / YES** on the preserved two-artifact projection/cardinality contract
+and this real pointer/Inspect consumer boundary before any Builder edit.
+After that verdict, authorize exactly one gate-only edit in
+`qa/gates/golden-g10-canvas-runtime.ts`:
+
+1. Select the exact Run tile through the existing real pointer/Inspect
+   consumer path, require Inspect visible, and assert the exact attached
+   `.qf-world-relation` row for Run→`result_set` Artifact with unchanged
+   `kind`, `from_id`, and `to_id` IDs.
+2. The red proof removes only that exact attached relation row after Inspect
+   and requires the F06 assertion to go red. The green proof reselects or
+   reopens the exact Run through the existing UI and requires the same exact
+   row with the same IDs.
+3. Preserve the independent Kernel-vs-`world.links` F06 oracle, the retained
+   worker executor→trajectory projection repair, existing lineage
+   substitution/removal refusals, selectors, IDs, timeouts, cleanup, and all
+   product, renderer, and Kernel code unchanged.
+
+No projection repair, expectation change, relation invention, F06 weakening,
+renderer/cable-model change, Kernel data/state/schema/write change, selector or
+timeout change, cleanup change, G9/G12/R18 change, other Golden-group change,
+other file, or scope expansion is authorized. No Builder edit exists before
+the same Reader's YES / YES reread. One fresh independent Verifier—not the
+Builder or Router—must decide G10 after the accepted proof.
