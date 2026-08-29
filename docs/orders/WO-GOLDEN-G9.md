@@ -1,10 +1,10 @@
 # WO-GOLDEN-G9 — Report authority consolidation
 
-status: CLOSED — PASS WITH G12 INHERITED RED
+status: REOPENED — NARROW CURRENT-REPORT FINALIZATION PREREQUISITE FOR G10 / PASS WITH G12 INHERITED RED
 kind: Golden Baseline Phase 2 bounded Report/result-authority group
 owner: Router
 depends: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS
-build-authority: CLOSED — final same-order repair independently verified; no further G9 Builder authority
+build-authority: **ONE SEMANTIC BUILDER — only the bounded current-report publication finalization below is reopened; accepted G9 candidate/evidence remain immutable and one independent Verifier must decide the prerequisite**
 reader-task: 01a0489e-04ea-71a1-8b6a-d0e151621103
 reader-round: FINAL
 reader-reviewed-authority: 8d78fb714998cc52d50538d6f9ea9a3323f75535
@@ -14,7 +14,7 @@ reader-round-1-authority: d6ab5ed66a18c9de23db047a4b41584acaaeec0e
 reader-round-1-tree: 8f94bf63b16bd74e5ef17461cc4f0d15477efc4f
 reader-round-2-authority: d6c0d7e91d726d8b5a33050f403efec87a3f1cd4
 reader-round-2-tree: 54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182
-builder-status: CLOSED — final same-order repair independently verified
+builder-status: **HISTORICAL CLOSE RETAINED — current narrow prerequisite has one semantic Builder authorized below**
 builder-starting-authority: 4ef49077b2b423601c02b043de82b34d231bb7f5
 builder-starting-tree: bdba7c9540122288866bed6fb4aa57952c6f025e
 builder-starting-evidence-head: f7e841ff3e075bd49ed70bf8da79c2409ca5c899
@@ -43,6 +43,11 @@ starting-evidence-tree: b04a991ca98da1d57b8637a7fcd0738a4e41bd21
 accepted-trajectory-prerequisite: 4a12b948746c108bae3143d5982decd50a6957e9
 rollback-boundary: 61abfa5b23553f86a5c2d95facdf0473310fc44
 evidence-directory: docs/orders/evidence/golden-baseline/g9/
+reopen-trigger: G10 F13 contradicted the accepted current-report publication/projection invariant after a real supported governed closure
+reopen-reader-task: 01a04da4-185a-7943-9a1b-1d36735f5cad
+reopen-reader-verdict: **NO / NO — real Report and gates linkage exist, but `current_report_id=""` and `HISTORICAL` expose a G9 publication-finalization defect; G10 must not repair or mask it**
+reopen-receipt: [G10 F04 live-membership rerun](evidence/golden-baseline/g10/golden-g10-f04-live-membership-rerun-20260829.txt) | SHA256 `5BB3CAB1AC521EE76F7B5A067EDB23C7A2BD9DA0A4D63125774618434B290729` (matches the cited `C:\tmp` receipt)
+reopen-candidate: **immutable accepted G9 candidate `3c17e5d380fd267270cbacf851999cc98bf30638` / tree `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`**
 
 accepted-product-candidate: 3c17e5d380fd267270cbacf851999cc98bf30638
 accepted-product-tree: d380c7b4655c53cd6e51de0c2112ae99885f0e3d
@@ -61,15 +66,18 @@ evidence defects in the first candidate; that prior repair produced one
 candidate and receipt-only evidence, then the fresh Reader found five finite
 proof-boundary ambiguities. That historical packet opened exactly one final
 same-order repair Builder. The original G9 meaning, scope, and dependency
-order remain unchanged; the repair is now closed and no further G9 Reader or
-Builder is authorized.
+order remain unchanged; that historical repair close had no further G9 Reader
+or Builder authority. It is superseded only by the finite G10-triggered
+prerequisite recorded at the end of this order; no other G9 meaning or scope is
+reopened.
 
 ## Authority and dependency order
 
 ADR-0004 assigns G9 one current Report/result authority after G8. The founder
 dependency is G8 → G9; G12 Windows/package qualification and R18 remain later.
-G9 did not reopen G8 or authorize G11, G12, or R18. The current `NEXT.md`
-rotation opens only the Reader-pending G10 order; it does not reopen G9.
+G9 does not reopen G8 or authorize G11, G12, or R18. The current `NEXT.md`
+rotation opens only this finite current-report prerequisite; G10 is paused until
+its independent Verifier pass, after which the preserved G10 packet may resume.
 
 The accepted minimum prerequisite already changed ordinary completion output to a
 trajectory Artifact and preserved the Kernel refusal for a Report without
@@ -645,3 +653,71 @@ The Builder report opens with one plain-language sentence and includes:
 The independent Verifier—not the Builder or Router—decides PASS/FAIL. On
 independent PASS, the Router writes G9 acceptance and rotates NEXT.md; G10-G12
 and R18 remain closed.
+
+## Current G9 narrow reopen — G10 F13 current-report prerequisite
+
+The same semantic Reader task
+`01a04da4-185a-7943-9a1b-1d36735f5cad` returned **NO / NO** for the new G10
+F13 red. The F04 live-membership receipt proves a real supported governed
+closure produced Evaluation
+`b7d37cd7-2012-46d1-9a26-29cbae5d97b3`, Report Artifact
+`2998b24560a171c870e18f675f1485087d7bfa97045435efaf9b2a3931216e66`, and the
+Evaluation's `gates` link, but the durable publication/projection state exposed
+`current_report_id=""` and marked the Report `HISTORICAL`. The exact receipt is
+[the repository copy of the cited F04 rerun](evidence/golden-baseline/g10/golden-g10-f04-live-membership-rerun-20260829.txt),
+whose SHA256 is
+`5BB3CAB1AC521EE76F7B5A067EDB23C7A2BD9DA0A4D63125774618434B290729`.
+
+This is a G9 publication-finalization defect, not a G10 projection, Canvas,
+fixture, or lifecycle defect. The relevant existing operation chain is
+`qf_record_evaluation` → `recordGovernedEvaluation` →
+`qf_review_publication.is_current` → `kernelFinalizeResearchEvaluation` →
+`reportContext`/`current_report_id`. G10 must not infer currentness from
+`report_ids`, rewrite the projection assertion, or otherwise mask this durable
+contradiction.
+
+Exactly one semantic G9 Builder is reopened from immutable accepted product
+candidate `3c17e5d380fd267270cbacf851999cc98bf30638` / tree
+`d380c7b4655c53cd6e51de0c2112ae99885f0e3d`. The current dirty G10 work and all
+accepted G9 evidence remain untouched and unstaged. The only production repair
+surface is principally `packages/qf-kernel/src/governed-review.ts`; the Builder
+may change the existing `qa/gates/report-authority.ts`, its existing
+registration, and directly required focused G9 tests/fixtures or append new
+receipt-only G9/G10 evidence when necessary to prove this contract. No new
+schema, object, link, writer, storage authority, projection workaround, or G10
+product/gate behavior is authorized.
+
+The focused proof uses a fresh isolated exact authority context
+`(mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of)` and
+two independently supported governed closures:
+
+1. For the first supported closure, the durable publication row must transition
+   to `is_current=1`; the returned Report id, its `Evaluation → Report`
+   identity, its `gates` link, and the read-only projection's exact
+   `current_report_id` must all agree. The first-closure falsifier removes only
+   that current transition (or forces `is_current=0`); the focused gate must exit
+   nonzero rather than accept a historical-only Report. Restoring the exact
+   transition must make the first case green.
+2. For the second supported closure in the same complete context, the existing
+   publication state must explicitly supersede the first Report, leave the first
+   durable and historical, make the second exact Report current, and leave
+   exactly one current row. The second-closure falsifier removes only that
+   explicit supersession/current replacement; the focused gate must exit
+   nonzero if both rows are current, neither is current, or the current/history
+   ids or markers disagree. Restoring the exact replacement must make the case
+   green.
+
+Across both cases, preserve the exact Report bytes and IDs, both durable
+publication/history rows, each Evaluation's own persisted Report identity,
+each `gates` link, the independent-support prerequisite, explicit current and
+historical markers, and idempotent retry behavior. The gate must compare the
+durable rows and projection, not counts or arrival order, and must prove exactly
+one current Report after the second closure.
+
+This is one finite semantic G9 repair followed by one fresh independent
+Verifier—not the Builder or Router. The Verifier binds to the immutable
+candidate and new receipt, reruns the first/second publication falsifier, and
+decides the prerequisite. Only after independent PASS may Router resume the
+preserved G10 identity-sequence/F09/projection packet. G11, G12, and R18 remain
+closed or frozen, and no G10 Builder or Verifier starts while this prerequisite
+is open.

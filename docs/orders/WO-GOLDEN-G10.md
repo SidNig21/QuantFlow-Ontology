@@ -1,13 +1,17 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: G10 IDENTITY-SEQUENCE REPAIR AUTHORIZED — same Builder resumes; fresh independent Verifier required
+status: G10 PAUSED — G9 CURRENT-REPORT FINALIZATION PREREQUISITE REOPENED; preserved G10 Builder resumes only after independent G9 verification
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
-depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **SAME BUILDER RESUMES — the latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned NO / NO for one finite gate-only identity-sequence correction; the four extra objects are legitimate asynchronous real critic continuation, so remove only duplicate synthetic review seeding, wait within the existing finite timeout, derive exact real identities/links, preserve exact 15-object/full-link equality, and one fresh independent Verifier still decides G10**
+depends: G9 NARROW CURRENT-REPORT FINALIZATION PREREQUISITE / PASS WITH G12 INHERITED RED
+build-authority: **PAUSED — G10 cannot build, verify, or release while the accepted G9 current-report authority is contradicted; exactly one semantic G9 Builder repairs the finite prerequisite, one independent G9 Verifier decides it, and the preserved G10 Builder then resumes**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
 diagnostic-pass-authority: **RETAINED EVIDENCE ONLY — the prior exact visible-HISTORY Mission click recorded the real projection refusal; the current authority is the Reader-approved product repair below, with no persistence/new truth/schema/Kernel/Canvas/timeout/assertion change**
 finite-rewrite-authority: **RETAINED/BINDING GATE CONTRACT — exactly one Task belongs to the Mission fixture; dynamic Task/Run IDs and exact object/link sets must survive CURRENT_MISSION, FULL_LINEAGE, close/reopen, and F04 parity; no multi-Task chooser**
+g9-f13-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
+g9-f13-reader-verdict: **NO / NO — the real supported closure created a Report and `gates` link, but publication/projection exposed `current_report_id=""` and `HISTORICAL`; this is G9-owned and G10 may not infer currentness or patch the projection assertion**
+g9-f13-receipt: [G10 F04 live-membership rerun](evidence/golden-baseline/g10/golden-g10-f04-live-membership-rerun-20260829.txt) | SHA256 `5BB3CAB1AC521EE76F7B5A067EDB23C7A2BD9DA0A4D63125774618434B290729` (matches the cited `C:\tmp` receipt)
+g9-prerequisite-candidate: **immutable accepted G9 candidate `3c17e5d380fd267270cbacf851999cc98bf30638` / tree `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`; dirty G10 implementation remains preserved and unstaged**
 product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
 product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
 product-repair-surface: **only `collab-electron/src/windows/shell/src/research-world.js` and `collab-electron/src/windows/shell/src/dock.js`**
@@ -162,10 +166,11 @@ G7 also routed these five retained Canvas/browser rows to G10:
 `focusAgentSession`. G10 owns their current Canvas boundary proof; it does not
 become a general protocol-contraction or browser-product order.
 
-G9 is closed and owns Report publication/current-history semantics. G10 may
-read and project the accepted `current_report_id` and Mission-local `report_ids`
-but may not change publication, Evaluation, gates, Report lineage, or current /
-historical selection. The exact packaged QuantFlow/Node shutdown survivor is an
+G9 owns Report publication/current-history semantics and is narrowly reopened by
+the finite prerequisite at the end of this order. G10 may read and project the
+durable `current_report_id` and Mission-local `report_ids` after that prerequisite
+passes, but may not change publication, Evaluation, gates, Report lineage, or
+current/historical selection. The exact packaged QuantFlow/Node shutdown survivor is an
 open G12 red: launcher PID `30512` exited `0`; packaged `QuantFlow.exe` PID
 `17316` and descendant Node PIDs `30836`, `20836`, and `30096` survived;
 `roots_remaining=0` and `leaked=[]`. G10 must not repair or relabel it.
@@ -1367,3 +1372,59 @@ independent Verifier—not the Builder or Router—must verify the candidate and
 decide G10. No product/Kernel/projection change, object filtering, assertion
 weakening, timeout weakening, synthetic substitute, second Builder, or scope
 expansion is authorized.
+
+## Current G10 pause — G9 current-report finalization prerequisite
+
+The latest same semantic Reader task
+`01a04da4-185a-7943-9a1b-1d36735f5cad` returned **NO / NO** for the new F13
+red. The cited F04 live-membership receipt has an exact repository copy at
+[the recorded rerun](evidence/golden-baseline/g10/golden-g10-f04-live-membership-rerun-20260829.txt)
+with SHA256
+`5BB3CAB1AC521EE76F7B5A067EDB23C7A2BD9DA0A4D63125774618434B290729`. It shows
+the real supported closure's Evaluation
+`b7d37cd7-2012-46d1-9a26-29cbae5d97b3`, Report
+`2998b24560a171c870e18f675f1485087d7bfa97045435efaf9b2a3931216e66`, and
+`gates` link, while durable publication/projection exposes
+`current_report_id=""` and `HISTORICAL`.
+
+G10 release and all G10 Builder/Verifier activity are paused. The accepted G9
+current-report authority is contradicted; the smallest rightful repair is
+G9-owned current-report publication finalization, principally in
+`packages/qf-kernel/src/governed-review.ts`. G10 must not alter the F13
+projection assertion, infer currentness from `report_ids`, or change any
+Canvas/Dock/projection behavior. The relevant existing source operation chain
+is `qf_record_evaluation` → `recordGovernedEvaluation` →
+`qf_review_publication.is_current` → `kernelFinalizeResearchEvaluation` →
+`reportContext`/`current_report_id`.
+
+Exactly one semantic G9 Builder may work from immutable accepted candidate
+`3c17e5d380fd267270cbacf851999cc98bf30638` / tree
+`d380c7b4655c53cd6e51de0c2112ae99885f0e3d`. The existing G9
+`qa/gates/report-authority.ts`/registration and directly required focused
+tests/fixtures or receipt-only G9/G10 evidence may change only as needed for
+this proof. The dirty G10 implementation remains preserved and unstaged. No
+new schema, object, link, writer, storage authority, projection workaround, or
+G10 product/gate change is authorized.
+
+The focused first/second publication falsifier uses two independently supported
+governed closures in a fresh exact
+`(mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of)` context:
+
+1. The first supported closure must durably publish with `is_current=1`, and
+   its exact persisted Report id must agree with the Evaluation→Report identity,
+   `gates` link, and projected `current_report_id`. Removing only the first
+   current transition must exit nonzero; restoring it must pass.
+2. A second supported closure in the same context must explicitly supersede the
+   first, preserve both durable Report bytes/IDs and history, preserve each
+   Evaluation's own Report identity and `gates` link, and leave exactly one
+   current Report with exact current/historical markers. Removing only the
+   explicit supersession/current replacement must exit nonzero; restoring it
+   must pass. Independent support and idempotent retries remain required.
+
+The G9 gate compares durable publication state with the read-only projection;
+it does not filter, infer by arrival order, or weaken the exact identity/history
+assertions. One fresh independent G9 Verifier—not the Builder or Router—must
+bind to the immutable candidate and new receipt and decide this prerequisite.
+Only after independent G9 PASS may Router resume the preserved G10
+identity-sequence, F09, projection, and remaining acceptance packet. G11 remains
+closed and no G10 release occurs before that pass.
