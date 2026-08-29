@@ -1,11 +1,11 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 CURRENT-MISSION HISTORY PROJECTION REPAIR
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 F06 TWO-ARTIFACT PROJECTION READER HOLD
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 A-PRIMARY CURRENT-MISSION HISTORY PROJECTION REPAIR AUTHORIZED — ONE BOUNDED BUILDER
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 F06 A-PRIMARY TWO-ARTIFACT PROJECTION READER HOLD
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **OPEN — exactly one bounded G10 product-projection repair plus red/green proof is authorized only in `collab-electron/src/windows/shell/src/renderer.js` and `qa/gates/golden-g10-canvas-runtime.ts`; same Reader returned YES / YES; no new semantic Reader, no other product/gate surface, no scope expansion, and one fresh independent Verifier remains required**
-g10-status: **A-PRIMARY CURRENT-MISSION HISTORY PROJECTION REPAIR — Builder open for one bounded renderer allowlist repair and gate red/green proof**
+builder-authority: **HOLD — no Builder edit is authorized until a fresh semantic Reader returns YES / YES on the two-artifact projection/cardinality contract; after that approval exactly one bounded repair/proof is authorized only in `collab-electron/src/main/research-world-projection.ts` and `collab-electron/src/main/research-world.test.ts`; no F06 gate change, no Kernel/renderer/cable-model change, no other surface, and one fresh independent Verifier remains required**
+g10-status: **F06 A-PRIMARY TWO-ARTIFACT PROJECTION READER HOLD — Reader approval required before the one bounded projection/test Builder**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
@@ -19,12 +19,12 @@ g10-reader-round-3-verdict: **YES / YES — prior amendments accepted; exactly o
 g10-adjudication-task: `01a04b3c-4db1-7a93-b618-21890b79bb26`
 g10-adjudication-authority: `222af07635e4566eb66b802cbcc3750be828d001`
 g10-adjudication-result: **C + D — fixture/driver sequencing plus cleanup mechanics; not a product or Kernel regression**
-g10-repair-authority: **ONE same-meaning fixture/driver-only repair; existing acceptance meaning and every F01–F14 assertion remain unchanged**
+g10-repair-authority: **HISTORICAL/RETAINED — prior same-meaning fixture/driver and lineage repairs are complete for this adjudication; current Builder authority is held pending the F06 Reader**
 g10-lineage-adjudication-task: `01a04b63-f4c6-7fd3-b6a8-f429f0e6aed1`
 g10-lineage-adjudication-authority: `9886a1225f2cf2c5ee713c6d2329fda0ac2ef9d2`
 g10-lineage-adjudication-result: **B primary with D/C secondary — retained accepted R16 helper Artifact-lineage defect; not a G10 Canvas product/Kernel regression**
-g10-lineage-repair-authority: **OPEN — exactly one bounded product-helper repair Builder for the accepted two-artifact/pre-admission lineage contract; one fresh independent Verifier afterward; no second Builder or scope expansion**
-g10-lineage-repair-surface: **only `collab-electron/src/main/kernel.ts`, existing `qa/gates/golden-g10-canvas-runtime.ts`, and `collab-electron/src/main/research-world.test.ts` only if needed; directly caused G10 evidence**
+g10-lineage-repair-authority: **HISTORICAL/RETAINED — the accepted two-artifact/pre-admission lineage contract is preserved; current Builder authority is held pending the F06 Reader**
+g10-lineage-repair-surface: **HISTORICAL/RETAINED — prior helper/gate/test surfaces are read-only under this amendment; the current F06 surface is named below**
 g10-lineage-reader-task: `01a04b77-cb43-7792-a225-2a7d57ef068c`
 g10-lineage-reader-authority: `db30a28d912f2e49e39802340993e17c62132f87`
 g10-lineage-reader-verdict: **HISTORICAL NO / NO — exact completed source-Task event/receipt lineage must be checked before review Task/Evaluation/Report mutation; superseded by the same Reader's accepted reread below**
@@ -35,19 +35,19 @@ g10-ordinary-adjudication-task: `01a04b99-46a1-7c00-a10d-b2d7b5c81dab`
 g10-ordinary-adjudication-authority: `f2ce7505ff53be883a78f4d463b0cb745c11aab1`
 g10-ordinary-adjudication-classification: **A primary — G10 cold-launch ordinary-Canvas product defect; D secondary — gate boundary-label ambiguity; accepted meaning unchanged**
 g10-ordinary-adjudication-result: **cold launch leaves the DOM without `ORDINARY_CANVAS` because `hydrateSaved()` is conditional on saved state; the direct Main RPC does not invoke the Dock Mission reveal callback**
-g10-ordinary-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one repair, with no new semantic Reader; one fresh independent Verifier afterward**
-g10-ordinary-repair-surface: **only `collab-electron/src/windows/shell/src/renderer.js` and `qa/gates/golden-g10-canvas-runtime.ts`; no other implementation, test, gate, or authority surface is authorized by this amendment**
+g10-ordinary-repair-authority: **HISTORICAL/RETAINED — prior ordinary-Canvas repair is complete for this adjudication; no current ordinary repair is authorized**
+g10-ordinary-repair-surface: **HISTORICAL/RETAINED — the current F06 amendment narrows all active repair authority to the two named projection/test files below**
 g10-browser-adjudication-task: `01a04baf-2dc7-7a70-95df-0e9405405048`
 g10-browser-adjudication-authority: `52a914206d9c4cb7d23dcc60ed31e50641cfaf6c`
 g10-browser-adjudication-classification: **C primary — fixture/setup defect; D secondary — diagnostic label only; no product defect or G10 meaning change**
 g10-browser-adjudication-result: **the gate used a blocked `data:` URL, so the DOM tile existed but no real browser webview or webContentsId was created; readiness is Main `!isLoading` or `did-finish-load`**
-g10-browser-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one gate-only repair, with no new semantic Reader; one fresh independent Verifier afterward**
-g10-browser-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; no timeout increase, blocked-URL policy change, source-only bait, weakened assertion, or other file is authorized**
+g10-browser-repair-authority: **HISTORICAL/RETAINED — prior browser-gate repair is complete for this adjudication; no current browser repair is authorized**
+g10-browser-repair-surface: **HISTORICAL/RETAINED — the current F06 amendment does not authorize the browser gate or any timeout/policy change**
 g10-mission-adjudication-task: `01a04bca-ad71-7b60-a475-5f014858cd5e`
 g10-mission-adjudication-authority: `58757be642f81d03c810449e9c8aebfa1d24bc02`
 g10-mission-adjudication-classification: **C primary — fixture/call/timing defect; D secondary — diagnostic label only; Mission/Kernel projection healthy and no meaning change**
 g10-mission-adjudication-result: **`openMission` returns `false` when the exact Mission control is not yet present; `waitFor()` treats only `null` as retry, so no click occurs and the gate reports a misleading CURRENT_MISSION timeout**
-g10-mission-repair-authority: **HISTORICAL/RETAINED — the exact `return null` gate correction remains binding; the current Builder step is the separately bounded A-primary current-Mission HISTORY projection repair below**
+g10-mission-repair-authority: **HISTORICAL/RETAINED — the exact `return null` gate correction and current-Mission HISTORY projection repair remain binding; current Builder authority is held pending the F06 Reader below**
 g10-mission-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; change the missing-control branch to return `null` and preserve the exact missionId/button selector, click, state assertions, and timeouts**
 g10-barrier-adjudication-task: `01a04bdd-5dfb-70c2-aa6e-ac7e418e7c33`
 g10-barrier-adjudication-authority: `dcc4bad6f3e92870d9a9d1ee84a2548d48f21406`
@@ -64,6 +64,13 @@ g10-mission-reopen-reader-task: `01a04bf8-eaba-7e53-8563-95d85d0f078a`
 g10-mission-reopen-reader-authority: `8c594f17cb7881fd4bb81c6e059d0157e946f549`
 g10-mission-reopen-reader-verdict: **YES / YES — repeated reopening of the active durable Mission is part of the accepted visible-HISTORY consumer path; the bounded allowlist and red/green proof below have one finite meaning**
 g10-mission-reopen-classification: **A primary — G10 product projection defect; the prior generic `RPC timeout: app.ui.evaluate` was D insufficient diagnostics and is not a product defect finding**
+g10-f06-adjudication-task: `01a04c4c-afc5-72e1-b554-6c45a46482e9`
+g10-f06-adjudication-authority: `a7a98ceec20140581b7eb72cfaa783564dc367f9`
+g10-f06-classification: **A primary — G10 product projection defect; D secondary — old R16 cardinality wording; not B, C, or E**
+g10-f06-canonical-produces-invariant: **Run → result_set Artifact; Executor AgentSession → worker trajectory Artifact; Critic AgentSession → findings Artifact; no Task → Artifact producer relation**
+g10-f06-durable-missing-tuple: **the Kernel contains `produces(synthetic-worker-37085aa4-a3bc-4c0e-af2b-cb4cce231066, af5da2f0d1b98edcf6e90df9246094a1a7665ccaa03dc8489083c14b4393d7c5)`; the read-only projection omits that exact tuple from `world.links`**
+g10-f06-reader-requirement: **REQUIRED — a fresh semantic Reader must return YES / YES on the two-artifact projection/cardinality contract before any Builder edit; no Builder authority exists before that verdict**
+g10-f06-repair-authority: **HELD PENDING READER — after fresh Reader YES / YES, exactly one bounded projection repair and expectation update are authorized in the two named files below, with one fresh independent Verifier afterward**
 g10-diagnostic-adjudication-task: `01a04c1c-ae43-7dd0-a773-4d6961fa9e4f`
 g10-diagnostic-adjudication-authority: `8c6c2df0910fa6c777df19cd15cd8dd245f10c66`
 g10-diagnostic-adjudication-classification: **HISTORICAL/SUPERSEDED — D primary — insufficient diagnostics; C was only a conditional mechanical F11 hypothesis; A, B, and E were unsupported**
@@ -249,10 +256,10 @@ receipt amendment reread also returned **YES / YES** at authority
 browser-readiness, and Mission-navigation repairs are within that accepted
 meaning; the final visible-HISTORY consumer-path adjudication below corrected
 the empirically false renderer-barrier premise and was accepted YES / YES by the
-same Reader. The later repeat-open failure is now classified A primary as a G10
-product projection defect; the current Builder action is exactly the bounded
-renderer allowlist repair and gate red/green proof below. No new semantic
-Reader, second Builder, or scope expansion is authorized.
+same Reader. The later repeat-open failure was classified A primary as a G10
+product projection defect under the prior authority; the current Builder is
+now held pending the fresh F06 Reader below. No second Builder or scope
+expansion is authorized.
 
 ### G10 finite Reader amendments — same Reader reread required
 
@@ -294,9 +301,8 @@ finite amendments are now binding in [WO-GOLDEN-G10](WO-GOLDEN-G10.md):
 
 The same Reader reread the amended G10 order and this handoff in Round 3 and
 returned **YES / YES** against authority `4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`.
-The Round-2 reread requirement is satisfied. The current Builder door is open
-exactly once under the accepted G10 order, with one independent Verifier
-required afterward.
+The Round-2 reread requirement is satisfied for that prior authority. The
+current Builder door is held pending the fresh F06 Reader YES / YES below.
 
 ### G10 Round-2 minimum amendment — accepted in Round 3
 
@@ -328,13 +334,15 @@ The same Reader's Round-3 reread accepted this Round-2 amendment and the
 amended G10 order with **YES / YES** against authority
 `4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`.
 
-### G10 Round-3 Reader acceptance — Builder open
+### Historical G10 Round-3 Reader acceptance — prior Builder opening
 
 The same Reader task `01a04a11-0b55-79b3-b6c0-55285177dd55` returned
 **YES / YES** after rereading the amended G10 order and this `NEXT.md` against
 authority `4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`. All prior finite
-amendments remain intact. Exactly one bounded G10 Builder is authorized under
-[WO-GOLDEN-G10](WO-GOLDEN-G10.md). The Builder must preserve G9 Report
+amendments remain intact. At that prior authority, exactly one bounded G10
+Builder was authorized under [WO-GOLDEN-G10](WO-GOLDEN-G10.md). That prior
+Builder opening is superseded by the current F06 Reader hold below. The
+Builder must preserve G9 Report
 authority, exact G12 survivor ownership, the G11 boundary, the R18 freeze, the
 Kernel sole-writer law, and every accepted allowlist and falsifier boundary.
 One independent Verifier, not Router or the Builder, must follow and decide
@@ -654,14 +662,13 @@ The same Reader task `01a04bf8-eaba-7e53-8563-95d85d0f078a` reread this
 amendment and `NEXT.md` at authority
 `8c6c2df0910fa6c777df19cd15cd8dd245f10c66` and returned **YES / YES**;
 visible-HISTORY red/green is proven and no new semantic Reader is required.
-The current Builder action is exactly the bounded current-Mission HISTORY
-projection repair and red/green proof below. One fresh independent Verifier—not
-the Builder or Router—must decide G10 afterward. Renderer behavior outside the
-exact allowlist, ledger filtering outside the active-Mission exception,
-product meaning, timeout values, selector semantics, click semantics, ordinary
-Canvas assertions, zero-leak cleanup, G9 authority, G12 ownership, R18, G11,
-and every other Golden-group boundary remain unchanged. No product or semantic
-red outside this A-primary finding may be repaired under this authority.
+That prior current-Mission authority is retained as accepted history. The
+current Builder is held pending the fresh F06 Reader YES / YES below. Renderer
+behavior, ledger filtering, product meaning, timeout values, selector
+semantics, click semantics, ordinary Canvas assertions, zero-leak cleanup, G9
+authority, G12 ownership, R18, G11, and every other Golden-group boundary
+remain unchanged. No product or semantic red outside the current F06 authority
+may be repaired.
 
 ### Historical G10 post-HISTORY diagnostic-only measurement — superseded by current-Mission projection adjudication
 
@@ -700,7 +707,7 @@ stops work and is not repairable under this authority. One fresh independent
 Verifier—not the Builder or Router—must decide G10 afterward. No other file,
 candidate/evidence commit, G11 work, or scope expansion is authorized.
 
-### G10 final current-Mission HISTORY projection adjudication — Reader accepted; Builder reopened
+### Historical G10 current-Mission HISTORY projection adjudication — prior Reader accepted; superseded by F06 hold
 
 The same semantic Reader task
 `01a04bf8-eaba-7e53-8563-95d85d0f078a` returned **YES / YES** against the
@@ -711,9 +718,12 @@ primary — G10 product projection defect**: the active durable Mission is
 omitted from the renderer's `historyIds` projection, so repeated visible
 HISTORY loses its exact row and button. The earlier generic
 `RPC timeout: app.ui.evaluate` is superseded as D insufficient diagnostics,
-not a product defect finding.
+not a product defect finding. This prior current-Mission authority is retained
+as accepted history; the current Builder is held pending the fresh F06 Reader
+and the current authority is the F06 section below.
 
-Authorize exactly one bounded G10 repair and red/green proof:
+The prior authority authorized exactly one bounded G10 repair and red/green
+proof:
 
 1. In `collab-electron/src/windows/shell/src/renderer.js`, change only the
    HISTORY allowlist to `existing historyIds ∪ exact entry where
@@ -747,6 +757,65 @@ work and is not repaired under this amendment. No new semantic Reader is
 required. One fresh independent Verifier—not the Builder or Router—must decide
 G10 after the repair and proof. No candidate/evidence commit or G11 work is
 authorized.
+
+### G10 current F06 two-artifact projection/cardinality adjudication — Reader required before Builder
+
+The fresh read-only F06 adjudication task
+`01a04c4c-afc5-72e1-b554-6c45a46482e9`, against current authority
+`a7a98ceec20140581b7eb72cfaa783564dc367f9`, classified the stopped F06
+failure as **A primary — G10 product projection defect**, with **D secondary
+— old R16 cardinality wording**. It is not B, C, or E. The durable Kernel
+lineage and helper are correct; `research-world-projection.ts` drops an
+existing executor-output relation while selecting the read-only `world.links`
+set.
+
+The canonical `produces` invariant is multiple explicit producer relations:
+
+- `Run → result_set Artifact`;
+- `Executor AgentSession → worker trajectory Artifact`;
+- `Critic AgentSession → findings Artifact`;
+- no `Task → Artifact` producer relation.
+
+For the adjudicated fixture, the durable Kernel relation is exactly
+`produces(synthetic-worker-37085aa4-a3bc-4c0e-af2b-cb4cce231066,
+af5da2f0d1b98edcf6e90df9246094a1a7665ccaa03dc8489083c14b4393d7c5)`. The
+worker trajectory Artifact ID is consistently the `source.result_artifact_id`,
+the completed-task receipt artifact ID, and the durable executor output. The
+Run result-set Artifact is a different ID and must not substitute for it.
+The durable Kernel tuple is present; the projected `world.links` tuple is
+missing. Canvas cables and relation rows remain projections, not relation
+truth.
+
+The current Builder is held. Before any implementation, a fresh semantic
+Reader must return **YES / YES** on the two-artifact projection/cardinality
+contract. Only after that verdict authorize exactly these bounded files:
+
+1. `collab-electron/src/main/research-world-projection.ts`: include the exact
+   already-durable tuple
+   `produces(source.executor_session_id, source.result_artifact_id)` only when
+   that tuple exists in the read-only Kernel relation set. Do not invent
+   relation truth, add a `Task → Artifact` relation, or substitute the Run
+   result-set Artifact.
+2. `collab-electron/src/main/research-world.test.ts`: update existing
+   expectations only as the smallest bounded consequence of projecting the
+   second Artifact/edge. No unrelated test or semantic change is authorized.
+
+Do not weaken or change QA gate F06. Its fail-capable proof must omit only the
+projection selection of the exact durable tuple above and go red on the exact
+F06 tuple; restoring that selection must go green with the same IDs. Retain
+the existing lineage substitution and durable-link-removal refusals unchanged:
+substituting the Run result-set or removing the durable executor→trajectory
+link must still refuse admission before review mutation.
+
+For this amendment, any broader G10 standing surface is narrowed to exactly
+`collab-electron/src/main/research-world-projection.ts` and
+`collab-electron/src/main/research-world.test.ts`, and no Builder edit is
+authorized before the fresh Reader YES / YES. Explicitly forbidden are any
+F06 gate change, new relation truth, Kernel data/state/schema/write change,
+`kernel-ledger.js`, renderer or Canvas cable-model change, G9/G12/R18 change,
+selector or timeout change, weakened assertion, cleanup change, other Golden
+group, other file, or scope expansion. One fresh independent Verifier—not the
+Builder or Router—must decide G10 after the accepted Reader, repair, and proof.
 
 ## Historical G9-open handoff (superseded)
 
