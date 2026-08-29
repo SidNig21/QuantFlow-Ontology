@@ -1,21 +1,21 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 F09 NATIVE-INPUT REPAIR
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 F09 NATIVE-INPUT SIGN REPAIR
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 F09 NATIVE-INPUT REPAIR AUTHORIZED / SAME BUILDER RESUMES
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 F09 NATIVE-INPUT SIGN REPAIR AUTHORIZED / SAME BUILDER RESUMES
 rotated-at: 2026-08-29
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **SAME BUILDER RESUMES — the latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned YES / YES for exactly one bounded native-input product+gate repair; preserve the full gate rewrite and retained fixture/readiness correction, make no other product/gate/timing/assertion change, and an independent fresh Verifier still decides G10**
+builder-authority: **SAME BUILDER RESUMES — the latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned YES / YES for exactly one bounded native-input sign product+gate repair; preserve the full gate rewrite and retained fixture/readiness correction, make no other product/gate/timing/assertion change, and an independent fresh Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
-g10-status: **F09 NATIVE-INPUT REPAIR AUTHORIZED — in the existing `browser:scroll` branch of `collab-electron/src/main/ipc-browser.ts`, use `const wc = getWc(webContentsId); await wc.sendInputEvent({ type: "mouseWheel", x: 0, y: 0, deltaX: x, deltaY: y }); return {};`; remove only the debugger-CDP wheel dependency; in `qa/gates/golden-g10-canvas-runtime.ts`, use existing normal `rpcCall` with its default 5000ms RPC boundary and no no-wait helper, then begin unchanged `wait(50)` only after RPC completion; retain fixture standards/readiness/`document.scrollingElement`, the real route, native user-visible input/deltas, `after > before`, zero-delta/overflow reds, and cleanup zero; prior no-wait and awaited-CDP clauses are superseded; no DOM shortcut or other product/gate/timing/assertion change; G11 remains closed**
+g10-status: **F09 NATIVE-INPUT SIGN REPAIR AUTHORIZED — in the existing `browser:scroll` branch of `collab-electron/src/main/ipc-browser.ts`, use `const wc = getWc(webContentsId); await wc.sendInputEvent({ type: "mouseWheel", x: 0, y: 0, deltaX: -x, deltaY: -y }); return {};`; this exact native awaited payload supersedes the prior byte-identical delta claim and corrects Electron's `WebMouseWheelEvent` sign convention; remove only the debugger-CDP wheel dependency; in `qa/gates/golden-g10-canvas-runtime.ts`, use existing normal `rpcCall` with its default 5000ms RPC boundary and no no-wait helper, then begin unchanged `wait(50)` only after RPC completion; retain fixture standards/readiness/`document.scrollingElement`, the real Canvas → Main → browser route, guest `webContentsId`, native user-visible input, `after > before`, zero-delta/removal/overflow reds, and cleanup zero; no DOM shortcut or other product/gate/timing/assertion change; G11 remains closed**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
 g10-product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
 g10-product-repair-surface: **only `collab-electron/src/windows/shell/src/research-world.js` and `collab-electron/src/windows/shell/src/dock.js`**
 g10-product-repair-proof: **red removes only event `world` and unchanged real G10 gate shows Inspect output and Mission binding `Not recorded`; green restores both lines and exact participant/artifact/Mission parity, truthful `closed`/`stopped`, and cleanup zero**
 g10-f09-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
-g10-f09-reader-verdict: **YES / YES — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` accepted exactly one bounded native-input product+gate repair; same Builder resumes and one fresh independent Verifier remains required**
-g10-f09-surface: **only `collab-electron/src/main/ipc-browser.ts` browser:scroll uses `const wc = getWc(webContentsId); await wc.sendInputEvent({ type: "mouseWheel", x: 0, y: 0, deltaX: x, deltaY: y }); return {};`, removing only the debugger-CDP wheel dependency, plus `qa/gates/golden-g10-canvas-runtime.ts` using existing normal `rpcCall` default 5000ms boundary with no no-wait helper and unchanged post-completion `wait(50)`; preserve all other dirty G10 work**
-g10-f09-proof: **old awaited-CDP behavior with normal RPC boundary times out and has no after sample; restore native `sendInputEvent` on the target webContents and the same Canvas → Main → browser route yields `after > before` within unchanged post-command 50ms; deltaY=0 and overflow remain red and cleanup remains zero**
+g10-f09-reader-verdict: **YES / YES — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` accepted exactly one bounded native-input sign product+gate repair; same Builder resumes and one fresh independent Verifier remains required**
+g10-f09-surface: **only `collab-electron/src/main/ipc-browser.ts` browser:scroll uses `const wc = getWc(webContentsId); await wc.sendInputEvent({ type: "mouseWheel", x: 0, y: 0, deltaX: -x, deltaY: -y }); return {};`, removing only the debugger-CDP wheel dependency, plus `qa/gates/golden-g10-canvas-runtime.ts` using existing normal `rpcCall` default 5000ms boundary with no no-wait helper and unchanged post-completion `wait(50)`; preserve the guest webContentsId, real Canvas → Main → browser route, all other dirty G10 work, and the prior gate contract**
+g10-f09-proof: **current native signs (`+800` for the downward test at `scrollTop=0`) remain red because the wheel clamps upward; restore only `deltaX: -x, deltaY: -y` and the same target route yields `after > before` within unchanged post-command 50ms; deltaY=0 or removed dispatch independently remains red, overflow remains red, and cleanup remains zero**
 g10-f09-reread: **SATISFIED — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned YES / YES; same Builder resumes and one fresh independent Verifier remains required**
 g10-reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
 g10-reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread amended NEXT.md and WO-GOLDEN-G10 and return YES / YES before Builder**
@@ -353,24 +353,29 @@ The full one-Task/dynamic-ID/object-link gate rewrite and standing Router
 mechanical authority remain binding. One fresh independent Verifier—not the
 Builder or Router—must verify the repair and decide G10.
 
-### G10 current F09 finite native-input repair — same Builder resumes
+### G10 current F09 finite native-input sign repair — same Builder resumes
 
 The latest finite Reader evidence task `01a04da4-185a-7943-9a1b-1d36735f5cad`
-returned **YES / YES** for exactly one bounded native-input repair. The
+returned **YES / YES** for exactly one bounded native-input sign repair. The
 awaited-CDP hypothesis is superseded: the debugger wheel command does not
 resolve within the normal RPC boundary and produces no after sample. F09 still
 protects native, user-visible guest-page scrolling through the target
 webContents on the real Canvas → Main → browser route.
+
+This amendment supersedes the prior byte-identical delta claim. The Reader's
+bounded causal finding is Electron's native `WebMouseWheelEvent` sign
+convention: the existing positive test delta attempts upward scrolling from
+`scrollTop=0` and clamps, so the product must negate the requested deltas.
 
 Authorize exactly this product+gate repair:
 
 1. In the existing `browser:scroll` branch of
    `collab-electron/src/main/ipc-browser.ts`, use:
    `const wc = getWc(webContentsId);`
-   `await wc.sendInputEvent({ type: "mouseWheel", x: 0, y: 0, deltaX: x, deltaY: y });`
+   `await wc.sendInputEvent({ type: "mouseWheel", x: 0, y: 0, deltaX: -x, deltaY: -y });`
    `return {};`. Remove only the debugger-CDP wheel dependency; preserve the
-   target `webContentsId`, native input, and existing deltas. Do not add a DOM
-   scroll shortcut.
+   guest `webContentsId`, native input route, and requested deltas after this
+   exact sign correction. Do not add a DOM scroll shortcut.
 2. In `qa/gates/golden-g10-canvas-runtime.ts`, use existing normal `rpcCall`
    with its default 5000ms RPC boundary for `canvas.browserScroll`; the
    `dispatchRpcWithoutWaiting` helper must be absent.
@@ -379,11 +384,13 @@ Authorize exactly this product+gate repair:
    measurements, real route, exact native input payload, unchanged
    `after > before`, zero-delta and overflow reds, and cleanup zero.
 
-The finite falsifier uses the verified nonzero surface. The old awaited-CDP
-path with normal RPC boundary must time out and produce no after sample. Restore
-native `sendInputEvent`; the same target route and deltas must return and yield
-`after > before` within the unchanged post-command 50ms interval. `deltaY: 0`
-and overflow remain independently red.
+The finite falsifier uses the verified nonzero surface. The current native
+positive signs (`deltaY: +800`) must remain red because the event attempts
+upward from `scrollTop=0` and clamps. Restore only the corrected native payload
+with `deltaX: -x, deltaY: -y`; the same target route must return and yield
+`after > before` within the unchanged post-command 50ms interval. Removing the
+wheel dispatch or setting `deltaY: 0` independently remains red, as does
+overflow poisoning; cleanup remains zero.
 
 The uncommitted `tileManager.focusCanvasTile(params.tileId)` line in
 `collab-electron/src/windows/shell/src/canvas-rpc.js` is noncausal and must be
