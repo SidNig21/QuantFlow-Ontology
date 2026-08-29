@@ -1,17 +1,21 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 READER-APPROVED PRODUCT REPAIR
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 F09 FIXTURE CORRECTION
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 READER-APPROVED PRODUCT REPAIR AUTHORIZED / SAME BUILDER RESUMES
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 F09 FIXTURE CORRECTION AUTHORIZED / SAME BUILDER RESUMES
 rotated-at: 2026-08-29
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **SAME BUILDER RESUMES — exactly the Reader-approved two-file G10 product repair is authorized; preserve the full gate rewrite, and an independent fresh Verifier still decides G10**
+builder-authority: **SAME BUILDER RESUMES — exactly the F09 gate-only fixture/setup correction and the one named dirty-line baseline reversion are authorized; preserve the full gate rewrite, and an independent fresh Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
-g10-status: **READER-APPROVED PRODUCT REPAIR AUTHORIZED — `research-world.js` includes existing `result.world` in existing ephemeral `qf:research-world-active`; `dock.js` consumes that event world into existing ephemeral `missionWorld` before refresh; no persistence/new truth/schema/Kernel/Canvas/timeout/assertion change; G11 remains closed**
+g10-status: **F09 FIXTURE CORRECTION AUTHORIZED — prepend `<!doctype html>` to the real loopback fixture; before F09 require `document.compatMode === CSS1Compat` and measured max(document scrolling roots) `scrollHeight > clientHeight`; preserve the real route, no-wait dispatch, 50ms wait, and `after > before`; no product/CSS/Canvas/RPC behavior, timing, or timeout/assertion weakening; G11 remains closed**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
 g10-product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
 g10-product-repair-surface: **only `collab-electron/src/windows/shell/src/research-world.js` and `collab-electron/src/windows/shell/src/dock.js`**
 g10-product-repair-proof: **red removes only event `world` and unchanged real G10 gate shows Inspect output and Mission binding `Not recorded`; green restores both lines and exact participant/artifact/Mission parity, truthful `closed`/`stopped`, and cleanup zero**
+g10-f09-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
+g10-f09-reader-verdict: **NO / NO — one finite gate-only fixture/setup amendment; same Builder resumes after this docs commit and one fresh independent Verifier remains required**
+g10-f09-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; revert only the uncommitted `await cdpSend(...)` line/change in `collab-electron/src/main/ipc-browser.ts` to baseline, preserving every other dirty G10 change**
+g10-f09-proof: **remove only doctype → BackCompat/zero scroll range red; restore doctype → precondition green; overflow poisoning → required old-red F09; exact restoration → new-green `after > before`**
 g10-reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
 g10-reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread amended NEXT.md and WO-GOLDEN-G10 and return YES / YES before Builder**
 g10-reader-round-4-reread: **REQUIRED — same Reader task `01a04d3f-3cd4-7513-b89e-6770c95237f0`; no substitute Reader is authorized**
@@ -197,7 +201,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; F04 founder-reauthorized mechanical lifecycle-order correction in the gate only; seed/reveal the real Mission world before pre-finalization participant parity; focused suite plus one complete G10 gate; zero cleanup; green immutable candidate for one fresh independent Verifier; F04 red again stops; G11 remains closed; no product, Canvas, Kernel, Ontology, identity, state, parity, timeout, cleanup, falsifier-meaning, or scope change
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Reader-approved ephemeral Dock projection repair plus F09 gate-only fixture correction; seed/reveal the real Mission world before pre-finalization participant parity; focused suite plus one complete G10 gate; zero cleanup; green immutable candidate for one fresh independent Verifier; G11 remains closed; no persistence, new truth, schema, Kernel, Canvas, CSS, RPC behavior, identity, state, parity, timeout, timing, cleanup, falsifier-meaning, or scope change beyond the named repairs
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -347,6 +351,38 @@ assertion change is authorized. No multi-Task chooser or G11 work is opened.
 The full one-Task/dynamic-ID/object-link gate rewrite and standing Router
 mechanical authority remain binding. One fresh independent Verifier—not the
 Builder or Router—must verify the repair and decide G10.
+
+### G10 current F09 finite fixture correction — same Builder resumes
+
+The fresh semantic Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned
+**NO / NO** with one finite amendment. F09 protects observable guest-page
+scrolling through the real Canvas → Main → renderer/preload → browser IPC
+route; the current red is a loopback fixture/setup defect because the page is
+BackCompat with zero scroll range, not a Canvas, CSS, lifecycle, or assertion
+defect.
+
+Authorize only this gate fixture/setup correction in
+`qa/gates/golden-g10-canvas-runtime.ts`:
+
+1. Prepend `<!doctype html>` to the real loopback fixture.
+2. Before F09, require `document.compatMode === CSS1Compat` and require the
+   measured maximum across the document scrolling roots to have
+   `scrollHeight > clientHeight`.
+3. Preserve the real Canvas → Main → renderer/preload → browser IPC route, the
+   gate-only no-wait dispatch, the existing 50ms wait, and the existing
+   `after > before` assertion.
+4. Falsify by removing only the doctype and requiring BackCompat/zero range to
+   make the registered gate red. Restore the doctype and require the precondition
+   green; overflow poisoning must produce the required F09 old-red, and exact
+   restoration must produce the new-green `after > before` result.
+
+The dirty `await cdpSend(...)` product change in
+`collab-electron/src/main/ipc-browser.ts` must not be retained: the same
+Builder must revert only that uncommitted line/change to baseline and preserve
+all other dirty G10 work. No product, CSS, Canvas, or RPC behavior change, and
+no timeout, timing, or assertion weakening is authorized. The same Builder resumes after this docs
+commit; one fresh independent Verifier—not the Builder or Router—remains
+required.
 
 G10 is now the sole active Phase-2 order. Its bounded accepted packet is
 [WO-GOLDEN-G10](WO-GOLDEN-G10.md): explicit ordinary/mission/full-lineage

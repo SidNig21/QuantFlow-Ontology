@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: G10 READER-APPROVED PRODUCT REPAIR AUTHORIZED — same Builder resumes; fresh independent Verifier required
+status: G10 F09 FIXTURE CORRECTION AUTHORIZED — same Builder resumes; fresh independent Verifier required
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **SAME BUILDER RESUMES — exactly the Reader-approved two-file G10 product repair is authorized; preserve the full gate rewrite, and one fresh independent Verifier still decides G10**
+build-authority: **SAME BUILDER RESUMES — exactly the F09 gate-only fixture/setup correction and the one named dirty-line baseline reversion are authorized; preserve the full gate rewrite, and one fresh independent Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
 diagnostic-pass-authority: **RETAINED EVIDENCE ONLY — the prior exact visible-HISTORY Mission click recorded the real projection refusal; the current authority is the Reader-approved product repair below, with no persistence/new truth/schema/Kernel/Canvas/timeout/assertion change**
 finite-rewrite-authority: **RETAINED/BINDING GATE CONTRACT — exactly one Task belongs to the Mission fixture; dynamic Task/Run IDs and exact object/link sets must survive CURRENT_MISSION, FULL_LINEAGE, close/reopen, and F04 parity; no multi-Task chooser**
@@ -12,6 +12,10 @@ product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
 product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
 product-repair-surface: **only `collab-electron/src/windows/shell/src/research-world.js` and `collab-electron/src/windows/shell/src/dock.js`**
 product-repair-proof: **red removes only event `world` and unchanged real G10 gate shows Inspect output and Mission binding `Not recorded`; green restores both lines and exact participant/artifact/Mission parity, truthful `closed`/`stopped`, and cleanup zero**
+f09-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
+f09-reader-verdict: **NO / NO — one finite gate-only fixture/setup amendment; same Builder resumes after this docs commit and one fresh independent Verifier remains required**
+f09-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; revert only the uncommitted `await cdpSend(...)` line/change in `collab-electron/src/main/ipc-browser.ts` to baseline, preserving every other dirty G10 change**
+f09-proof: **remove only doctype → BackCompat/zero scroll range red; restore doctype → precondition green; overflow poisoning → required old-red F09; exact restoration → new-green `after > before`**
 reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
 reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread this order and NEXT.md and return YES / YES before Builder**
 reader-round-4-reread: **REQUIRED — same Reader task `01a04d3f-3cd4-7513-b89e-6770c95237f0`; no substitute Reader is authorized**
@@ -394,7 +398,7 @@ does not observe owned state is not acceptance.
 | F06 | drop the exact frozen `(kind, from_id, to_id)` `produces` tuple named by the independent-Kernel fixture from projection resolution | the tuple present in the isolated Kernel renders `Not recorded` or the wrong id | existing `strategy`/`produces` links project exactly; only absent facts use exactly `Not recorded` |
 | F07 | break `browserEvaluate` at any link in its current Canvas boundary | `canvas.browserEvaluate` does not traverse the full named path or does not return the known value | the unchanged call traverses the full named path and returns the known value |
 | F08 | break `browserInfo` at any link in its current Canvas boundary | `canvas.browserInfo` does not traverse the full named path or does not return URL/title/loading | the unchanged call traverses the full named path and returns URL/title/loading |
-| F09 | break `browserScroll` at any link in its current Canvas boundary | `canvas.browserScroll` does not traverse the full named path or does not change observable page scroll | the unchanged call traverses the full named path and changes observable page scroll |
+| F09 | remove only `<!doctype html>` from the real loopback fixture, then poison and restore overflow in the isolated live fixture | after doctype removal, the registered gate observes `document.compatMode !== CSS1Compat` or measured `max(document scrolling roots).scrollHeight <= clientHeight` and exits nonzero; after exact doctype restoration, overflow poisoning makes the unchanged F09 `after > before` check exit nonzero | restored doctype makes the precondition green; the real Canvas → Main → renderer/preload → browser IPC route uses gate-only no-wait dispatch, the existing 50ms wait, and the unchanged `after > before` assertion, which return zero after exact overflow restoration |
 | F10 | break `browserWait` at any link in its current Canvas boundary | `canvas.browserWait` does not traverse the full named path or does not observe load completion or timeout | the unchanged call traverses the full named path and observes load completion or timeout |
 | F11 | break `focusAgentSession` at its current Canvas boundary | `focusAgentSession(id)` cannot focus the existing terminal tile whose `sessionId` equals `id`, or reports success without doing so | the unchanged focus path focuses that exact terminal tile; removal requires the separately named G10 Reader amendment |
 | F12a | add a renderer-side durable domain write in an isolated live fixture | both registered gates, `golden-g10-canvas-runtime` and `no-canvas-domain-writes`, exit nonzero on the added write | the bait is removed, both same registered gates exit `0`, and the real projection path remains green |
@@ -1242,3 +1246,36 @@ fixture, acceptance, or G11 change is authorized. Preserve the complete
 one-Task/dynamic-ID/object-link/falsifier rewrite and the standing Router
 mechanical authority. The same Builder resumes now; one fresh independent
 Verifier—not the Builder or Router—must verify the repair and decide G10.
+
+## Current F09 finite fixture correction — same Builder resumes
+
+The fresh semantic Reader task
+`01a04da4-185a-7943-9a1b-1d36735f5cad` returned **NO / NO** with one finite
+amendment. F09 protects observable guest-page scrolling through the real Canvas
+→ Main → renderer/preload → browser IPC route. The current red is a loopback
+fixture/setup defect: without a doctype the page is BackCompat and its measured
+scroll range is zero. This is not a Canvas, CSS, lifecycle, or assertion
+defect.
+
+Authorize only this fixture/setup correction in
+`qa/gates/golden-g10-canvas-runtime.ts`:
+
+1. Prepend `<!doctype html>` to the real loopback fixture.
+2. Before F09, require `document.compatMode === "CSS1Compat"` and require the
+   measured maximum across the document scrolling roots to have
+   `scrollHeight > clientHeight`.
+3. Preserve the real Canvas → Main → renderer/preload → browser IPC route, the
+   gate-only no-wait dispatch, the existing 50ms wait, and the unchanged
+   `after > before` assertion.
+4. Remove only the doctype for the first red proof and require BackCompat/zero
+   range. Restore the doctype and require the precondition green; overflow
+   poisoning must produce the required F09 old-red, and exact restoration must
+   produce the new-green `after > before` result.
+
+The dirty `await cdpSend(...)` product change in
+`collab-electron/src/main/ipc-browser.ts` must not be retained. The same Builder
+must revert only that uncommitted line/change to baseline and preserve every
+other dirty G10 change. No product, CSS, Canvas, or RPC behavior change, and no
+timeout, timing, or assertion weakening is authorized. The same Builder resumes
+after this docs commit; one fresh independent Verifier—not the Builder or
+Router—remains required.
