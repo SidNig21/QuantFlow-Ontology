@@ -15,7 +15,7 @@ product-repair-proof: **red removes only event `world` and unchanged real G10 ga
 f09-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
 f09-reader-verdict: **A — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` accepted exactly one bounded deterministic guest-scroll product+gate repair; same Builder resumes and one fresh independent Verifier remains required**
 f09-surface: **only `collab-electron/src/main/ipc-browser.ts` browser:scroll validates finite `x`/`y` and awaits the fixed `document.scrollingElement` closure via `wc.executeJavaScript` with `userGesture: false`, and `collab-electron/src/windows/shell/src/canvas-rpc.js` calls existing `shellApi.browserScroll` directly; the prior native/focus/RAF unit is reverted as one unit only for this operation; `qa/gates/golden-g10-canvas-runtime.ts` retains existing normal `rpcCall` default 5000ms boundary and unchanged post-completion `wait(50)`; preserve the real Canvas → Main → browser route, all other dirty G10 work, and the prior gate contract**
-f09-proof: **native negative input without the explicit focus/RAF unit remains red at `before=0, after=0`; the fixed guest-scroll closure restores the same route and yields green `before=0, after=800`; replacing only `scrollTop += numeric y` with a no-op remains red at `0→0`, while zero-delta and overflow remain red and cleanup remains zero**
+f09-proof: **native negative input without the explicit focus/RAF unit remains red at `before=0, after=0`; the fixed guest-scroll closure restores the same route and yields green `before=0, after=800`; replacing only `scrollTop += numeric y` with a no-op remains red at `0→0`, while zero-delta remains red, all other overflow/Canvas contracts elsewhere remain unchanged, and cleanup remains zero**
 f09-reread: **SATISFIED — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned A; same Builder resumes and one fresh independent Verifier remains required**
 reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
 reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread this order and NEXT.md and return YES / YES before Builder**
@@ -399,7 +399,7 @@ does not observe owned state is not acceptance.
 | F06 | drop the exact frozen `(kind, from_id, to_id)` `produces` tuple named by the independent-Kernel fixture from projection resolution | the tuple present in the isolated Kernel renders `Not recorded` or the wrong id | existing `strategy`/`produces` links project exactly; only absent facts use exactly `Not recorded` |
 | F07 | break `browserEvaluate` at any link in its current Canvas boundary | `canvas.browserEvaluate` does not traverse the full named path or does not return the known value | the unchanged call traverses the full named path and returns the known value |
 | F08 | break `browserInfo` at any link in its current Canvas boundary | `canvas.browserInfo` does not traverse the full named path or does not return URL/title/loading | the unchanged call traverses the full named path and returns URL/title/loading |
-| F09 | on the isolated live fixture retain the standards/readiness/`document.scrollingElement` precondition, then use the provisional native/focus/RAF unit as the first causal bait and independently use zero-delta and overflow baits | the provisional native/focus/RAF route remains red at `before=0, after=0`; the fixed guest closure with direct `shellApi.browserScroll` yields green `before=0, after=800`; replacing only `element.scrollTop += numeric y` with a no-op leaves `0→0`, and overflow poisoning exits nonzero | revert `canvas-rpc.js` to direct existing `shellApi.browserScroll`; in `browser:scroll`, validate finite `x`/`y` or throw `Invalid browser scroll delta`, then await `wc.executeJavaScript` with `userGesture: false` on a fixed closure requiring `document.scrollingElement`, adding numeric `x` to `scrollLeft`, numeric `y` to `scrollTop`, returning `true`, and return `{}`; serialize only fixed numeric values with no arbitrary script input; preserve the guest webContentsId, normal `rpcCall` default 5000ms boundary, unchanged post-completion `wait(50)`, real Canvas → Main → browser route, independent `scrollingElement` `after > before`, zero-delta/overflow reds, and cleanup zero; this is the only browser:scroll exception to the prior DOM-shortcut prohibition |
+| F09 | on the isolated live fixture retain the standards/readiness/`document.scrollingElement` precondition, then use the provisional native/focus/RAF unit as the historical bait and independently use the retained zero-delta and exact production guest-assignment baits | the provisional native/focus/RAF route remains red at `before=0, after=0`; the fixed guest closure with direct `shellApi.browserScroll` yields green `before=0, after=800`; replacing only `element.scrollTop += numeric y` with a no-op leaves `0→0`, while zero-delta remains red and all other overflow/Canvas contracts remain unchanged | revert `canvas-rpc.js` to direct existing `shellApi.browserScroll`; in `browser:scroll`, validate finite `x`/`y` or throw `Invalid browser scroll delta`, then await `wc.executeJavaScript` with `userGesture: false` on a fixed closure requiring `document.scrollingElement`, adding numeric `x` to `scrollLeft`, numeric `y` to `scrollTop`, returning `true`, and return `{}`; serialize only fixed numeric values with no arbitrary script input; preserve the guest webContentsId, normal `rpcCall` default 5000ms boundary, unchanged post-completion `wait(50)`, real Canvas → Main → browser route, independent `scrollingElement` `after > before`, zero-delta red, all other overflow/Canvas contracts elsewhere, and cleanup zero; this is the only browser:scroll exception to the prior DOM-shortcut prohibition |
 | F10 | break `browserWait` at any link in its current Canvas boundary | `canvas.browserWait` does not traverse the full named path or does not observe load completion or timeout | the unchanged call traverses the full named path and observes load completion or timeout |
 | F11 | break `focusAgentSession` at its current Canvas boundary | `focusAgentSession(id)` cannot focus the existing terminal tile whose `sessionId` equals `id`, or reports success without doing so | the unchanged focus path focuses that exact terminal tile; removal requires the separately named G10 Reader amendment |
 | F12a | add a renderer-side durable domain write in an isolated live fixture | both registered gates, `golden-g10-canvas-runtime` and `no-canvas-domain-writes`, exit nonzero on the added write | the bait is removed, both same registered gates exit `0`, and the real projection path remains green |
@@ -1264,6 +1264,11 @@ webContents boundary: validate finite numeric deltas, mutate only
 `document.scrollingElement`, and return no caller-provided script. All other
 DOM-shortcut prohibitions and all other F09/G10 scope remain binding.
 
+The obsolete F09 `overflow:hidden` bait belonged to the superseded native-wheel
+policy and is removed from this operation. The replacement no-op directly
+falsifies the sole causal guest-assignment operation while preserving every
+other overflow/Canvas contract elsewhere.
+
 Authorize exactly this product+gate repair:
 
 1. In `collab-electron/src/windows/shell/src/canvas-rpc.js`, revert the
@@ -1287,7 +1292,8 @@ Authorize exactly this product+gate repair:
 4. Start the unchanged `wait(50)` only after the normal RPC completes. Preserve
    the retained fixture standards/readiness/`document.scrollingElement`
    measurements, real route, fixed closure, unchanged `after > before`,
-   zero-delta and overflow reds, and cleanup zero.
+   the zero-delta red, unrelated overflow/Canvas contracts elsewhere
+   unchanged, and cleanup zero.
 
 The finite falsifier uses the verified nonzero surface. The provisional native
 negative input without the explicit focus/RAF unit must remain red at
@@ -1295,7 +1301,8 @@ negative input without the explicit focus/RAF unit must remain red at
 `shellApi.browserScroll`; the independent `document.scrollingElement` check
 must yield green `before=0, after=800`. Replace only
 `element.scrollTop += numeric y` with a no-op and it must remain red at
-`0→0`; zero-delta and overflow remain red, and cleanup remains zero.
+`0→0`; zero-delta remains red, all other overflow/Canvas contracts elsewhere
+remain unchanged, and cleanup remains zero.
 
 No other product, gate, timing, assertion, or scope change is authorized.
 

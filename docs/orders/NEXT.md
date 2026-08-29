@@ -6,7 +6,7 @@ rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 builder-authority: **SAME BUILDER RESUMES — the latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned A for exactly one bounded deterministic guest-scroll product+gate repair; supersede the native-input/focus/RAF unit only for `browser:scroll`, preserve the full gate rewrite and retained fixture/readiness correction, make no other product/gate/timing/assertion change, and an independent fresh Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
-g10-status: **F09 DETERMINISTIC GUEST-SCROLL REPAIR AUTHORIZED — supersede the native-input/focus/RAF unit only for `browser:scroll`; in `collab-electron/src/windows/shell/src/canvas-rpc.js`, call existing `shellApi.browserScroll` directly; in `collab-electron/src/main/ipc-browser.ts`, validate finite numeric `x`/`y` or throw `Invalid browser scroll delta`, then await `wc.executeJavaScript` on a fixed closure using `document.scrollingElement`, throwing if absent, adding numeric `x` to `scrollLeft` and numeric `y` to `scrollTop`, returning `true`, with `userGesture: false`; serialize only fixed numeric values and accept no arbitrary script input; preserve the guest `webContentsId`, normal RPC with its default 5000ms boundary, unchanged post-completion `wait(50)`, fixture standards/readiness/`document.scrollingElement`, the real Canvas → Main → browser route, independent `after > before`, zero-delta/overflow reds, and cleanup zero; no other product/gate/timing/assertion change; G11 remains closed**
+g10-status: **F09 DETERMINISTIC GUEST-SCROLL REPAIR AUTHORIZED — supersede the native-input/focus/RAF unit only for `browser:scroll`; in `collab-electron/src/windows/shell/src/canvas-rpc.js`, call existing `shellApi.browserScroll` directly; in `collab-electron/src/main/ipc-browser.ts`, validate finite numeric `x`/`y` or throw `Invalid browser scroll delta`, then await `wc.executeJavaScript` on a fixed closure using `document.scrollingElement`, throwing if absent, adding numeric `x` to `scrollLeft` and numeric `y` to `scrollTop`, returning `true`, with `userGesture: false`; serialize only fixed numeric values and accept no arbitrary script input; preserve the guest `webContentsId`, normal RPC with its default 5000ms boundary, unchanged post-completion `wait(50)`, fixture standards/readiness/`document.scrollingElement`, the real Canvas → Main → browser route, independent `after > before`, the zero-delta red, all other overflow/Canvas contracts elsewhere, and cleanup zero; no other product/gate/timing/assertion change; G11 remains closed**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
 g10-product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
@@ -15,7 +15,7 @@ g10-product-repair-proof: **red removes only event `world` and unchanged real G1
 g10-f09-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
 g10-f09-reader-verdict: **A — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` accepted exactly one bounded deterministic guest-scroll product+gate repair; same Builder resumes and one fresh independent Verifier remains required**
 g10-f09-surface: **only `collab-electron/src/main/ipc-browser.ts` browser:scroll validates finite `x`/`y` and awaits the fixed `document.scrollingElement` closure via `wc.executeJavaScript` with `userGesture: false`, and `collab-electron/src/windows/shell/src/canvas-rpc.js` calls existing `shellApi.browserScroll` directly; the prior native/focus/RAF unit is reverted as one unit only for this operation; `qa/gates/golden-g10-canvas-runtime.ts` retains existing normal `rpcCall` default 5000ms boundary and unchanged post-completion `wait(50)`; preserve the real Canvas → Main → browser route, all other dirty G10 work, and the prior gate contract**
-g10-f09-proof: **native negative input without the explicit focus/RAF unit remains red at `before=0, after=0`; the fixed guest-scroll closure restores the same route and yields green `before=0, after=800`; replacing only `scrollTop += numeric y` with a no-op remains red at `0→0`, while zero-delta and overflow remain red and cleanup remains zero**
+g10-f09-proof: **native negative input without the explicit focus/RAF unit remains red at `before=0, after=0`; the fixed guest-scroll closure restores the same route and yields green `before=0, after=800`; replacing only `scrollTop += numeric y` with a no-op remains red at `0→0`, while zero-delta remains red, all other overflow/Canvas contracts elsewhere remain unchanged, and cleanup remains zero**
 g10-f09-reread: **SATISFIED — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned A; same Builder resumes and one fresh independent Verifier remains required**
 g10-reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
 g10-reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread amended NEXT.md and WO-GOLDEN-G10 and return YES / YES before Builder**
@@ -369,6 +369,11 @@ webContents boundary: validate finite numeric deltas, mutate only
 `document.scrollingElement`, and return no caller-provided script. All other
 DOM-shortcut prohibitions and all other F09/G10 scope remain binding.
 
+The obsolete F09 `overflow:hidden` bait belonged to the superseded native-wheel
+policy and is removed from this operation. The replacement no-op directly
+falsifies the sole causal guest-assignment operation while preserving every
+other overflow/Canvas contract elsewhere.
+
 Authorize exactly this product+gate repair:
 
 1. In `collab-electron/src/windows/shell/src/canvas-rpc.js`, revert the
@@ -392,7 +397,8 @@ Authorize exactly this product+gate repair:
 4. Start the unchanged `wait(50)` only after the normal RPC completes. Preserve
    the retained fixture standards/readiness/`document.scrollingElement`
    measurements, real route, fixed closure, unchanged `after > before`,
-   zero-delta and overflow reds, and cleanup zero.
+   the zero-delta red, unrelated overflow/Canvas contracts elsewhere
+   unchanged, and cleanup zero.
 
 The finite falsifier uses the verified nonzero surface. The provisional native
 negative input without the explicit focus/RAF unit must remain red at
@@ -400,7 +406,8 @@ negative input without the explicit focus/RAF unit must remain red at
 `shellApi.browserScroll`; the independent `document.scrollingElement` check
 must yield green `before=0, after=800`. Replace only
 `element.scrollTop += numeric y` with a no-op and it must remain red at
-`0→0`; zero-delta and overflow remain red, and cleanup remains zero.
+`0→0`; zero-delta remains red, all other overflow/Canvas contracts elsewhere
+remain unchanged, and cleanup remains zero.
 
 No other product, gate, timing, assertion, or scope change is authorized.
 
