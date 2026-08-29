@@ -1,11 +1,11 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 COMPLETION/RECEIPT READER REQUIRED
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 BUILDER OPEN / INDEPENDENT VERIFIER REQUIRED
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 COMPLETION/RECEIPT READER NO / NO — REREAD REQUIRED
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 COMPLETION/RECEIPT READER YES / YES — BUILDER OPEN / INDEPENDENT VERIFIER REQUIRED
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **CLOSED — the same Reader must reread the completion/receipt-lineage amendment and answer YES / YES before exactly one bounded product-helper repair Builder; no Builder authority yet**
-g10-status: **COMPLETION/RECEIPT READER NO / NO — exact pre-admission source-Task event/receipt lineage guard required; Builder remains closed**
+builder-authority: **OPEN — exactly one bounded G10 Builder is reopened for the accepted two-artifact/pre-admission lineage repair plus previously accepted G10 work; one fresh independent Verifier must follow; no second Builder or scope expansion**
+g10-status: **COMPLETION/RECEIPT LINEAGE READER YES / YES — exactly one bounded G10 Builder reopened; one fresh independent Verifier required afterward**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
@@ -23,12 +23,14 @@ g10-repair-authority: **ONE same-meaning fixture/driver-only repair; existing ac
 g10-lineage-adjudication-task: `01a04b63-f4c6-7fd3-b6a8-f429f0e6aed1`
 g10-lineage-adjudication-authority: `9886a1225f2cf2c5ee713c6d2329fda0ac2ef9d2`
 g10-lineage-adjudication-result: **B primary with D/C secondary — retained accepted R16 helper Artifact-lineage defect; not a G10 Canvas product/Kernel regression**
-g10-lineage-repair-authority: **PENDING READER — exactly one product-helper repair; Builder closed until YES / YES; one independent Verifier afterward**
+g10-lineage-repair-authority: **OPEN — exactly one bounded product-helper repair Builder for the accepted two-artifact/pre-admission lineage contract; one fresh independent Verifier afterward; no second Builder or scope expansion**
 g10-lineage-repair-surface: **only `collab-electron/src/main/kernel.ts`, existing `qa/gates/golden-g10-canvas-runtime.ts`, and `collab-electron/src/main/research-world.test.ts` only if needed; directly caused G10 evidence**
 g10-lineage-reader-task: `01a04b77-cb43-7792-a225-2a7d57ef068c`
 g10-lineage-reader-authority: `db30a28d912f2e49e39802340993e17c62132f87`
-g10-lineage-reader-verdict: **NO / NO — exact completed source-Task event/receipt lineage must be checked before review Task/Evaluation/Report mutation**
-g10-lineage-reader-reread: **REQUIRED — same Reader reread of this completion/receipt-lineage amendment and NEXT.md; Builder remains closed until YES / YES**
+g10-lineage-reader-verdict: **HISTORICAL NO / NO — exact completed source-Task event/receipt lineage must be checked before review Task/Evaluation/Report mutation; superseded by the same Reader's accepted reread below**
+g10-lineage-reader-reread-authority: `45cffba08f9990ef90c4273daa59ea5c4107ec61`
+g10-lineage-reader-reread-verdict: **YES / YES — the same Reader reread this amendment and NEXT.md; one meaning and fail-capable pre-admission acceptance remain intact**
+g10-lineage-reader-reread: **SATISFIED — same Reader reread at authority `45cffba08f9990ef90c4273daa59ea5c4107ec61`; exactly one bounded Builder reopened and one fresh independent Verifier is required afterward**
 g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
@@ -125,7 +127,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; completion/receipt-lineage amendment; same Reader NO / NO and reread required; Builder closed; no second Builder
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; completion/receipt-lineage Reader YES / YES; exactly one bounded Builder reopened for the accepted two-artifact/pre-admission lineage repair plus previously accepted G10 work; one fresh independent Verifier required afterward; no second Builder or scope expansion
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -375,12 +377,13 @@ every other G10/Golden boundary remain unchanged. No other product path,
    for the trajectory or removing its `produces` link refuses before review
    Task/Evaluation/Report, while exact restoration admits?**
 
-The fresh semantic Reader must answer **YES / YES** to these exact questions
-before the one product-helper repair Builder may start. Until then, the
-Builder remains closed. One independent Verifier, not Router or the Builder,
-must decide G10 after that one repair.
+The amendment required the fresh semantic Reader to answer **YES / YES** to
+these exact questions before the one product-helper repair Builder could
+start. The accepted reread below records that condition. Exactly one bounded
+Builder is now reopened; one fresh independent Verifier, not Router or the
+Builder, must decide G10 after that one repair.
 
-### G10 completion/receipt lineage amendment — same Reader reread required
+### G10 completion/receipt lineage amendment — Reader accepted; Builder reopened
 
 The same Reader task
 `01a04b77-cb43-7792-a225-2a7d57ef068c` returned **NO / NO** against authority
@@ -410,11 +413,16 @@ The same Reader must reread this amendment and `NEXT.md` and answer exactly:
    or mismatching that completion/receipt lineage refuses before review
    Task/Evaluation/Report mutation, while exact restoration admits?**
 
-The same Reader must return **YES / YES** before the one bounded product-helper
-repair Builder may start. Until then, the Builder remains closed. G9
-validator/schema/Report authority, all G10 scope and assertions, G12, R18,
-and every other Golden-group boundary remain preserved; one independent
-Verifier must decide G10 after the repair.
+The same Reader task
+`01a04b77-cb43-7792-a225-2a7d57ef068c` reread this amendment and `NEXT.md` at
+authority `45cffba08f9990ef90c4273daa59ea5c4107ec61` (short `45cffba0`) and
+returned **YES / YES** to both questions. This closes the amendment Reader
+step and reopens exactly one bounded G10 Builder for the accepted
+two-artifact/pre-admission lineage repair plus the previously accepted G10
+work. G9 validator/schema/Report authority, all G10 scope and assertions,
+G12, R18, and every other Golden-group boundary remain preserved. No second
+Builder or scope expansion is authorized. One fresh independent Verifier—not
+the Builder or Router—must follow and decide G10 PASS/FAIL.
 
 ## Historical G9-open handoff (superseded)
 
