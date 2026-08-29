@@ -18,7 +18,7 @@ g9-reopen-surface: **CLOSED — the one semantic G9 current-report finalization 
 g10-status: **AUTHORIZED TO RESUME — start with focused F13 current-report proof, then run exactly one complete registered `bun qa/run.ts golden-g10-canvas-runtime` gate; preserve the accepted F09, projection, identity-sequence, and all prior G10 assertions; G11 remains closed**
 g10-f11-reader-task: `01a04f37-bbe5-7f61-b234-f542241ebf63`
 g10-f11-reader-verdict: **YES / YES — `focusAgentSession(id)` always focuses/raises the exact existing terminal tile; native webview focus/mouse forwarding is conditional on a connected guest; stopped/no-guest and wrong/duplicate identity cases are fail-capable**
-g10-f11-surface: **add only `collab-electron/src/renderer/src/tile-manager.js` to the active F11 seam; preserve mouse-first tile focus/raise, all existing assertions, and G11 closure**
+g10-f11-surface: **add only `collab-electron/src/windows/shell/src/tile-manager.js` to the active F11 seam; preserve mouse-first tile focus/raise, all existing assertions, and G11 closure**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
 g10-product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
@@ -1382,7 +1382,7 @@ candidate; G11 remains closed.
 
 Reader `01a04f37-bbe5-7f61-b234-f542241ebf63` returned **YES / YES** for the
 finite F11 amendment. The active G10 surface now includes only
-`collab-electron/src/renderer/src/tile-manager.js` for the existing
+`collab-electron/src/windows/shell/src/tile-manager.js` for the existing
 `focusAgentSession(id)` seam, in addition to the already-authorized routed
 caller and gate paths.
 

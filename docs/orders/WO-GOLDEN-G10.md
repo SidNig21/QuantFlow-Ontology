@@ -297,7 +297,7 @@ and only for a named defect above:
 - `collab-electron/src/windows/shell/src/canvas-rpc.js`;
 - `collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx` and
   its paired CSS/type files only for the routed `focusAgentSession` call;
-- `collab-electron/src/renderer/src/tile-manager.js` only for the existing
+- `collab-electron/src/windows/shell/src/tile-manager.js` only for the existing
   `focusAgentSession(id)` exact terminal-tile focus/raise seam and its
   connected-guest conditional native focus/mouse forwarding;
 - `collab-electron/src/windows/shell/src/shell.css` only for bounded visibility,
@@ -330,7 +330,7 @@ and only for a named defect above:
 The current routed `focusAgentSession` row is recorded at
 `collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx`.
 The Builder must freeze both this routed row and the literal
-`collab-electron/src/renderer/src/tile-manager.js` path and byte identity in the
+`collab-electron/src/windows/shell/src/tile-manager.js` path and byte identity in the
 starting manifest; no guessed path or broad directory glob is an editable
 allowance.
 
@@ -1478,7 +1478,7 @@ authorized.
 
 Reader task `01a04f37-bbe5-7f61-b234-f542241ebf63` returned **YES / YES** for
 this finite same-meaning authority amendment. Add only
-`collab-electron/src/renderer/src/tile-manager.js` to the F11 product seam;
+`collab-electron/src/windows/shell/src/tile-manager.js` to the F11 product seam;
 the existing routed caller, preload/Main boundary, registered gate, and all
 other G10 paths remain unchanged.
 
