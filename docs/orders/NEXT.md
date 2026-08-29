@@ -1,12 +1,12 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 F09 DETERMINISTIC GUEST-SCROLL REPAIR
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 IDENTITY-SEQUENCE REPAIR
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 F09 DETERMINISTIC GUEST-SCROLL REPAIR AUTHORIZED / SAME BUILDER RESUMES
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 IDENTITY-SEQUENCE REPAIR AUTHORIZED / SAME BUILDER RESUMES
 rotated-at: 2026-08-29
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **SAME BUILDER RESUMES — the latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned A for exactly one bounded deterministic guest-scroll product+gate repair; supersede the native-input/focus/RAF unit only for `browser:scroll`, preserve the full gate rewrite and retained fixture/readiness correction, make no other product/gate/timing/assertion change, and an independent fresh Verifier still decides G10**
+builder-authority: **SAME BUILDER RESUMES — the latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned NO / NO for one finite gate-only identity-sequence correction; the four extra objects are legitimate asynchronous real critic continuation, so remove only duplicate synthetic review seeding, wait within the existing finite timeout, derive exact real identities/links, preserve exact 15-object/full-link equality, and an independent fresh Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
-g10-status: **F09 DETERMINISTIC GUEST-SCROLL REPAIR AUTHORIZED — supersede the native-input/focus/RAF unit only for `browser:scroll`; in `collab-electron/src/windows/shell/src/canvas-rpc.js`, call existing `shellApi.browserScroll` directly; in `collab-electron/src/main/ipc-browser.ts`, validate finite numeric `x`/`y` or throw `Invalid browser scroll delta`, then await `wc.executeJavaScript` on a fixed closure using `document.scrollingElement`, throwing if absent, adding numeric `x` to `scrollLeft` and numeric `y` to `scrollTop`, returning `true`, with `userGesture: false`; serialize only fixed numeric values and accept no arbitrary script input; preserve the guest `webContentsId`, normal RPC with its default 5000ms boundary, unchanged post-completion `wait(50)`, fixture standards/readiness/`document.scrollingElement`, the real Canvas → Main → browser route, independent `after > before`, the zero-delta red, all other overflow/Canvas contracts elsewhere, and cleanup zero; no other product/gate/timing/assertion change; G11 remains closed**
+g10-status: **IDENTITY-SEQUENCE REPAIR AUTHORIZED — retain the accepted deterministic F09 guest-scroll repair; in `qa/gates/golden-g10-canvas-runtime.ts` remove duplicate synthetic review seeding, wait within the existing finite timeout for the one real product review closure, derive exact real critic session/review task/evaluation/artifact IDs and links, and retain exact sorted expected 15-object and complete sorted `(kind, from_id, to_id)` Kernel link equality across `CURRENT_MISSION`, `FULL_LINEAGE`, close/reopen, and every identity-preserving checkpoint; do not filter objects, change product behavior, weaken assertions/timeouts, or add a synthetic substitute; preserve all existing F09, Canvas, route, cleanup, and G11 boundaries**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
 g10-product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
@@ -16,7 +16,14 @@ g10-f09-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
 g10-f09-reader-verdict: **A — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` accepted exactly one bounded deterministic guest-scroll product+gate repair; same Builder resumes and one fresh independent Verifier remains required**
 g10-f09-surface: **only `collab-electron/src/main/ipc-browser.ts` browser:scroll validates finite `x`/`y` and awaits the fixed `document.scrollingElement` closure via `wc.executeJavaScript` with `userGesture: false`, and `collab-electron/src/windows/shell/src/canvas-rpc.js` calls existing `shellApi.browserScroll` directly; the prior native/focus/RAF unit is reverted as one unit only for this operation; `qa/gates/golden-g10-canvas-runtime.ts` retains existing normal `rpcCall` default 5000ms boundary and unchanged post-completion `wait(50)`; preserve the real Canvas → Main → browser route, all other dirty G10 work, and the prior gate contract**
 g10-f09-proof: **native negative input without the explicit focus/RAF unit remains red at `before=0, after=0`; the fixed guest-scroll closure restores the same route and yields green `before=0, after=800`; replacing only `scrollTop += numeric y` with a no-op remains red at `0→0`, while zero-delta remains red, all other overflow/Canvas contracts elsewhere remain unchanged, and cleanup remains zero**
-g10-f09-reread: **SATISFIED — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned A; same Builder resumes and one fresh independent Verifier remains required**
+g10-f09-reread: **SATISFIED — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned A; same Builder resumes and one fresh independent Verifier remains required; current identity-sequence amendment is separately NO / NO below**
+g10-identity-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
+g10-identity-reader-verdict: **NO / NO — F03 exposed a race: four extra objects are legitimate asynchronous real critic continuation, and one bounded gate-only sequencing correction is required; no projection filtering or product change**
+g10-identity-extra-1: `agent_session:critic-c9a2196c-9a8b-47aa-868b-4b9b8d374ad0` | kind=`agent_session` | operation=`createKernelAgentSession` automatic post-source critic continuation
+g10-identity-extra-2: `task:review-task-06d2536d-c515-45a2-a8f5-46a0d52de579` | kind=`task` | operation=`kernelContinueGovernedResearchResult` → `governed_review_task` admit
+g10-identity-extra-3: `evaluation:f41e741f-e91b-4a5c-b68e-1055d03df342` | kind=`evaluation` | operation=Critic `qf_record_evaluation` → `record_evaluation`
+g10-identity-extra-4: `artifact:00cd3f44e407917716129f8e07cc7874b15324a4377a69040c471174842f0064` | kind=`artifact` | operation=Evaluation finalization; `produces` from extra critic
+g10-identity-contract: **legitimate real continuation; F03 only exposes the race; expected exact sorted 15-object set and complete sorted `(kind, from_id, to_id)` link set remain required at every checkpoint; second matching evaluation fails the gate, not ignored**
 g10-reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
 g10-reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread amended NEXT.md and WO-GOLDEN-G10 and return YES / YES before Builder**
 g10-reader-round-4-reread: **REQUIRED — same Reader task `01a04d3f-3cd4-7513-b89e-6770c95237f0`; no substitute Reader is authorized**
@@ -202,7 +209,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Reader-approved ephemeral Dock projection repair plus retained F09 fixture/readiness correction and the one named deterministic guest-scroll repair; seed/reveal the real Mission world before pre-finalization participant parity; focused suite plus one complete G10 gate; zero cleanup; green immutable candidate for one fresh independent Verifier; G11 remains closed; no persistence, new truth, schema, Kernel, Canvas, CSS, identity, state, parity, timeout, timing, cleanup, falsifier-meaning, or scope change beyond the named repairs
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Reader-approved ephemeral Dock projection repair plus retained deterministic F09 guest-scroll repair and the one named identity-sequence gate-only correction; seed/reveal the real Mission world before pre-finalization participant parity; focused suite plus one complete G10 gate; zero cleanup; green immutable candidate for one fresh independent Verifier; G11 remains closed; no persistence, new truth, schema, Kernel, Canvas, CSS, identity, state, parity, timeout, timing, cleanup, falsifier-meaning, or scope change beyond the named repairs
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -414,6 +421,57 @@ No other product, gate, timing, assertion, or scope change is authorized.
 The same Builder resumes this bounded repair. One fresh independent
 Verifier—not the Builder or Router—must verify the candidate afterward and
 decide G10.
+
+### G10 current identity-sequence finite gate-only repair — same Builder resumes
+
+The latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned
+**NO / NO** on the current identity sequence. F03 exposed a race, not a
+projection defect: four extra objects are legitimate durable outputs of the
+already-scheduled asynchronous real critic continuation. F03 performs no
+Kernel writes; its navigation only gives that continuation time to finish.
+
+The exact observed continuation objects and causal operations are:
+
+| ID | kind | causal operation |
+| --- | --- | --- |
+| `critic-c9a2196c-9a8b-47aa-868b-4b9b8d374ad0` | `agent_session` | automatic post-source critic continuation via `createKernelAgentSession` |
+| `review-task-06d2536d-c515-45a2-a8f5-46a0d52de579` | `task` | `kernelContinueGovernedResearchResult` → `governed_review_task` admit |
+| `f41e741f-e91b-4a5c-b68e-1055d03df342` | `evaluation` | Critic `qf_record_evaluation` → `record_evaluation` |
+| `00cd3f44e407917716129f8e07cc7874b15324a4377a69040c471174842f0064` | `artifact` | evaluation finalization, linked by `produces` from the extra critic |
+
+These objects carry valid continuation links and evaluate the same source
+Task/Run/trajectory as the expected closure. The gate must not filter them or
+weaken identity to counts/subsets. Authorize exactly one gate-only correction
+in `qa/gates/golden-g10-canvas-runtime.ts`:
+
+1. Remove duplicate synthetic review seeding for the already-real source,
+   including the `seed_fixture_dataset(visible_world)` synthetic review
+   creation. Do not change product behavior, projection resolution, or add a
+   synthetic substitute.
+2. Wait within the existing finite timeout for the one real product review
+   closure, then derive its exact real critic session, review Task, Evaluation,
+   findings Artifact, Report Artifact, and all associated IDs/links from the
+   durable Kernel state. A second matching Evaluation must fail the gate, not
+   be ignored.
+3. Retain exact sorted expected **15-object** equality and the complete sorted
+   `(kind, from_id, to_id)` Kernel link equality across `CURRENT_MISSION`,
+   `FULL_LINEAGE`, close/reopen, and every identity-preserving checkpoint.
+   Preserve the exact dynamic Task/Run, participant, both `produces` tuples,
+   and all existing lineage, parity, route, assertion, timeout, and cleanup
+   contracts.
+
+The old red is synthetic seeding alongside the real continuation: the exact
+manifest becomes 19 instead of 15 and fails on the four observed IDs. The new
+green removes only the duplicate seeding, waits for the one real closure, and
+passes the exact dynamically derived 15-object/full-link manifest. This is the
+same acceptance meaning: the four objects are legitimate real continuation,
+and F03 exposed only a timing race.
+
+The same Builder resumes this finite gate-only correction. One fresh
+independent Verifier—not the Builder or Router—must verify the candidate and
+decide G10. No product/Kernel/projection change, object filtering, assertion
+weakening, timeout weakening, synthetic substitute, second Builder, or scope
+expansion is authorized.
 
 G10 is now the sole active Phase-2 order. Its bounded accepted packet is
 [WO-GOLDEN-G10](WO-GOLDEN-G10.md): explicit ordinary/mission/full-lineage

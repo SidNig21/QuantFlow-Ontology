@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: G10 F09 DETERMINISTIC GUEST-SCROLL REPAIR AUTHORIZED — same Builder resumes; fresh independent Verifier required
+status: G10 IDENTITY-SEQUENCE REPAIR AUTHORIZED — same Builder resumes; fresh independent Verifier required
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **SAME BUILDER RESUMES — the latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned A for exactly one bounded deterministic guest-scroll product+gate repair; supersede the native-input/focus/RAF unit only for `browser:scroll`, preserve the full gate rewrite and retained fixture/readiness correction, make no other product/gate/timing/assertion change, and one fresh independent Verifier still decides G10**
+build-authority: **SAME BUILDER RESUMES — the latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned NO / NO for one finite gate-only identity-sequence correction; the four extra objects are legitimate asynchronous real critic continuation, so remove only duplicate synthetic review seeding, wait within the existing finite timeout, derive exact real identities/links, preserve exact 15-object/full-link equality, and one fresh independent Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
 diagnostic-pass-authority: **RETAINED EVIDENCE ONLY — the prior exact visible-HISTORY Mission click recorded the real projection refusal; the current authority is the Reader-approved product repair below, with no persistence/new truth/schema/Kernel/Canvas/timeout/assertion change**
 finite-rewrite-authority: **RETAINED/BINDING GATE CONTRACT — exactly one Task belongs to the Mission fixture; dynamic Task/Run IDs and exact object/link sets must survive CURRENT_MISSION, FULL_LINEAGE, close/reopen, and F04 parity; no multi-Task chooser**
@@ -16,7 +16,14 @@ f09-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
 f09-reader-verdict: **A — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` accepted exactly one bounded deterministic guest-scroll product+gate repair; same Builder resumes and one fresh independent Verifier remains required**
 f09-surface: **only `collab-electron/src/main/ipc-browser.ts` browser:scroll validates finite `x`/`y` and awaits the fixed `document.scrollingElement` closure via `wc.executeJavaScript` with `userGesture: false`, and `collab-electron/src/windows/shell/src/canvas-rpc.js` calls existing `shellApi.browserScroll` directly; the prior native/focus/RAF unit is reverted as one unit only for this operation; `qa/gates/golden-g10-canvas-runtime.ts` retains existing normal `rpcCall` default 5000ms boundary and unchanged post-completion `wait(50)`; preserve the real Canvas → Main → browser route, all other dirty G10 work, and the prior gate contract**
 f09-proof: **native negative input without the explicit focus/RAF unit remains red at `before=0, after=0`; the fixed guest-scroll closure restores the same route and yields green `before=0, after=800`; replacing only `scrollTop += numeric y` with a no-op remains red at `0→0`, while zero-delta remains red, all other overflow/Canvas contracts elsewhere remain unchanged, and cleanup remains zero**
-f09-reread: **SATISFIED — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned A; same Builder resumes and one fresh independent Verifier remains required**
+f09-reread: **SATISFIED — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned A; same Builder resumes and one fresh independent Verifier remains required; current identity-sequence amendment is separately NO / NO below**
+identity-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
+identity-reader-verdict: **NO / NO — F03 exposed a race: four extra objects are legitimate asynchronous real critic continuation, and one bounded gate-only sequencing correction is required; no projection filtering or product change**
+identity-extra-1: `agent_session:critic-c9a2196c-9a8b-47aa-868b-4b9b8d374ad0` | kind=`agent_session` | operation=`createKernelAgentSession` automatic post-source critic continuation
+identity-extra-2: `task:review-task-06d2536d-c515-45a2-a8f5-46a0d52de579` | kind=`task` | operation=`kernelContinueGovernedResearchResult` → `governed_review_task` admit
+identity-extra-3: `evaluation:f41e741f-e91b-4a5c-b68e-1055d03df342` | kind=`evaluation` | operation=Critic `qf_record_evaluation` → `record_evaluation`
+identity-extra-4: `artifact:00cd3f44e407917716129f8e07cc7874b15324a4377a69040c471174842f0064` | kind=`artifact` | operation=Evaluation finalization; `produces` from extra critic
+identity-contract: **legitimate real continuation; F03 only exposes the race; expected exact sorted 15-object set and complete sorted `(kind, from_id, to_id)` link set remain required at every checkpoint; second matching evaluation fails the gate, not ignored**
 reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
 reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread this order and NEXT.md and return YES / YES before Builder**
 reader-round-4-reread: **REQUIRED — same Reader task `01a04d3f-3cd4-7513-b89e-6770c95237f0`; no substitute Reader is authorized**
@@ -392,7 +399,7 @@ does not observe owned state is not acceptance.
 | --- | --- | --- | --- |
 | F01 | re-enable exclusive Mission hiding after submit | under `ORDINARY_CANVAS`, a pre-existing non-research tile container is absent, visually hidden, `aria-hidden="true"`, or not pointer-enabled, or submission cannot return through the existing Canvas path | `CURRENT_MISSION` is explicit and the exact ordinary-container DOM predicates remain true after return |
 | F02 | neutralize the real `Back to world` action in an isolated live fixture | the registered gate attempts the same visible control and observes that the current Mission view cannot restore `ORDINARY_CANVAS` without a refresh or destructive write | the real action is restored and the same control reaches `ORDINARY_CANVAS` with unchanged Kernel ids and exact ordinary-container predicates |
-| F03 | break the same-process navigation sequence in an isolated live fixture | the registered gate exits nonzero when `Back to world`, the real visible `HISTORY` exact Mission click, or `CURRENT_MISSION` restoration is neutralized or skipped | same-process `Back to world` reaches ordinary Canvas, then the real visible `HISTORY` exact Mission click restores `CURRENT_MISSION` through the existing path |
+| F03 | break the same-process navigation sequence or retain duplicate synthetic review seeding alongside the already-real asynchronous critic continuation in an isolated live fixture | the registered gate exits nonzero when `Back to world`, the real visible `HISTORY` exact Mission click, or `CURRENT_MISSION` restoration is neutralized or skipped, or exact identity becomes 19 instead of 15 on the four observed continuation objects | same-process `Back to world` reaches ordinary Canvas, then the real visible `HISTORY` exact Mission click restores `CURRENT_MISSION` through the existing path; the gate waits for one real review closure, derives its IDs/links, and retains exact sorted 15-object/full-link equality |
 | F03-cold | reintroduce saved auto-reveal during cold reopen in an isolated live fixture | after `app.shutdown`, the registered gate exits nonzero if an entirely new app launch on the same Kernel/fixture does not start ordinary, or the real visible `HISTORY` exact Mission click cannot restore `CURRENT_MISSION` | `app.shutdown` is followed by an entirely new app launch on the same Kernel/fixture with no saved auto-reveal; the real visible `HISTORY` exact Mission click restores `CURRENT_MISSION` |
 | F04 | derive Runtime `running` from persisted session status while no process is live | a dead process is rendered `running`, or Dock, Canvas, and Inspect disagree for the exact `agent_session.id` | Runtime is `running` only for a live-session-registry observation and all three consumers receive the same snapshot |
 | F05 | remove or corrupt one shared participant-projection input | the same participant gets contradictory Dock/Canvas/Inspect role, runtime, work, recovery, Task, output, or Mission binding | all three consumers show the same values for the same `agent_session.id` |
@@ -1309,3 +1316,54 @@ No other product, gate, timing, assertion, or scope change is authorized.
 The same Builder resumes this bounded repair. One fresh independent
 Verifier—not the Builder or Router—must verify the candidate afterward and
 decide G10.
+
+## Current G10 identity-sequence finite gate-only repair — same Builder resumes
+
+The latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned
+**NO / NO** on the current identity sequence. F03 exposed a race, not a
+projection defect: four extra objects are legitimate durable outputs of the
+already-scheduled asynchronous real critic continuation. F03 performs no
+Kernel writes; its navigation only gives that continuation time to finish.
+
+The exact observed continuation objects and causal operations are:
+
+| ID | kind | causal operation |
+| --- | --- | --- |
+| `critic-c9a2196c-9a8b-47aa-868b-4b9b8d374ad0` | `agent_session` | automatic post-source critic continuation via `createKernelAgentSession` |
+| `review-task-06d2536d-c515-45a2-a8f5-46a0d52de579` | `task` | `kernelContinueGovernedResearchResult` → `governed_review_task` admit |
+| `f41e741f-e91b-4a5c-b68e-1055d03df342` | `evaluation` | Critic `qf_record_evaluation` → `record_evaluation` |
+| `00cd3f44e407917716129f8e07cc7874b15324a4377a69040c471174842f0064` | `artifact` | evaluation finalization, linked by `produces` from the extra critic |
+
+These objects carry valid continuation links and evaluate the same source
+Task/Run/trajectory as the expected closure. The gate must not filter them or
+weaken identity to counts/subsets. Authorize exactly one gate-only correction
+in `qa/gates/golden-g10-canvas-runtime.ts`:
+
+1. Remove duplicate synthetic review seeding for the already-real source,
+   including the `seed_fixture_dataset(visible_world)` synthetic review
+   creation. Do not change product behavior, projection resolution, or add a
+   synthetic substitute.
+2. Wait within the existing finite timeout for the one real product review
+   closure, then derive its exact real critic session, review Task, Evaluation,
+   findings Artifact, Report Artifact, and all associated IDs/links from the
+   durable Kernel state. A second matching Evaluation must fail the gate, not
+   be ignored.
+3. Retain exact sorted expected **15-object** equality and the complete sorted
+   `(kind, from_id, to_id)` Kernel link equality across `CURRENT_MISSION`,
+   `FULL_LINEAGE`, close/reopen, and every identity-preserving checkpoint.
+   Preserve the exact dynamic Task/Run, participant, both `produces` tuples,
+   and all existing lineage, parity, route, assertion, timeout, and cleanup
+   contracts.
+
+The old red is synthetic seeding alongside the real continuation: the exact
+manifest becomes 19 instead of 15 and fails on the four observed IDs. The new
+green removes only the duplicate seeding, waits for the one real closure, and
+passes the exact dynamically derived 15-object/full-link manifest. This is the
+same acceptance meaning: the four objects are legitimate real continuation,
+and F03 exposed only a timing race.
+
+The same Builder resumes this finite gate-only correction. One fresh
+independent Verifier—not the Builder or Router—must verify the candidate and
+decide G10. No product/Kernel/projection change, object filtering, assertion
+weakening, timeout weakening, synthetic substitute, second Builder, or scope
+expansion is authorized.
