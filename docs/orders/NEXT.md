@@ -1,18 +1,21 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G9 CURRENT-REPORT FINALIZATION REOPENED / G10 PAUSED
+# NEXT — R18 GOLDEN BASELINE HOLD / G9 CLOSED / G10 IDENTITY-SEQUENCE RESUMED
 
-status: G8 CLOSED / G9 NARROW CURRENT-REPORT FINALIZATION REOPENED FOR G10 / G10 PAUSED / PASS WITH G12 INHERITED RED
+status: G8 CLOSED / G9 NARROW CURRENT-REPORT FINALIZATION CLOSED / G10 AUTHORIZED TO RESUME / PASS WITH G12 INHERITED RED
 rotated-at: 2026-08-29
 rotated-by: Router under founder standing mechanical authority
-active-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md)
-builder-authority: **G10 IS PAUSED — the same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned NO / NO for F13 because accepted G9 current-report authority is contradicted; exactly one semantic G9 Builder may repair only current-report publication finalization below, then one independent Verifier must decide that prerequisite before the preserved G10 Builder resumes**
+active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
+builder-authority: **SAME G10 BUILDER RESUMES — begin with the focused F13 current-report proof against durable G9 currentness, then run exactly one complete registered `bun qa/run.ts golden-g10-canvas-runtime` gate; preserve every prior G10 scope and assertion, then one fresh independent G10 Verifier decides the candidate**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
-g9-status: **NARROWLY REOPENED — G9 owns the current-report publication finalization prerequisite exposed by G10 F13; all accepted G9 history, report bytes/IDs, Evaluation→Report identity, gates linkage, and independent-support requirements remain binding**
+g9-status: **CLOSED — the narrowly reopened G10 F13 current-report finalization prerequisite independently passed; all accepted G9 history, report bytes/IDs, Evaluation→Report identity, gates linkage, and independent-support requirements remain binding**
 g9-f13-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
 g9-f13-reader-verdict: **NO / NO — real supported closure produced Report `2998b24560a171c870e18f675f1485087d7bfa97045435efaf9b2a3931216e66` and its `gates` link, but durable publication/projection exposed `current_report_id=""` and `HISTORICAL`; G10 may not repair this**
 g9-f13-receipt: [G10 F04 live-membership rerun](evidence/golden-baseline/g10/golden-g10-f04-live-membership-rerun-20260829.txt) | SHA256 `5BB3CAB1AC521EE76F7B5A067EDB23C7A2BD9DA0A4D63125774618434B290729` (matches the cited `C:\tmp` receipt)
-g9-reopen-candidate: **immutable prerequisite candidate `3c17e5d380fd267270cbacf851999cc98bf30638` / tree `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`; current dirty G10 work remains untouched and unstaged**
-g9-reopen-surface: **one semantic G9 Builder may change principally `packages/qf-kernel/src/governed-review.ts`, the existing G9 `qa/gates/report-authority.ts`/registration and directly required focused proof fixtures/tests, plus receipt-only G9/G10 evidence; no G10 projection workaround or Report-id inference**
-g10-status: **PAUSED — preserve the accepted F09, projection, and identity-sequence packet unchanged; no G10 Builder, G10 release, or G10 Verifier starts until the narrowly reopened G9 prerequisite independently passes**
+g9-reopen-candidate: **narrow prerequisite independently verified on candidate `a9daa856a6df9992842c1709e1f761465ba9721d` / tree `47abb928d2f006254118145ff78e6a16ddeb0982`; prior accepted G9 candidate/evidence remain immutable and current dirty G10 work remains untouched and unstaged**
+g9-reopen-verifier-task: `01a04edc-8928-77d3-921f-50110f0458df`
+g9-reopen-verdict: **PASS WITH INHERITED G12 SHUTDOWN RED — closes only the narrowly reopened G9 prerequisite**
+g9-reopen-hermes-research-sha: `0C7AD489E94EA94A1CE5D3752A6D8E9891819DAE17BE868679D353CFDE8FA0D8` (unchanged)
+g9-reopen-surface: **CLOSED — the one semantic G9 current-report finalization repair is independently verified; no further G9 Builder authority or G10 projection workaround is opened**
+g10-status: **AUTHORIZED TO RESUME — start with focused F13 current-report proof, then run exactly one complete registered `bun qa/run.ts golden-g10-canvas-runtime` gate; preserve the accepted F09, projection, identity-sequence, and all prior G10 assertions; G11 remains closed**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
 g10-product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
@@ -123,7 +126,7 @@ g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
 g10-starting-evidence-tree: `0bba13e124565cfa5052aa79a0d47da2b4bc9c1f`
-g9-status: **NARROWLY REOPENED — current-report publication finalization prerequisite for G10; prior acceptance remains immutable / PASS WITH G12 INHERITED RED**
+g9-status: **CLOSED — narrow current-report publication finalization prerequisite for G10 independently verified PASS WITH INHERITED G12 SHUTDOWN RED; prior acceptance remains immutable**
 g9-accepted-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g9-accepted-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g9-accepted-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
@@ -215,16 +218,16 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G9 narrow current-report publication finalization prerequisite for G10; G10 Current Canvas/Mission/runtime coherence is paused with its Reader-approved Dock projection, deterministic F09 guest-scroll repair, and identity-sequence correction preserved; one semantic G9 Builder plus one independent G9 Verifier first; G11 remains closed; no persistence, new truth, schema, Kernel, Canvas, CSS, identity, state, parity, timeout, timing, cleanup, falsifier-meaning, or scope change beyond the named G9 prerequisite
+phase-2-active-group: G10 Current Canvas/Mission/runtime coherence resumes at focused F13 current-report proof, then one complete registered G10 gate; the Reader-approved Dock projection, deterministic F09 guest-scroll repair, identity-sequence correction, and every prior G10 assertion remain preserved; G9 narrow prerequisite is independently PASS with inherited G12 shutdown red; G11 remains closed; no persistence, new truth, schema, Kernel, Canvas, CSS, identity, state, parity, timeout, timing, cleanup, falsifier-meaning, or scope change beyond the preserved G10 order
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
 g3-acceptance: [G3 CLOSED / ACCEPTED](evidence/golden-baseline/g3/GROUP-ACCEPTANCE.md)
 g2-acceptance: [G2 CLOSED / ACCEPTED](evidence/golden-baseline/g2/GROUP-ACCEPTANCE.md)
 g1-acceptance: [G1 CLOSED / ACCEPTED](evidence/golden-baseline/g1/GROUP-ACCEPTANCE.md)
-full-g9-authority: **NARROWLY REOPENED — accepted final semantic Reader/Verifier closure remains immutable; only the G10 F13 current-report finalization prerequisite is active**
+full-g9-authority: **CLOSED — only the G10 F13 current-report finalization prerequisite was reopened and it independently passed; accepted final semantic Reader/Verifier closure remains immutable**
 full-g8-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md) — CLOSED
-full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — NARROW CURRENT-REPORT FINALIZATION REOPEN / PASS WITH G12 INHERITED RED
+full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — CLOSED NARROW CURRENT-REPORT FINALIZATION PREREQUISITE / PASS WITH INHERITED G12 SHUTDOWN RED
 g9-reader-status: **FINAL YES / YES — all seven cumulative defects cured; no new ambiguity or scope expansion**
 g9-reader-task: `01a0489e-04ea-71a1-8b6a-d0e151621103`
 g9-reader-round: FINAL
@@ -235,7 +238,7 @@ g9-reader-round-1-authority: `d6ab5ed66a18c9de23db047a4b41584acaaeec0e`
 g9-reader-round-1-tree: `8f94bf63b16bd74e5ef17461cc4f0d15477efc4f`
 g9-reader-round-2-authority: `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4`
 g9-reader-round-2-tree: `54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182`
-g9-builder-status: **ONE SEMANTIC BUILDER AUTHORIZED — only the current-report finalization prerequisite; prior final repair remains immutable**
+g9-builder-status: **CLOSED — narrow current-report finalization prerequisite independently verified; no further G9 Builder authority**
 g9-builder-starting-authority: `4ef49077b2b423601c02b043de82b34d231bb7f5`
 g9-builder-starting-tree: `bdba7c9540122288866bed6fb4aa57952c6f025e`
 g9-builder-starting-evidence-head: `f7e841ff3e075bd49ed70bf8da79c2409ca5c899`
@@ -1351,3 +1354,23 @@ a fresh independent Verifier. No production edit, semantic change, relaxed
 assertion, new gate/group, G9 work, or R18 change is authorized.
 
 G9 remains after G8 and R18 remains frozen.
+
+## Current authority — G9 prerequisite closed; G10 resumes
+
+The narrowly reopened G9 prerequisite is independently **PASS WITH INHERITED
+G12 SHUTDOWN RED**. The independent Verifier was task
+`01a04edc-8928-77d3-921f-50110f0458df` against candidate
+`a9daa856a6df9992842c1709e1f761465ba9721d` / tree
+`47abb928d2f006254118145ff78e6a16ddeb0982`. The unchanged
+`qa/gates/hermes-research.ts` identity is
+`0C7AD489E94EA94A1CE5D3752A6D8E9891819DAE17BE868679D353CFDE8FA0D8`.
+This closes only the reopened G9 current-report finalization prerequisite;
+G12's shutdown red and all other inherited reds remain outside this close.
+
+`NEXT.md` therefore restores [WO-GOLDEN-G10](WO-GOLDEN-G10.md) as the active
+order. The same preserved G10 candidate/order resumes at the focused F13
+current-report proof against durable currentness, then runs exactly one complete
+registered `bun qa/run.ts golden-g10-canvas-runtime` gate. Every prior G10
+scope, assertion, route, falsifier, identity, lifecycle, and cleanup contract
+remains binding. A fresh independent G10 Verifier must decide the resulting
+candidate; G11 remains closed.

@@ -1,17 +1,20 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: G10 PAUSED — G9 CURRENT-REPORT FINALIZATION PREREQUISITE REOPENED; preserved G10 Builder resumes only after independent G9 verification
+status: G10 AUTHORIZED TO RESUME — G9 NARROW CURRENT-REPORT FINALIZATION PREREQUISITE INDEPENDENTLY VERIFIED; focused F13 proof then one complete registered gate
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
-depends: G9 NARROW CURRENT-REPORT FINALIZATION PREREQUISITE / PASS WITH G12 INHERITED RED
-build-authority: **PAUSED — G10 cannot build, verify, or release while the accepted G9 current-report authority is contradicted; exactly one semantic G9 Builder repairs the finite prerequisite, one independent G9 Verifier decides it, and the preserved G10 Builder then resumes**
+depends: G9 NARROW CURRENT-REPORT FINALIZATION PREREQUISITE CLOSED / PASS WITH INHERITED G12 SHUTDOWN RED
+build-authority: **SAME G10 BUILDER RESUMES — start with focused F13 current-report proof against durable G9 currentness, then run exactly one complete registered `bun qa/run.ts golden-g10-canvas-runtime` gate; preserve all prior G10 scope/assertions and require one fresh independent G10 Verifier afterward**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
 diagnostic-pass-authority: **RETAINED EVIDENCE ONLY — the prior exact visible-HISTORY Mission click recorded the real projection refusal; the current authority is the Reader-approved product repair below, with no persistence/new truth/schema/Kernel/Canvas/timeout/assertion change**
 finite-rewrite-authority: **RETAINED/BINDING GATE CONTRACT — exactly one Task belongs to the Mission fixture; dynamic Task/Run IDs and exact object/link sets must survive CURRENT_MISSION, FULL_LINEAGE, close/reopen, and F04 parity; no multi-Task chooser**
 g9-f13-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
-g9-f13-reader-verdict: **NO / NO — the real supported closure created a Report and `gates` link, but publication/projection exposed `current_report_id=""` and `HISTORICAL`; this is G9-owned and G10 may not infer currentness or patch the projection assertion**
+g9-f13-reader-verdict: **HISTORICAL NO / NO — the real supported closure created a Report and `gates` link, but publication/projection exposed `current_report_id=""` and `HISTORICAL`; G9 repaired and independently verified this prerequisite, so G10 now proves the corrected durable currentness without inferring it**
 g9-f13-receipt: [G10 F04 live-membership rerun](evidence/golden-baseline/g10/golden-g10-f04-live-membership-rerun-20260829.txt) | SHA256 `5BB3CAB1AC521EE76F7B5A067EDB23C7A2BD9DA0A4D63125774618434B290729` (matches the cited `C:\tmp` receipt)
-g9-prerequisite-candidate: **immutable accepted G9 candidate `3c17e5d380fd267270cbacf851999cc98bf30638` / tree `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`; dirty G10 implementation remains preserved and unstaged**
+g9-prerequisite-candidate: **independently verified narrow prerequisite candidate `a9daa856a6df9992842c1709e1f761465ba9721d` / tree `47abb928d2f006254118145ff78e6a16ddeb0982`; dirty G10 implementation remains preserved and unstaged**
+g9-prerequisite-verifier-task: `01a04edc-8928-77d3-921f-50110f0458df`
+g9-prerequisite-verdict: **PASS WITH INHERITED G12 SHUTDOWN RED — closes only the reopened G9 prerequisite**
+g9-prerequisite-hermes-research-sha: `0C7AD489E94EA94A1CE5D3752A6D8E9891819DAE17BE868679D353CFDE8FA0D8` (unchanged)
 product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
 product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
 product-repair-surface: **only `collab-electron/src/windows/shell/src/research-world.js` and `collab-electron/src/windows/shell/src/dock.js`**
@@ -1428,3 +1431,25 @@ bind to the immutable candidate and new receipt and decide this prerequisite.
 Only after independent G9 PASS may Router resume the preserved G10
 identity-sequence, F09, projection, and remaining acceptance packet. G11 remains
 closed and no G10 release occurs before that pass.
+
+## Current G10 resume after independently verified G9 prerequisite
+
+Independent G9 Verifier task `01a04edc-8928-77d3-921f-50110f0458df` returned
+**PASS WITH INHERITED G12 SHUTDOWN RED** for candidate
+`a9daa856a6df9992842c1709e1f761465ba9721d` / tree
+`47abb928d2f006254118145ff78e6a16ddeb0982`; the unchanged
+`qa/gates/hermes-research.ts` hash is
+`0C7AD489E94EA94A1CE5D3752A6D8E9891819DAE17BE868679D353CFDE8FA0D8`.
+That closes only the reopened G9 prerequisite. G11 remains closed and the
+inherited G12 shutdown red remains recorded, not repaired here.
+
+The same preserved G10 Builder/order/candidate work now resumes with the
+focused F13 current-report proof, which must observe the corrected durable
+`current_report_id` and exact current/history identity rather than infer
+currentness from a report list. After that proof, run exactly one complete
+registered `bun qa/run.ts golden-g10-canvas-runtime` gate. Preserve all prior
+G10 scope and assertions, including the exact one-Task fixture, dynamic IDs and
+full object/link sets, visible-HISTORY route, F09, lifecycle/participant parity,
+falsifiers, timing, and cleanup. A fresh independent G10 Verifier remains
+required after the candidate; no G10 publication change and no G11 work is
+authorized.

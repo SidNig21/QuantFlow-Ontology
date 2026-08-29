@@ -1,10 +1,10 @@
 # WO-GOLDEN-G9 — Report authority consolidation
 
-status: REOPENED — NARROW CURRENT-REPORT FINALIZATION PREREQUISITE FOR G10 / PASS WITH G12 INHERITED RED
+status: CLOSED — NARROW CURRENT-REPORT FINALIZATION PREREQUISITE FOR G10 INDEPENDENTLY VERIFIED / PASS WITH INHERITED G12 SHUTDOWN RED
 kind: Golden Baseline Phase 2 bounded Report/result-authority group
 owner: Router
-depends: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS
-build-authority: **ONE SEMANTIC BUILDER — only the bounded current-report publication finalization below is reopened; accepted G9 candidate/evidence remain immutable and one independent Verifier must decide the prerequisite**
+depends: G8 CLOSED / NARROW G9 PREREQUISITE PASS / INHERITED G12 SHUTDOWN RED
+build-authority: **CLOSED — the bounded current-report publication finalization prerequisite was independently verified; no further G9 Builder authority, and the accepted G9 candidate/evidence remain immutable**
 reader-task: 01a0489e-04ea-71a1-8b6a-d0e151621103
 reader-round: FINAL
 reader-reviewed-authority: 8d78fb714998cc52d50538d6f9ea9a3323f75535
@@ -14,7 +14,7 @@ reader-round-1-authority: d6ab5ed66a18c9de23db047a4b41584acaaeec0e
 reader-round-1-tree: 8f94bf63b16bd74e5ef17461cc4f0d15477efc4f
 reader-round-2-authority: d6c0d7e91d726d8b5a33050f403efec87a3f1cd4
 reader-round-2-tree: 54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182
-builder-status: **HISTORICAL CLOSE RETAINED — current narrow prerequisite has one semantic Builder authorized below**
+builder-status: **CLOSED — narrow prerequisite candidate independently verified; no further G9 Builder is authorized**
 builder-starting-authority: 4ef49077b2b423601c02b043de82b34d231bb7f5
 builder-starting-tree: bdba7c9540122288866bed6fb4aa57952c6f025e
 builder-starting-evidence-head: f7e841ff3e075bd49ed70bf8da79c2409ca5c899
@@ -47,7 +47,12 @@ reopen-trigger: G10 F13 contradicted the accepted current-report publication/pro
 reopen-reader-task: 01a04da4-185a-7943-9a1b-1d36735f5cad
 reopen-reader-verdict: **NO / NO — real Report and gates linkage exist, but `current_report_id=""` and `HISTORICAL` expose a G9 publication-finalization defect; G10 must not repair or mask it**
 reopen-receipt: [G10 F04 live-membership rerun](evidence/golden-baseline/g10/golden-g10-f04-live-membership-rerun-20260829.txt) | SHA256 `5BB3CAB1AC521EE76F7B5A067EDB23C7A2BD9DA0A4D63125774618434B290729` (matches the cited `C:\tmp` receipt)
-reopen-candidate: **immutable accepted G9 candidate `3c17e5d380fd267270cbacf851999cc98bf30638` / tree `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`**
+reopen-candidate: **prior accepted G9 candidate `3c17e5d380fd267270cbacf851999cc98bf30638` / tree `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`; narrow prerequisite candidate below is independently verified and closed**
+reopen-verified-candidate: `a9daa856a6df9992842c1709e1f761465ba9721d`
+reopen-verified-tree: `47abb928d2f006254118145ff78e6a16ddeb0982`
+reopen-verifier-task: `01a04edc-8928-77d3-921f-50110f0458df`
+reopen-verdict: **PASS WITH INHERITED G12 SHUTDOWN RED — closes only this narrow G9 prerequisite**
+reopen-hermes-research-sha: `0C7AD489E94EA94A1CE5D3752A6D8E9891819DAE17BE868679D353CFDE8FA0D8` (unchanged)
 
 accepted-product-candidate: 3c17e5d380fd267270cbacf851999cc98bf30638
 accepted-product-tree: d380c7b4655c53cd6e51de0c2112ae99885f0e3d
@@ -76,8 +81,9 @@ reopened.
 ADR-0004 assigns G9 one current Report/result authority after G8. The founder
 dependency is G8 → G9; G12 Windows/package qualification and R18 remain later.
 G9 does not reopen G8 or authorize G11, G12, or R18. The current `NEXT.md`
-rotation opens only this finite current-report prerequisite; G10 is paused until
-its independent Verifier pass, after which the preserved G10 packet may resume.
+rotation opened only this finite current-report prerequisite; its independent
+Verifier passed it, so G9 is closed again and the preserved G10 packet resumes at
+focused F13 current-report proof.
 
 The accepted minimum prerequisite already changed ordinary completion output to a
 trajectory Artifact and preserved the Kernel refusal for a Report without
@@ -721,3 +727,26 @@ decides the prerequisite. Only after independent PASS may Router resume the
 preserved G10 identity-sequence/F09/projection packet. G11, G12, and R18 remain
 closed or frozen, and no G10 Builder or Verifier starts while this prerequisite
 is open.
+
+## Current G9 closure — narrow prerequisite independently verified
+
+The independent Verifier task `01a04edc-8928-77d3-921f-50110f0458df` returned
+**PASS WITH INHERITED G12 SHUTDOWN RED** for the narrow prerequisite candidate
+`a9daa856a6df9992842c1709e1f761465ba9721d` / tree
+`47abb928d2f006254118145ff78e6a16ddeb0982`. The unchanged
+`qa/gates/hermes-research.ts` hash is
+`0C7AD489E94EA94A1CE5D3752A6D8E9891819DAE17BE868679D353CFDE8FA0D8`.
+
+This independently closes only the G10-triggered G9 current-report finalization
+prerequisite. The first supported closure in the exact authority context
+published one current Report with exact Evaluation→Report, `gates`, and
+projection identity; the second same-context closure explicitly superseded it,
+preserved both durable Report bytes/IDs and history, and left exactly one
+current Report. Independent support, current/historical markers, and idempotent
+retry behavior remain binding. No further G9 Builder is authorized, and G12's
+shutdown red, G11, and R18 remain outside this close.
+
+`NEXT.md` is restored to the preserved G10 order as active. G10 resumes at the
+focused F13 current-report proof, then one complete registered gate; this G9
+closure does not authorize a G10 publication workaround or any change to the
+preserved G10 scope.
