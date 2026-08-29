@@ -292,11 +292,21 @@ This is one finite, gate-only rewrite of [WO-GOLDEN-G10](WO-GOLDEN-G10.md):
    `produces` tuples.
 3. Rewrite F02 to neutralize the real `Back to world` action, attempt the same
    control, observe failure, restore the action, and reach ordinary Canvas.
-   F03, F03-cold, F12a, and F12b each use an isolated live fixture through the
-   registered gate and prove red on the deliberate break plus restored green;
-   none is a source-only check. F14a compares actual close/reopen identity,
-   not an in-memory array. F14b runs on the normal path against real G10-owned
-   cleanup and does not use or mutate inherited G12 PIDs.
+   F03 is the same-process path: `Back to world`, then the real visible
+   `HISTORY` exact Mission click, then `CURRENT_MISSION` restoration. F03-cold
+   is `app.shutdown`, an entirely new app launch on the same Kernel/fixture
+   with no saved auto-reveal, then that same real visible `HISTORY` exact
+   Mission click and `CURRENT_MISSION` restoration. F03, F03-cold, F12a, and
+   F12b each use an isolated live fixture through the registered gate and prove
+   red on the deliberate break plus restored green; none is a source-only
+   check. F12a must make both registered gates red/nonzero and restore both
+   green/zero. F14a requires actual first-launch close, second-launch reopen,
+   and exact sorted identity/link comparison. F14b deliberately leaves exactly
+   one real G10-owned temp root before normal-path cleanup; the same registered
+   gate must report nonzero, `roots_remaining=1`, and
+   `leaked=[exact canonical bait path]`, then after removing only that root and
+   rerunning it must report zero, `roots_remaining=0`, `leaked=[]`, and
+   `processes=0`, with inherited/pre-existing roots and PIDs excluded.
 4. This rewrite changes no product, Kernel, or Canvas behavior, adds no
    multi-Task chooser, weakens no timeout, and does not reopen G11. The exact
    gate remains `bun qa/run.ts golden-g10-canvas-runtime`; no semantic Builder

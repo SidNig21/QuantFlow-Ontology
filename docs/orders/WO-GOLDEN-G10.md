@@ -383,8 +383,8 @@ does not observe owned state is not acceptance.
 | --- | --- | --- | --- |
 | F01 | re-enable exclusive Mission hiding after submit | under `ORDINARY_CANVAS`, a pre-existing non-research tile container is absent, visually hidden, `aria-hidden="true"`, or not pointer-enabled, or submission cannot return through the existing Canvas path | `CURRENT_MISSION` is explicit and the exact ordinary-container DOM predicates remain true after return |
 | F02 | neutralize the real `Back to world` action in an isolated live fixture | the registered gate attempts the same visible control and observes that the current Mission view cannot restore `ORDINARY_CANVAS` without a refresh or destructive write | the real action is restored and the same control reaches `ORDINARY_CANVAS` with unchanged Kernel ids and exact ordinary-container predicates |
-| F03 | reintroduce latest-world auto-reveal during normal reopen in an isolated live fixture | the registered gate exits nonzero because normal reopen does not start in `ORDINARY_CANVAS`, silently enters an exclusive Mission layer, or hides ordinary tiles | the bait is restored and the registered gate exits zero with `ORDINARY_CANVAS`, exact ordinary-container predicates, and deliberate Mission navigation |
-| F03-cold | reintroduce latest-world auto-reveal during cold reopen in an isolated live fixture | the registered gate exits nonzero because cold reopen does not start in `ORDINARY_CANVAS`, silently enters an exclusive Mission layer, or hides ordinary tiles | the bait is restored and the registered gate exits zero with `ORDINARY_CANVAS`, exact ordinary-container predicates, and deliberate Mission navigation |
+| F03 | break the same-process navigation sequence in an isolated live fixture | the registered gate exits nonzero when `Back to world`, the real visible `HISTORY` exact Mission click, or `CURRENT_MISSION` restoration is neutralized or skipped | same-process `Back to world` reaches ordinary Canvas, then the real visible `HISTORY` exact Mission click restores `CURRENT_MISSION` through the existing path |
+| F03-cold | reintroduce saved auto-reveal during cold reopen in an isolated live fixture | after `app.shutdown`, the registered gate exits nonzero if an entirely new app launch on the same Kernel/fixture does not start ordinary, or the real visible `HISTORY` exact Mission click cannot restore `CURRENT_MISSION` | `app.shutdown` is followed by an entirely new app launch on the same Kernel/fixture with no saved auto-reveal; the real visible `HISTORY` exact Mission click restores `CURRENT_MISSION` |
 | F04 | derive Runtime `running` from persisted session status while no process is live | a dead process is rendered `running`, or Dock, Canvas, and Inspect disagree for the exact `agent_session.id` | Runtime is `running` only for a live-session-registry observation and all three consumers receive the same snapshot |
 | F05 | remove or corrupt one shared participant-projection input | the same participant gets contradictory Dock/Canvas/Inspect role, runtime, work, recovery, Task, output, or Mission binding | all three consumers show the same values for the same `agent_session.id` |
 | F06 | drop the exact frozen `(kind, from_id, to_id)` `produces` tuple named by the independent-Kernel fixture from projection resolution | the tuple present in the isolated Kernel renders `Not recorded` or the wrong id | existing `strategy`/`produces` links project exactly; only absent facts use exactly `Not recorded` |
@@ -393,17 +393,19 @@ does not observe owned state is not acceptance.
 | F09 | break `browserScroll` at any link in its current Canvas boundary | `canvas.browserScroll` does not traverse the full named path or does not change observable page scroll | the unchanged call traverses the full named path and changes observable page scroll |
 | F10 | break `browserWait` at any link in its current Canvas boundary | `canvas.browserWait` does not traverse the full named path or does not observe load completion or timeout | the unchanged call traverses the full named path and observes load completion or timeout |
 | F11 | break `focusAgentSession` at its current Canvas boundary | `focusAgentSession(id)` cannot focus the existing terminal tile whose `sessionId` equals `id`, or reports success without doing so | the unchanged focus path focuses that exact terminal tile; removal requires the separately named G10 Reader amendment |
-| F12a | add a renderer-side durable domain write in an isolated live fixture | the registered `golden-g10-canvas-runtime` gate and/or `no-canvas-domain-writes` exits `1` on the added write | the bait is removed, the same registered gate exits `0`, and the real projection path remains green |
+| F12a | add a renderer-side durable domain write in an isolated live fixture | both registered gates, `golden-g10-canvas-runtime` and `no-canvas-domain-writes`, exit nonzero on the added write | the bait is removed, both same registered gates exit `0`, and the real projection path remains green |
 | F12b | add a second durable Canvas/Mission store in an isolated live fixture | the registered `golden-g10-canvas-runtime` gate exits `1` on the second store | the bait is removed, the same registered gate exits `0`, and the real projection path remains green |
 | F13 | substitute a current Report/history id or marker in the view fixture | the read-only Kernel comparison catches disagreement with accepted G9 current/history truth | current/historical Report and Artifact markers match the persisted G9 projection |
-| F14a | substitute a new in-memory or live identity during actual close/reopen | the registered gate's actual close/reopen comparison does not preserve the same durable Mission, exact Task, exact participant/session, and complete object/link identities | the real close/reopen path independently observes the same exact identities and complete object/link sets |
-| F14b | leave a real G10-owned process/root alive on the normal path or falsify its ownership | the registered gate fails from the actual pre-run census and G10-owned cleanup observation | the normal path observes real G10-owned cleanup at `processes=0`, `roots_remaining=0`, and `leaked=[]`; inherited G12 processes are outside this falsifier and are not read, changed, or counted |
+| F14a | substitute a new identity/link set during actual close/reopen | after the actual first launch closes and the second launch reopens, the registered gate's exact sorted identity/link comparison exits nonzero when the durable Mission, exact Task, exact participant/session, object set, or complete link set differs | the actual first-launch close and second-launch reopen independently observe the same exact sorted object-ID set and complete sorted `(kind, from_id, to_id)` link set |
+| F14b | deliberately leave exactly one real G10-owned temp root from the isolated fixture before normal-path cleanup | the same registered `golden-g10-canvas-runtime` gate exits nonzero with `roots_remaining=1` and `leaked=[exact canonical bait path]`; inherited/pre-existing roots and PIDs are excluded | remove only the exact canonical bait root, rerun the same registered gate, and require exit `0` with `roots_remaining=0`, `leaked=[]`, and `processes=0`; inherited/pre-existing roots and PIDs remain excluded |
 
 The F07–F11 cases must be individually named in the evidence; one aggregate
 browser assertion is insufficient. F03, F03-cold, F12a, and F12b each require
 an isolated live fixture, a registered-gate red transcript, and a restored-green
-transcript. F14a and F14b must separately prove actual identity and normal-path
-owned cleanup; neither may use inherited G12 PIDs. F07–F10 green requires the
+transcript. F12a must show both registered gates red and both restored green.
+F14a must show the actual first-launch close and second-launch reopen identity
+comparison. F14b must show the exact canonical bait root red/green on the normal
+path; inherited/pre-existing roots and PIDs are excluded. F07–F10 green requires the
 full current call path and operation-specific result; `focusAgentSession` green
 requires the exact terminal tile. A routed-row removal requires the separate
 G10 Reader amendment stated in section D.
@@ -1172,12 +1174,23 @@ Authorize one finite gate-only rewrite, with no product behavior change:
    Run → `result_set` Artifact and executor AgentSession → trajectory Artifact.
 3. Rewrite F02 so an isolated live fixture neutralizes the real `Back to world`
    action, attempts that same control, observes failure, restores the action,
-   and reaches ordinary Canvas. Rewrite F03, F03-cold, F12a, and F12b as
-   isolated live-fixture red/green proofs through the registered gate, never as
-   source-only checks. Make F14a compare actual close/reopen identity rather
-   than an in-memory array. Make F14b run on the normal path against real
-   G10-owned cleanup, without reading, changing, or counting inherited G12
-   PIDs.
+   and reaches ordinary Canvas. F03 is the same-process path: `Back to world`,
+   then the real visible `HISTORY` exact Mission click, then `CURRENT_MISSION`
+   restoration. F03-cold is `app.shutdown`, an entirely new app launch on the
+   same Kernel/fixture with no saved auto-reveal, then that same real visible
+   `HISTORY` exact Mission click and `CURRENT_MISSION` restoration. F03,
+   F03-cold, F12a, and F12b must each use an isolated live fixture through the
+   registered gate and prove red on the deliberate break plus restored green;
+   none is a source-only check. F12a must make both registered
+   `golden-g10-canvas-runtime` and `no-canvas-domain-writes` gates nonzero/red,
+   then exact restoration must make both exit `0`/green. Make F14a require
+   actual first-launch close, second-launch reopen, and exact sorted
+   identity/link comparison. Make F14b use exactly one real G10-owned temp-root
+   bait on the normal cleanup path: the same registered G10 gate must exit
+   nonzero with `roots_remaining=1` and `leaked=[exact canonical bait path]`.
+   Remove only that exact bait root, rerun the same gate, and require exit `0`
+   with `roots_remaining=0`, `leaked=[]`, and `processes=0`; inherited/pre-
+   existing roots and PIDs remain excluded.
 4. Preserve the real visible-HISTORY Mission click and the accepted
    `CURRENT_MISSION → FULL_LINEAGE → Back to world` path. Do not add a
    multi-Task chooser, change product/Kernel/Canvas behavior, weaken a timeout,
