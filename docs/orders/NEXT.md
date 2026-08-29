@@ -1,11 +1,11 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 SEMANTIC READER REQUIRED
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 COMPLETION/RECEIPT READER REQUIRED
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 SEMANTIC READER REQUIRED — B PRIMARY / D+C SECONDARY
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 COMPLETION/RECEIPT READER NO / NO — REREAD REQUIRED
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **CLOSED — fresh semantic Reader must answer the two exact lineage-amendment questions YES / YES before exactly one product-helper repair Builder; no Builder authority yet**
-g10-status: **SEMANTIC READER REQUIRED — B primary with D/C secondary; retained R16 Artifact lineage repair pending; independent Verifier required afterward**
+builder-authority: **CLOSED — the same Reader must reread the completion/receipt-lineage amendment and answer YES / YES before exactly one bounded product-helper repair Builder; no Builder authority yet**
+g10-status: **COMPLETION/RECEIPT READER NO / NO — exact pre-admission source-Task event/receipt lineage guard required; Builder remains closed**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
@@ -25,6 +25,10 @@ g10-lineage-adjudication-authority: `9886a1225f2cf2c5ee713c6d2329fda0ac2ef9d2`
 g10-lineage-adjudication-result: **B primary with D/C secondary — retained accepted R16 helper Artifact-lineage defect; not a G10 Canvas product/Kernel regression**
 g10-lineage-repair-authority: **PENDING READER — exactly one product-helper repair; Builder closed until YES / YES; one independent Verifier afterward**
 g10-lineage-repair-surface: **only `collab-electron/src/main/kernel.ts`, existing `qa/gates/golden-g10-canvas-runtime.ts`, and `collab-electron/src/main/research-world.test.ts` only if needed; directly caused G10 evidence**
+g10-lineage-reader-task: `01a04b77-cb43-7792-a225-2a7d57ef068c`
+g10-lineage-reader-authority: `db30a28d912f2e49e39802340993e17c62132f87`
+g10-lineage-reader-verdict: **NO / NO — exact completed source-Task event/receipt lineage must be checked before review Task/Evaluation/Report mutation**
+g10-lineage-reader-reread: **REQUIRED — same Reader reread of this completion/receipt-lineage amendment and NEXT.md; Builder remains closed until YES / YES**
 g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
@@ -121,7 +125,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; B-primary R16 lineage amendment; fresh semantic Reader required; Builder closed; no second Builder
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; completion/receipt-lineage amendment; same Reader NO / NO and reread required; Builder closed; no second Builder
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -196,11 +200,12 @@ G10 is now the sole active Phase-2 order. Its bounded accepted packet is
 Canvas views and return, no submit/reopen hiding, real runtime liveness with
 separate session/work/recovery axes, truthful existing relations, and the five
 G7-routed Canvas/browser calls. The same Reader's Round-3 reread answered the
-two original questions in its Reader brief **YES / YES**, but the current
-retained R16 Artifact-lineage amendment below requires a fresh semantic Reader.
-The Builder is closed until that Reader answers the two exact amendment
-questions **YES / YES**; no product/Kernel repair, second Builder, or scope
-expansion is currently authorized.
+two original questions in its Reader brief **YES / YES**, but the retained R16
+Artifact-lineage amendment received a finite **NO / NO** on missing
+pre-admission completion/receipt validation. The same Reader must reread the
+completion/receipt amendment below and answer its two exact questions
+**YES / YES**; until then the Builder is closed and no product/Kernel repair,
+second Builder, or scope expansion is authorized.
 
 ### G10 finite Reader amendments — same Reader reread required
 
@@ -322,7 +327,7 @@ context and is not altered or staged by this Router docs-only amendment. One
 independent Verifier, not Router or the repair Builder, must decide G10 after
 this one repair; no second Builder is authorized.
 
-### G10 retained R16 lineage amendment — fresh semantic Reader required
+### G10 retained R16 lineage amendment — historical Reader requirement
 
 The final read-only adjudication from task
 `01a04b63-f4c6-7fd3-b6a8-f429f0e6aed1`, against the current authority
@@ -374,6 +379,42 @@ The fresh semantic Reader must answer **YES / YES** to these exact questions
 before the one product-helper repair Builder may start. Until then, the
 Builder remains closed. One independent Verifier, not Router or the Builder,
 must decide G10 after that one repair.
+
+### G10 completion/receipt lineage amendment — same Reader reread required
+
+The same Reader task
+`01a04b77-cb43-7792-a225-2a7d57ef068c` returned **NO / NO** against authority
+`db30a28d912f2e49e39802340993e17c62132f87` (short `db30a28d`). The finite
+defect is that, before `requestGovernedReview` creates any review Task, the
+helper/fixture must validate the exact completed source Task event and durable
+receipt lineage for the same Task, executor, worker trajectory Artifact, and
+accepted assignment/delegation tuple. Missing, duplicate, or mismatched
+completion/receipt lineage must refuse with zero review Task, Evaluation, or
+Report mutation rather than fail later.
+
+The repair must preserve the separate Run `result_set` versus worker
+trajectory distinction and the exact `produces(executor, trajectory)` link.
+Add one independent fail-capable red/green falsifier: remove or mismatch that
+exact completion/receipt lineage in an otherwise valid isolated fixture and
+prove pre-admission refusal with zero review Task, Evaluation, or Report
+mutation; restore the exact lineage and prove admission. Existing G10
+assertions and acceptance meaning remain unchanged.
+
+The same Reader must reread this amendment and `NEXT.md` and answer exactly:
+
+1. **Does the repair have one finite meaning: before review admission, the
+   exact completed source Task event/receipt lineage matches the same Task,
+   executor, worker trajectory Artifact, and accepted assignment/delegation
+   tuple, while the Run `result_set` remains separate?**
+2. **Does acceptance remain fail-capable: independently removing, duplicating,
+   or mismatching that completion/receipt lineage refuses before review
+   Task/Evaluation/Report mutation, while exact restoration admits?**
+
+The same Reader must return **YES / YES** before the one bounded product-helper
+repair Builder may start. Until then, the Builder remains closed. G9
+validator/schema/Report authority, all G10 scope and assertions, G12, R18,
+and every other Golden-group boundary remain preserved; one independent
+Verifier must decide G10 after the repair.
 
 ## Historical G9-open handoff (superseded)
 
