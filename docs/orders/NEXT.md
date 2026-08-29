@@ -1,11 +1,11 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 MISSION-NAVIGATION GATE REPAIR OPEN / INDEPENDENT VERIFIER REQUIRED
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 RENDERER-BARRIER READER REQUIRED
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 MISSION-NAVIGATION C PRIMARY / D DIAGNOSTIC LABEL ONLY — SAME BUILDER REOPENED / INDEPENDENT VERIFIER REQUIRED
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 RENDERER-INITIALIZATION-BARRIER AMENDMENT — SAME READER REREAD REQUIRED / BUILDER HELD
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **OPEN — the same G10 Builder is reopened for exactly one gate-only Mission-navigation repair limited to `qa/gates/golden-g10-canvas-runtime.ts`; no new semantic Reader; one fresh independent Verifier must follow; no second Builder or scope expansion**
-g10-status: **MISSION-NAVIGATION ADJUDICATION C PRIMARY / D DIAGNOSTIC LABEL ONLY — same-order Builder reopened for exactly one named G10 gate repair; one fresh independent Verifier required afterward**
+builder-authority: **HELD — the existing G10 semantic Reader must reread the finite renderer-initialization-barrier amendment before the same Builder may apply it; no new semantic Reader, no scope expansion, and one fresh independent Verifier remains required**
+g10-status: **RENDERER-INITIALIZATION-BARRIER AMENDMENT — same Reader reread required; gate-only scope, Builder held**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
@@ -47,8 +47,16 @@ g10-mission-adjudication-task: `01a04bca-ad71-7b60-a475-5f014858cd5e`
 g10-mission-adjudication-authority: `58757be642f81d03c810449e9c8aebfa1d24bc02`
 g10-mission-adjudication-classification: **C primary — fixture/call/timing defect; D secondary — diagnostic label only; Mission/Kernel projection healthy and no meaning change**
 g10-mission-adjudication-result: **`openMission` returns `false` when the exact Mission control is not yet present; `waitFor()` treats only `null` as retry, so no click occurs and the gate reports a misleading CURRENT_MISSION timeout**
-g10-mission-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one gate-only repair, with no new semantic Reader; one fresh independent Verifier afterward**
+g10-mission-repair-authority: **HISTORICAL/RETAINED — the exact `return null` gate correction remains binding; the current Builder step is held by the pending renderer-initialization-barrier amendment below**
 g10-mission-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; change the missing-control branch to return `null` and preserve the exact missionId/button selector, click, state assertions, and timeouts**
+g10-barrier-adjudication-task: `01a04bdd-5dfb-70c2-aa6e-ac7e418e7c33`
+g10-barrier-adjudication-authority: `dcc4bad6f3e92870d9a9d1ee84a2548d48f21406`
+g10-barrier-adjudication-classification: **C primary — gate fixture/renderer-initialization sequencing defect; D secondary — diagnostic label only; Mission/Kernel projection healthy and accepted meaning unchanged**
+g10-barrier-adjudication-result: **Main `app.readiness` does not prove renderer initialization; the gate seeds before the existing ordinary-projection rendered boundary, so the unawaited ledger refresh/invalidation leaves zero exact Mission rows/buttons**
+g10-barrier-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
+g10-barrier-reader-requirement: **REQUIRED — the existing semantic Reader must reread this finite authority/evidence amendment; no new semantic Reader is needed**
+g10-barrier-repair-authority: **PENDING SAME READER REREAD — exactly one gate-only renderer-initialization barrier amendment; retain `return null`; no new semantic Reader; one fresh independent Verifier afterward**
+g10-barrier-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; observe the existing ordinary-projection rendered boundary before first fixture seed; no renderer behavior, ledger filtering, product meaning, timeout, selector semantics, or acceptance-criteria change**
 g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
@@ -145,7 +153,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; completion/receipt-lineage Reader YES / YES; exactly one bounded Builder reopened for the accepted two-artifact/pre-admission lineage repair plus previously accepted G10 work; one fresh independent Verifier required afterward; no second Builder or scope expansion
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; finite renderer-initialization-barrier amendment; same existing semantic Reader reread required; Builder held; one fresh independent Verifier afterward; no second Builder or scope expansion
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -222,11 +230,12 @@ separate session/work/recovery axes, truthful existing relations, and the five
 G7-routed Canvas/browser calls. The same Reader's Round-3 reread answered the
 two original questions in its Reader brief **YES / YES**, and its completion/
 receipt amendment reread also returned **YES / YES** at authority
-`45cffba08f9990ef90c4273daa59ea5c4107ec61`. The ordinary-Canvas and
-browser-readiness repairs are within that accepted meaning; the final
-Mission-navigation adjudication below now reopens the same Builder for
-exactly one gate-only correction in the named G10 gate. No new semantic
-Reader, second Builder, or scope expansion is authorized.
+`45cffba08f9990ef90c4273daa59ea5c4107ec61`. The ordinary-Canvas,
+browser-readiness, and Mission-navigation repairs are within that accepted
+meaning; the final renderer-initialization adjudication below adds one finite
+gate barrier and requires the existing semantic Reader's reread before the
+same Builder may continue. No new semantic Reader, second Builder, or scope
+expansion is authorized.
 
 ### G10 finite Reader amendments — same Reader reread required
 

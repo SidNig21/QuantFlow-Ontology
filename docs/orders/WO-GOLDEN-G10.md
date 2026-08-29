@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: BUILDER REOPENED — final Mission-navigation adjudication C primary / D diagnostic-label only; exactly one same-order gate-only repair reopened; one fresh independent Verifier required afterward
+status: SEMANTIC READER REQUIRED — final renderer-initialization-barrier amendment; Builder held pending same Reader reread; one independent Verifier remains required afterward
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **YES — the same G10 Builder is reopened for exactly one gate-only Mission-navigation repair limited to `qa/gates/golden-g10-canvas-runtime.ts`; no new semantic Reader; one fresh independent Verifier must follow; no second Builder or scope expansion**
+build-authority: **NO — the existing G10 semantic Reader must reread this finite renderer-initialization-barrier amendment before the same Builder may apply it; no new semantic Reader, no scope expansion, and one fresh independent Verifier must follow**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
@@ -49,8 +49,16 @@ mission-adjudication-task: `01a04bca-ad71-7b60-a475-5f014858cd5e`
 mission-adjudication-authority: `58757be642f81d03c810449e9c8aebfa1d24bc02`
 mission-adjudication-classification: **C primary — fixture/call/timing defect; D secondary — diagnostic label only; Mission/Kernel projection healthy and no meaning change**
 mission-adjudication-result: **`openMission` returns `false` when the exact Mission control is not yet present; `waitFor()` treats only `null` as retry, so no click occurs and the gate reports a misleading CURRENT_MISSION timeout**
-mission-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one gate-only repair, with no new semantic Reader; one fresh independent Verifier afterward**
+mission-repair-authority: **HISTORICAL/RETAINED — the exact `return null` gate correction remains binding; the current Builder step is held by the pending renderer-initialization-barrier amendment below**
 mission-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; change the missing-control branch to return `null` and preserve the exact missionId/button selector, click, state assertions, and timeouts**
+barrier-adjudication-task: `01a04bdd-5dfb-70c2-aa6e-ac7e418e7c33`
+barrier-adjudication-authority: `dcc4bad6f3e92870d9a9d1ee84a2548d48f21406`
+barrier-adjudication-classification: **C primary — gate fixture/renderer-initialization sequencing defect; D secondary — diagnostic label only; Mission/Kernel projection healthy and accepted meaning unchanged**
+barrier-adjudication-result: **Main `app.readiness` does not prove renderer initialization; the gate seeds before the existing ordinary-projection rendered boundary, so the unawaited ledger refresh/invalidation leaves zero exact Mission rows/buttons**
+barrier-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
+barrier-reader-requirement: **REQUIRED — the existing semantic Reader must reread this finite authority/evidence amendment; no new semantic Reader is needed**
+barrier-repair-authority: **PENDING SAME READER REREAD — exactly one gate-only renderer-initialization barrier amendment; retain `return null`; no new semantic Reader; one fresh independent Verifier afterward**
+barrier-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; observe the existing ordinary-projection rendered boundary before first fixture seed; no renderer behavior, ledger filtering, product meaning, timeout, selector semantics, or acceptance-criteria change**
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-disposition: Current Canvas/Mission/runtime coherence group from the audited Phase-2 disposition
 accepted-g9-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
@@ -725,3 +733,49 @@ two-Artifact/pre-admission lineage, existing assertions and timeouts, F14a/
 F14b ownership, and every other Golden group remain unchanged. No assertion
 weakening, product change, second Builder, scope expansion, other file, or
 G11 work is authorized.
+
+## Final renderer-initialization barrier amendment — same Reader reread required
+
+The completed fresh adjudication task
+`01a04bdd-5dfb-70c2-aa6e-ac7e418e7c33`, against authority
+`dcc4bad6f3e92870d9a9d1ee84a2548d48f21406` (short `dcc4bad6`), found that the
+prior `false`→`null` retry correction is intact but the exact Mission control
+still times out twice. It classified the defect as **C primary — fixture/call/
+timing sequencing**, with **D secondary — diagnostic label only**. The Mission
+and Kernel projection remain healthy; accepted product meaning is unchanged.
+
+The finite cause is that Main `app.readiness` proves only the shell URL is
+loaded and not loading. The gate seeds immediately, before the existing
+ordinary-projection rendered boundary. The ledger's initial refresh is
+unawaited and its invalidation is unbuffered, so the exact target Mission row
+and button can be absent even though the durable Mission, event, link, and
+projection are valid.
+
+Authorize one finite, same-meaning, gate-only evidence amendment in
+`qa/gates/golden-g10-canvas-runtime.ts`, pending the existing semantic Reader's
+reread before further Builder work:
+
+1. Before the first fixture seed, wait on the existing rendered ordinary-
+   projection boundary: `ORDINARY_CANVAS`, controls hidden, and projection
+   inactive. This is a gate barrier observing renderer readiness; it must not
+   change renderer behavior.
+2. Retain the missing-control `return null` retry. Require visible `HISTORY`
+   tab selection, a visible `HISTORY` pane, the exact Mission row, and the
+   exact Mission button click. Then require the unchanged sequence
+   `CURRENT_MISSION → FULL_LINEAGE → Back to world`.
+3. Add fail-capable red evidence that bypassing the barrier yields zero exact
+   target rows and buttons and the existing timeout. Restore the barrier and
+   require the full green sequence with zero-leak cleanup.
+
+The amendment is authority/evidence-only. Renderer behavior, ledger filtering,
+product meaning, timeout values, selector semantics, click semantics, state
+assertions, and acceptance criteria may not change. No timeout-only fix,
+direct controller shortcut, invented control, assertion weakening, product
+change, or other file is authorized. The same existing G10 semantic Reader
+must reread this finite amendment; no new semantic Reader is needed. After
+that reread, the same bounded Builder may apply only this gate amendment, and
+one fresh independent Verifier—not the Builder or Router—must decide G10.
+All prior G10/G9/G12/R18 boundaries, the accepted browser and Mission routes,
+two-Artifact/pre-admission lineage, F14a/F14b ownership, and every other
+Golden-group boundary remain unchanged. No candidate/product commit, cleanup,
+G11 work, second Builder, or scope expansion is authorized here.
