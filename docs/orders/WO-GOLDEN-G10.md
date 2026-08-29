@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: READER ACCEPTED — completion/receipt lineage YES / YES; exactly one bounded G10 Builder reopened; one fresh independent Verifier required afterward
+status: BUILDER REOPENED — final ordinary-Canvas adjudication A primary / D secondary; exactly one same-order repair reopened; one fresh independent Verifier required afterward
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **YES — exactly one bounded G10 Builder is reopened for the accepted two-artifact/pre-admission lineage repair plus previously accepted G10 work; one fresh independent Verifier must follow; no second Builder or scope expansion**
+build-authority: **YES — the same G10 Builder is reopened for exactly one ordinary cold-launch repair limited to `renderer.js` and `qa/gates/golden-g10-canvas-runtime.ts`; no new semantic Reader; one fresh independent Verifier must follow; no second Builder or scope expansion**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
@@ -33,6 +33,12 @@ lineage-reader-verdict: **HISTORICAL NO / NO — exact completed source-Task eve
 lineage-reader-reread-authority: `45cffba08f9990ef90c4273daa59ea5c4107ec61`
 lineage-reader-reread-verdict: **YES / YES — the same Reader reread this amendment and NEXT.md; one meaning and fail-capable pre-admission acceptance remain intact**
 lineage-reader-reread: **SATISFIED — same Reader reread at authority `45cffba08f9990ef90c4273daa59ea5c4107ec61`; exactly one bounded Builder reopened and one fresh independent Verifier is required afterward**
+ordinary-adjudication-task: `01a04b99-46a1-7c00-a10d-b2d7b5c81dab`
+ordinary-adjudication-authority: `f2ce7505ff53be883a78f4d463b0cb745c11aab1`
+ordinary-adjudication-classification: **A primary — G10 cold-launch ordinary-Canvas product defect; D secondary — gate boundary-label ambiguity; accepted meaning unchanged**
+ordinary-adjudication-result: **the app is internally ordinary but the DOM never publishes `ORDINARY_CANVAS` on cold launch because `hydrateSaved()` is conditional on saved state; the direct Main RPC does not invoke the Dock Mission reveal callback**
+ordinary-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one repair, with no new semantic Reader; one fresh independent Verifier afterward**
+ordinary-repair-surface: **only `collab-electron/src/windows/shell/src/renderer.js` and `qa/gates/golden-g10-canvas-runtime.ts`; no other implementation, test, gate, or authority surface is authorized by this amendment**
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-disposition: Current Canvas/Mission/runtime coherence group from the audited Phase-2 disposition
 accepted-g9-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
@@ -566,3 +572,52 @@ boundaries remain binding: no second Builder, no scope expansion, and no
 change to G9 validator/schema/Report authority, G10 assertions, G12, R18, or
 any other Golden group. One fresh independent Verifier—not the Builder or
 Router—must follow and decide G10 PASS/FAIL.
+
+## Final ordinary-Canvas adjudication — same Builder reopened; no new semantic Reader
+
+The final read-only adjudication task
+`01a04b99-46a1-7c00-a10d-b2d7b5c81dab`, against authority
+`f2ce7505ff53be883a78f4d463b0cb745c11aab1` (short `f2ce7505`), classified the
+twice-observed `ordinary Canvas after initial launch timed out` failure as
+**A primary — G10 product defect**, with **D secondary — gate assertion
+boundary-label ambiguity**. The accepted G10 meaning is unchanged.
+
+The finite cause is cold-launch DOM initialization: the renderer's internal
+mode is ordinary, but `hydrateSaved()` runs only when saved state exists, so
+the DOM never publishes `ORDINARY_CANVAS` on a fresh launch. The direct Main
+RPC path creates the Director terminal tile but does not invoke the Dock
+form's deliberate Mission reveal callback. This is deterministic product
+behavior, not executor timing or selection.
+
+Authorize exactly one same-order Builder repair, limited to these two existing
+G10 files and no others:
+
+1. In `collab-electron/src/windows/shell/src/renderer.js`, initialize ordinary
+   mode unconditionally on cold launch through the existing `hydrateSaved()`
+   path. Do not add a state store or change the accepted Mission semantics.
+2. In `qa/gates/golden-g10-canvas-runtime.ts`, rename and reposition the proof
+   as ordinary Canvas **before deliberate Mission navigation**, and observe it
+   at the first valid terminal-tile boundary. Retain a separate post-RPC
+   ordinary assertion and every full ordinary predicate: `ORDINARY_CANVAS`,
+   existing non-research tile containers present, visible, not
+   `aria-hidden="true"`, and pointer-enabled. Preserve the subsequent
+   deliberate Mission/current/full-lineage and `Back to world` proof.
+
+Bind fail-capable red/green proof and cleanup: the red bait removes or guards
+the cold-launch ordinary initialization and the registered
+`golden-g10-canvas-runtime` command must fail with the ordinary-Canvas
+timeout; restored initialization must observe the ordinary predicates, pass
+the post-RPC ordinary assertion, and continue through the accepted G10
+checks. Both red and green runs must perform the owned-process/root cleanup,
+with `processes=0`, `roots_remaining=0`, and `leaked=[]`; inherited G12 state
+remains untouched and excluded.
+
+This repair is within the existing Reader-accepted G10 semantics and files;
+no new semantic Reader is required. The same G10 Builder is reopened for
+this exact repair only. All other G10/G9/G12/R18 boundaries, the two-Artifact
+and pre-admission lineage contract, G9 validator/schema/Report authority,
+existing assertions, F14a/F14b ownership, and every other Golden group remain
+unchanged. One fresh independent Verifier—not the Builder or Router—must
+follow this repair and decide G10 PASS/FAIL. No second Builder, scope
+expansion, implementation outside the two named files, or G11 work is
+authorized.
