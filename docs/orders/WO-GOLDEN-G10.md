@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: DIAGNOSTIC-ONLY GATE MEASUREMENT AUTHORIZED — same Reader YES / YES at 8c6c2df; one bounded diagnostic edit/run; one independent Verifier remains required afterward
+status: G10 PRODUCT PROJECTION REPAIR AUTHORIZED — same Reader YES / YES in task 01a04bf8 at authority 8c594f17; one bounded repair/proof; one independent Verifier remains required afterward
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **YES — exactly one diagnostic-only edit/run is authorized in `qa/gates/golden-g10-canvas-runtime.ts`; no new semantic Reader, no product/semantic repair, no scope expansion, and one fresh independent Verifier must follow**
+build-authority: **YES — exactly one bounded G10 product-projection repair plus red/green proof is authorized only in `collab-electron/src/windows/shell/src/renderer.js` and `qa/gates/golden-g10-canvas-runtime.ts` as specified below; no new semantic Reader, no other product/gate surface, no scope expansion, and one fresh independent Verifier must follow**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
@@ -49,7 +49,7 @@ mission-adjudication-task: `01a04bca-ad71-7b60-a475-5f014858cd5e`
 mission-adjudication-authority: `58757be642f81d03c810449e9c8aebfa1d24bc02`
 mission-adjudication-classification: **C primary — fixture/call/timing defect; D secondary — diagnostic label only; Mission/Kernel projection healthy and no meaning change**
 mission-adjudication-result: **`openMission` returns `false` when the exact Mission control is not yet present; `waitFor()` treats only `null` as retry, so no click occurs and the gate reports a misleading CURRENT_MISSION timeout**
-mission-repair-authority: **HISTORICAL/RETAINED — the exact `return null` gate correction remains binding; the current Builder step is held by the pending visible-HISTORY consumer-path amendment below**
+mission-repair-authority: **HISTORICAL/RETAINED — the exact `return null` gate correction remains binding; the current Builder step is the separately bounded A-primary current-Mission HISTORY projection repair below**
 mission-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; change the missing-control branch to return `null` and preserve the exact missionId/button selector, click, state assertions, and timeouts**
 barrier-adjudication-task: `01a04bdd-5dfb-70c2-aa6e-ac7e418e7c33`
 barrier-adjudication-authority: `dcc4bad6f3e92870d9a9d1ee84a2548d48f21406`
@@ -62,14 +62,18 @@ history-adjudication-result: **the old global `openMission` path omitted visible
 history-reader-task: `01a04bf8-eaba-7e53-8563-95d85d0f078a`
 history-reader-authority: `8c6c2df0910fa6c777df19cd15cd8dd245f10c66`
 history-reader-verdict: **YES / YES — visible `HISTORY` red/green is proven; the later generic `RPC timeout: app.ui.evaluate` is D insufficient diagnostics, not a product defect; no new semantic Reader is required**
+mission-reopen-reader-task: `01a04bf8-eaba-7e53-8563-95d85d0f078a`
+mission-reopen-reader-authority: `8c594f17cb7881fd4bb81c6e059d0157e946f549`
+mission-reopen-reader-verdict: **YES / YES — repeated reopening of the active durable Mission is part of the accepted visible-HISTORY consumer path; the bounded allowlist and red/green proof below have one finite meaning**
+mission-reopen-classification: **A primary — G10 product projection defect; the prior generic `RPC timeout: app.ui.evaluate` was D insufficient diagnostics and is not a product defect finding**
 diagnostic-adjudication-task: `01a04c1c-ae43-7dd0-a773-4d6961fa9e4f`
 diagnostic-adjudication-authority: `8c6c2df0910fa6c777df19cd15cd8dd245f10c66`
-diagnostic-adjudication-classification: **D primary — insufficient diagnostics; C is only a conditional mechanical F11 hypothesis; A, B, and E are unsupported**
-diagnostic-adjudication-result: **the generic `RPC timeout: app.ui.evaluate` does not identify the post-HISTORY phase and is not evidence of a product defect; add phase-specific receipts before any repair decision**
+diagnostic-adjudication-classification: **HISTORICAL/SUPERSEDED — D primary — insufficient diagnostics; C was only a conditional mechanical F11 hypothesis; A, B, and E were unsupported**
+diagnostic-adjudication-result: **HISTORICAL/SUPERSEDED — the generic `RPC timeout: app.ui.evaluate` did not identify the post-HISTORY phase; the later repeated Mission reopening failure is separately classified A primary by the same Reader**
 barrier-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
-barrier-reader-requirement: **SATISFIED — the same Reader task `01a04bf8-eaba-7e53-8563-95d85d0f078a` returned YES / YES at authority `8c6c2df0910fa6c777df19cd15cd8dd245f10c66`; this diagnostic-only amendment requires no new semantic Reader**
-barrier-repair-authority: **HISTORICAL/SUPERSEDED — the visible-HISTORY consumer-path amendment is accepted; current authority is the one diagnostic-only phase/readiness measurement below, with any product/semantic red stopping work**
-barrier-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; diagnostic phase labels and existing browser identity/readiness receipts only; no timeout, product, selector, assertion, semantic, cleanup, or scope change**
+barrier-reader-requirement: **SATISFIED — the same Reader task `01a04bf8-eaba-7e53-8563-95d85d0f078a` returned YES / YES at authority `8c594f17cb7881fd4bb81c6e059d0157e946f549`; no new semantic Reader is required for this current-Mission projection amendment**
+barrier-repair-authority: **HISTORICAL/SUPERSEDED — the diagnostic-only hold is closed by the Reader-accepted A-primary current-Mission projection amendment below**
+barrier-repair-surface: **HISTORICAL/SUPERSEDED — prior diagnostics only; current repair surface is exactly `collab-electron/src/windows/shell/src/renderer.js` and `qa/gates/golden-g10-canvas-runtime.ts` as specified below**
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-disposition: Current Canvas/Mission/runtime coherence group from the audited Phase-2 disposition
 accepted-g9-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
@@ -793,15 +797,15 @@ authorized. The same Reader task `01a04bf8-eaba-7e53-8563-95d85d0f078a`
 reread this amendment and `NEXT.md` at authority
 `8c6c2df0910fa6c777df19cd15cd8dd245f10c66` and returned **YES / YES**;
 visible-HISTORY red/green is proven and no new semantic Reader is required.
-The current Builder action is limited to the diagnostic-only phase/readiness
-measurement below. One fresh independent Verifier—not the Builder or Router—
-must decide G10 after the accepted proof and any same-meaning mechanical gate
-repair. All prior G10/G9/G12/R18 boundaries, the accepted browser and Mission
-routes, two-Artifact/pre-admission lineage, F14a/F14b ownership, and every
-other Golden-group boundary remain unchanged. No product/semantic red may be
+The current Builder action is exactly the bounded current-Mission HISTORY
+projection repair and red/green proof below. One fresh independent Verifier—
+not the Builder or Router—must decide G10 afterward. All prior G10/G9/G12/R18
+boundaries, the accepted browser and Mission routes, two-Artifact/pre-admission
+lineage, F14a/F14b ownership, and every other Golden-group boundary remain
+unchanged. No product or semantic red outside this A-primary finding may be
 repaired under this authority.
 
-## Final post-HISTORY diagnostic-only measurement — Builder open; no new semantic Reader
+## Historical post-HISTORY diagnostic-only measurement — superseded by current-Mission projection adjudication
 
 The fresh read-only adjudication task
 `01a04c1c-ae43-7dd0-a773-4d6961fa9e4f`, against authority
@@ -811,12 +815,12 @@ The already-corrected visible-HISTORY red/green proof is accepted: omitted
 selection reached the existing navigation timeout, and restored visible
 HISTORY produced exact Mission row/button counts `1/1` with green cleanup.
 The generic timeout does not identify which post-HISTORY phase failed and is
-not evidence of a product defect. A stale browser webContents/session and
-other product causes remain unsupported until a phase-specific receipt proves
-one.
+not evidence of a product defect. This diagnostic-only hold is now closed:
+the later repeated active-Mission reopening failure was separately classified
+by the same Reader as an A-primary G10 product projection defect.
 
-Under standing Golden mechanical-proof authority, authorize exactly one
-diagnostic-only edit/run in `qa/gates/golden-g10-canvas-runtime.ts`:
+The following was the superseded diagnostic-only authority and is retained as
+history only; it does not authorize the current Builder work:
 
 1. Add phase labels and receipts for the post-HISTORY sequence:
    `openMission`, `currentMission`, `fullLineage`, `Back`, `F11 graph
@@ -837,3 +841,51 @@ mechanical-proof authority in this gate file; any product or semantic red
 stops work and is not repairable under this authority. One fresh independent
 Verifier—not the Builder or Router—must decide G10 afterward. No other file,
 candidate/evidence commit, G11 work, or scope expansion is authorized.
+
+## Final current-Mission HISTORY projection adjudication — Reader accepted; Builder reopened
+
+The same semantic Reader task
+`01a04bf8-eaba-7e53-8563-95d85d0f078a` returned **YES / YES** against the
+current authority `8c594f17cb7881fd4bb81c6e059d0157e946f549`. The accepted
+visible-HISTORY red/green proof remains binding. The later repeated failure
+after the first `openMission → CURRENT_MISSION → Back` sequence is **A
+primary — G10 product projection defect**: the active durable Mission is
+omitted from the renderer's `historyIds` projection, so repeated visible
+HISTORY loses its exact row and button. The earlier generic
+`RPC timeout: app.ui.evaluate` is superseded as D insufficient diagnostics,
+not a product defect finding.
+
+Authorize exactly one bounded G10 repair and red/green proof:
+
+1. In `collab-electron/src/windows/shell/src/renderer.js`, change only the
+   HISTORY allowlist to `existing historyIds ∪ exact entry where
+   entry.stage === question and entry.id === active model.mission.id`. Preserve
+   current/historical provenance and expose no unrelated events. Do not union
+   all current IDs.
+2. In `qa/gates/golden-g10-canvas-runtime.ts`, add the required fail-capable
+   red/green proof. The red bait neutralizes only the current-Mission
+   exception; after the first exact open and `Back`, repeated visible HISTORY
+   must fail at the exact visible-HISTORY precondition or existing deliberate
+   navigation timeout. It must not assert zero rows or buttons. Restore the
+   exception; repeated visible HISTORY must show the visible pane, exact
+   Mission row count `1`, exact-Mission button count `1`, click the exact
+   button, and complete `CURRENT_MISSION → FULL_LINEAGE → Back to world`.
+3. Retain every inherited ordinary Canvas, Mission, lineage, browser,
+   focus, timeout, selector, state, and zero-leak cleanup assertion. The
+   inherited owned-process/root cleanup must remain `processes=0`,
+   `roots_remaining=0`, and `leaked=[]`.
+
+For this amendment, the broader standing G10 surface is narrowed to exactly
+these two paths and no others:
+`collab-electron/src/windows/shell/src/renderer.js` and
+`qa/gates/golden-g10-canvas-runtime.ts`.
+
+Explicitly forbidden: union of all current IDs; unrelated event exposure;
+`kernel-ledger.js`; `research-world.js`; any Kernel data, state, schema, or
+write-path change; selectors; timeout changes; click or assertion changes;
+acceptance-semantic changes; cleanup changes; ownership changes; other Golden
+groups; or any other file or scope expansion. A product or semantic red stops
+work and is not repaired under this amendment. No new semantic Reader is
+required. One fresh independent Verifier—not the Builder or Router—must decide
+G10 after the repair and proof. No candidate/evidence commit or G11 work is
+authorized.
