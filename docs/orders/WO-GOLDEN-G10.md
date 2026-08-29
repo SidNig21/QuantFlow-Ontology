@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: BUILDER REOPENED — final ordinary-Canvas adjudication A primary / D secondary; exactly one same-order repair reopened; one fresh independent Verifier required afterward
+status: BUILDER REOPENED — final browser-readiness adjudication C primary / D diagnostic-label only; exactly one same-order gate-only repair reopened; one fresh independent Verifier required afterward
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **YES — the same G10 Builder is reopened for exactly one ordinary cold-launch repair limited to `renderer.js` and `qa/gates/golden-g10-canvas-runtime.ts`; no new semantic Reader; one fresh independent Verifier must follow; no second Builder or scope expansion**
+build-authority: **YES — the same G10 Builder is reopened for exactly one gate-only browser-readiness repair limited to `qa/gates/golden-g10-canvas-runtime.ts`; no new semantic Reader; one fresh independent Verifier must follow; no second Builder or scope expansion**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
@@ -39,6 +39,12 @@ ordinary-adjudication-classification: **A primary — G10 cold-launch ordinary-C
 ordinary-adjudication-result: **the app is internally ordinary but the DOM never publishes `ORDINARY_CANVAS` on cold launch because `hydrateSaved()` is conditional on saved state; the direct Main RPC does not invoke the Dock Mission reveal callback**
 ordinary-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one repair, with no new semantic Reader; one fresh independent Verifier afterward**
 ordinary-repair-surface: **only `collab-electron/src/windows/shell/src/renderer.js` and `qa/gates/golden-g10-canvas-runtime.ts`; no other implementation, test, gate, or authority surface is authorized by this amendment**
+browser-adjudication-task: `01a04baf-2dc7-7a70-95df-0e9405405048`
+browser-adjudication-authority: `52a914206d9c4cb7d23dcc60ed31e50641cfaf6c`
+browser-adjudication-classification: **C primary — fixture/setup defect; D secondary — diagnostic label only; no product defect or G10 meaning change**
+browser-adjudication-result: **the gate used a blocked `data:` URL, so the DOM tile existed but no real browser webview or webContentsId was created; readiness is Main `!isLoading` or `did-finish-load`**
+browser-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one gate-only repair; one fresh independent Verifier afterward**
+browser-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; no timeout increase, blocked-URL policy change, source-only bait, weakened assertion, or other file is authorized**
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-disposition: Current Canvas/Mission/runtime coherence group from the audited Phase-2 disposition
 accepted-g9-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
@@ -621,3 +627,51 @@ unchanged. One fresh independent Verifier—not the Builder or Router—must
 follow this repair and decide G10 PASS/FAIL. No second Builder, scope
 expansion, implementation outside the two named files, or G11 work is
 authorized.
+
+## Final browser-readiness adjudication — same Builder reopened; gate-only; no new semantic Reader
+
+The final read-only adjudication task
+`01a04baf-2dc7-7a70-95df-0e9405405048`, against authority
+`52a914206d9c4cb7d23dcc60ed31e50641cfaf6c` (short `52a91420`), classified the
+twice-observed `browser webview readiness timed out` failure as **C primary —
+fixture/setup defect**, with **D secondary — diagnostic label only**. There
+is no product defect and no G10 meaning change.
+
+The gate created a Canvas tile and received its exact `tileId`, but used a
+blocked `data:` URL. The DOM tile therefore existed without a real browser
+`<webview>` or `webContentsId`; the browser RPC route was never reached.
+Readiness is the existing Main observation `!isLoading` or the
+`did-finish-load` event. `did-stop-loading` and `dom-ready` are not substitute
+readiness events. Cleanup reaching `owned_processes_remaining=0` is separate
+evidence and does not make the browser tile ready.
+
+Authorize exactly one same-meaning, gate-only Builder repair in
+`qa/gates/golden-g10-canvas-runtime.ts`:
+
+1. Serve the fixture from an ephemeral loopback HTTP server and use
+   `http://127.0.0.1:<port>/...`, then before F07–F10 assert the exact returned
+   DOM tile id and type (`data-tile-id` and `data-tile-type="browser"`), a real
+   `<webview>`, and a real `getWebContentsId()` value. Preserve the actual
+   Main Canvas RPC → renderer → preload → browser Main IPC route.
+2. Prove operation-specific executable red/green falsifiers: `evaluate` must
+   return the known value; `info` must return the exact URL, title, and loading
+   state; `scroll` must produce an observable scroll change; `wait` must prove
+   completion and the timeout behavior on a delayed page; and
+   `focusAgentSession(id)` must focus the exact existing terminal tile whose
+   `sessionId` equals `id`.
+3. Bind cleanup in both red and restored-green runs: the owned process/root
+   census must finish at `processes=0`, `roots_remaining=0`, and `leaked=[]`,
+   while inherited G12 state remains untouched and excluded.
+
+The red bait must independently break each operation's actual response or
+observable behavior and go nonzero; exact restoration must return green. A
+source-only bait, assertion weakening, timeout increase, blocked-URL policy
+change, mocked or skipped webview, or readiness substitution is invalid.
+This repair is within the existing Reader-accepted G10 semantics/files, so no
+new semantic Reader is required. The same G10 Builder is reopened for this
+gate-only repair, followed by one fresh independent Verifier—not the Builder
+or Router—to decide G10 PASS/FAIL. All other G10, G9, G12, and R18 boundaries,
+the accepted ordinary Canvas/Mission/full-lineage meaning, prior lineage
+contract, existing assertions, F14a/F14b ownership, and every other Golden
+group remain unchanged. No other file, second Builder, scope expansion, or
+G11 work is authorized.
