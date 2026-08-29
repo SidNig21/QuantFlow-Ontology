@@ -1,21 +1,21 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 F09 RUNTIME FOCUS REPAIR
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 F09 RUNTIME READINESS CORRECTION
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 F09 RUNTIME FOCUS REPAIR AUTHORIZED / SAME READER REREAD REQUIRED
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 F09 RUNTIME READINESS CORRECTION AUTHORIZED / SAME READER REREAD REQUIRED
 rotated-at: 2026-08-29
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **NO BUILDER IS OPEN — the same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` must reread this amended authority and WO-GOLDEN-G10.md and return YES / YES before the same Builder resumes; then exactly one named production focus line is authorized, the full gate rewrite and retained fixture correction must be preserved, and an independent fresh Verifier still decides G10**
+builder-authority: **NO BUILDER IS OPEN — the same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` must reread this amended authority and WO-GOLDEN-G10.md and return YES / YES before the same Builder resumes; then exactly one gate/runtime-readiness correction in `qa/gates/golden-g10-canvas-runtime.ts` is authorized, the noncausal focus-line repair must be reverted to starting-HEAD bytes, the full gate rewrite and retained fixture correction must be preserved, and an independent fresh Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
-g10-status: **F09 RUNTIME FOCUS REPAIR AUTHORIZED — immediately before existing `shellApi.browserScroll(...)` in `collab-electron/src/windows/shell/src/canvas-rpc.js`, call existing `tileManager.focusCanvasTile(params.tileId)`; retain the doctype and positive-range precondition, real route, no-wait dispatch, coordinates, 50ms wait, `after > before`, overflow falsifier, and cleanup; no other product/gate/Canvas/RPC/timing/assertion/scope change; G11 remains closed**
+g10-status: **F09 RUNTIME READINESS CORRECTION AUTHORIZED — only `qa/gates/golden-g10-canvas-runtime.ts` may change: within the existing accepted readiness envelope, wait for host webview `getBoundingClientRect().width > 0 && height > 0` and guest `innerWidth > 0 && innerHeight > 0`; measure `document.scrollingElement` exclusively for `scrollHeight`, `clientHeight`, and `scrollTop`; preserve the real route, exact existing CDP payload, no-wait dispatch, exact 50ms interval, `after > before`, overflow red, and cleanup zero; revert the noncausal `focusCanvasTile` line to starting-HEAD bytes, keep `ipc-browser.ts` byte-identical, and make no product/RPC/payload/timing/assertion change; G11 remains closed**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
 g10-product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
 g10-product-repair-surface: **only `collab-electron/src/windows/shell/src/research-world.js` and `collab-electron/src/windows/shell/src/dock.js`**
 g10-product-repair-proof: **red removes only event `world` and unchanged real G10 gate shows Inspect output and Mission binding `Not recorded`; green restores both lines and exact participant/artifact/Mission parity, truthful `closed`/`stopped`, and cleanup zero**
 g10-f09-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
-g10-f09-reader-verdict: **NO / NO — updated finite evidence requires exactly one production focus line; same Reader must reread this amended authority and return YES / YES before the same Builder resumes, and one fresh independent Verifier remains required**
-g10-f09-surface: **only `collab-electron/src/windows/shell/src/canvas-rpc.js`: immediately before existing `shellApi.browserScroll(...)`, call existing `tileManager.focusCanvasTile(params.tileId)`; `collab-electron/src/main/ipc-browser.ts` must remain byte-identical to starting HEAD**
-g10-f09-proof: **retained doctype/positive-range precondition; exact standards-ready tile old-red is `before=0 after=0`; green is produced only by the focus line with `after > before`; overflow poisoning remains red and exact restoration green; preserve cleanup**
+g10-f09-reader-verdict: **NO / NO — the focus-only repair is noncausal; one finite gate/runtime-readiness correction is required; same Reader must reread this amended authority and return YES / YES before the same Builder resumes, and one fresh independent Verifier remains required**
+g10-f09-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`: within the existing accepted readiness envelope wait for host webview `getBoundingClientRect().width > 0 && height > 0` and guest `innerWidth > 0 && innerHeight > 0`, and measure `document.scrollingElement` exclusively for `scrollHeight`, `clientHeight`, and `scrollTop`; remove/revert the uncommitted `tileManager.focusCanvasTile(params.tileId)` line in `collab-electron/src/windows/shell/src/canvas-rpc.js` to starting-HEAD bytes; `collab-electron/src/main/ipc-browser.ts` must remain byte-identical to starting HEAD**
+g10-f09-proof: **retained doctype/standards and positive-range precondition; on verified nonzero surface, independently remove only wheel dispatch or set `deltaY: 0` so `after === before` is red; restore the exact existing payload `{type: "mouseWheel", x: 0, y: 0, deltaX: 0, deltaY: 800}` so `after > before` is green; overflow remains red and cleanup remains zero**
 g10-f09-reread: **REQUIRED — same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` must reread amended NEXT.md and WO-GOLDEN-G10.md and return YES / YES before same Builder**
 g10-reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
 g10-reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread amended NEXT.md and WO-GOLDEN-G10 and return YES / YES before Builder**
@@ -202,7 +202,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Reader-approved ephemeral Dock projection repair plus retained F09 doctype/positive-range fixture correction and the one named Canvas tile-focus line; seed/reveal the real Mission world before pre-finalization participant parity; focused suite plus one complete G10 gate; zero cleanup; green immutable candidate for one fresh independent Verifier; G11 remains closed; no persistence, new truth, schema, Kernel, Canvas, CSS, RPC behavior, identity, state, parity, timeout, timing, cleanup, falsifier-meaning, or scope change beyond the named repairs
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; Reader-approved ephemeral Dock projection repair plus retained F09 doctype/positive-range fixture correction and the one named gate/runtime-readiness correction; seed/reveal the real Mission world before pre-finalization participant parity; focused suite plus one complete G10 gate; zero cleanup; green immutable candidate for one fresh independent Verifier; G11 remains closed; no persistence, new truth, schema, Kernel, Canvas, CSS, RPC behavior, payload, identity, state, parity, timeout, timing, cleanup, falsifier-meaning, or scope change beyond the named repairs
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -353,34 +353,49 @@ The full one-Task/dynamic-ID/object-link gate rewrite and standing Router
 mechanical authority remain binding. One fresh independent Verifier—not the
 Builder or Router—must verify the repair and decide G10.
 
-### G10 current F09 finite runtime-focus repair — same Reader reread required
+### G10 current F09 finite runtime-readiness correction — same Reader reread required
 
-The updated finite Reader evidence task `01a04da4-185a-7943-9a1b-1d36735f5cad`
-returned **NO / NO**: the retained doctype and positive scroll-range
-precondition are green, but the exact standards-ready tile remains unchanged
-(`before=0 after=0`) through the existing real Canvas → Main →
-renderer/preload → browser IPC path. The smallest named repair is one production
-line at the Canvas RPC boundary, not a gate timing/assertion or IPC dispatch
-change.
+The latest finite Reader evidence task `01a04da4-185a-7943-9a1b-1d36735f5cad`
+returned **NO / NO** and superseded the noncausal focus-only hypothesis. The
+existing CDP wheel payload is already valid; the current red is an invalid
+runtime-readiness/scroll-root observation because the measured surface reports
+a zero-size guest viewport. The exact accepted F09 invariant remains observable
+guest-page scrolling through the real Canvas → Main → renderer/preload →
+browser IPC path within the existing 50ms check.
 
-Authorize exactly one production line in
-`collab-electron/src/windows/shell/src/canvas-rpc.js`: immediately before the
-existing `shellApi.browserScroll(...)` call, call the existing
-`tileManager.focusCanvasTile(params.tileId)`.
+Authorize exactly one gate/runtime-readiness correction in
+`qa/gates/golden-g10-canvas-runtime.ts`:
 
-Preserve every existing IPC/CDP dispatch, fire-and-forget/no-wait gate path,
-scroll coordinates, unchanged 50ms wait, unchanged `after > before` assertion,
-retained `<!doctype html>` and positive-range precondition, overflow falsifier,
-and cleanup. The old-red is the current exact standards-ready tile with
-`before=0 after=0`; green may be obtained only from the focus line and must show
-`after > before`; overflow poisoning remains red and exact restoration remains
-green. `collab-electron/src/main/ipc-browser.ts` must remain byte-identical to
-starting HEAD. No other product, Canvas, gate, timing, assertion, or scope
-change is authorized.
+1. Within the existing accepted readiness envelope, wait for nonzero host
+   webview bounds and nonzero guest viewport dimensions.
+2. Measure `document.scrollingElement` exclusively for `scrollHeight`,
+   `clientHeight`, and `scrollTop` (retain the doctype/standards and
+   positive-range precondition); do not combine `documentElement` and `body`.
+   The readiness observation must see host webview
+   `getBoundingClientRect().width > 0 && height > 0` and guest
+   `innerWidth > 0 && innerHeight > 0`.
+3. Preserve the real Canvas → Main → renderer/preload → browser IPC route, the
+   exact existing CDP payload `{type: "mouseWheel", x: 0, y: 0, deltaX: 0,
+   deltaY: 800}`, fire-and-forget/no-wait dispatch, exact existing 50ms
+   interval, unchanged `after > before` assertion, overflow red, and cleanup
+   zero.
+
+The finite falsifier runs on a verified nonzero surface. Independently remove
+only the wheel dispatch or set `deltaY: 0`; the unchanged check must observe
+`after === before` and exit red. Restore the exact existing payload; the same
+route must observe `after > before` and exit green. Preserve the existing
+overflow poison red and exact restoration green.
+
+The uncommitted `tileManager.focusCanvasTile(params.tileId)` line in
+`collab-electron/src/windows/shell/src/canvas-rpc.js` is noncausal and must be
+removed/reverted to starting-HEAD bytes. Keep
+`collab-electron/src/main/ipc-browser.ts` byte-identical to starting HEAD. No
+product, RPC, payload, timing, assertion, or other scope change is authorized.
 
 The same Reader must reread this amended `NEXT.md` and `WO-GOLDEN-G10.md` and
 return **YES / YES** before the same Builder resumes. One fresh independent
-Verifier—not the Builder or Router—must still verify the repair and decide G10.
+Verifier—not the Builder or Router—must verify the candidate afterward and
+decide G10.
 
 G10 is now the sole active Phase-2 order. Its bounded accepted packet is
 [WO-GOLDEN-G10](WO-GOLDEN-G10.md): explicit ordinary/mission/full-lineage
