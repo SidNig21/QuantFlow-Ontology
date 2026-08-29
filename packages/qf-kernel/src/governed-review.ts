@@ -974,26 +974,34 @@ export function recordGovernedEvaluation(db: KernelDb, input: JsonRecord, trace:
     db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'performed_by', ?, ?, ?)").run(crypto.randomUUID(), evaluationId, criticSessionId, new Date().toISOString());
     let reportId: string | null = existingPublication?.report_artifact_id ?? null;
     if (derivedVerdict === "supports" && !authorityContext) throw new KernelError("Report authority context is unavailable");
-    if (derivedVerdict === "supports" && !existingPublication) {
-      const reportBytes = canonicalReport(work, resultArtifact.artifactId, resultArtifact.content_hash, { ...evaluationRow, id: evaluationId }, findingsId, findingsId);
-      reportId = contentHash(reportBytes);
-      insertArtifact(db, reportId, "report", reportBytes, "reports");
-      const predecessor = db.query(
+    if (derivedVerdict === "supports") {
+      const currentPublication = db.query(
         "SELECT source_work_key FROM qf_review_publication WHERE authority_key = ? AND is_current = 1",
       ).get(authorityContext!.authority_key) as { source_work_key: string } | null;
-      if (predecessor) {
-        db.query("UPDATE qf_review_publication SET is_current = 0, superseded_by_source_work_key = ? WHERE source_work_key = ?")
-          .run(sourceWorkKey(work), predecessor.source_work_key);
+      if (!existingPublication) {
+        const reportBytes = canonicalReport(work, resultArtifact.artifactId, resultArtifact.content_hash, { ...evaluationRow, id: evaluationId }, findingsId, findingsId);
+        reportId = contentHash(reportBytes);
+        insertArtifact(db, reportId, "report", reportBytes, "reports");
+        if (currentPublication) {
+          db.query("UPDATE qf_review_publication SET is_current = 0, superseded_by_source_work_key = ? WHERE source_work_key = ?")
+            .run(sourceWorkKey(work), currentPublication.source_work_key);
+        }
+        db.query(`INSERT INTO qf_review_publication
+          (source_work_key, report_artifact_id, publication_evaluation_id, created_at,
+           mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of,
+           authority_key, is_current, supersedes_source_work_key, superseded_by_source_work_key)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, NULL)`)
+          .run(sourceWorkKey(work), reportId, evaluationId, new Date().toISOString(),
+            authorityContext!.mission_id, authorityContext!.strategy_id, authorityContext!.strategy_version,
+            authorityContext!.dataset_id, authorityContext!.dataset_as_of, authorityContext!.authority_key,
+            currentPublication?.source_work_key ?? null);
+      } else if (existingPublication.authority_key !== authorityContext!.authority_key) {
+        throw new KernelError("existing Report publication authority context disagrees with the governed closure");
+      } else if (existingPublication.is_current !== 1 && !currentPublication) {
+        // Recover an interrupted first finalization without reviving a valid historical row.
+        db.query("UPDATE qf_review_publication SET is_current = 1, superseded_by_source_work_key = NULL WHERE source_work_key = ?")
+          .run(sourceWorkKey(work));
       }
-      db.query(`INSERT INTO qf_review_publication
-        (source_work_key, report_artifact_id, publication_evaluation_id, created_at,
-         mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of,
-         authority_key, is_current, supersedes_source_work_key, superseded_by_source_work_key)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, NULL)`)
-        .run(sourceWorkKey(work), reportId, evaluationId, new Date().toISOString(),
-          authorityContext!.mission_id, authorityContext!.strategy_id, authorityContext!.strategy_version,
-          authorityContext!.dataset_id, authorityContext!.dataset_as_of, authorityContext!.authority_key,
-          predecessor?.source_work_key ?? null);
     }
     if (reportId) {
       db.query("UPDATE evaluation SET publication_report_id = ? WHERE id = ?").run(reportId, evaluationId);

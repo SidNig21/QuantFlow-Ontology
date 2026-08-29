@@ -286,6 +286,13 @@ function assertOneCurrent(fixture: Fixture, authorityKey?: string): void {
   assert(current.length === 1, "current authority cardinality is " + current.length);
 }
 
+function assertFirstCurrent(fixture: Fixture, world: GateWorld): void {
+  const publication = fixture.db.query("SELECT authority_key, report_artifact_id, is_current FROM qf_review_publication WHERE source_work_key = ?").get(Object.values(world.work).join("\0")) as { authority_key: string; report_artifact_id: string; is_current: number } | null;
+  assert(publication?.report_artifact_id === world.reportId && Number(publication.is_current) === 1, "first supported publication is not the exact current Report");
+  assertOneCurrent(fixture, publication.authority_key);
+  assertProjection(fixture, world, world);
+}
+
 function assertHistory(fixture: Fixture, first: GateWorld, second: GateWorld): void {
   const rows = currentRows(fixture);
   assert(rows.length === 2 && rows.filter((row) => Number(row.is_current) === 1).length === 1, "supersession row cardinality is invalid");
@@ -440,6 +447,7 @@ async function runFalsifiers(): Promise<boolean> {
 
   ok = await runProbe("F05 current-uniqueness", (fixture) => {
     const first = supportWorld(fixture, "f05-first") as GateWorld;
+    assertFirstCurrent(fixture, first);
     const second = supportWorld(fixture, "f05-second", undefined, undefined, undefined, "worker-b", "critic-b") as GateWorld;
     return {
       break: () => { fixture.db.exec("DROP INDEX qf_review_publication_current_authority"); fixture.db.query("UPDATE qf_review_publication SET is_current = 1 WHERE report_artifact_id = ?").run(first.reportId); },
@@ -447,6 +455,19 @@ async function runFalsifiers(): Promise<boolean> {
       assertClean: () => {
         const row = fixture.db.query("SELECT authority_key FROM qf_review_publication WHERE report_artifact_id = ?").get(second.reportId) as { authority_key: string };
         assertOneCurrent(fixture, row.authority_key);
+      },
+    };
+  }) && ok;
+
+  ok = await runProbe("F15 first-publication-transition", (fixture) => {
+    const first = supportWorld(fixture, "f15-first") as GateWorld;
+    let current = true;
+    return {
+      break: () => { fixture.db.query("UPDATE qf_review_publication SET is_current = 0 WHERE report_artifact_id = ?").run(first.reportId); current = false; },
+      restore: () => { fixture.db.query("UPDATE qf_review_publication SET is_current = 1 WHERE report_artifact_id = ?").run(first.reportId); current = true; },
+      assertClean: () => {
+        assert(current, "first publication current transition was removed");
+        assertFirstCurrent(fixture, first);
       },
     };
   }) && ok;

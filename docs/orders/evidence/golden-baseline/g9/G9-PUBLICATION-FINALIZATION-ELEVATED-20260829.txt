@@ -1,0 +1,118 @@
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F01 ordinary-report-relabel RED exit=1 ordinary completion is not one trajectory Artifact
+F01 ordinary-report-relabel GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F02 duplicate-publisher RED exit=1 Evaluation publication agreement is invalid: 01100753-d544-460f-adcd-70b4c4ec6901
+F02 duplicate-publisher GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F03 lineage-bypass RED exit=1 record_evaluation requires a running governed review Task
+F03 lineage-bypass GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F04 worker-evidence-cardinality RED exit=1 Run lacks exact worker evidence binding: f04-run
+F04 worker-evidence-cardinality GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F05 current-uniqueness RED exit=1 current authority cardinality is 2
+F05 current-uniqueness GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F15 first-publication-transition RED exit=1 first publication current transition was removed
+F15 first-publication-transition GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F06 supersession-loss RED exit=1 prior publication is not explicit history
+F06 supersession-loss GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F07 context-crossing RED exit=1 distinct five-field contexts folded into one authority key
+F07 context-crossing GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F08 projection-swap RED exit=1 projection current_report_id disagrees with durable current row
+F08 projection-swap GREEN exit=0 restored runtime invariant passed
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g9-gate-F09 restart-memory-oa8vT8\kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g9-gate-F09 restart-memory-oa8vT8\kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+F09 restart-memory RED exit=1 Run lacks exact worker evidence binding: f09-run
+F09 restart-memory GREEN exit=0 restored runtime invariant passed
+windows-cold-boot: preparing runtime staging
+pack-agent: ready qf-proof-agent
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-onwIoq\repo\species\hermes\packed\hermes.aospkg and C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-onwIoq\repo\species\hermes\packed\hermes.meta.json
+windows-cold-boot: building Electron bundle
+windows-cold-boot: creating unpacked Windows package
+windows-hermes-research: FALSIFY RED future Dataset after as_of refused; FALSIFY GREEN no downstream objects
+hermes-first-turn-synthetic: FALSIFY RED stale-profile rejected=unknown agent_definition_id: hermes-orchestrator
+hermes-first-turn-synthetic: FALSIFY RED missing_report rejected=KernelError: publish_artifact report requires an Evaluation with verdict supports
+hermes-first-turn-synthetic: FALSIFY RED rejects_evaluation rejected=status=rejected
+hermes-first-turn-synthetic: FALSIFY RED changed_repeat rejected=KernelError: claimed deterministic repeat input manifest differs
+hermes-first-turn-synthetic: FALSIFY GREEN stale profile restored to hermes-research-director; missing Evaluation, rejects Evaluation, and changed replay restored to accepted positive-control boundaries
+hermes-f10: FAIL application did not exit within 20000ms
+hermes-first-turn-synthetic: temp-cleanup roots_created=1 roots_remaining=0 retried=0 preexisting=7 leaked=[]
+F10 stale-profile-boundary RED exit=1 unknown agent_definition_id: hermes-orchestrator (actual Electron qf.research.run_kernel_falsifiers)
+F10 stale-profile-boundary GREEN exit=1 restored actual Electron executor to hermes-research-director with refusal and cleanup
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F11 replay-duplicate RED exit=1 Evaluation publication agreement is invalid: 80cd8632-793c-4bde-bb46-56ca245be2af
+F11 replay-duplicate GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F12 legacy-upgrade-order RED exit=1 legacy authority key does not preserve the complete five-field partition
+F12 legacy-upgrade-order GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F13 legacy-upgrade-atomicity RED exit=1 legacy publication row cannot resolve Evaluation: invalid-legacy-row
+F13 legacy-upgrade-atomicity GREEN exit=0 restored runtime invariant passed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+F14 finalizer-current-history-id RED exit=1 historical Electron finalizer marked its own Report current
+F14 finalizer-current-history-id GREEN exit=0 restored runtime invariant passed
+bun test v1.3.12 (700fc117)
+
+packages\qf-kernel\src\g9-report-authority.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > publishes one current row with explicit superseded history for one full key [93.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > keeps same-version different-strategy and other key fields independent [94.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > refuses missing completed worker evidence before any Report publication [31.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > refuses rejects, inconclusive reviews, and self-review without publishing [63.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > binds completion evidence to the exact Run and rejects zero, multiple, non-trajectory, and mismatched candidates [31.00ms]
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g9-restart-IaS4ev\restart.db provenance=explicit journal=wal sync=2 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g9-restart-IaS4ev\restart.db provenance=explicit journal=wal sync=2 schema_meta=89
+(pass) G9 Report authority > durable completion and publication survive closing and reopening the Kernel [531.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > legacy migration partitions before deterministic fold and aborts atomically [79.00ms]
+
+ 7 pass
+ 0 fail
+ 38 expect() calls
+Ran 7 tests across 1 file. [1052.00ms]
+report-authority: isolated Kernel authority proof exit=0
+bun test v1.3.12 (700fc117)
+
+collab-electron\src\main\research-world.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) Main research-world projection > returns exact root errors and honest empty-world facts [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) Main research-world projection > returns a frozen value snapshot with no filesystem path in Artifact receipts [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) Main research-world projection > projects the complete normal governed world as 13 objects and 15 links [78.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) Main research-world projection > isolates two Missions that share Dataset and result Artifact in both root directions [78.00ms]
+
+ 4 pass
+ 0 fail
+ 79 expect() calls
+Ran 4 tests across 1 file. [360.00ms]
+report-authority: durable projection proof exit=0
+bun test v1.3.12 (700fc117)
+
+collab-electron\src\main\ontology-gateway.test.ts:
+(pass) only ontology reads receive the Kernel read marker
+(pass) production read dispatch marks market reads but not desk orchestration reads
+(pass) generic ontology actions expose deterministic execution but not task bypasses
+(pass) native research roles receive a focused generated ontology surface
+kernel: path=:memory: provenance=env journal=memory sync=2 schema_meta=89
+(pass) production list_tools serves action and read schemas for admitted seats [47.00ms]
+(pass) an admitted governed critic receives and records the verified Artifact receipt [328.00ms]
+
+ 6 pass
+ 0 fail
+ 102 expect() calls
+Ran 6 tests across 1 file. [570.00ms]
+report-authority: persisted finalizer proof exit=0
+report-authority: cleanup pid=29484 exit=0 roots_remaining=0 paths=[]
+FAIL report-authority
+FAIL  report-authority
