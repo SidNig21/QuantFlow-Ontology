@@ -1,10 +1,12 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: G10 F04 LIFECYCLE-ORDER BUILDER AUTHORIZED — one founder-reauthorized mechanical same-meaning correction
+status: G10 DIAGNOSTIC-ONLY PASS AUTHORIZED — standing Router mechanical authority; no semantic Builder open
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **AUTHORIZED ONCE — Founder reauthorized one mechanical same-meaning lifecycle-order correction after the twice-red F04 stop; no new Reader is required; edit only `qa/gates/golden-g10-canvas-runtime.ts`, then run the focused suite and one complete G10 gate with zero cleanup; green freezes an immutable candidate for one fresh independent Verifier; no product/Canvas/Kernel/Ontology/identity/state/parity/timeout/cleanup/falsifier-meaning change, no F06 change, no other surface**
+build-authority: **NO SEMANTIC BUILDER IS OPEN — one diagnostic-only G10 gate pass is authorized; any semantic defect routes to a fresh Reader before Builder, and an independent Verifier still decides G10**
+router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
+diagnostic-pass-authority: **ONE PASS — record the real Mission projection RPC result and the immediate post-click Canvas state after the exact visible-HISTORY Mission control click; no product behavior, assertion, timing, fixture, or acceptance change**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
@@ -1073,3 +1075,44 @@ authorized. No F06 change, selector/timeout relaxation, assertion weakening,
 or G9/G12/R18 change is authorized. Run the focused suite and one complete
 G10 gate; cleanup must be zero. Green freezes an immutable candidate for one
 fresh independent Verifier. F04 red again stops, and G11 remains closed.
+
+## Current standing Router mechanical authority — one diagnostic-only pass
+
+The founder's standing authority, recorded on 2026-08-29, governs the remaining
+Golden goal. Router may continuously handle mechanical diagnostic, harness,
+same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections
+without returning for founder authorization. This standing authority applies
+only where the correction preserves the accepted product meaning and existing
+authority; it does not open a new product, Kernel, ontology, identity, state,
+acceptance, or scope decision.
+
+The prior F04 lifecycle-order contract and every earlier accepted G10/G9/G12/R18
+boundary remain binding. Router may not self-verify or close G10. The semantic
+Reader/Builder/Verifier separation remains: a genuine semantic defect or a
+product/authority decision not resolved by the existing authority stops the
+mechanical path and requires a fresh Reader before any Builder work; an
+independent Verifier decides the resulting G10 outcome.
+
+Authorize exactly one diagnostic-only G10 gate pass:
+
+1. Invoke the registered gate once with `bun qa/run.ts golden-g10-canvas-runtime`.
+2. Use the real visible-HISTORY consumer path and click the exact Mission
+   control for the durable `missionId`; do not substitute a mock, shortcut,
+   synthetic control, or direct Kernel write path.
+3. Record the real Mission projection RPC result at the existing
+   renderer/preload/Main/read-only-Kernel boundary, then record the immediate
+   Canvas state directly after that exact click and before any subsequent
+   `CURRENT_MISSION`, `FULL_LINEAGE`, or `Back to world` action.
+4. Treat the pass as diagnostics and receipt evidence only. It may not change
+   product behavior, assertions, timing values, fixtures, acceptance meaning,
+   selectors, cleanup meaning, or any other G10 contract. Diagnostic output is
+   not a G10 PASS, candidate freeze, or closure decision.
+
+Route the measured result automatically. A mechanical same-meaning issue may be
+handled by Router through the exact repair and same-meaning proof under this
+standing authority, including any required harness, teardown, receipt,
+selector, or lifecycle-order correction. A semantic defect, or an issue that
+requires a product/authority decision not already resolved here, stops and
+routes to a fresh Reader before Builder; no founder reauthorization is needed
+for the mechanical branch. Any later G10 closure still requires the independent
+Verifier and the existing acceptance contract.

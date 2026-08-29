@@ -1,12 +1,14 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 F04 LIFECYCLE-ORDER BUILDER AUTHORIZED
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 STANDING ROUTER MECHANICAL AUTHORITY
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 F04 D-PRIMARY LIFECYCLE-ORDER BUILDER AUTHORIZED
-rotated-at: 2026-08-28
-rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 DIAGNOSTIC-ONLY PASS AUTHORIZED / STANDING ROUTER MECHANICAL AUTHORITY
+rotated-at: 2026-08-29
+rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **AUTHORIZED ONCE — Founder reauthorized one mechanical same-meaning lifecycle-order correction after the twice-red F04 stop; no new Reader is required; edit only `qa/gates/golden-g10-canvas-runtime.ts`, then run the focused suite and one complete G10 gate with zero cleanup; green freezes an immutable candidate for one fresh independent Verifier; no product/Canvas/Kernel/Ontology/identity/state/parity/timeout/cleanup/falsifier-meaning change, no F06 change, no other surface**
-g10-status: **F04 D-PRIMARY LIFECYCLE-ORDER BUILDER AUTHORIZED — one founder-reauthorized gate-only correction; F04 red again stops; G11 remains closed**
+builder-authority: **NO SEMANTIC BUILDER IS OPEN — one diagnostic-only G10 gate pass is authorized; any semantic defect routes to a fresh Reader before Builder, and an independent Verifier still decides G10**
+router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
+g10-status: **DIAGNOSTIC-ONLY PASS AUTHORIZED — record the real Mission projection RPC result and immediate post-click Canvas state after the exact visible-HISTORY Mission control click; no product behavior, assertion, timing, fixture, or acceptance change; G11 remains closed**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
+g10-diagnostic-routing: **mechanical same-meaning issue → Router-authorized exact repair and proof; semantic defect or unresolved product/authority decision → stop and obtain a fresh Reader before any Builder work; no Router self-verification or G10 closure**
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 g10-reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
