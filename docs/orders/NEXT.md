@@ -1,14 +1,17 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 STANDING ROUTER MECHANICAL AUTHORITY
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 FINITE GATE-ONLY REWRITE
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 DIAGNOSTIC-ONLY PASS AUTHORIZED / STANDING ROUTER MECHANICAL AUTHORITY
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 FINITE GATE-ONLY REWRITE AUTHORIZED / SAME READER REREAD REQUIRED
 rotated-at: 2026-08-29
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **NO SEMANTIC BUILDER IS OPEN — one diagnostic-only G10 gate pass is authorized; any semantic defect routes to a fresh Reader before Builder, and an independent Verifier still decides G10**
+builder-authority: **NO BUILDER IS OPEN — the same fresh Reader must reread this finite rewrite and WO-GOLDEN-G10 and return YES / YES before one bounded gate-only Builder; an independent Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
-g10-status: **DIAGNOSTIC-ONLY PASS AUTHORIZED — record the real Mission projection RPC result and immediate post-click Canvas state after the exact visible-HISTORY Mission control click; no product behavior, assertion, timing, fixture, or acceptance change; G11 remains closed**
+g10-status: **FINITE GATE-ONLY REWRITE AUTHORIZED — exactly one Task belongs to the Mission fixture; dynamic Task/Run IDs and exact object/link sets must survive CURRENT_MISSION, FULL_LINEAGE, close/reopen, and F04 parity; same Reader reread required; no product/Kernel/Canvas change, multi-Task chooser, timeout weakening, or G11 work**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-g10-diagnostic-routing: **mechanical same-meaning issue → Router-authorized exact repair and proof; semantic defect or unresolved product/authority decision → stop and obtain a fresh Reader before any Builder work; no Router self-verification or G10 closure**
+g10-reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
+g10-reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread amended NEXT.md and WO-GOLDEN-G10 and return YES / YES before Builder**
+g10-reader-round-4-reread: **REQUIRED — same Reader task `01a04d3f-3cd4-7513-b89e-6770c95237f0`; no substitute Reader is authorized**
+g10-diagnostic-routing: **mechanical same-meaning issue → Router-authorized exact repair and proof; semantic defect or unresolved product/authority decision → fresh Reader before any Builder work; no Router self-verification or G10 closure**
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 g10-reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
@@ -260,6 +263,47 @@ descendant Node PIDs `30836`, `20836`, and `30096` survived;
 `roots_remaining=0` and `leaked=[]`. G10 must preserve this ownership and may
 not repair, relabel, or absorb it.
 
+### G10 current finite gate-only rewrite — same Reader reread required
+
+This section is the current active authority and supersedes any earlier G10
+text that opens a one-off Builder or requires the prior F06/F04 repair
+sequence; those records remain retained history.
+
+The fresh semantic Reader task `01a04d3f-3cd4-7513-b89e-6770c95237f0` returned
+**NO / NO**. The exact Mission click reached the real projection, which
+correctly refused `WORLD_ROOT_INELIGIBLE` because the isolated Mission had two
+linked research Tasks; there is no visible Task chooser in the accepted
+consumer path. The refusal is healthy product behavior. The gate must therefore
+use one Task in its isolated fixture rather than drive a new product path.
+
+This is one finite, gate-only rewrite of [WO-GOLDEN-G10](WO-GOLDEN-G10.md):
+
+1. The isolated fixture must contain exactly one `belongs_to` link from one
+   Task to the Mission and no second synthetic Mission Task. Independently
+   query and assert the exact one-Task cardinality before the real visible
+   `HISTORY` Mission control click, then use that exact Task ID for every
+   source, current-workflow, full-lineage, close/reopen, and receipt assertion.
+2. Capture actual dynamic Task and Run IDs from the live fixture and remove the
+   hard-coded `task-r17-gate` and `run-r17-gate` lineage identities. At
+   `CURRENT_MISSION`, `FULL_LINEAGE`, close/reopen, and each identity-preserving
+   checkpoint, compare the exact sorted object-ID set and complete sorted
+   `(kind, from_id, to_id)` Kernel link set. The comparison includes the exact
+   F04 participant identity, live/closed state parity, and both accepted
+   `produces` tuples.
+3. Rewrite F02 to neutralize the real `Back to world` action, attempt the same
+   control, observe failure, restore the action, and reach ordinary Canvas.
+   F03, F03-cold, F12a, and F12b each use an isolated live fixture through the
+   registered gate and prove red on the deliberate break plus restored green;
+   none is a source-only check. F14a compares actual close/reopen identity,
+   not an in-memory array. F14b runs on the normal path against real G10-owned
+   cleanup and does not use or mutate inherited G12 PIDs.
+4. This rewrite changes no product, Kernel, or Canvas behavior, adds no
+   multi-Task chooser, weakens no timeout, and does not reopen G11. The exact
+   gate remains `bun qa/run.ts golden-g10-canvas-runtime`; no semantic Builder
+   starts until this same Reader rereads both amended authority documents and
+   returns **YES / YES**. The standing Router mechanical authority and the
+   independent Verifier boundary remain in force.
+
 G10 is now the sole active Phase-2 order. Its bounded accepted packet is
 [WO-GOLDEN-G10](WO-GOLDEN-G10.md): explicit ordinary/mission/full-lineage
 Canvas views and return, no submit/reopen hiding, real runtime liveness with
@@ -272,8 +316,9 @@ browser-readiness, and Mission-navigation repairs are within that accepted
 meaning; the final visible-HISTORY consumer-path adjudication below corrected
 the empirically false renderer-barrier premise and was accepted YES / YES by the
 same Reader. The later repeat-open failure was classified A primary as a G10
-product projection defect under the prior authority; the current Builder is
-now held pending the fresh F06 Reader below. No second Builder or scope
+product projection defect under the prior authority. The later F06 hold is
+superseded by the current finite gate-only rewrite above; no semantic Builder is
+open pending the named same Reader's reread. No second Builder or scope
 expansion is authorized.
 
 ### G10 finite Reader amendments — same Reader reread required
@@ -317,7 +362,8 @@ finite amendments are now binding in [WO-GOLDEN-G10](WO-GOLDEN-G10.md):
 The same Reader reread the amended G10 order and this handoff in Round 3 and
 returned **YES / YES** against authority `4ec9301ad2c6eec169c6dbfbc93c29b880ca7a64`.
 The Round-2 reread requirement is satisfied for that prior authority. The
-current Builder door is held pending the fresh F06 Reader YES / YES below.
+current Builder door remains closed for the current authority until the named
+same Reader returns YES / YES on the finite rewrite above.
 
 ### G10 Round-2 minimum amendment — accepted in Round 3
 

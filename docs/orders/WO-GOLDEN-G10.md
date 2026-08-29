@@ -1,12 +1,16 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: G10 DIAGNOSTIC-ONLY PASS AUTHORIZED — standing Router mechanical authority; no semantic Builder open
+status: G10 FINITE GATE-ONLY REWRITE AUTHORIZED — fresh Reader NO/NO; same Reader reread required; no Builder open
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **NO SEMANTIC BUILDER IS OPEN — one diagnostic-only G10 gate pass is authorized; any semantic defect routes to a fresh Reader before Builder, and an independent Verifier still decides G10**
+build-authority: **NO BUILDER IS OPEN — the same fresh Reader must reread this finite rewrite and NEXT.md and return YES / YES before one bounded gate-only Builder; an independent Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
-diagnostic-pass-authority: **ONE PASS — record the real Mission projection RPC result and the immediate post-click Canvas state after the exact visible-HISTORY Mission control click; no product behavior, assertion, timing, fixture, or acceptance change**
+diagnostic-pass-authority: **RETAINED EVIDENCE ONLY — the prior exact visible-HISTORY Mission click recorded the real projection refusal; the current authority is this one finite gate-only rewrite, with no product behavior, assertion, timing, fixture, or acceptance change**
+finite-rewrite-authority: **ONE BOUNDED GATE-ONLY REWRITE — exactly one Task belongs to the Mission fixture; dynamic Task/Run IDs and exact object/link sets must survive CURRENT_MISSION, FULL_LINEAGE, close/reopen, and F04 parity; no product/Kernel/Canvas change or multi-Task chooser**
+reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
+reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread this order and NEXT.md and return YES / YES before Builder**
+reader-round-4-reread: **REQUIRED — same Reader task `01a04d3f-3cd4-7513-b89e-6770c95237f0`; no substitute Reader is authorized**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
@@ -351,6 +355,21 @@ The normal proof must show:
 9. `no-canvas-domain-writes` and the relevant Kernel write-path checks stay
    green; and
 10. the isolated G10 run ends with actual owned process/root cleanup at zero.
+11. the isolated fixture contains exactly one `belongs_to` link from one Task
+    to the Mission; an independent cardinality query proves exactly one linked
+    Task before the real visible `HISTORY` Mission control click, and that
+    exact dynamic Task ID is used for every later lineage assertion;
+12. the gate captures the actual dynamic Task and Run IDs and compares the
+    exact sorted object-ID set and complete sorted `(kind, from_id, to_id)`
+    Kernel link set at `CURRENT_MISSION`, `FULL_LINEAGE`, close/reopen, and
+    every identity-preserving checkpoint, including both accepted `produces`
+    tuples;
+13. F04 retains the exact participant `agent_session.id` and proves its
+    truthful live/closed state parity across the accepted Canvas, Dock, and
+    Inspect seams; and
+14. F02, F03, F03-cold, F12a, F12b, F14a, and F14b each prove a real red
+    failure and restored green through the registered gate, using the actual
+    UI/lifecycle/cleanup path named by that falsifier.
 
 ## Fail-capable falsifiers
 
@@ -363,8 +382,9 @@ does not observe owned state is not acceptance.
 | id | deliberate break | required red | restored green |
 | --- | --- | --- | --- |
 | F01 | re-enable exclusive Mission hiding after submit | under `ORDINARY_CANVAS`, a pre-existing non-research tile container is absent, visually hidden, `aria-hidden="true"`, or not pointer-enabled, or submission cannot return through the existing Canvas path | `CURRENT_MISSION` is explicit and the exact ordinary-container DOM predicates remain true after return |
-| F02 | remove or neutralize the real `Back to world` action | the current Mission view cannot restore `ORDINARY_CANVAS` without a refresh or destructive write, or any exact ordinary-container DOM predicate is false | labeled `Back to world` restores `ORDINARY_CANVAS` with unchanged Kernel ids and the exact ordinary-container predicates |
-| F03 | reintroduce latest-world auto-reveal during cold reopen | cold reopen does not start in `ORDINARY_CANVAS`, silently enters an exclusive Mission layer, or hides ordinary tiles | reopen starts in `ORDINARY_CANVAS`, the exact ordinary-container DOM predicates hold, and deliberate Mission navigation works |
+| F02 | neutralize the real `Back to world` action in an isolated live fixture | the registered gate attempts the same visible control and observes that the current Mission view cannot restore `ORDINARY_CANVAS` without a refresh or destructive write | the real action is restored and the same control reaches `ORDINARY_CANVAS` with unchanged Kernel ids and exact ordinary-container predicates |
+| F03 | reintroduce latest-world auto-reveal during normal reopen in an isolated live fixture | the registered gate exits nonzero because normal reopen does not start in `ORDINARY_CANVAS`, silently enters an exclusive Mission layer, or hides ordinary tiles | the bait is restored and the registered gate exits zero with `ORDINARY_CANVAS`, exact ordinary-container predicates, and deliberate Mission navigation |
+| F03-cold | reintroduce latest-world auto-reveal during cold reopen in an isolated live fixture | the registered gate exits nonzero because cold reopen does not start in `ORDINARY_CANVAS`, silently enters an exclusive Mission layer, or hides ordinary tiles | the bait is restored and the registered gate exits zero with `ORDINARY_CANVAS`, exact ordinary-container predicates, and deliberate Mission navigation |
 | F04 | derive Runtime `running` from persisted session status while no process is live | a dead process is rendered `running`, or Dock, Canvas, and Inspect disagree for the exact `agent_session.id` | Runtime is `running` only for a live-session-registry observation and all three consumers receive the same snapshot |
 | F05 | remove or corrupt one shared participant-projection input | the same participant gets contradictory Dock/Canvas/Inspect role, runtime, work, recovery, Task, output, or Mission binding | all three consumers show the same values for the same `agent_session.id` |
 | F06 | drop the exact frozen `(kind, from_id, to_id)` `produces` tuple named by the independent-Kernel fixture from projection resolution | the tuple present in the isolated Kernel renders `Not recorded` or the wrong id | existing `strategy`/`produces` links project exactly; only absent facts use exactly `Not recorded` |
@@ -373,19 +393,20 @@ does not observe owned state is not acceptance.
 | F09 | break `browserScroll` at any link in its current Canvas boundary | `canvas.browserScroll` does not traverse the full named path or does not change observable page scroll | the unchanged call traverses the full named path and changes observable page scroll |
 | F10 | break `browserWait` at any link in its current Canvas boundary | `canvas.browserWait` does not traverse the full named path or does not observe load completion or timeout | the unchanged call traverses the full named path and observes load completion or timeout |
 | F11 | break `focusAgentSession` at its current Canvas boundary | `focusAgentSession(id)` cannot focus the existing terminal tile whose `sessionId` equals `id`, or reports success without doing so | the unchanged focus path focuses that exact terminal tile; removal requires the separately named G10 Reader amendment |
-| F12a | add a renderer-side durable domain write in an isolated copy | `golden-g10-canvas-runtime` or `no-canvas-domain-writes` exits `1` on the added write | the write is removed, the same gate exits `0`, and the real projection path remains green |
-| F12b | add a second durable Canvas/Mission store in an isolated copy | `golden-g10-canvas-runtime` exits `1` on the second store | the second store is removed, the same gate exits `0`, and the real projection path remains green |
+| F12a | add a renderer-side durable domain write in an isolated live fixture | the registered `golden-g10-canvas-runtime` gate and/or `no-canvas-domain-writes` exits `1` on the added write | the bait is removed, the same registered gate exits `0`, and the real projection path remains green |
+| F12b | add a second durable Canvas/Mission store in an isolated live fixture | the registered `golden-g10-canvas-runtime` gate exits `1` on the second store | the bait is removed, the same registered gate exits `0`, and the real projection path remains green |
 | F13 | substitute a current Report/history id or marker in the view fixture | the read-only Kernel comparison catches disagreement with accepted G9 current/history truth | current/historical Report and Artifact markers match the persisted G9 projection |
-| F14a | skip close/reopen or substitute a new id in the focused gate | close/reopen does not independently preserve the same durable Mission/session ids | close/reopen independently observes the same durable ids |
-| F14b | fabricate runtime cleanup or count the inherited G12 survivor as G10-owned | the gate fails because the pre-run process/root census and G10-owned delta are not independently observed, or the inherited survivor is changed | only the G10-owned delta reaches `processes=0`, `roots_remaining=0`, and `leaked=[]`; inherited G12 PIDs `30512`, `17316`, `30836`, `20836`, and `30096` remain untouched and unchanged |
+| F14a | substitute a new in-memory or live identity during actual close/reopen | the registered gate's actual close/reopen comparison does not preserve the same durable Mission, exact Task, exact participant/session, and complete object/link identities | the real close/reopen path independently observes the same exact identities and complete object/link sets |
+| F14b | leave a real G10-owned process/root alive on the normal path or falsify its ownership | the registered gate fails from the actual pre-run census and G10-owned cleanup observation | the normal path observes real G10-owned cleanup at `processes=0`, `roots_remaining=0`, and `leaked=[]`; inherited G12 processes are outside this falsifier and are not read, changed, or counted |
 
 The F07–F11 cases must be individually named in the evidence; one aggregate
-browser assertion is insufficient. F12a and F12b each require their own red and
-restored-green transcript. F14a and F14b must separately prove identity and
-owned-delta cleanup. F07–F10 green requires the full current call path and
-operation-specific result; `focusAgentSession` green requires the exact terminal
-tile. A routed-row removal requires the separate G10 Reader amendment stated in
-section D.
+browser assertion is insufficient. F03, F03-cold, F12a, and F12b each require
+an isolated live fixture, a registered-gate red transcript, and a restored-green
+transcript. F14a and F14b must separately prove actual identity and normal-path
+owned cleanup; neither may use inherited G12 PIDs. F07–F10 green requires the
+full current call path and operation-specific result; `focusAgentSession` green
+requires the exact terminal tile. A routed-row removal requires the separate
+G10 Reader amendment stated in section D.
 
 ## Evidence and close
 
@@ -1076,15 +1097,17 @@ or G9/G12/R18 change is authorized. Run the focused suite and one complete
 G10 gate; cleanup must be zero. Green freezes an immutable candidate for one
 fresh independent Verifier. F04 red again stops, and G11 remains closed.
 
-## Current standing Router mechanical authority — one diagnostic-only pass
+## Standing Router mechanical authority — superseded diagnostic-pass record
 
-The founder's standing authority, recorded on 2026-08-29, governs the remaining
-Golden goal. Router may continuously handle mechanical diagnostic, harness,
-same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections
-without returning for founder authorization. This standing authority applies
-only where the correction preserves the accepted product meaning and existing
-authority; it does not open a new product, Kernel, ontology, identity, state,
-acceptance, or scope decision.
+The founder's standing authority, recorded on 2026-08-29, remains in force for
+the remaining Golden goal. Router may continuously handle mechanical diagnostic,
+harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order
+corrections without returning for founder authorization. This standing authority
+applies only where the correction preserves the accepted product meaning and
+existing authority; it does not open a new product, Kernel, ontology, identity,
+state, acceptance, or scope decision. The prior one-pass diagnostic instruction
+below is retained as evidence context and is superseded as active work by the
+finite rewrite that follows.
 
 The prior F04 lifecycle-order contract and every earlier accepted G10/G9/G12/R18
 boundary remain binding. Router may not self-verify or close G10. The semantic
@@ -1093,7 +1116,7 @@ product/authority decision not resolved by the existing authority stops the
 mechanical path and requires a fresh Reader before any Builder work; an
 independent Verifier decides the resulting G10 outcome.
 
-Authorize exactly one diagnostic-only G10 gate pass:
+The prior diagnostic-only G10 gate pass was constrained as follows:
 
 1. Invoke the registered gate once with `bun qa/run.ts golden-g10-canvas-runtime`.
 2. Use the real visible-HISTORY consumer path and click the exact Mission
@@ -1116,3 +1139,56 @@ requires a product/authority decision not already resolved here, stops and
 routes to a fresh Reader before Builder; no founder reauthorization is needed
 for the mechanical branch. Any later G10 closure still requires the independent
 Verifier and the existing acceptance contract.
+
+## Current finite gate-only rewrite — same Reader reread required
+
+This section is the current active authority and supersedes any earlier G10
+text that opens a one-off Builder or requires the prior F06/F04 repair
+sequence; those records remain retained history.
+
+The fresh semantic Reader task
+`01a04d3f-3cd4-7513-b89e-6770c95237f0` returned **NO / NO**. Its diagnostic
+finding is bounded: the exact visible-HISTORY Mission control reached the real
+projection, which correctly returned `WORLD_ROOT_INELIGIBLE` because the
+fixture contained two linked research Tasks. The refusal is correct product
+behavior, and the accepted visible consumer path has no Task chooser. In plain
+terms, the test must give the Mission one real Task so it can prove the existing
+workflow without inventing a new choice screen.
+
+Authorize one finite gate-only rewrite, with no product behavior change:
+
+1. Make the isolated live fixture contain exactly one `belongs_to` link from
+   one Task to the Mission. Delete or avoid the second synthetic Mission Task.
+   Before the real visible `HISTORY` Mission control click, independently query
+   and assert exactly one linked Task; use that exact dynamic Task ID for every
+   source, receipt, `CURRENT_MISSION`, `FULL_LINEAGE`, close/reopen, and later
+   lineage assertion.
+2. Capture the actual dynamic Task and Run IDs from the fixture and remove the
+   hard-coded `task-r17-gate` and `run-r17-gate` identities. Compare the exact
+   sorted object-ID set and complete sorted `(kind, from_id, to_id)` Kernel link
+   set at `CURRENT_MISSION`, `FULL_LINEAGE`, close/reopen, and each
+   identity-preserving checkpoint. The comparison includes the exact F04
+   `agent_session.id`, live/closed parity, and both accepted `produces` tuples:
+   Run → `result_set` Artifact and executor AgentSession → trajectory Artifact.
+3. Rewrite F02 so an isolated live fixture neutralizes the real `Back to world`
+   action, attempts that same control, observes failure, restores the action,
+   and reaches ordinary Canvas. Rewrite F03, F03-cold, F12a, and F12b as
+   isolated live-fixture red/green proofs through the registered gate, never as
+   source-only checks. Make F14a compare actual close/reopen identity rather
+   than an in-memory array. Make F14b run on the normal path against real
+   G10-owned cleanup, without reading, changing, or counting inherited G12
+   PIDs.
+4. Preserve the real visible-HISTORY Mission click and the accepted
+   `CURRENT_MISSION → FULL_LINEAGE → Back to world` path. Do not add a
+   multi-Task chooser, change product/Kernel/Canvas behavior, weaken a timeout,
+   weaken an assertion, change fixture meaning, change acceptance meaning, or
+   reopen G11. The registered gate remains
+   `bun qa/run.ts golden-g10-canvas-runtime`.
+
+The same Reader task `01a04d3f-3cd4-7513-b89e-6770c95237f0` must reread this
+amendment, the updated falsifier table, and `NEXT.md` and return **YES / YES**
+before any Builder starts. No substitute Reader is authorized. Router retains
+standing authority for later mechanical same-meaning diagnostics and exact
+repairs; a genuine semantic defect or unresolved product/authority decision
+routes to that fresh Reader before Builder. One independent Verifier—not the
+Builder or Router—must decide G10 after the accepted rewrite and proof.
