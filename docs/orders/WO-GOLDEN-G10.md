@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: G10 F09 RPC-COMPLETION REPAIR AUTHORIZED — same Builder resumes; fresh independent Verifier required
+status: G10 F09 NATIVE-INPUT REPAIR AUTHORIZED — same Builder resumes; fresh independent Verifier required
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **SAME BUILDER RESUMES — the latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned YES / YES for exactly one bounded RPC-completion product+gate repair; preserve the full gate rewrite and retained fixture/readiness correction, make no other product/gate/timing/assertion change, and one fresh independent Verifier still decides G10**
+build-authority: **SAME BUILDER RESUMES — the latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned YES / YES for exactly one bounded native-input product+gate repair; preserve the full gate rewrite and retained fixture/readiness correction, make no other product/gate/timing/assertion change, and one fresh independent Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
 diagnostic-pass-authority: **RETAINED EVIDENCE ONLY — the prior exact visible-HISTORY Mission click recorded the real projection refusal; the current authority is the Reader-approved product repair below, with no persistence/new truth/schema/Kernel/Canvas/timeout/assertion change**
 finite-rewrite-authority: **RETAINED/BINDING GATE CONTRACT — exactly one Task belongs to the Mission fixture; dynamic Task/Run IDs and exact object/link sets must survive CURRENT_MISSION, FULL_LINEAGE, close/reopen, and F04 parity; no multi-Task chooser**
@@ -13,9 +13,9 @@ product-repair-reader-verdict: **YES / YES — bounded product projection repair
 product-repair-surface: **only `collab-electron/src/windows/shell/src/research-world.js` and `collab-electron/src/windows/shell/src/dock.js`**
 product-repair-proof: **red removes only event `world` and unchanged real G10 gate shows Inspect output and Mission binding `Not recorded`; green restores both lines and exact participant/artifact/Mission parity, truthful `closed`/`stopped`, and cleanup zero**
 f09-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
-f09-reader-verdict: **YES / YES — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` accepted exactly one bounded RPC-completion product+gate repair; same Builder resumes and one fresh independent Verifier remains required**
-f09-surface: **only `collab-electron/src/main/ipc-browser.ts` await the existing `cdpSend(...)` in `browser:scroll` with byte-identical payload, plus `qa/gates/golden-g10-canvas-runtime.ts` replacing `dispatchRpcWithoutWaiting` with existing normal `rpcCall` default 5000ms boundary and removing the unused helper; preserve all other dirty G10 work**
-f09-proof: **with normal RPC boundary and no-await production behavior, verified surface and exact payload remain `after === before` red; restore only `await cdpSend(...)` and begin unchanged post-completion `wait(50)` so the same route/payload yields `after > before` green; zero-delta and overflow remain red and cleanup remains zero**
+f09-reader-verdict: **YES / YES — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` accepted exactly one bounded native-input product+gate repair; same Builder resumes and one fresh independent Verifier remains required**
+f09-surface: **only `collab-electron/src/main/ipc-browser.ts` browser:scroll uses `const wc = getWc(webContentsId); await wc.sendInputEvent({ type: "mouseWheel", x: 0, y: 0, deltaX: x, deltaY: y }); return {};`, removing only the debugger-CDP wheel dependency, plus `qa/gates/golden-g10-canvas-runtime.ts` using existing normal `rpcCall` default 5000ms boundary with no no-wait helper and unchanged post-completion `wait(50)`; preserve all other dirty G10 work**
+f09-proof: **old awaited-CDP behavior with normal RPC boundary times out and has no after sample; restore native `sendInputEvent` on the target webContents and the same Canvas → Main → browser route yields `after > before` within unchanged post-command 50ms; deltaY=0 and overflow remain red and cleanup remains zero**
 f09-reread: **SATISFIED — latest same Reader task `01a04da4-185a-7943-9a1b-1d36735f5cad` returned YES / YES; same Builder resumes and one fresh independent Verifier remains required**
 reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
 reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread this order and NEXT.md and return YES / YES before Builder**
@@ -399,7 +399,7 @@ does not observe owned state is not acceptance.
 | F06 | drop the exact frozen `(kind, from_id, to_id)` `produces` tuple named by the independent-Kernel fixture from projection resolution | the tuple present in the isolated Kernel renders `Not recorded` or the wrong id | existing `strategy`/`produces` links project exactly; only absent facts use exactly `Not recorded` |
 | F07 | break `browserEvaluate` at any link in its current Canvas boundary | `canvas.browserEvaluate` does not traverse the full named path or does not return the known value | the unchanged call traverses the full named path and returns the known value |
 | F08 | break `browserInfo` at any link in its current Canvas boundary | `canvas.browserInfo` does not traverse the full named path or does not return URL/title/loading | the unchanged call traverses the full named path and returns URL/title/loading |
-| F09 | on the isolated live fixture retain the standards/readiness/`document.scrollingElement` precondition, then use normal RPC boundary with no-await production behavior as the first causal bait, and independently use zero-delta and overflow baits | with normal RPC boundary and no-await behavior, the exact payload leaves `after === before` and exits nonzero; independently setting `deltaY: 0` also leaves `after === before`, and overflow poisoning exits nonzero | await existing `cdpSend(...)` in `browser:scroll` with byte-identical payload; replace `dispatchRpcWithoutWaiting` with existing normal `rpcCall` default 5000ms boundary and remove the helper; start unchanged `wait(50)` only after RPC completion; preserve the real Canvas → Main → renderer/preload → browser IPC route, `after > before`, zero-delta/overflow reds, and cleanup zero |
+| F09 | on the isolated live fixture retain the standards/readiness/`document.scrollingElement` precondition, then use the old awaited-CDP path as the first causal bait, and independently use zero-delta and overflow baits | old awaited-CDP behavior with normal RPC boundary times out and has no after sample; independently setting `deltaY: 0` leaves `after === before`, and overflow poisoning exits nonzero | in `browser:scroll`, use `const wc = getWc(webContentsId); await wc.sendInputEvent({ type: "mouseWheel", x: 0, y: 0, deltaX: x, deltaY: y }); return {};`; replace `dispatchRpcWithoutWaiting` with existing normal `rpcCall` default 5000ms boundary and remove the helper; start unchanged `wait(50)` only after RPC completion; preserve the target webContentsId, native user-visible input/deltas, real Canvas → Main → browser route, `after > before`, zero-delta/overflow reds, no DOM shortcut, and cleanup zero |
 | F10 | break `browserWait` at any link in its current Canvas boundary | `canvas.browserWait` does not traverse the full named path or does not observe load completion or timeout | the unchanged call traverses the full named path and observes load completion or timeout |
 | F11 | break `focusAgentSession` at its current Canvas boundary | `focusAgentSession(id)` cannot focus the existing terminal tile whose `sessionId` equals `id`, or reports success without doing so | the unchanged focus path focuses that exact terminal tile; removal requires the separately named G10 Reader amendment |
 | F12a | add a renderer-side durable domain write in an isolated live fixture | both registered gates, `golden-g10-canvas-runtime` and `no-canvas-domain-writes`, exit nonzero on the added write | the bait is removed, both same registered gates exit `0`, and the real projection path remains green |
@@ -1248,42 +1248,43 @@ one-Task/dynamic-ID/object-link/falsifier rewrite and the standing Router
 mechanical authority. The same Builder resumes now; one fresh independent
 Verifier—not the Builder or Router—must verify the repair and decide G10.
 
-## Current F09 finite RPC-completion repair — same Builder resumes
+## Current F09 finite native-input repair — same Builder resumes
 
 The latest finite Reader evidence task
 `01a04da4-185a-7943-9a1b-1d36735f5cad` returned **YES / YES** for exactly one
-bounded RPC-completion repair. The prior focus-only and readiness-only
-explanations are superseded: the CDP wheel payload is already valid, but
-production `browser:scroll` reports completion before the existing CDP promise
-completes. The exact accepted F09 invariant remains observable guest-page
-scrolling through the real Canvas → Main → renderer/preload → browser IPC path.
+bounded native-input repair. The awaited-CDP hypothesis is superseded: the
+debugger wheel command does not resolve within the normal RPC boundary and
+produces no after sample. F09 still protects native, user-visible guest-page
+scrolling through the target webContents on the real Canvas → Main → browser
+route.
 
 Authorize exactly this product+gate repair:
 
 1. In the existing `browser:scroll` branch of
-   `collab-electron/src/main/ipc-browser.ts`, await the existing
-   `cdpSend(...)`; keep the exact existing CDP payload
-   `{type: "mouseWheel", x: 0, y: 0, deltaX: 0, deltaY: 800}` byte-identical.
-2. In `qa/gates/golden-g10-canvas-runtime.ts`, replace
-   `dispatchRpcWithoutWaiting` with existing normal `rpcCall` using its default
-   5000ms RPC boundary, and remove the now-unused helper.
+   `collab-electron/src/main/ipc-browser.ts`, use:
+   `const wc = getWc(webContentsId);`
+   `await wc.sendInputEvent({ type: "mouseWheel", x: 0, y: 0, deltaX: x, deltaY: y });`
+   `return {};`. Remove only the debugger-CDP wheel dependency; preserve the
+   target `webContentsId`, native input, and existing deltas. Do not add a DOM
+   scroll shortcut.
+2. In `qa/gates/golden-g10-canvas-runtime.ts`, use existing normal `rpcCall`
+   with its default 5000ms RPC boundary for `canvas.browserScroll`; the
+   `dispatchRpcWithoutWaiting` helper must be absent.
 3. Start the unchanged `wait(50)` only after the normal RPC completes. Preserve
    the retained fixture standards/readiness/`document.scrollingElement`
-   measurements, real route, exact payload, unchanged `after > before`,
-   zero-delta and overflow reds, and cleanup zero.
+   measurements, real route, exact native input payload, unchanged
+   `after > before`, zero-delta and overflow reds, and cleanup zero.
 
-The finite falsifier uses the verified nonzero surface. With the normal RPC
-boundary but no-await production behavior, the exact payload must leave
-`after === before` and exit red. Restore only `await cdpSend(...)`; the same
-route and byte-identical payload must yield `after > before` within the
-unchanged post-completion 50ms interval and exit green. Zero-delta and overflow
-remain independently red.
+The finite falsifier uses the verified nonzero surface. The old awaited-CDP
+path with normal RPC boundary must time out and produce no after sample. Restore
+native `sendInputEvent`; the same target route and deltas must return and yield
+`after > before` within the unchanged post-command 50ms interval. `deltaY: 0`
+and overflow remain independently red.
 
 The uncommitted `tileManager.focusCanvasTile(params.tileId)` line in
 `collab-electron/src/windows/shell/src/canvas-rpc.js` is noncausal and must be
-removed/reverted to starting-HEAD bytes. The prior no-wait/HEAD-identical
-`ipc-browser.ts` clause is superseded by the exact await above. No other
-product, gate, timing, assertion, or scope change is authorized.
+removed/reverted to starting-HEAD bytes. No other product, gate, timing,
+assertion, or scope change is authorized.
 
 The same Builder resumes this bounded repair. One fresh independent
 Verifier—not the Builder or Router—must verify the candidate afterward and
