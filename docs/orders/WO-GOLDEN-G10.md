@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: BUILDER REOPENED — final browser-readiness adjudication C primary / D diagnostic-label only; exactly one same-order gate-only repair reopened; one fresh independent Verifier required afterward
+status: BUILDER REOPENED — final Mission-navigation adjudication C primary / D diagnostic-label only; exactly one same-order gate-only repair reopened; one fresh independent Verifier required afterward
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **YES — the same G10 Builder is reopened for exactly one gate-only browser-readiness repair limited to `qa/gates/golden-g10-canvas-runtime.ts`; no new semantic Reader; one fresh independent Verifier must follow; no second Builder or scope expansion**
+build-authority: **YES — the same G10 Builder is reopened for exactly one gate-only Mission-navigation repair limited to `qa/gates/golden-g10-canvas-runtime.ts`; no new semantic Reader; one fresh independent Verifier must follow; no second Builder or scope expansion**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
@@ -45,6 +45,12 @@ browser-adjudication-classification: **C primary — fixture/setup defect; D sec
 browser-adjudication-result: **the gate used a blocked `data:` URL, so the DOM tile existed but no real browser webview or webContentsId was created; readiness is Main `!isLoading` or `did-finish-load`**
 browser-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one gate-only repair; one fresh independent Verifier afterward**
 browser-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; no timeout increase, blocked-URL policy change, source-only bait, weakened assertion, or other file is authorized**
+mission-adjudication-task: `01a04bca-ad71-7b60-a475-5f014858cd5e`
+mission-adjudication-authority: `58757be642f81d03c810449e9c8aebfa1d24bc02`
+mission-adjudication-classification: **C primary — fixture/call/timing defect; D secondary — diagnostic label only; Mission/Kernel projection healthy and no meaning change**
+mission-adjudication-result: **`openMission` returns `false` when the exact Mission control is not yet present; `waitFor()` treats only `null` as retry, so no click occurs and the gate reports a misleading CURRENT_MISSION timeout**
+mission-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one gate-only repair, with no new semantic Reader; one fresh independent Verifier afterward**
+mission-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; change the missing-control branch to return `null` and preserve the exact missionId/button selector, click, state assertions, and timeouts**
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-disposition: Current Canvas/Mission/runtime coherence group from the audited Phase-2 disposition
 accepted-g9-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
@@ -674,4 +680,48 @@ or Router—to decide G10 PASS/FAIL. All other G10, G9, G12, and R18 boundaries,
 the accepted ordinary Canvas/Mission/full-lineage meaning, prior lineage
 contract, existing assertions, F14a/F14b ownership, and every other Golden
 group remain unchanged. No other file, second Builder, scope expansion, or
+G11 work is authorized.
+
+## Final Mission-navigation adjudication — same Builder reopened; gate-only; no new semantic Reader
+
+The final read-only adjudication task
+`01a04bca-ad71-7b60-a475-5f014858cd5e`, against authority
+`58757be642f81d03c810449e9c8aebfa1d24bc02` (short `58757be6`), classified the
+twice-observed `CURRENT_MISSION after deliberate navigation timed out` failure
+as **C primary — fixture/call/timing defect**, with **D secondary — diagnostic
+label only**. The Mission and Kernel projection are healthy; there is no
+product defect and no G10 meaning change.
+
+The gate calls `openMission(first.endpoint, missionId)` and targets the exact
+button selector `button.kl-reveal[aria-label="Show research world mission
+${missionId}"]`. Its missing-control branch currently returns `false`, while
+`waitFor()` treats only `null` as retry. That is a premature success: no click
+occurs, the controller remains ordinary, and the gate reports a misleading
+`CURRENT_MISSION` timeout. The exact Mission id exists and the projection
+path is healthy.
+
+Authorize exactly one same-meaning, gate-only Builder repair in
+`qa/gates/golden-g10-canvas-runtime.ts`: change only the missing-control branch
+of `openMission` from `return false` to `return null`, preserving the exact
+`missionId`, button selector, `button.click()`, Mission state assertions, and
+existing timeouts. No renderer, controller, preload, Main, Kernel, timeout,
+or acceptance-semantic change is authorized.
+
+Bind fail-capable red/green proof and cleanup: retain the red bait with
+`return false` while delaying the exact Mission control; it must reproduce the
+no-click `CURRENT_MISSION` failure. Restore `return null`; the gate must retry
+until the exact button appears, click it, observe `CURRENT_MISSION`, then
+complete the unchanged `FULL_LINEAGE` and `Back to world`/ordinary checks.
+Both red and restored-green runs must retain the existing cleanup proof with
+owned process/root state at zero and inherited G12 state untouched and
+excluded.
+
+This repair is within the existing Reader-accepted G10 semantics/files, so no
+new semantic Reader is required. The same G10 Builder is reopened for this
+exact gate-only correction, followed by one fresh independent Verifier—not
+the Builder or Router—to decide G10 PASS/FAIL. All other G10, G9, G12, and R18
+boundaries, ordinary/Mission/full-lineage meaning, browser-route contract,
+two-Artifact/pre-admission lineage, existing assertions and timeouts, F14a/
+F14b ownership, and every other Golden group remain unchanged. No assertion
+weakening, product change, second Builder, scope expansion, other file, or
 G11 work is authorized.

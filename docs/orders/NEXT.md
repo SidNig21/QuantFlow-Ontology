@@ -1,11 +1,11 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 BROWSER-READINESS GATE REPAIR OPEN / INDEPENDENT VERIFIER REQUIRED
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 MISSION-NAVIGATION GATE REPAIR OPEN / INDEPENDENT VERIFIER REQUIRED
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 BROWSER-READINESS C PRIMARY / D DIAGNOSTIC LABEL ONLY — SAME BUILDER REOPENED / INDEPENDENT VERIFIER REQUIRED
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 MISSION-NAVIGATION C PRIMARY / D DIAGNOSTIC LABEL ONLY — SAME BUILDER REOPENED / INDEPENDENT VERIFIER REQUIRED
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **OPEN — the same G10 Builder is reopened for exactly one gate-only browser-readiness repair limited to `qa/gates/golden-g10-canvas-runtime.ts`; no new semantic Reader; one fresh independent Verifier must follow; no second Builder or scope expansion**
-g10-status: **BROWSER-READINESS ADJUDICATION C PRIMARY / D DIAGNOSTIC LABEL ONLY — same-order Builder reopened for exactly one named G10 gate repair; one fresh independent Verifier required afterward**
+builder-authority: **OPEN — the same G10 Builder is reopened for exactly one gate-only Mission-navigation repair limited to `qa/gates/golden-g10-canvas-runtime.ts`; no new semantic Reader; one fresh independent Verifier must follow; no second Builder or scope expansion**
+g10-status: **MISSION-NAVIGATION ADJUDICATION C PRIMARY / D DIAGNOSTIC LABEL ONLY — same-order Builder reopened for exactly one named G10 gate repair; one fresh independent Verifier required afterward**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
@@ -43,6 +43,12 @@ g10-browser-adjudication-classification: **C primary — fixture/setup defect; D
 g10-browser-adjudication-result: **the gate used a blocked `data:` URL, so the DOM tile existed but no real browser webview or webContentsId was created; readiness is Main `!isLoading` or `did-finish-load`**
 g10-browser-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one gate-only repair, with no new semantic Reader; one fresh independent Verifier afterward**
 g10-browser-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; no timeout increase, blocked-URL policy change, source-only bait, weakened assertion, or other file is authorized**
+g10-mission-adjudication-task: `01a04bca-ad71-7b60-a475-5f014858cd5e`
+g10-mission-adjudication-authority: `58757be642f81d03c810449e9c8aebfa1d24bc02`
+g10-mission-adjudication-classification: **C primary — fixture/call/timing defect; D secondary — diagnostic label only; Mission/Kernel projection healthy and no meaning change**
+g10-mission-adjudication-result: **`openMission` returns `false` when the exact Mission control is not yet present; `waitFor()` treats only `null` as retry, so no click occurs and the gate reports a misleading CURRENT_MISSION timeout**
+g10-mission-repair-authority: **OPEN — same-order G10 Builder reopened for exactly one gate-only repair, with no new semantic Reader; one fresh independent Verifier afterward**
+g10-mission-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; change the missing-control branch to return `null` and preserve the exact missionId/button selector, click, state assertions, and timeouts**
 g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
@@ -216,11 +222,11 @@ separate session/work/recovery axes, truthful existing relations, and the five
 G7-routed Canvas/browser calls. The same Reader's Round-3 reread answered the
 two original questions in its Reader brief **YES / YES**, and its completion/
 receipt amendment reread also returned **YES / YES** at authority
-`45cffba08f9990ef90c4273daa59ea5c4107ec61`. The ordinary-Canvas repair is
-within that accepted meaning; the final browser-readiness adjudication below
-now reopens the same Builder for exactly one gate-only repair in the named G10
-gate. No new semantic Reader, second Builder, or scope expansion is
-authorized.
+`45cffba08f9990ef90c4273daa59ea5c4107ec61`. The ordinary-Canvas and
+browser-readiness repairs are within that accepted meaning; the final
+Mission-navigation adjudication below now reopens the same Builder for
+exactly one gate-only correction in the named G10 gate. No new semantic
+Reader, second Builder, or scope expansion is authorized.
 
 ### G10 finite Reader amendments — same Reader reread required
 
@@ -532,6 +538,50 @@ or Router—to decide G10 PASS/FAIL. All other G10, G9, G12, and R18 boundaries,
 the accepted ordinary Canvas/Mission/full-lineage meaning, prior lineage
 contract, existing assertions, F14a/F14b ownership, and every other Golden
 group remain unchanged. No other file, second Builder, scope expansion, or
+G11 work is authorized.
+
+### G10 final Mission-navigation adjudication — same Builder reopened; gate-only; no new semantic Reader
+
+The final read-only adjudication task
+`01a04bca-ad71-7b60-a475-5f014858cd5e`, against authority
+`58757be642f81d03c810449e9c8aebfa1d24bc02` (short `58757be6`), classified the
+twice-observed `CURRENT_MISSION after deliberate navigation timed out` failure
+as **C primary — fixture/call/timing defect**, with **D secondary — diagnostic
+label only**. The Mission and Kernel projection are healthy; there is no
+product defect and no G10 meaning change.
+
+The gate calls `openMission(first.endpoint, missionId)` and targets the exact
+button selector `button.kl-reveal[aria-label="Show research world mission
+${missionId}"]`. Its missing-control branch currently returns `false`, while
+`waitFor()` treats only `null` as retry. That is a premature success: no click
+occurs, the controller remains ordinary, and the gate reports a misleading
+`CURRENT_MISSION` timeout. The exact Mission id exists and the projection
+path is healthy.
+
+Authorize exactly one same-meaning, gate-only Builder repair in
+`qa/gates/golden-g10-canvas-runtime.ts`: change only the missing-control branch
+of `openMission` from `return false` to `return null`, preserving the exact
+`missionId`, button selector, `button.click()`, Mission state assertions, and
+existing timeouts. No renderer, controller, preload, Main, Kernel, timeout,
+or acceptance-semantic change is authorized.
+
+Bind fail-capable red/green proof and cleanup: retain the red bait with
+`return false` while delaying the exact Mission control; it must reproduce the
+no-click `CURRENT_MISSION` failure. Restore `return null`; the gate must retry
+until the exact button appears, click it, observe `CURRENT_MISSION`, then
+complete the unchanged `FULL_LINEAGE` and `Back to world`/ordinary checks.
+Both red and restored-green runs must retain the existing cleanup proof with
+owned process/root state at zero and inherited G12 state untouched and
+excluded.
+
+This repair is within the existing Reader-accepted G10 semantics/files, so no
+new semantic Reader is required. The same G10 Builder is reopened for this
+exact gate-only correction, followed by one fresh independent Verifier—not
+the Builder or Router—to decide G10 PASS/FAIL. All other G10, G9, G12, and R18
+boundaries, ordinary/Mission/full-lineage meaning, browser-route contract,
+two-Artifact/pre-admission lineage, existing assertions and timeouts, F14a/
+F14b ownership, and every other Golden group remain unchanged. No assertion
+weakening, product change, second Builder, scope expansion, other file, or
 G11 work is authorized.
 
 ## Historical G9-open handoff (superseded)
