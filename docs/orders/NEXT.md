@@ -1,11 +1,11 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 F04 PARTICIPANT-PROJECTION READER HOLD
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 F04 LIFECYCLE-ORDER BUILDER AUTHORIZED
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 F04 D-PRIMARY PARTICIPANT-PROJECTION READER HOLD
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 F04 D-PRIMARY LIFECYCLE-ORDER BUILDER AUTHORIZED
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **HOLD — no Builder edit is authorized until the fresh semantic Reader returns YES / YES on the F04 compact Canvas participant seam and truthful closed/stopped lifecycle contract; after that approval exactly one bounded gate-only proof edit is authorized only in `qa/gates/golden-g10-canvas-runtime.ts`; no product/renderer/Kernel change, no F06 change, no other surface, and one fresh independent Verifier remains required**
-g10-status: **F04 D-PRIMARY PARTICIPANT-PROJECTION READER HOLD — Reader approval required before the one bounded gate-only proof Builder**
+builder-authority: **AUTHORIZED ONCE — Founder reauthorized one mechanical same-meaning lifecycle-order correction after the twice-red F04 stop; no new Reader is required; edit only `qa/gates/golden-g10-canvas-runtime.ts`, then run the focused suite and one complete G10 gate with zero cleanup; green freezes an immutable candidate for one fresh independent Verifier; no product/Canvas/Kernel/Ontology/identity/state/parity/timeout/cleanup/falsifier-meaning change, no F06 change, no other surface**
+g10-status: **F04 D-PRIMARY LIFECYCLE-ORDER BUILDER AUTHORIZED — one founder-reauthorized gate-only correction; F04 red again stops; G11 remains closed**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
@@ -19,11 +19,11 @@ g10-reader-round-3-verdict: **YES / YES — prior amendments accepted; exactly o
 g10-adjudication-task: `01a04b3c-4db1-7a93-b618-21890b79bb26`
 g10-adjudication-authority: `222af07635e4566eb66b802cbcc3750be828d001`
 g10-adjudication-result: **C + D — fixture/driver sequencing plus cleanup mechanics; not a product or Kernel regression**
-g10-repair-authority: **HISTORICAL/RETAINED — prior same-meaning fixture/driver and lineage repairs are complete for this adjudication; current Builder authority is held pending the F04 Reader**
+g10-repair-authority: **HISTORICAL/RETAINED — prior same-meaning fixture/driver and lineage repairs are complete for this adjudication; current authority is the founder-reauthorized F04 lifecycle-order correction below**
 g10-lineage-adjudication-task: `01a04b63-f4c6-7fd3-b6a8-f429f0e6aed1`
 g10-lineage-adjudication-authority: `9886a1225f2cf2c5ee713c6d2329fda0ac2ef9d2`
 g10-lineage-adjudication-result: **B primary with D/C secondary — retained accepted R16 helper Artifact-lineage defect; not a G10 Canvas product/Kernel regression**
-g10-lineage-repair-authority: **HISTORICAL/RETAINED — the accepted two-artifact/pre-admission lineage contract is preserved; current Builder authority is held pending the F04 Reader**
+g10-lineage-repair-authority: **HISTORICAL/RETAINED — the accepted two-artifact/pre-admission lineage contract is preserved; current authority is the founder-reauthorized F04 lifecycle-order correction below**
 g10-lineage-repair-surface: **HISTORICAL/RETAINED — prior helper/gate/test surfaces are read-only under this amendment; the current F04 surface is named below**
 g10-lineage-reader-task: `01a04b77-cb43-7792-a225-2a7d57ef068c`
 g10-lineage-reader-authority: `db30a28d912f2e49e39802340993e17c62132f87`
@@ -47,7 +47,7 @@ g10-mission-adjudication-task: `01a04bca-ad71-7b60-a475-5f014858cd5e`
 g10-mission-adjudication-authority: `58757be642f81d03c810449e9c8aebfa1d24bc02`
 g10-mission-adjudication-classification: **C primary — fixture/call/timing defect; D secondary — diagnostic label only; Mission/Kernel projection healthy and no meaning change**
 g10-mission-adjudication-result: **`openMission` returns `false` when the exact Mission control is not yet present; `waitFor()` treats only `null` as retry, so no click occurs and the gate reports a misleading CURRENT_MISSION timeout**
-g10-mission-repair-authority: **HISTORICAL/RETAINED — the exact `return null` gate correction and current-Mission HISTORY projection repair remain binding; current Builder authority is held pending the F04 Reader below**
+g10-mission-repair-authority: **HISTORICAL/RETAINED — the exact `return null` gate correction and current-Mission HISTORY projection repair remain binding; current authority is the founder-reauthorized F04 lifecycle-order correction below**
 g10-mission-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; change the missing-control branch to return `null` and preserve the exact missionId/button selector, click, state assertions, and timeouts**
 g10-barrier-adjudication-task: `01a04bdd-5dfb-70c2-aa6e-ac7e418e7c33`
 g10-barrier-adjudication-authority: `dcc4bad6f3e92870d9a9d1ee84a2548d48f21406`
@@ -75,8 +75,15 @@ g10-f06-renderer-receipt-classification: **D primary — gate/consumer-boundary 
 g10-f06-renderer-receipt-result: **the real pointer/Inspect consumer path is required before asserting the exact Run→result_set Artifact `.qf-world-relation` row; `run=true`, `relation=false`, `missing=true` is not a new projection failure**
 g10-f06-reader-task: `01a04c5b-5104-7a10-a31b-4a28c4c0a340`
 g10-f06-reader-requirement: **HISTORICAL/RETAINED — the F06 consumer proof is complete; the current same-Reader requirement is the F04 compact Canvas participant seam and lifecycle contract below**
-g10-f06-repair-authority: **HISTORICAL/RETAINED — the F06 gate-only consumer proof is complete; current Builder authority is held pending the F04 Reader**
+g10-f06-repair-authority: **HISTORICAL/RETAINED — the F06 gate-only consumer proof is complete; current authority is the founder-reauthorized F04 lifecycle-order correction below**
 g10-f06-repair-surface: **HISTORICAL/RETAINED — the F06 consumer proof used only `qa/gates/golden-g10-canvas-runtime.ts`; no projection, product, Kernel, renderer, cable-model, or other file edit was authorized by that amendment; the current F04 surface is named below**
+g10-f04-adjudication-task: `01a04c7e-d62c-7ee2-8285-f080b213f744`
+g10-f04-classification: **D primary — gate/consumer-boundary selector mismatch; C secondary only for the post-completion lifecycle sequencing defect; this founder reauthorization is mechanical and same-meaning after the twice-red stop**
+g10-f04-reader-requirement: **WAIVED FOR THIS FOUNDER REAUTHORIZATION — no new semantic Reader is required for the one mechanical same-meaning lifecycle-order correction; the accepted F04 seam and contract remain unchanged**
+g10-f04-repair-authority: **AUTHORIZED ONCE — exactly one bounded lifecycle-order correction is authorized in `qa/gates/golden-g10-canvas-runtime.ts`; after the twice-red stop, no second correction is authorized without new founder direction**
+g10-f04-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; all product behavior, Canvas, Kernel, Ontology, identity, state, parity, timeouts, cleanup, falsifier meaning, F06, and scope remain unchanged**
+g10-f04-lifecycle-order: **seed and reveal the real Mission world before pre-finalization participant parity; the old ordering must fail for the identified causal reason, and corrected ordering must reach the same real Mission world and exact participant identity/state without synthetic substitution**
+g10-f04-lifecycle-acceptance: **focused suite plus one complete G10 gate; cleanup zero; green freezes an immutable candidate for one fresh independent Verifier; F04 red again stops; G11 remains closed**
 g10-diagnostic-adjudication-task: `01a04c1c-ae43-7dd0-a773-4d6961fa9e4f`
 g10-diagnostic-adjudication-authority: `8c6c2df0910fa6c777df19cd15cd8dd245f10c66`
 g10-diagnostic-adjudication-classification: **HISTORICAL/SUPERSEDED — D primary — insufficient diagnostics; C was only a conditional mechanical F11 hypothesis; A, B, and E were unsupported**
@@ -181,7 +188,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; F04 participant-projection gate/consumer-boundary Reader hold; F06 consumer proof and executor→trajectory projection repair retained/proven; same fresh Reader `01a04c5b-5104-7a10-a31b-4a28c4c0a340` must reread YES / YES before one gate-only Builder edit; one fresh independent Verifier afterward; no product, renderer, Kernel, or scope expansion
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; F04 founder-reauthorized mechanical lifecycle-order correction in the gate only; seed/reveal the real Mission world before pre-finalization participant parity; focused suite plus one complete G10 gate; zero cleanup; green immutable candidate for one fresh independent Verifier; F04 red again stops; G11 remains closed; no product, Canvas, Kernel, Ontology, identity, state, parity, timeout, cleanup, falsifier-meaning, or scope change
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -870,7 +877,7 @@ other file, or scope expansion is authorized. No Builder edit exists before
 the same Reader's YES / YES reread. One fresh independent Verifier—not the
 Builder or Router—must decide G10 after the accepted proof.
 
-### G10 current F04 participant-projection adjudication — same Reader reread required before Builder
+### G10 current F04 participant-projection adjudication — founder-reauthorized lifecycle-order correction
 
 The fresh read-only F04 adjudication task
 `01a04c7e-d62c-7ee2-8285-f080b213f744` found that the exact participant tile
@@ -890,33 +897,39 @@ and `runtime=stopped`; completion, restartability, and live-registry
 membership remain separate truthful axes. No synthetic UI truth or alternate
 session identity is permitted.
 
-The current Builder is held. The same fresh semantic Reader task
-`01a04c5b-5104-7a10-a31b-4a28c4c0a340` must reread this F04 amendment and
-return **YES / YES** before any Builder edit. After that verdict, authorize
-exactly one gate-only edit in `qa/gates/golden-g10-canvas-runtime.ts`:
+The prior F04 Reader hold is superseded for this bounded mechanical
+same-meaning correction by the founder's explicit reauthorization after the
+twice-red stop. No new Reader is required. Authorize exactly one gate-only
+lifecycle-order correction in `qa/gates/golden-g10-canvas-runtime.ts`:
 
-1. Make F04 parity read the accepted compact Canvas participant seam through
+1. Seed and reveal the real Mission world before pre-finalization participant
+   parity. The old ordering must fail for the identified causal reason: the
+   participant parity precondition is attempted before that real Mission world
+   exists in the consumer path. The corrected ordering must reach the same
+   real Mission world and exact participant identity/state without synthetic
+   substitution.
+2. Make F04 parity read the accepted compact Canvas participant seam through
    the exact `data-qf-participant-*` attributes/card for the exact
    `agent_session.id`; read Dock/Inspect parity from their visible detailed
    fields. Preserve all existing IDs, selectors, assertions, timeouts, and
    cleanup outside this consumer-boundary correction.
-2. The red proof alters only the exact participant's Canvas or Dock runtime
+3. The red proof alters only the exact participant's Canvas or Dock runtime
    field away from authoritative `closed`/`stopped` and requires parity to
    fail. The green proof reopens/reselects that same exact ID through the real
    UI and requires Canvas plus Dock/Inspect to agree on truthful
    `closed`/`stopped`.
-3. Split lifecycle timing: prove `live=true`/`running` at an earlier real
+4. Split lifecycle timing: prove `live=true`/`running` at an earlier real
    pre-finalization checkpoint; after Task/Run completion require truthful
    `closed`/`stopped` and absence from the live registry. Do not require the
    completed executor to remain live/running.
 
 Preserve all product behavior, exact IDs, existing assertions, timeouts, F06,
-lineage refusals, cleanup, and scope. No product, projection, Kernel,
-renderer, Dock, Inspect, Canvas, cable-model, or other file edit is
-authorized. No F06 change, new relation truth, selector/timeout relaxation,
-assertion weakening, or G9/G12/R18 change is authorized. No Builder edit
-exists before the same Reader's YES / YES reread. One fresh independent
-Verifier—not the Builder or Router—must decide G10 after the accepted proof.
+lineage refusals, cleanup, and scope. No product, Canvas, Kernel, Ontology,
+identity, state, parity, timeout, cleanup, or falsifier-meaning change is
+authorized. No F06 change, selector/timeout relaxation, assertion weakening,
+or G9/G12/R18 change is authorized. Run the focused suite and one complete
+G10 gate; cleanup must be zero. Green freezes an immutable candidate for one
+fresh independent Verifier. F04 red again stops, and G11 remains closed.
 
 ## Historical G9-open handoff (superseded)
 
