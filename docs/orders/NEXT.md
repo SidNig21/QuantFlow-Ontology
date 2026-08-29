@@ -1,11 +1,11 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 VISIBLE-HISTORY READER REQUIRED
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 DIAGNOSTIC-ONLY GATE MEASUREMENT
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 VISIBLE-HISTORY CONSUMER-PATH AMENDMENT — SAME READER REREAD REQUIRED / BUILDER HELD
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 DIAGNOSTIC-ONLY GATE MEASUREMENT AUTHORIZED — ONE BOUNDED EDIT/RUN
 rotated-at: 2026-08-28
 rotated-by: Router after independent G9 closure Verifier PASS WITH G12 INHERITED RED
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **HELD — the existing G10 semantic Reader must reread the finite visible-HISTORY consumer-path amendment before the same Builder may apply it; no new semantic Reader, no scope expansion, and one fresh independent Verifier remains required**
-g10-status: **VISIBLE-HISTORY CONSUMER-PATH AMENDMENT — same Reader reread required; gate-only scope, Builder held**
+builder-authority: **OPEN — exactly one diagnostic-only edit/run is authorized in `qa/gates/golden-g10-canvas-runtime.ts`; same Reader returned YES / YES at `8c6c2df`; no new semantic Reader, no product/semantic repair, no scope expansion, and one fresh independent Verifier remains required**
+g10-status: **DIAGNOSTIC-ONLY GATE MEASUREMENT — phase-labeled post-HISTORY readiness/identity receipts; Builder open for one bounded edit/run**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
 g10-reader-brief: **exactly two questions in WO-GOLDEN-G10 §Reader brief; same Reader returned YES / YES in Round 3**
 g10-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
@@ -57,10 +57,17 @@ g10-history-adjudication-task: `01a04c05-febe-7ca3-ac21-f364e0197768`
 g10-history-adjudication-authority: `444d5fab3a0f3b3b6b08eb2efc6e8342c6be5a59`
 g10-history-adjudication-classification: **C primary — visible consumer-path fixture/driver defect; D secondary — prior diagnostic boundary; Mission/Kernel projection healthy and accepted meaning unchanged**
 g10-history-adjudication-result: **the old global `openMission` path omitted visible `HISTORY` selection; after selecting the visible tab and pane, the bypass still yielded exactly one Mission row and one exact button with green cleanup**
+g10-history-reader-task: `01a04bf8-eaba-7e53-8563-95d85d0f078a`
+g10-history-reader-authority: `8c6c2df0910fa6c777df19cd15cd8dd245f10c66`
+g10-history-reader-verdict: **YES / YES — visible `HISTORY` red/green is proven; the later generic `RPC timeout: app.ui.evaluate` is D insufficient diagnostics, not a product defect; no new semantic Reader is required**
+g10-diagnostic-adjudication-task: `01a04c1c-ae43-7dd0-a773-4d6961fa9e4f`
+g10-diagnostic-adjudication-authority: `8c6c2df0910fa6c777df19cd15cd8dd245f10c66`
+g10-diagnostic-adjudication-classification: **D primary — insufficient diagnostics; C is only a conditional mechanical F11 hypothesis; A, B, and E are unsupported**
+g10-diagnostic-adjudication-result: **the generic `RPC timeout: app.ui.evaluate` does not identify the post-HISTORY phase and is not evidence of a product defect; add phase-specific receipts before any repair decision**
 g10-barrier-reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
-g10-barrier-reader-requirement: **REQUIRED — the existing semantic Reader must reread this corrected finite visible-HISTORY consumer-path authority/evidence amendment; no new semantic Reader is needed**
-g10-barrier-repair-authority: **PENDING SAME READER REREAD — revoke the pre-seed ordinary-render barrier as causal acceptance and revoke the false zero-row/button bypass requirement; retain `return null`, visible `HISTORY` navigation, exact row/button/click proof, and one fresh independent Verifier afterward**
-g10-barrier-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; remove the causal barrier requirement while retaining unchanged ordinary Canvas assertions, visible `HISTORY` tab/pane selection, exact Mission row/button/click, existing timeouts/selectors, product behavior, and zero-leak cleanup**
+g10-barrier-reader-requirement: **SATISFIED — the same Reader task `01a04bf8-eaba-7e53-8563-95d85d0f078a` returned YES / YES at authority `8c6c2df0910fa6c777df19cd15cd8dd245f10c66`; this diagnostic-only amendment requires no new semantic Reader**
+g10-barrier-repair-authority: **HISTORICAL/SUPERSEDED — the visible-HISTORY consumer-path amendment is accepted; current authority is the one diagnostic-only phase/readiness measurement below, with any product/semantic red stopping work**
+g10-barrier-repair-surface: **only `qa/gates/golden-g10-canvas-runtime.ts`; diagnostic phase labels and existing browser identity/readiness receipts only; no timeout, product, selector, assertion, semantic, cleanup, or scope change**
 g10-starting-product-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
 g10-starting-product-tree: `d380c7b4655c53cd6e51de0c2112ae99885f0e3d`
 g10-starting-evidence-head: `83311bf0be15c0d18d102072e1528c4b5432cde2`
@@ -157,7 +164,7 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; finite visible-HISTORY consumer-path amendment correcting the false renderer-barrier premise; same existing semantic Reader reread required; Builder held; one fresh independent Verifier afterward; no second Builder or scope expansion
+phase-2-active-group: G10 — Current Canvas/Mission/runtime coherence; one diagnostic-only post-HISTORY phase/readiness measurement under standing Golden mechanical-proof authority; same Reader accepted at `8c6c2df`; Builder open once; one fresh independent Verifier afterward; no new semantic Reader, product/semantic repair, or scope expansion
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
@@ -236,10 +243,11 @@ two original questions in its Reader brief **YES / YES**, and its completion/
 receipt amendment reread also returned **YES / YES** at authority
 `45cffba08f9990ef90c4273daa59ea5c4107ec61`. The ordinary-Canvas,
 browser-readiness, and Mission-navigation repairs are within that accepted
-meaning; the final visible-HISTORY consumer-path adjudication below corrects
-the empirically false renderer-barrier premise and requires the existing
-semantic Reader's reread before the same Builder may continue. No new semantic
-Reader, second Builder, or scope expansion is authorized.
+meaning; the final visible-HISTORY consumer-path adjudication below corrected
+the empirically false renderer-barrier premise and was accepted YES / YES by the
+same Reader at `8c6c2df`. The diagnostic-only phase/readiness measurement below
+is the sole current Builder action; no new semantic Reader, product/semantic
+repair, second Builder, or scope expansion is authorized.
 
 ### G10 finite Reader amendments — same Reader reread required
 
@@ -597,7 +605,7 @@ F14b ownership, and every other Golden group remain unchanged. No assertion
 weakening, product change, second Builder, scope expansion, other file, or
 G11 work is authorized.
 
-### G10 final visible-HISTORY consumer-path adjudication — same Reader reread required
+### G10 final visible-HISTORY consumer-path adjudication — same Reader accepted
 
 The completed fresh read-only adjudication task
 `01a04c05-febe-7ca3-ac21-f364e0197768`, against authority
@@ -637,16 +645,55 @@ reread before further Builder work:
    selection and require the visible pane, exact row count `1`, exact button
    count `1`, exact click, unchanged state sequence, and zero-leak cleanup.
 
-The same existing G10 semantic Reader must reread this finite amendment and
-`NEXT.md`; no new semantic Reader is needed. The same bounded Builder remains
-held until that reread, after which it may apply only this gate amendment. One
-fresh independent Verifier—not the Builder or Router—must then decide G10
-PASS/FAIL. Renderer behavior, ledger filtering, product meaning, timeout
-values, selector semantics, click semantics, ordinary Canvas assertions,
-zero-leak cleanup, G9 authority, G12 ownership, R18, G11, and every other
-Golden-group boundary remain unchanged. No product/gate work outside the named
-gate, candidate/evidence commit, cleanup, second Builder, or scope expansion is
-authorized here.
+The same Reader task `01a04bf8-eaba-7e53-8563-95d85d0f078a` reread this
+amendment and `NEXT.md` at authority
+`8c6c2df0910fa6c777df19cd15cd8dd245f10c66` and returned **YES / YES**;
+visible-HISTORY red/green is proven and no new semantic Reader is required.
+The current Builder action is limited to the diagnostic-only phase/readiness
+measurement below. One fresh independent Verifier—not the Builder or Router—
+must decide G10 after the accepted proof and any same-meaning mechanical gate
+repair. Renderer behavior, ledger filtering, product meaning, timeout values,
+selector semantics, click semantics, ordinary Canvas assertions, zero-leak
+cleanup, G9 authority, G12 ownership, R18, G11, and every other Golden-group
+boundary remain unchanged. No product/semantic red may be repaired under this
+authority.
+
+### G10 final post-HISTORY diagnostic-only measurement — Builder open; no new semantic Reader
+
+The fresh read-only adjudication task
+`01a04c1c-ae43-7dd0-a773-4d6961fa9e4f`, against authority
+`8c6c2df0910fa6c777df19cd15cd8dd245f10c66`, classified the later generic
+`RPC timeout: app.ui.evaluate` as **D primary — insufficient diagnostics**.
+The already-corrected visible-HISTORY red/green proof is accepted: omitted
+selection reached the existing navigation timeout, and restored visible
+HISTORY produced exact Mission row/button counts `1/1` with green cleanup.
+The generic timeout does not identify which post-HISTORY phase failed and is
+not evidence of a product defect. A stale browser webContents/session and
+other product causes remain unsupported until a phase-specific receipt proves
+one.
+
+Under standing Golden mechanical-proof authority, authorize exactly one
+diagnostic-only edit/run in `qa/gates/golden-g10-canvas-runtime.ts`:
+
+1. Add phase labels and receipts for the post-HISTORY sequence:
+   `openMission`, `currentMission`, `fullLineage`, `Back`, `F11 graph
+   readiness`, and `F11 focus`.
+2. At the F11 graph-readiness phase, record whether the graph webview is
+   connected, its positive `webContentsId`, and its loading state.
+3. After `Back`, record the existing `browserTileReceipt` and
+   `canvas.browserInfo` result and their browser identity continuity.
+
+This is mechanical diagnostics only. Do not change timeouts, product code,
+selectors, assertions, semantics, cleanup, ownership, or scope; do not add a
+shortcut, mock, or substitute readiness. Preserve the visible-HISTORY
+red/green proof, real F07–F10 browser calls, exact F11 focus target,
+`CURRENT_MISSION → FULL_LINEAGE → Back to world`, and zero-leak cleanup. No
+new semantic Reader is required. If the measurement isolates a mechanical
+gate defect, a same-meaning repair may proceed under standing Golden
+mechanical-proof authority in this gate file; any product or semantic red
+stops work and is not repairable under this authority. One fresh independent
+Verifier—not the Builder or Router—must decide G10 afterward. No other file,
+candidate/evidence commit, G11 work, or scope expansion is authorized.
 
 ## Historical G9-open handoff (superseded)
 
