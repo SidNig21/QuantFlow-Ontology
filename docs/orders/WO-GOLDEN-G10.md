@@ -4,10 +4,13 @@ status: G10 AUTHORIZED TO RESUME — G9 NARROW CURRENT-REPORT FINALIZATION PRERE
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 NARROW CURRENT-REPORT FINALIZATION PREREQUISITE CLOSED / PASS WITH INHERITED G12 SHUTDOWN RED
-build-authority: **SAME G10 BUILDER RESUMES — start with focused F13 current-report proof against durable G9 currentness, then run exactly one complete registered `bun qa/run.ts golden-g10-canvas-runtime` gate; preserve all prior G10 scope/assertions and require one fresh independent G10 Verifier afterward**
+build-authority: **SAME G10 BUILDER RESUMES — start with focused F13 current-report proof against durable G9 currentness, then run exactly one complete registered `bun qa/run.ts golden-g10-canvas-runtime` gate; preserve all prior G10 scope/assertions, including the F11 tile-manager seam below, and require one fresh independent G10 Verifier afterward**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
 diagnostic-pass-authority: **RETAINED EVIDENCE ONLY — the prior exact visible-HISTORY Mission click recorded the real projection refusal; the current authority is the Reader-approved product repair below, with no persistence/new truth/schema/Kernel/Canvas/timeout/assertion change**
 finite-rewrite-authority: **RETAINED/BINDING GATE CONTRACT — exactly one Task belongs to the Mission fixture; dynamic Task/Run IDs and exact object/link sets must survive CURRENT_MISSION, FULL_LINEAGE, close/reopen, and F04 parity; no multi-Task chooser**
+f11-reader-task: `01a04f37-bbe5-7f61-b234-f542241ebf63`
+f11-reader-verdict: **YES / YES — `focusAgentSession(id)` must always focus/raise the exact existing terminal tile; connected-guest native focus/mouse forwarding is conditional; stopped/no-guest and wrong/duplicate identity cases are fail-capable**
+f11-authority: **same-meaning seam correction only — preserve mouse-first tile focus/raise and every existing assertion; no G11 advancement**
 g9-f13-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
 g9-f13-reader-verdict: **HISTORICAL NO / NO — the real supported closure created a Report and `gates` link, but publication/projection exposed `current_report_id=""` and `HISTORICAL`; G9 repaired and independently verified this prerequisite, so G10 now proves the corrected durable currentness without inferring it**
 g9-f13-receipt: [G10 F04 live-membership rerun](evidence/golden-baseline/g10/golden-g10-f04-live-membership-rerun-20260829.txt) | SHA256 `5BB3CAB1AC521EE76F7B5A067EDB23C7A2BD9DA0A4D63125774618434B290729` (matches the cited `C:\tmp` receipt)
@@ -269,11 +272,17 @@ F07–F10 must traverse the full path
 `canvas.browserX → Main canvas RPC → canvas:rpc-request → shell renderer → shell preload → browser:* Main IPC`, with operation-specific results: `evaluate`
 returns a known value, `info` returns URL/title/loading, `scroll` changes
 observable page scroll, and `wait` observes load completion or timeout.
-`focusAgentSession(id)` must focus the existing terminal tile whose
-`sessionId` equals `id`. It may not be removed in G10 unless a new G10 Reader
-amendment also authorizes the paired G7-gate amendment and defines replacement
-agent-node behavior. Static absence alone is not deletion proof; no unrelated
-browser or protocol surface may be contracted here.
+`focusAgentSession(id)` must always focus and raise the exact existing terminal
+tile shell whose `sessionId` equals `id`, before any guest operation. This is the
+mouse-first authority: a stopped or no-guest tile still becomes focused/raised
+and must emit no native guest-focus event; only a connected guest may receive
+native webview keyboard focus and mouse forwarding, and a live connected guest
+must still receive native focus and normal typing. Wrong or duplicate identity
+must be a red failure, never a fallback or chooser. It may not be removed in
+G10 unless a new G10 Reader amendment also authorizes the paired G7-gate
+amendment and defines replacement agent-node behavior. Static absence alone is
+not deletion proof; no unrelated browser or protocol surface may be contracted
+here.
 
 ## Allowed surface
 
@@ -288,6 +297,9 @@ and only for a named defect above:
 - `collab-electron/src/windows/shell/src/canvas-rpc.js`;
 - `collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx` and
   its paired CSS/type files only for the routed `focusAgentSession` call;
+- `collab-electron/src/renderer/src/tile-manager.js` only for the existing
+  `focusAgentSession(id)` exact terminal-tile focus/raise seam and its
+  connected-guest conditional native focus/mouse forwarding;
 - `collab-electron/src/windows/shell/src/shell.css` only for bounded visibility,
   label, or interaction corrections caused by A–D;
 - `collab-electron/src/main/research-world-projection.ts`;
@@ -317,8 +329,10 @@ and only for a named defect above:
 
 The current routed `focusAgentSession` row is recorded at
 `collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx`.
-The Builder must still freeze the literal path and byte identity in the starting
-manifest; no guessed path or broad directory glob is an editable allowance.
+The Builder must freeze both this routed row and the literal
+`collab-electron/src/renderer/src/tile-manager.js` path and byte identity in the
+starting manifest; no guessed path or broad directory glob is an editable
+allowance.
 
 ## Explicitly out of scope
 
@@ -373,9 +387,12 @@ The normal proof must show:
    current/historical markers, exact ids, and read-only Kernel agreement;
 8. `browserEvaluate`, `browserInfo`, `browserScroll`, and `browserWait` each
    traverse the full renderer/preload/Main path with their named result;
-   `focusAgentSession(id)` focuses the existing terminal tile whose
-   `sessionId` equals `id`; no routed row is removed without a new G10 Reader
-   amendment authorizing the paired G7 change and replacement behavior;
+   `focusAgentSession(id)` first focuses and raises the exact existing terminal
+   tile whose `sessionId` equals `id`; stopped/no-guest has tile focus/raise with
+   no native focus event, while a connected live guest receives native focus and
+   normal typing/mouse forwarding; wrong or duplicate identity is red; no routed
+   row is removed without a new G10 Reader amendment authorizing the paired G7
+   change and replacement behavior;
 9. `no-canvas-domain-writes` and the relevant Kernel write-path checks stay
    green; and
 10. the isolated G10 run ends with actual owned process/root cleanup at zero.
@@ -416,7 +433,7 @@ does not observe owned state is not acceptance.
 | F08 | break `browserInfo` at any link in its current Canvas boundary | `canvas.browserInfo` does not traverse the full named path or does not return URL/title/loading | the unchanged call traverses the full named path and returns URL/title/loading |
 | F09 | on the isolated live fixture retain the standards/readiness/`document.scrollingElement` precondition, then use the provisional native/focus/RAF unit as the historical bait and independently use the retained zero-delta and exact production guest-assignment baits | the provisional native/focus/RAF route remains red at `before=0, after=0`; the fixed guest closure with direct `shellApi.browserScroll` yields green `before=0, after=800`; replacing only `element.scrollTop += numeric y` with a no-op leaves `0→0`, while zero-delta remains red and all other overflow/Canvas contracts remain unchanged | revert `canvas-rpc.js` to direct existing `shellApi.browserScroll`; in `browser:scroll`, validate finite `x`/`y` or throw `Invalid browser scroll delta`, then await `wc.executeJavaScript` with `userGesture: false` on a fixed closure requiring `document.scrollingElement`, adding numeric `x` to `scrollLeft`, numeric `y` to `scrollTop`, returning `true`, and return `{}`; serialize only fixed numeric values with no arbitrary script input; preserve the guest webContentsId, normal `rpcCall` default 5000ms boundary, unchanged post-completion `wait(50)`, real Canvas → Main → browser route, independent `scrollingElement` `after > before`, zero-delta red, all other overflow/Canvas contracts elsewhere, and cleanup zero; this is the only browser:scroll exception to the prior DOM-shortcut prohibition |
 | F10 | break `browserWait` at any link in its current Canvas boundary | `canvas.browserWait` does not traverse the full named path or does not observe load completion or timeout | the unchanged call traverses the full named path and observes load completion or timeout |
-| F11 | break `focusAgentSession` at its current Canvas boundary | `focusAgentSession(id)` cannot focus the existing terminal tile whose `sessionId` equals `id`, or reports success without doing so | the unchanged focus path focuses that exact terminal tile; removal requires the separately named G10 Reader amendment |
+| F11 | break `focusAgentSession` at its current Canvas/tile-manager boundary | the registered gate exits nonzero if the exact existing terminal tile is not focused/raised first, if a stopped/no-guest tile emits a native focus event, if a connected live guest fails native focus or normal typing/mouse forwarding, or if a wrong/duplicate `sessionId` is accepted | `focusAgentSession(id)` focuses/raises the exact shell tile for stopped/no-guest without native focus, conditionally forwards native focus/mouse input only to a connected guest, preserves normal typing for a live guest, rejects wrong/duplicate identity, and ends with cleanup zero; removal still requires the separately named G10 Reader amendment |
 | F12a | add a renderer-side durable domain write in an isolated live fixture | both registered gates, `golden-g10-canvas-runtime` and `no-canvas-domain-writes`, exit nonzero on the added write | the bait is removed, both same registered gates exit `0`, and the real projection path remains green |
 | F12b | add a second durable Canvas/Mission store in an isolated live fixture | the registered `golden-g10-canvas-runtime` gate exits `1` on the second store | the bait is removed, the same registered gate exits `0`, and the real projection path remains green |
 | F13 | substitute a current Report/history id or marker in the view fixture | the read-only Kernel comparison catches disagreement with accepted G9 current/history truth | current/historical Report and Artifact markers match the persisted G9 projection |
@@ -430,9 +447,12 @@ transcript. F12a must show both registered gates red and both restored green.
 F14a must show the actual first-launch close and second-launch reopen identity
 comparison. F14b must show the exact canonical bait root red/green on the normal
 path; inherited/pre-existing roots and PIDs are excluded. F07–F10 green requires the
-full current call path and operation-specific result; `focusAgentSession` green
-requires the exact terminal tile. A routed-row removal requires the separate
-G10 Reader amendment stated in section D.
+full current call path and operation-specific result; F11 green requires the
+exact tile-manager focus/raise, stopped/no-guest no-native-focus, connected-guest
+native focus/typing/mouse behavior, wrong/duplicate red, and cleanup-zero
+receipts. A routed-row removal requires the separate G10 Reader amendment stated
+in section D. This F11 seam is separate from the superseded F09 native/focus/RAF
+scroll bait and does not alter F09 or any existing assertion.
 
 ## Evidence and close
 
@@ -1453,3 +1473,28 @@ full object/link sets, visible-HISTORY route, F09, lifecycle/participant parity,
 falsifiers, timing, and cleanup. A fresh independent G10 Verifier remains
 required after the candidate; no G10 publication change and no G11 work is
 authorized.
+
+### Current F11 tile-focus/raise amendment — Reader YES / YES
+
+Reader task `01a04f37-bbe5-7f61-b234-f542241ebf63` returned **YES / YES** for
+this finite same-meaning authority amendment. Add only
+`collab-electron/src/renderer/src/tile-manager.js` to the F11 product seam;
+the existing routed caller, preload/Main boundary, registered gate, and all
+other G10 paths remain unchanged.
+
+`focusAgentSession(id)` is mouse-first and must always focus and raise the exact
+existing terminal tile shell whose `sessionId` equals `id`, before any guest
+operation. In the stopped/no-guest case, the exact tile must become
+focused/raised and no native guest-focus event may occur. Native webview
+keyboard focus and mouse forwarding are conditional on a connected guest; a
+live connected guest must still receive native focus and normal typing. A wrong
+or duplicate identity must make the registered gate red, never select a
+fallback or multi-tile chooser.
+
+The registered `golden-g10-canvas-runtime` gate must contain fail-capable F11
+coverage for stopped/no-guest, live connected guest, wrong/duplicate identity,
+and cleanup zero, with a red transcript and exact restored-green transcript.
+Preserve every existing G10 assertion, including the mouse-first contract and
+the F09 guest-scroll repair; this tile-manager seam is not a change to the
+superseded F09 native/focus/RAF scroll bait. No other product, gate, timing,
+assertion, scope, or G11 change is authorized.
