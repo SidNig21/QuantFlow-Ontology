@@ -1,10 +1,10 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: REPAIR AUTHORIZED — adjudication C + D; exactly one same-meaning fixture/driver-only repair Builder open; independent Verifier required afterward
+status: SEMANTIC READER REQUIRED — adjudication B primary with D/C secondary; Builder closed pending YES / YES
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 CLOSED / PASS WITH G12 INHERITED RED
-build-authority: **YES — exactly one same-meaning G10 fixture/driver-only repair Builder is authorized under this accepted order; one independent Verifier must follow; no product/Kernel change or scope expansion**
+build-authority: **NO — a fresh semantic Reader must answer the two exact lineage-amendment questions below YES / YES before exactly one bounded product-helper repair Builder may start; no Builder authority yet**
 reader-task: `01a04a11-0b55-79b3-b6c0-55285177dd55`
 reader-authority: `43e0c779e4b255624eefd021716d2afe5245020e`
 reader-verdict: **NO / NO — six finite amendments required; no Builder authority**
@@ -20,8 +20,13 @@ adjudication-task: `01a04b3c-4db1-7a93-b618-21890b79bb26`
 adjudication-authority: `222af07635e4566eb66b802cbcc3750be828d001`
 adjudication-result: **C + D — fixture/driver sequencing plus cleanup mechanics; not a product or Kernel regression**
 adjudication-failed-twice: **the same R16 "Kernel-owned director-to-executor delegation link" assertion failed twice**
-repair-authority: **ONE same-meaning fixture/driver-only repair; existing acceptance meaning and every F01–F14 assertion remain unchanged**
-repair-surface: **only the existing `qa/gates/golden-g10-canvas-runtime.ts` fixture/driver and directly caused G10 evidence; no product file**
+repair-authority: **HISTORICAL — one same-meaning fixture/driver-only repair was authorized by C + D; superseded by the B-primary lineage amendment below; Builder now closed pending Reader YES / YES**
+repair-surface: **HISTORICAL — existing G10 fixture/driver and directly caused evidence only; the current product-helper surface is named below**
+lineage-adjudication-task: `01a04b63-f4c6-7fd3-b6a8-f429f0e6aed1`
+lineage-adjudication-authority: `9886a1225f2cf2c5ee713c6d2329fda0ac2ef9d2`
+lineage-adjudication-result: **B primary with D/C secondary — retained accepted R16 helper artifact-lineage defect; helper precondition misuse and G10 fixture/driver selection are secondary; not a G10 product/Kernel regression**
+lineage-repair-authority: **PENDING READER — exactly one product-helper repair, with one independent Verifier afterward; Builder remains closed until YES / YES**
+lineage-repair-surface: **only `collab-electron/src/main/kernel.ts` helper, existing `qa/gates/golden-g10-canvas-runtime.ts`, and `collab-electron/src/main/research-world.test.ts` only if the smallest focused test is needed; directly caused G10 evidence only**
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-disposition: Current Canvas/Mission/runtime coherence group from the audited Phase-2 disposition
 accepted-g9-candidate: `3c17e5d380fd267270cbacf851999cc98bf30638`
@@ -377,7 +382,7 @@ one Builder, exactly one independent Verifier must rerun the accepted G10
 gates and decide PASS/FAIL; Router is not the Verifier, and no second Builder
 or scope expansion is authorized.
 
-## Round-4 finite adjudication and repair authority
+## Round-4 C + D adjudication — historical fixture/driver repair authority
 
 The final read-only adjudication from task
 `01a04b3c-4db1-7a93-b618-21890b79bb26`, against authority
@@ -415,3 +420,80 @@ The existing dirty Builder diff is preserved as read-only context for this
 Router amendment; this docs-only commit does not alter or stage it. A fresh
 independent Verifier, not the repair Builder or Router, must decide G10 after
 the one repair.
+
+## Retained R16 lineage amendment — fresh semantic Reader required
+
+The final read-only adjudication from task
+`01a04b63-f4c6-7fd3-b6a8-f429f0e6aed1`, against the current authority
+`9886a1225f2cf2c5ee713c6d2329fda0ac2ef9d2`, classified the repeated R16
+review-precondition failure as **B primary with D/C secondary**. **B primary**
+is a pre-existing accepted-product defect: the retained
+`kernelSeedVisibleResearchWorld` helper conflates the Run's
+`A_run_result_set` Artifact with the worker's `A_worker_trajectory` Artifact,
+contradicting the accepted G9 review invariant. Production already uses these
+two Artifacts correctly. **D/C secondary** records the accepted R16 helper's
+precondition misuse and the G10 fixture/driver's selection/temporal-boundary
+contribution; this is not a regression introduced by the G10 Canvas product
+work.
+
+The finite semantic boundary is before `requestGovernedReview`: the Kernel
+must durably contain the exact `qf_review_source_work` row, succeeded Run and
+separate `result_set` Artifact, exact Hypothesis and executor assignment,
+executor-produced `trajectory` Artifact, durable
+`produces(executor, trajectory)` link, and the exact completed Task result/
+receipt lineage, including `task.completed.payload.input.result_artifact_id =
+A_worker_trajectory`. The source-work `result_artifact_id` is
+`A_worker_trajectory`, never the succeeded Run's separate
+`A_run_result_set` Artifact. If existing R17 source-work IDs are reused, the
+repair must freeze and reuse the exact existing `qf_review_source_work` row;
+it may not reconstruct that row from the Run result Artifact.
+
+Exactly one product-helper repair is authorized only after a fresh semantic
+Reader returns **YES / YES**. Its only implementation surface is:
+
+- `collab-electron/src/main/kernel.ts`, only the retained
+  `kernelSeedVisibleResearchWorld` helper;
+- the existing `qa/gates/golden-g10-canvas-runtime.ts`, only to exercise the
+  repaired helper and preserve the accepted G10 proof; and
+- `collab-electron/src/main/research-world.test.ts` only if the smallest
+  focused test is needed, plus directly caused G10 evidence.
+
+The helper repair must create or use a separate worker trajectory Artifact
+(`kind=trajectory`), durably record `produces(executor, trajectory)`, complete
+the exact Task with `task.completed.payload.input.result_artifact_id =
+A_worker_trajectory` and its durable receipt lineage, and bind
+`source_work.result_artifact_id` to that trajectory while preserving the
+succeeded Run's separate `A_run_result_set` (`kind=result_set`). The G10 gate
+must not pass R17 IDs to a fresh source-work reconstruction; when those IDs
+are reused it must use the exact frozen existing source-work row.
+
+The fail-capable falsifier must substitute the Run `result_set` for the worker
+trajectory or remove `produces(executor, trajectory)`. Review admission must
+refuse before creating the review Task, Evaluation, or Report. Restoring the
+separate trajectory, exact Task/receipt lineage, and link must make the same
+path admit. No assertion may be weakened or rewritten to make either result
+green.
+
+This amendment changes no G9 validator, schema or golden output, Report
+publication/current-history authority, existing G10 assertion or acceptance
+meaning, G12 ownership, or other Golden group. It does not authorize changes
+to `packages/qf-kernel`, `qa/run.ts`, any other product path, or G11. The
+previous fixture/driver-only C + D authority is superseded for current work.
+
+### Fresh semantic Reader requirement — Builder closed
+
+A fresh semantic Reader must answer exactly these two questions about this
+lineage amendment:
+
+1. **Does the repair have one finite meaning: the worker trajectory remains
+   distinct from the succeeded Run's result-set output, with exact
+   `produces(executor, trajectory)`, completed Task/receipt lineage, and
+   `source_work.result_artifact_id` bound to the trajectory?**
+2. **Does acceptance remain fail-capable: substituting the result-set Artifact
+   for the trajectory or removing its `produces` link refuses before review
+   Task/Evaluation/Report, while exact restoration admits?**
+
+The fresh semantic Reader must return **YES / YES** to both questions before
+the one product-helper repair Builder may start. Until then, the Builder door
+remains closed. After that one Builder, one independent Verifier—not the
+Builder or Router—must decide G10 PASS/FAIL.
