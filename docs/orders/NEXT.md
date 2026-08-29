@@ -1,13 +1,17 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 FINITE GATE-ONLY REWRITE
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 + G9 CLOSED / G10 READER-APPROVED PRODUCT REPAIR
 
-status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 FINITE GATE-ONLY REWRITE AUTHORIZED / SAME READER REREAD REQUIRED
+status: G8 CLOSED / G9 CLOSED / PASS WITH G12 INHERITED RED / G10 READER-APPROVED PRODUCT REPAIR AUTHORIZED / SAME BUILDER RESUMES
 rotated-at: 2026-08-29
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **NO BUILDER IS OPEN — the same fresh Reader must reread this finite rewrite and WO-GOLDEN-G10 and return YES / YES before one bounded gate-only Builder; an independent Verifier still decides G10**
+builder-authority: **SAME BUILDER RESUMES — exactly the Reader-approved two-file G10 product repair is authorized; preserve the full gate rewrite, and an independent fresh Verifier still decides G10**
 router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
-g10-status: **FINITE GATE-ONLY REWRITE AUTHORIZED — exactly one Task belongs to the Mission fixture; dynamic Task/Run IDs and exact object/link sets must survive CURRENT_MISSION, FULL_LINEAGE, close/reopen, and F04 parity; same Reader reread required; no product/Kernel/Canvas change, multi-Task chooser, timeout weakening, or G11 work**
+g10-status: **READER-APPROVED PRODUCT REPAIR AUTHORIZED — `research-world.js` includes existing `result.world` in existing ephemeral `qf:research-world-active`; `dock.js` consumes that event world into existing ephemeral `missionWorld` before refresh; no persistence/new truth/schema/Kernel/Canvas/timeout/assertion change; G11 remains closed**
 g10-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
+g10-product-repair-reader-task: `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2`
+g10-product-repair-reader-verdict: **YES / YES — bounded product projection repair; same Builder resumes and one fresh independent Verifier remains required**
+g10-product-repair-surface: **only `collab-electron/src/windows/shell/src/research-world.js` and `collab-electron/src/windows/shell/src/dock.js`**
+g10-product-repair-proof: **red removes only event `world` and unchanged real G10 gate shows Inspect output and Mission binding `Not recorded`; green restores both lines and exact participant/artifact/Mission parity, truthful `closed`/`stopped`, and cleanup zero**
 g10-reader-round-4-task: `01a04d3f-3cd4-7513-b89e-6770c95237f0`
 g10-reader-round-4-verdict: **NO / NO — one finite gate-only rewrite is required; the same Reader must reread amended NEXT.md and WO-GOLDEN-G10 and return YES / YES before Builder**
 g10-reader-round-4-reread: **REQUIRED — same Reader task `01a04d3f-3cd4-7513-b89e-6770c95237f0`; no substitute Reader is authorized**
@@ -313,6 +317,36 @@ This is one finite, gate-only rewrite of [WO-GOLDEN-G10](WO-GOLDEN-G10.md):
    starts until this same Reader rereads both amended authority documents and
    returns **YES / YES**. The standing Router mechanical authority and the
    independent Verifier boundary remain in force.
+
+### G10 current Reader-approved product repair — same Builder resumes
+
+This is the sole current G10 exception to earlier gate-only/no-product-repair
+language: exactly the two existing projection-consumer lines below are
+authorized, and every other prior boundary remains binding.
+
+The fresh semantic Reader task `01a04d79-ebf9-7782-b9f5-f2577b5cc5f2` returned
+**YES / YES** for one bounded product projection repair. The existing Kernel
+projection and Canvas are correct; Dock Inspect is missing the same ephemeral
+world snapshot and therefore renders `Not recorded` for output and Mission
+binding. The same G10 Builder resumes on exactly these two files:
+
+1. In `collab-electron/src/windows/shell/src/research-world.js`, include the
+   existing `result.world` in the existing ephemeral `qf:research-world-active`
+   event.
+2. In `collab-electron/src/windows/shell/src/dock.js`, consume that existing
+   event `world` into the existing ephemeral `missionWorld` before the existing
+   refresh.
+
+The red proof removes only the event `world`; the unchanged real G10 gate must
+show Inspect `output=Not recorded` and Mission binding `Not recorded`. The green
+proof restores both lines and requires exact participant/artifact/Mission
+parity from the full gate rewrite, truthful `closed`/`stopped`, and cleanup
+zero. No persistence, new truth store, schema, Kernel, Canvas, timeout, or
+assertion change is authorized. No multi-Task chooser or G11 work is opened.
+
+The full one-Task/dynamic-ID/object-link gate rewrite and standing Router
+mechanical authority remain binding. One fresh independent Verifier—not the
+Builder or Router—must verify the repair and decide G10.
 
 G10 is now the sole active Phase-2 order. Its bounded accepted packet is
 [WO-GOLDEN-G10](WO-GOLDEN-G10.md): explicit ordinary/mission/full-lineage
