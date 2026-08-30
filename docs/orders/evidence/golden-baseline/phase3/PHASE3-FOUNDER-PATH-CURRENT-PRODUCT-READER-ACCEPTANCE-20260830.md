@@ -18,3 +18,19 @@ status: **YES / YES**
 
 No semantic Reader defect remains. Product Builder authority may open only for the accepted order.
 
+## F01 projection amendment reread
+
+status: **YES / YES**
+
+- accepted amendment commit: `ec6b326a1d7832af17902fff2e291c214a25ea65`
+- Reader: fresh semantic Reader `/root/founder_path_f01_reader`
+- Reader mutations: none
+- F02-F07 product/UI blobs versus `295fa47d`: byte-identical
+
+The amendment has one meaning: an exact open Task keeps its exact delegator,
+assignee, and delegator identity, but projects `unavailable` with exactly the
+assignee ID when that assignee is absent or not running. Done/cancelled Tasks
+retain historical assignment regardless of later session lifecycle. The four
+source/gate files are complete; the existing build receipt and changed generated
+Atlas outputs are the only additional Builder-owned outputs. No second truth,
+action, schema, Task mutation, link mutation, or acceptance weakening is present.
