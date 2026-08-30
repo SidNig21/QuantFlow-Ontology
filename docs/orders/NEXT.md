@@ -20,6 +20,7 @@ phase3-status: **PREPARED / READER REQUIRED — whole-repository/current-product
 phase3-order: [WO-GOLDEN-PHASE3](WO-GOLDEN-PHASE3.md)
 phase3-source: `d14ceb36659d86f157b4856b927581616dbaaa56` / tree `b84d4641a5f37e76c3e62a7df54d8019e0869ffe`
 phase3-amendment: **the first fresh Reader's five finite defects are closed in the current authority packet: finite census/completeness, exact Windows traversal and Kernel oracle, isolated cold-source lifecycle, immutable candidate/Verifier/Golden chain, and explicit R18 freeze; a fresh YES / YES against this amended commit is still required**
+phase3-clean-install-amendment: **BUILDER CLOSED / FRESH READER YES / YES REQUIRED — `9ee5c688` is rejected RED evidence (`windows-unit` 59/1); exact repair is only Electron direct runtime `@agentclientprotocol/sdk` 0.18.2 plus lock, existing Phase-3 proof/evidence, and unconditional generated Atlas outputs; new execution source and full P09–P17 rerun required; no source/Kernel/UI/behavior change**
 r18-status: **FROZEN / PENDING GOLDEN CLOSURE — Phase-3 PASS or Golden designation does not activate R18; only a separate later NEXT.md rotation may open it**
 g11-starting-authority: `b1720c086bb2d93942448a3fdd352b7d58af9483` / tree `97b2768e3bc79d45c321336e73ec30167c6c8959`; exact denominator `1,421` tracked paths including the prepared order; immutable product baseline remains `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`
 
