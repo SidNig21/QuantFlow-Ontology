@@ -19,6 +19,8 @@ If a fresh Reader accepts this amendment and a later rotation opens it, the only
 
 The correction preserves every exact Artifact identity, settlement receipt, literal oracle, conflict/refusal, reopen, and zero-delta assertion already present. It may not weaken cardinality, lineage, currentness, duplicate-settlement, malformed/wrong Technique, or persistence checks; it may not add a fallback selector or synthesize a result.
 
+The focused gate and its literal projection oracle must directly assert both field-ownership facts: the exact Run-result Artifact has `fields.run_id === run.id`, and the distinct worker-evidence Artifact has no `run_id` field. Outcome-control visibility is a separate assertion and cannot substitute for either literal field assertion.
+
 ## Proposed repair 2 — exact product identity
 
 If later opened, the only product path is `collab-electron/src/main/research-world-projection.ts`. Projection field `fields.run_id` belongs only to the exact Artifact reached from the Run's `produces` link and matching `runFields.result_artifact_id`. The distinct worker-evidence Artifact must never inherit that `run_id` and must never expose the outcome control.
@@ -27,12 +29,13 @@ No Kernel schema, write path, object/link identity, settlement behavior, UI layo
 
 ## Mandatory falsifiers and green proof
 
-All four cases are required and fail-capable:
+All five cases are required and fail-capable:
 
-1. Project `run_id` onto the worker-evidence Artifact: RED because worker evidence exposes an outcome control.
-2. Remove or replace the exact Run-result Artifact's `run_id`: RED because the eligible result cannot settle or identifies the wrong Run.
-3. Restore the compact-tile outcome selector: RED because the compact tile is not the valid control surface.
-4. Restore the repair: exact Run-result Artifact pointer selection opens Dock `INSPECT`; its `.qf-outcome-row` records Ticket/grade settlement; exact identities, oracle, conflicts, zero deltas, and reopen all GREEN, while worker evidence has no outcome control.
+1. Mutate projection to attach `run_id` to the worker-evidence Artifact: RED directly on literal field ownership because worker evidence must have no `run_id`, regardless of whether an outcome control renders.
+2. Project an outcome control for worker evidence: RED on the separate worker-evidence-no-outcome-control assertion.
+3. Remove or replace the exact Run-result Artifact's `run_id`: RED because the literal oracle requires `fields.run_id === run.id` and the eligible result cannot settle under a missing/wrong identity.
+4. Restore the compact-tile outcome selector: RED because the compact tile is not the valid control surface.
+5. Restore the repair: the literal projection oracle proves exact result `fields.run_id === run.id` and no worker-evidence `run_id`; exact Run-result Artifact pointer selection opens Dock `INSPECT`; its `.qf-outcome-row` records Ticket/grade settlement; exact identities, oracle, conflicts, zero deltas, and reopen all GREEN; the separate assertion proves worker evidence has no outcome control.
 
 The focused proof must run before fresh P14-C and P13/P16. This repair is likely sufficient for those rows when their unchanged assertions pass; it does not repair or close P15 by itself. P15 retains its own existing gate, durable steering, refusal, and zero-delta obligations.
 
