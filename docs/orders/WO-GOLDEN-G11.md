@@ -3,12 +3,12 @@
 This order removes only proven stale instruction and history noise so a fresh
 agent sees one truthful route while every required receipt remains recoverable.
 
-status: AMENDED AFTER READER NO / NO — SAME READER REREAD REQUIRED; no G11 Builder authority
+status: BUILDER COMPLETE — immutable candidate awaiting independent Verifier
 kind: Golden Baseline Phase 2 bounded authority/history group
 owner: Router
 depends: WO-GOLDEN-G10 CLOSED / independent Verifier PASS
-build-authority: **CLOSED until replacement Reader task `01a050eb-06dd-7450-978e-d684f0063538` rereads the exact amendment commit and returns YES / YES; this packet does not implement G11**
-router-authority: **ORDER-ONLY — may amend this order and its exact manifests, commit only those authority paths, and route the replacement Reader; may not implement product, tests, gates, Canvas, Kernel, R18, packaging, or operations**
+build-authority: **CLOSED — the one bounded G11 Builder candidate is complete; only independent Verifier task `01a050fc-c682-7333-8079-c021c8c0743c` may accept or reject it**
+router-authority: **CLOSED PENDING INDEPENDENT VERIFIER — no product, tests beyond the authorized G11 static verifier, Canvas, Kernel, R18, packaging, or operations work is authorized**
 verifier-authority: **One independent G11 Verifier must inspect the eventual candidate and all falsifier transcripts; the Builder and Router cannot accept their own work**
 golden-fast-mode: **BOUND BY `docs/orders/GOLDEN-RUN.md` §Golden Fast Mode; this group is documentation/history-only and does not authorize a product rebuild or package lifecycle run**
 
@@ -170,8 +170,8 @@ columns green.
 
 The exact current classification is the 1,421-row disposition manifest. All
 history and agent-context paths are `RETAIN_FAIL_CLOSED` unless that manifest
-assigns a unique archive destination. The sole archive target is
-`docs/plans/2026-08-16-001-feat-atlas-finish-line-plan.md`, whose exact mapping
+assigns a unique archive destination. The sole archived target is
+`docs/history/plans/2026-08-16-001-feat-atlas-finish-line-plan.md`, whose exact mapping
 and original hashes are in `G11-ARCHIVE-MAP.tsv`. No wildcard, directory-wide
 delete, parent cleanup, inferred status, or unlisted move is allowed.
 
@@ -214,7 +214,7 @@ these exact read-only probes at the frozen start and stores output hashes:
 
 | Proof | Exact probe | Required result |
 |---|---|---|
-| P01 non-current | `Select-String -Path docs/plans/2026-08-16-001-feat-atlas-finish-line-plan.md -Pattern 'Product authority:.*NEXT.md','artifact_readiness: requirements-only'` | both declarations present; this plan disclaims authority |
+| P01 non-current | `Select-String -Path docs/history/plans/2026-08-16-001-feat-atlas-finish-line-plan.md -Pattern 'Product authority:.*NEXT.md','artifact_readiness: requirements-only'` | both declarations present; this plan disclaims authority |
 | P02 non-packaged | `git grep -n -F '2026-08-16-001-feat-atlas-finish-line-plan' -- ':(glob)**/package.json' ':(glob)**/electron-builder*.yml' ':(glob)**/electron-builder*.yaml' ':(glob)**/forge.config.*'` | exit `1`, empty |
 | P03 non-runtime | `git grep -n -F '2026-08-16-001-feat-atlas-finish-line-plan' -- collab-electron packages qf-kernel-schema tools qf-atlas` | exit `1`, empty |
 | P04 non-state/authority | `git grep -n -F '2026-08-16-001-feat-atlas-finish-line-plan' -- START_HERE.md docs/orders/NEXT.md docs/DOCTRINE.md docs/LAWS.md docs/orders/PROTOCOL.md docs/DEBT.md docs/adr` | exit `1`, empty |

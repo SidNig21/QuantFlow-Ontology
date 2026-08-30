@@ -872,6 +872,14 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "golden-g11-authority",
+    description: "G11 authority route, immutable evidence, archive mapping, and scope remain exact",
+    run: async () => {
+      const { checkGoldenG11Authority } = await import("./gates/golden-g11-authority.ts");
+      return checkGoldenG11Authority().ok;
+    },
+  },
+  {
     name: "rung-ladder",
     description:
       "GOLDEN-RUN.md rung status and NEXT.md agree; one active rung; complete rungs have evidence; no rung skipped; no second ladder",

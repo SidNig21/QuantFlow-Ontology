@@ -74,14 +74,14 @@ The ontology has three planes:
 
 | Layer | State |
 | --- | --- |
-| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) records R18 Ground Reader `YES/YES`; the Builder remains closed until Ryan sends the exact activation phrase |
+| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) names the bounded G11 authority/history compression; its replacement Reader returned `YES/YES` at `dc16169f1494d270388eda1c0b369bc0a0aaf73a` |
 | Product plan | [`docs/plans/INSTITUTIONAL-BUILD-PLAN.md`](docs/plans/INSTITUTIONAL-BUILD-PLAN.md) — canonical R18-R25 outcome contracts; route authority remains [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) and build authority remains [`docs/orders/NEXT.md`](docs/orders/NEXT.md) |
-| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R0-R17 and Pre-R18 are accepted; R18 Ground & First Use is active with no Builder |
+| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R0-R17 and Pre-R18 are accepted; G11 compresses authority/history without opening R18 product work |
 | Product floor | Windows app, Hermes Research Director, durable governed work and steering, independent review, evaluation-gated publication, visible/reopenable research world, named Technique selection, and operator-supplied outcome grading |
 | Honest boundary | No normal Mission yet acquires real QB-interception market evidence. R18 owns that first-use journey. R19-R25 remain route-level only. |
 
 ```bash
-bun qa/run.ts rung-ladder    # must say active=R18; NEXT must say Builder authority NO
+bun qa/run.ts rung-ladder    # must say active=R18; NEXT remains the sole build-authority pointer
 bun qa/run.ts --list         # every registered gate
 ```
 

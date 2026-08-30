@@ -1,13 +1,13 @@
 # Workshop protocol — how QuantFlow gets built
 
-Solves the real constraint: **founder usage limits**. The architect (Fable, premium usage) is scarce; builder agents (Codex, Cursor, second Claude) are plentiful. So the architect never writes bulk code — it architects, orders, and verifies.
+Solves the real constraint: **independent judgment is scarce**. The Reader, Builder, and Verifier are separate roles, so the author of a change never certifies it.
 
 ## Roles
 
 | Role | Who | Does | Never does |
 |---|---|---|---|
 | **Architect/Verifier** | Fable (main account) | Writes work orders · makes design calls · re-runs gates independently · inspects contracts/seams · maintains roadmap | Bulk code generation |
-| **Builders** | Codex · Cursor · Claude #2 | Execute one work order on one branch · run gates before submitting · report in the required format | Self-certify · touch schema semantics without an order · exceed order scope |
+| **Builders** | Any assigned implementation agent | Execute one work order on one branch · run gates before submitting · report in the required format | Self-certify · touch schema semantics without an order · exceed order scope |
 | **Machine verifier** | qa gates + GitHub Actions CI | Runs on every push, forever | Sleep |
 | **Reviewer** | An agent that is **neither the builder nor the verifier** of the work under review | Reads merged work and draft orders adversarially · reports findings only | Edit code · edit orders · merge · be the same eyes that built or passed the thing |
 
@@ -145,7 +145,7 @@ When a verification round ends in REWORK, the verifier appends the record to the
 
 ## The NEXT.md rotation (verifier duty)
 
-`docs/orders/NEXT.md` is the standing handoff: it always contains the full builder instructions for the single currently-unblocked order, so the founder feeds every fresh builder window the same file forever. It is updated **only by the verifier**: the verification commit that passes an order must, atomically — merge the builder branch, flip the order's status in the `README.md` log, and rewrite `NEXT.md` to the next unblocked rung (including its parallel-eligible note if a second builder may start an independent order). If `NEXT.md` and the log ever disagree, the log wins and the mismatch is a defect to fix in the same sitting.
+`docs/orders/NEXT.md` is the standing handoff: it names the single currently-unblocked order or closes the Builder door. It is rotated only by the role explicitly authorized by the active order; no README status cache outranks it. If another document disagrees, `NEXT.md` wins and the mismatch is repaired only under named authority.
 
 **The verifier's door gets rotated too, not just the builder's (added 2026-07-25; retargeted 2026-08-03 when `VERIFYING.md` was archived and this file became the verifier's only door).** The same passing commit must also confirm **this file** still names every authority document a verifier needs **and that every pasteable command in it resolves against live refs** (widened 2026-07-25: the first door-rot fix covered the doc list and missed a dead `origin/QuantFlow` diff base eight lines below it — a stale ref inside a runnable command is the same rot in executable form, and worse, because it gets pasted, not read). This exists because it failed exactly once and silently: `VERIFYING.md` sat untouched from 2026-07-18 while `AGENTS.md`, `DOCTRINE.md` and `SCOPES.md` were created around it, so for a week **the seat with more authority entered through the worse map** — a verifier following it literally would have met a known-defective, already-routed type description with nothing telling them it was owned by a later rung, and failed the order or fixed it out of scope.
 
