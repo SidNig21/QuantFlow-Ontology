@@ -1,0 +1,9 @@
+g10_build=SKIPPED nested_registered_gate_using_existing_candidate
+g10_contract=PASS
+F12a-focused raw=RED qf_execute=CommandNotAllowlisted mission=mission-g10-f12a-raw-a125339b-6b19-4edb-8c08-94abee37acd8
+F12a-focused old-same-db=RED first_mission=mission-g10-f12a-old-primary-a125339b-6b19-4edb-8c08-94abee37acd8 second_mission=mission-g10-f12a-old-bait-a125339b-6b19-4edb-8c08-94abee37acd8 hypothesis=hypothesis-r17-gate error="UNIQUE constraint failed: hypothesis.id"
+g10_cleanup_child=2392 owned_processes_remaining=0
+F12a-focused isolated-child=GREEN root=C:\Users\rybow\AppData\Local\Temp\qf-g10-f12a-child-a125339b-6b19-4edb-8c08-94abee37acd8-WbQi5E kernel=C:\Users\rybow\AppData\Local\Temp\qf-g10-f12a-child-a125339b-6b19-4edb-8c08-94abee37acd8-WbQi5E\stores\qf-kernel-store.sqlite artifact=C:\Users\rybow\AppData\Local\Temp\qf-g10-f12a-child-a125339b-6b19-4edb-8c08-94abee37acd8-WbQi5E\stores\artifacts user=C:\Users\rybow\AppData\Local\Temp\qf-g10-f12a-child-a125339b-6b19-4edb-8c08-94abee37acd8-WbQi5E\home hermes=C:\Users\rybow\AppData\Local\Temp\qf-g10-f12a-child-a125339b-6b19-4edb-8c08-94abee37acd8-WbQi5E\hermes-profile-root mission=mission-g10-f12a-isolated-a125339b-6b19-4edb-8c08-94abee37acd8 hypothesis=5bd1bc66-7981-42f4-8a3c-b990ffa517ef exact_missions=1 exact_hypotheses=1 parent_unchanged=true parent_sha256=52db5b8c0b520347cb907d7f90b4569bbe0d31e18694b103bbf3e7546fd65ac4
+g10_cleanup_child=4392 owned_processes_remaining=0
+F12a-focused isolated-child cleanup=zero root=C:\Users\rybow\AppData\Local\Temp\qf-g10-f12a-child-a125339b-6b19-4edb-8c08-94abee37acd8-WbQi5E
+F14b green=processes=0 roots_remaining=0 leaked=[] inherited_stable=true

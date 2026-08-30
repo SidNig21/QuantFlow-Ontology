@@ -200,6 +200,7 @@ export function initDock(panelEl, options = {}) {
 	let missionWorld = null;
 	let latestDefinitions = [];
 	let activeMissionId = null;
+	let runtimeSnapshot = [];
 
 	function syncStartDiscovery() {
 		if (teamSummaryEl) teamSummaryEl.textContent = formatLaunchableTeamSummary(latestDefinitions);
@@ -221,11 +222,12 @@ export function initDock(panelEl, options = {}) {
 		tab.addEventListener("click", () => setMode(tab.dataset.dockMode));
 	}
 	panelEl.querySelector("#dock-browse-catalog")?.addEventListener("click", () => setMode("CATALOG"));
-	document.addEventListener("qf:research-world-active", (event) => {
-		activeMissionId = String(event?.detail?.missionId ?? "") || null;
-		syncStartDiscovery();
-		void refresh();
-	});
+  document.addEventListener("qf:research-world-active", (event) => {
+      activeMissionId = String(event?.detail?.missionId ?? "") || null;
+      missionWorld = event?.detail?.world ?? null;
+      syncStartDiscovery();
+      void refresh();
+  });
 	setMode("START");
 
 	function participantFor(session, assignments, sessions = []) {
@@ -236,6 +238,7 @@ export function initDock(panelEl, options = {}) {
 			assignments,
 			world: missionWorld,
 			planningDirector,
+			runtimeSnapshot: options.getRuntimeSnapshot?.() ?? runtimeSnapshot,
 		});
 	}
 
@@ -274,6 +277,14 @@ export function initDock(panelEl, options = {}) {
 		if (refreshing) return;
 		refreshing = true;
 		try {
+			if (options.refreshRuntimeSnapshot) {
+				runtimeSnapshot = await options.refreshRuntimeSnapshot();
+			} else {
+				const runtimeResult = await window.shellApi.qf.getRuntimeSnapshot?.();
+				runtimeSnapshot = runtimeResult?.ok && Array.isArray(runtimeResult.snapshot)
+					? runtimeResult.snapshot
+					: [];
+			}
 			const [defsRes, sessRes, surfaceRes] = await Promise.all([
 				window.shellApi.qf.listDefinitions(),
 				window.shellApi.qf.listSessions(),

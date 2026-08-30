@@ -22,9 +22,14 @@ const WORLD_LANE_GAP = 160;
 const WORLD_ROW_GAP = 40;
 const WORLD_COLLISION_STEP = 20;
 const WORKFLOW_STAGE_STEP = WORLD_TILE_WIDTH + WORLD_LANE_GAP;
-const PROJECTION_DEFAULT = "DEFAULT";
-const PROJECTION_LOCAL = "LOCAL";
-const PROJECTION_FULL = "FULL";
+export const RESEARCH_PROJECTION_STATES = Object.freeze({
+	ORDINARY_CANVAS: "ORDINARY_CANVAS",
+	CURRENT_MISSION: "CURRENT_MISSION",
+	FULL_LINEAGE: "FULL_LINEAGE",
+});
+const PROJECTION_ORDINARY = RESEARCH_PROJECTION_STATES.ORDINARY_CANVAS;
+const PROJECTION_MISSION = RESEARCH_PROJECTION_STATES.CURRENT_MISSION;
+const PROJECTION_FULL = RESEARCH_PROJECTION_STATES.FULL_LINEAGE;
 const WORKFLOW_STAGE_LABELS = Object.freeze(["Mission", "Work", "Evidence", "Evaluation", "Current Report"]);
 const WORLD_TYPE_ORDER = new Map([
 	["mission", 0], ["task", 1], ["hypothesis", 2], ["dataset", 3],
@@ -847,7 +852,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 	let lastRoot = null;
 	let lastWorld = null;
 	let lastWorkflow = null;
-	let projectionState = PROJECTION_DEFAULT;
+	let projectionState = PROJECTION_ORDINARY;
 	let selectedSubject = null;
 	let savedOverview = null;
 	let projectionControls = null;
@@ -991,7 +996,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 
 	function visibleObjectIds() {
 		if (!lastWorkflow) return new Set();
-		if (projectionState === PROJECTION_DEFAULT) return new Set(lastWorkflow.primaryIds);
+		if (projectionState === PROJECTION_ORDINARY) return new Set(lastWorkflow.objects.map((object) => object.id));
 		if (projectionState === PROJECTION_FULL) return new Set(lastWorkflow.objects.map((object) => object.id));
 		const ids = new Set(lastWorkflow.currentMissionIds);
 		if (selectedSubject) for (const id of localLineage(selectedSubject).objectIds) ids.add(id);
@@ -1001,7 +1006,8 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 	function visibleLinkKeys() {
 		if (!lastWorkflow) return new Set();
 		const objectIds = visibleObjectIds();
-		if (projectionState === PROJECTION_DEFAULT) return new Set([...lastWorkflow.primaryLinkKeys].filter((key) => {
+		if (projectionState === PROJECTION_ORDINARY) return new Set();
+		if (projectionState === PROJECTION_MISSION) return new Set([...lastWorkflow.primaryLinkKeys].filter((key) => {
 			const [, fromId, toId] = key.split("\u0000");
 			return objectIds.has(fromId) && objectIds.has(toId);
 		}));
@@ -1035,10 +1041,11 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		for (const path of document.querySelectorAll?.(".cable-path[data-qf-world-cable-kind]") || []) {
 			const key = `${path.dataset.qfWorldCableKind}\u0000${path.dataset.qfWorldCableFrom}\u0000${path.dataset.qfWorldCableTo}`;
 			const selected = path.classList.contains("cable-path--selected");
-			const local = projectionState === PROJECTION_LOCAL && localKeys.has(key);
-			const visibility = projectionState === PROJECTION_LOCAL ? (local ? "normal" : "dim") : "background";
+			const inspecting = Boolean(selectedSubject);
+			const local = inspecting && localKeys.has(key);
+			const visibility = inspecting ? (local ? "normal" : "dim") : "background";
 			path.dataset.qfProjectionVisibility = selected ? "selected" : visibility;
-			path.style.opacity = String(selected || local ? 0.9 : projectionState === PROJECTION_DEFAULT ? 0.28 : 0.16);
+			path.style.opacity = String(selected || local ? 0.9 : projectionState === PROJECTION_MISSION ? 0.28 : 0.16);
 		}
 	}
 
@@ -1052,18 +1059,30 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 
 	function applyProjection({ fit = false } = {}) {
 		if (!lastWorkflow) return;
+		const ordinary = projectionState === PROJECTION_ORDINARY;
 		const visibleIds = visibleObjectIds();
 		const local = selectedSubject ? localLineage(selectedSubject) : null;
 		const doms = getTileDOMs();
 		const visibleTiles = [];
+		if (ordinary) {
+			for (const tile of tiles) {
+				const dom = doms.get(tile.id);
+				if (!dom?.container) continue;
+				dom.container.hidden = false;
+				dom.container.setAttribute("aria-hidden", "false");
+				dom.container.style.pointerEvents = "";
+				delete dom.container.dataset.qfProjectionVisibility;
+				delete dom.container.dataset.qfSelected;
+			}
+		}
 		for (const object of lastWorkflow.objects) {
 			const tile = object.type === "agent_session"
 				? tiles.find((entry) => entry.sessionId === object.id)
 				: tiles.find((entry) => entry.type === "research" && entry.ontologyType === object.type && entry.ontologyId === object.id);
 			const dom = tile && doms.get(tile.id);
 			if (!tile || !dom) continue;
-			const visible = visibleIds.has(object.id);
-			const normal = projectionState !== PROJECTION_LOCAL || !local || local.objectIds.includes(object.id);
+			const visible = ordinary || visibleIds.has(object.id);
+			const normal = ordinary || !local || local.objectIds.includes(object.id);
 			const selected = selectedSubject?.kind === "object" && selectedSubject.id === object.id;
 			dom.container.hidden = !visible;
 			dom.container.setAttribute("aria-hidden", visible ? "false" : "true");
@@ -1072,10 +1091,13 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			dom.container.dataset.qfSelected = selected ? "true" : "false";
 			if (!dom.container.style) dom.container.style = {};
 			dom.container.style.opacity = visible && normal ? "1" : visible ? "0.35" : "";
+			dom.container.style.pointerEvents = visible ? "" : "none";
 			if (visible) visibleTiles.push(tile);
 		}
-		document.getElementById?.("panel-viewer")?.setAttribute("data-qf-research-projection-active", "true");
-		syncStageLabels(visibleIds);
+		const viewer = document.getElementById?.("panel-viewer");
+		if (ordinary) viewer?.removeAttribute("data-qf-research-projection-active");
+		else viewer?.setAttribute("data-qf-research-projection-active", "true");
+		syncStageLabels(ordinary ? new Set() : visibleIds);
 		const keySet = visibleLinkKeys();
 		const cables = lastWorkflow.links.filter((link) => keySet.has(`${link.kind}\u0000${link.from_id}\u0000${link.to_id}`)).map((link) => makeWorldCable(link, lastWorkflow));
 		tileManager.repositionAllTiles?.();
@@ -1084,17 +1106,17 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		globalThis.queueMicrotask?.(() => syncCableProjectionPaint());
 		const controls = ensureProjectionControls();
 		if (controls) {
-			controls.hidden = false;
+			controls.hidden = ordinary;
 			controls.dataset.qfProjectionState = projectionState;
 			controls.querySelector("[data-qf-projection-label]")?.replaceChildren(document.createTextNode(
-				projectionState === PROJECTION_DEFAULT ? "current Mission" : projectionState === PROJECTION_LOCAL ? "local lineage" : "full lineage",
+				projectionState === PROJECTION_FULL ? "full lineage" : "current Mission",
 			));
 			const full = controls.querySelector("[data-qf-world-full]");
 			const back = controls.querySelector("[data-qf-world-back]");
-			if (full) full.hidden = projectionState !== PROJECTION_DEFAULT;
-			if (back) back.hidden = projectionState !== PROJECTION_FULL && projectionState !== PROJECTION_LOCAL;
+			if (full) full.hidden = projectionState !== PROJECTION_MISSION;
+			if (back) back.hidden = ordinary;
 		}
-		if (projectionState === PROJECTION_LOCAL && selectedSubject) renderDockInspect(selectedSubject);
+		if (selectedSubject) renderDockInspect(selectedSubject);
 		if (fit) tileManager.onResearchWorldReady?.(visibleTiles);
 	}
 
@@ -1104,22 +1126,20 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 
 	function selectSubject(subject) {
 		if (!lastWorkflow || !subject) return;
-		if (projectionState !== PROJECTION_LOCAL) savedOverview = saveOverview();
 		selectedSubject = subject;
 		if (subject.kind === "object") onClearCableSelection?.();
-		projectionState = PROJECTION_LOCAL;
 		applyProjection();
 		setDockMode("INSPECT");
 	}
 
 	function restoreOverview() {
-		const restore = savedOverview || { state: PROJECTION_DEFAULT, dockMode: "START" };
-		projectionState = restore.state;
+		projectionState = PROJECTION_ORDINARY;
 		selectedSubject = null;
+		savedOverview = null;
 		onClearCableSelection?.();
 		clearInspectSurface();
 		applyProjection();
-		setDockMode(restore.dockMode);
+		setDockMode("START");
 	}
 
 	bindBackToWorldControls(document, restoreOverview);
@@ -1259,13 +1279,13 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		lastRoot = { type: rootType, id: rootId };
 		lastWorld = result.world;
 		lastWorkflow = deriveResearchWorkflow(result.world);
-		projectionState = PROJECTION_DEFAULT;
+		projectionState = PROJECTION_MISSION;
 		selectedSubject = null;
 		savedOverview = null;
 		onClearCableSelection?.();
 		clearInspectSurface();
 		ensureProjectionControls();
-		document.dispatchEvent?.(new CustomEvent("qf:research-world-active", { detail: { missionId: lastWorkflow.mission?.id || rootId } }));
+  document.dispatchEvent?.(new CustomEvent("qf:research-world-active", { detail: { missionId: lastWorkflow.mission?.id || rootId, world: result.world } }));
 		const navToggle = document.getElementById?.("nav-toggle");
 		if (navToggle?.getAttribute?.("aria-pressed") === "true") navToggle.click?.();
 		const worldResearchIds = new Set(result.world.objects
@@ -1384,8 +1404,16 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 
 	function hydrateSaved() {
 		installCableSelectionBridge();
-		const root = latestSavedWorldRoot(tiles);
-		if (root) void reveal(root.ontologyType, root.ontologyId);
+		projectionState = PROJECTION_ORDINARY;
+		selectedSubject = null;
+		savedOverview = null;
+		clearInspectSurface();
+		const controls = ensureProjectionControls();
+		if (controls) {
+			controls.hidden = true;
+			controls.dataset.qfProjectionState = PROJECTION_ORDINARY;
+		}
+		if (lastWorkflow) applyProjection();
 	}
 
 	installCableSelectionBridge();

@@ -38,6 +38,7 @@ import {
 } from "./bovada-capture-rpc";
 import {
   getArtifactRoot,
+  closeAppKernel,
   getKernelDb,
   kernelExecute,
   kernelCapabilityGroupsForSession,
@@ -710,6 +711,12 @@ ipcMain.on("analytics:track-event", (_event, name, properties) => {
   trackEvent(name, properties);
 });
 
+ipcMain.on("canvas:focus-agent-session", (_event, sessionId: unknown) => {
+  if (typeof sessionId !== "string" || sessionId.length === 0) return;
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.webContents.send("canvas:focus-agent-session", sessionId);
+});
+
 ipcMain.handle("shell:get-view-config", () => {
   const preload = pathToFileURL(
     getPreloadPath("universal"),
@@ -903,6 +910,7 @@ async function shutdownBackgroundServices(): Promise<void> {
   if (!DISABLE_GIT_REPLAY) gitReplay.stopWorker();
   stopJsonRpcServer();
   stopImageWorker();
+  closeAppKernel();
 }
 
 app.on("open-file", (event, path) => {
@@ -1535,7 +1543,9 @@ app.whenReady().then(async () => {
       );
       const result = await admitAndStartSession(definitionId, {
         missionActivation: activationInstruction,
-        beforeActivation: (sessionId) => bindMissionToDirectorSession(missionId, sessionId),
+        beforeActivation: (sessionId) => {
+          bindMissionToDirectorSession(missionId, sessionId);
+        },
         onStarted: projectStartedSession,
       });
         bindResearchHypothesis(result.sessionId, hypothesisId, strategyId);

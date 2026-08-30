@@ -259,7 +259,7 @@ export async function admitNativeTuiDefinition(opts: {
       );
       readinessWaiter = waiter;
       try {
-        return await createHostCommandSession({
+        const pty = await createHostCommandSession({
           command,
           args: commandArgs,
           cwd: commandCwd,
@@ -310,6 +310,7 @@ export async function admitNativeTuiDefinition(opts: {
           },
           displayName,
         });
+        return pty;
       } catch (error) {
         waiter.cancel();
         throw error;

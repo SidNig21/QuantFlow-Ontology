@@ -32,31 +32,31 @@ class FakeDocument {
 describe("Back to world restoration seam", () => {
   test("Canvas and Dock controls share one ephemeral action, including a replaced painted target", () => {
     const document = new FakeDocument();
-    let projection = "FULL";
+    let projection = "FULL_LINEAGE";
     let domainIpcCalls = 0;
     let restorationCount = 0;
     const dispose = bindBackToWorldControls(document, () => {
       restorationCount += 1;
-      projection = "DEFAULT";
+      projection = "ORDINARY_CANVAS";
     });
     const canvasControl = new FakeControl("[data-qf-world-back]");
     const replacedCanvasControl = new FakeControl("[data-qf-world-back]");
     const dockControl = new FakeControl("[data-qf-back-to-world]");
 
     document.activate(canvasControl);
-    expect(projection).toBe("DEFAULT");
-    projection = "FULL";
+    expect(projection).toBe("ORDINARY_CANVAS");
+    projection = "FULL_LINEAGE";
     document.activate(replacedCanvasControl);
-    expect(projection).toBe("DEFAULT");
-    projection = "FULL";
+    expect(projection).toBe("ORDINARY_CANVAS");
+    projection = "FULL_LINEAGE";
     document.activate(dockControl);
-    expect(projection).toBe("DEFAULT");
+    expect(projection).toBe("ORDINARY_CANVAS");
     expect(restorationCount).toBe(3);
     expect(domainIpcCalls).toBe(0);
 
     dispose();
-    projection = "FULL";
+    projection = "FULL_LINEAGE";
     document.activate(canvasControl);
-    expect(projection).toBe("FULL");
+    expect(projection).toBe("FULL_LINEAGE");
   });
 });

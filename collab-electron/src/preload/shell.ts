@@ -96,6 +96,7 @@ contextBridge.exposeInMainWorld("shellApi", {
       ipcRenderer.invoke("qf:review:secondCritic", args),
     listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
+    getRuntimeSnapshot: () => ipcRenderer.invoke("qf:sessions:runtime-snapshot"),
     submitResearchQuestion: (question: string, datasetId?: string, definitionId?: string, strategyId?: string) => {
       if (UI_PROOF) console.info("qf-ui-proof preload_ipc=qf:research:submitQuestion");
       return ipcRenderer.invoke("qf:research:submitQuestion", {
@@ -206,6 +207,12 @@ contextBridge.exposeInMainWorld("shellApi", {
     ipcRenderer.on("browser-tile:focus-url", handler);
     return () =>
       ipcRenderer.removeListener("browser-tile:focus-url", handler);
+  },
+
+  onFocusAgentSession: (cb: (sessionId: string) => void) => {
+    const handler = (_event: unknown, sessionId: string) => cb(sessionId);
+    ipcRenderer.on("canvas:focus-agent-session", handler);
+    return () => ipcRenderer.removeListener("canvas:focus-agent-session", handler);
   },
 
   onPrefChanged: (cb: (key: string, value: unknown) => void) => {
@@ -371,6 +378,31 @@ contextBridge.exposeInMainWorld("shellApi", {
     webContentsId: number, selector: string, text: string,
   ): Promise<void> =>
     ipcRenderer.invoke("browser:type", { webContentsId, selector, text }),
+
+  browserScroll: (
+    webContentsId: number, x: number, y: number,
+  ): Promise<{ status: string }> =>
+    ipcRenderer.invoke("browser:scroll", { webContentsId, x, y }),
+
+  browserEvaluate: (
+    webContentsId: number, expression: string,
+  ): Promise<{ value?: unknown }> =>
+    ipcRenderer.invoke("browser:evaluate", { webContentsId, expression }),
+
+  browserWait: (
+    webContentsId: number, timeout?: number,
+  ): Promise<{ status: string }> =>
+    ipcRenderer.invoke("browser:wait", { webContentsId, timeout }),
+
+  browserInfo: (
+    webContentsId: number,
+  ): Promise<{
+    url: string;
+    title: string;
+    loading: boolean;
+    canGoBack: boolean;
+    canGoForward: boolean;
+  }> => ipcRenderer.invoke("browser:info", { webContentsId }),
 
 
 });

@@ -9,6 +9,14 @@ function text(value) {
 	return recorded(value) ? String(value) : "Not recorded";
 }
 
+export function runtimeObservationForSession(snapshot, sessionId) {
+	const id = String(sessionId ?? "");
+	const row = (Array.isArray(snapshot) ? snapshot : []).find((candidate) =>
+		String(candidate?.sessionId ?? "") === id,
+	);
+	return { live: row?.live === true, runtime: "Native TUI" };
+}
+
 export function shortParticipantId(id) {
 	const value = text(id);
 	return value.length <= 14 ? value : `${value.slice(0, 8)}…${value.slice(-4)}`;
@@ -107,6 +115,7 @@ export function participantViewForSession({
 	assignments = [],
 	world = null,
 	planningDirector = null,
+	runtimeSnapshot = [],
 } = {}) {
 	const id = String(sessionId ?? "");
 	const worldObject = Array.isArray(world?.objects)
@@ -129,7 +138,7 @@ export function participantViewForSession({
 		session,
 		definition,
 		task,
-		runtimeObservation: { live: session?.status === "running", runtime: "Native TUI" },
+		runtimeObservation: runtimeObservationForSession(runtimeSnapshot, id),
 		missionBinding: {
 			missionId: world?.root?.id ?? planningDirector?.missionId,
 			hasTask,
@@ -151,5 +160,6 @@ export function participantFieldRows(view) {
 		["recruiter / reason", view?.recruiterReason],
 		["Task", view?.task],
 		["output", view?.output],
+		["Mission binding", view?.missionId],
 	].map(([field, value]) => ({ field, value: text(value) }));
 }

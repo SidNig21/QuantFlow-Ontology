@@ -144,7 +144,19 @@ const nativeTuiTeardowns = createNativeTuiTeardownRegistry();
 
 /** Process-local host boundary used by Kernel-captured Task delivery. */
 export function hasLiveAgentSession(sessionId: string): boolean {
-  return live.has(sessionId);
+	return live.has(sessionId);
+}
+
+/** Read the process-local runtime observation without persisting runtime state. */
+export function getLiveSessionSnapshot(sessionIds: readonly string[] = []): Array<{ sessionId: string; live: boolean }> {
+	const ids = new Set<string>();
+	for (const sessionId of sessionIds) {
+		if (typeof sessionId === "string" && sessionId.length > 0) ids.add(sessionId);
+	}
+	for (const sessionId of live.keys()) ids.add(sessionId);
+	return [...ids]
+		.sort((left, right) => left.localeCompare(right))
+		.map((sessionId) => ({ sessionId, live: live.has(sessionId) }));
 }
 
 /** Write exactly one app-authored envelope to the already-owned runtime. */
@@ -457,7 +469,7 @@ export async function admitAndStartSession(
   },
 ): Promise<AdmitResult> {
   const runtime = getDefinitionRuntime(definitionId);
-  return dispatchRuntimeRoute(runtime.metadata.route, runtime.packageRef, {
+  const result = await dispatchRuntimeRoute(runtime.metadata.route, runtime.packageRef, {
     native_tui: () => {
       const peerDelivery = allowsPtyRoleDelivery(
         runtime.metadata,
@@ -495,8 +507,11 @@ export async function admitAndStartSession(
           : undefined,
       });
     },
-    host_acp: () => admitHostAcpDefinition(runtime, opts),
+    host_acp: () => {
+      return admitHostAcpDefinition(runtime, opts);
+    },
   });
+  return result;
 }
 
 /**

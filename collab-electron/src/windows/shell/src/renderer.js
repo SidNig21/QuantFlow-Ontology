@@ -37,6 +37,27 @@ const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
 
 const viewportState = { panX: 0, panY: 0, zoom: 1 };
 let planningDirectorSubmission = null;
+let runtimeSnapshot = [];
+let runtimeSnapshotInFlight = null;
+
+async function refreshRuntimeSnapshot() {
+	if (runtimeSnapshotInFlight) return runtimeSnapshotInFlight;
+	runtimeSnapshotInFlight = Promise.resolve(window.shellApi.qf.getRuntimeSnapshot?.())
+		.then((result) => {
+			runtimeSnapshot = result?.ok && Array.isArray(result.snapshot)
+				? result.snapshot
+				: [];
+			return runtimeSnapshot;
+		})
+		.catch(() => {
+			runtimeSnapshot = [];
+			return runtimeSnapshot;
+		})
+		.finally(() => {
+			runtimeSnapshotInFlight = null;
+		});
+	return runtimeSnapshotInFlight;
+}
 
 const canvasEl = document.getElementById("panel-viewer");
 const gridCanvas = document.getElementById("grid-canvas");
@@ -284,6 +305,8 @@ async function init() {
 
 	initDock(panelAgent, {
 		onTidy: () => tidyTilesToGrid(),
+		getRuntimeSnapshot: () => runtimeSnapshot,
+		refreshRuntimeSnapshot,
 		onResearchSubmitted: (result) => {
 			planningDirectorSubmission = { sessionId: String(result.sessionId), missionId: String(result.missionId) };
 			void researchWorldController?.reveal("mission", String(result.missionId));
@@ -730,7 +753,8 @@ async function init() {
 			if (!res?.ok) return [];
 			const entries = Array.isArray(res.entries) ? res.entries : [];
 			const model = researchWorldController?.getProjectionModel?.();
-			return model ? entries.filter((entry) => model.historyIds.has(String(entry?.id ?? ""))) : entries;
+			const activeMissionId = model?.mission?.id;
+			return model ? entries.filter((entry) => model.historyIds.has(String(entry?.id ?? "")) || (entry?.stage === "question" && entry?.id === activeMissionId)) : entries;
 		},
 		onSubscribe: (cb) => window.shellApi.qf.onEventsInvalidate(cb),
 		onReveal: (type, id) => researchWorldController?.reveal(type, id),
@@ -764,8 +788,9 @@ async function init() {
 			sessionId: id,
 			sessions: taskSurface.sessions,
 			assignments: taskSurface.assignments,
-			world: world ?? (object ? { objects: [object], links: [] } : null),
-			planningDirector: planningDirectorSubmission,
+		world: world ?? (object ? { objects: [object], links: [] } : null),
+		planningDirector: planningDirectorSubmission,
+		runtimeSnapshot,
 		});
 	}
 
@@ -823,6 +848,7 @@ async function init() {
 	}
 
 	async function refreshTaskSurface() {
+		await refreshRuntimeSnapshot();
 		const result = await window.shellApi.qf.listTaskSurface();
 		taskSurface = result?.ok
 			? {
@@ -854,6 +880,15 @@ async function init() {
 	agentPanel.initPrefs(prefAgentWidth, prefAgentMode);
 	agentPanel.setupResize(() => {
 		agentPanel.updateTogglePosition();
+	});
+
+	window.shellApi.onFocusAgentSession?.((sessionId) => {
+		const target = tiles.find((tile) =>
+			tile.type === "term" && tile.sessionId === String(sessionId ?? ""),
+		);
+		if (!target) return;
+		tileManager.focusCanvasTile(target.id);
+		edgeIndicators.panToTile(target);
 	});
 
 	// -- Surface focus management --
@@ -1990,7 +2025,6 @@ async function init() {
 			: 0;
 		viewport.updateCanvas();
 		tileManager.restoreCanvasState(savedTiles);
-		researchWorldController?.hydrateSaved();
 		viewport.redrawGrid();
 		minimap.update();
 
@@ -2008,6 +2042,10 @@ async function init() {
 			tileManager.saveCanvasDebounced();
 		}
 	}
+	// Cold launches have no saved Canvas state, but they must still publish the
+	// same ordinary projection boundary as restores before any deliberate Mission
+	// navigation occurs.
+	researchWorldController?.hydrateSaved();
 
 	taskProjectionReady = true;
 	void scheduleTaskProjectionRefresh();

@@ -283,6 +283,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "golden-g10-canvas-runtime",
+    description: "G10: explicit Canvas/Mission views, live runtime snapshot, exact relation oracle, and browser RPC boundary",
+    run: async () => {
+      const { runGoldenG10CanvasRuntimeGate } = await import("./gates/golden-g10-canvas-runtime.ts");
+      const { ok } = await runGoldenG10CanvasRuntimeGate();
+      return ok;
+    },
+  },
+  {
     name: "pre-r18-coherence",
     description: "PRE-R18: coherent participant projection, current/historical authority markers, and falsifiable product proof",
     run: async () => {

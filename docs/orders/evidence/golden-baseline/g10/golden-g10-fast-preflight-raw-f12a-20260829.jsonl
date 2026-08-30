@@ -1,0 +1,54 @@
+preflight.F03-cold focused red=observed_failure message="preflight deliberate bait red"
+preflight.F03-cold focused green=restored_pass
+preflight.F13-publication-current red=observed_failure message="preflight deliberate bait red"
+preflight.F13-publication-current green=restored_pass
+preflight.F04-event-world red=observed_failure message="preflight deliberate bait red"
+preflight.F04-event-world green=restored_pass
+preflight.F07 red=observed_failure message="preflight deliberate bait red"
+preflight.F07 green=restored_pass
+preflight.F08 red=observed_failure message="preflight deliberate bait red"
+preflight.F08 green=restored_pass
+preflight.F09-doctype red=observed_failure message="preflight deliberate bait red"
+preflight.F09-doctype green=restored_pass
+preflight.F09 red=observed_failure message="preflight deliberate bait red"
+preflight.F09 green=restored_pass
+preflight.F10 red=observed_failure message="preflight deliberate bait red"
+preflight.F10 green=restored_pass
+preflight.F03 red=observed_failure message="preflight deliberate bait red"
+preflight.F03 green=restored_pass
+preflight.F01 red=observed_failure message="preflight deliberate bait red"
+preflight.F01 green=restored_pass
+preflight.F02 red=observed_failure message="preflight deliberate bait red"
+preflight.F02 green=restored_pass
+preflight.F06 red=observed_failure message="preflight deliberate bait red"
+preflight.F06 green=restored_pass
+preflight.F04-live-membership red=observed_failure message="preflight deliberate bait red"
+preflight.F04-live-membership green=restored_pass
+preflight.F04 red=observed_failure message="preflight deliberate bait red"
+preflight.F04 green=restored_pass
+preflight.F05 red=observed_failure message="preflight deliberate bait red"
+preflight.F05 green=restored_pass
+preflight.F13 red=observed_failure message="preflight deliberate bait red"
+preflight.F13 green=restored_pass
+preflight.F11 red=observed_failure message="preflight deliberate bait red"
+preflight.F11 green=restored_pass
+preflight.F03-cold red=observed_failure message="preflight deliberate bait red"
+preflight.F03-cold green=restored_pass
+preflight.F14a red=observed_failure message="preflight deliberate bait red"
+preflight.F14a green=restored_pass
+655 |       roots_remaining: 0,
+656 |       app_launches: 0,
+657 |       cleanup_callbacks_exercised: false,
+658 |       cleanup_callbacks_static_checked: true,
+659 |     });
+660 |     writeFileSync(receipt, records.map((entry) => `${JSON.stringify(entry)}\n`).join(""), "utf8");
+          ^
+EPERM: operation not permitted, open 'C:\tmp\golden-g10-fast-preflight-0247c61b-11e5-44da-a47b-03777003ef2f.jsonl'
+    path: "C:\\tmp\\golden-g10-fast-preflight-0247c61b-11e5-44da-a47b-03777003ef2f.jsonl",
+ syscall: "open",
+   errno: -1,
+    code: "EPERM"
+
+      at runG10FastPreflight (C:\Users\rybow\QuantFlow-Ontology\qa\gates\golden-g10-canvas-runtime.ts:660:5)
+
+Bun v1.3.12 (Windows x64)

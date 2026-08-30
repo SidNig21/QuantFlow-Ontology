@@ -176,7 +176,7 @@ export function createTileManager({
 			repositionAllTiles();
 		}
 		const dom = tileDOMs.get(id);
-		if (dom && dom.webview) {
+		if (dom) {
 			if (focusedTileId && focusedTileId !== id) {
 				blurCanvasTileGuest(focusedTileId);
 			}
@@ -186,14 +186,17 @@ export function createTileManager({
 			}
 			clearTileFocusRing();
 			dom.container.classList.add("tile-focused");
-			dom.webview.focus();
+			const webview = dom.webview;
+			if (webview?.isConnected) {
+				webview.focus();
+			}
 			onNoteSurfaceFocus("canvas-tile");
 
 			if (
-				mouseEvent && mouseEvent.button === 0 &&
+				webview?.isConnected && mouseEvent && mouseEvent.button === 0 &&
 				tile.type !== "browser"
 			) {
-				forwardClickToWebview(dom.webview, mouseEvent);
+				forwardClickToWebview(webview, mouseEvent);
 			}
 		}
 	}

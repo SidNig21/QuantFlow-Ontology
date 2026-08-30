@@ -1,0 +1,39 @@
+preflight.F03-cold focused red=observed_failure message="preflight deliberate bait red"
+preflight.F03-cold focused green=restored_pass
+preflight.F13-publication-current red=observed_failure message="preflight deliberate bait red"
+preflight.F13-publication-current green=restored_pass
+preflight.F04-event-world red=observed_failure message="preflight deliberate bait red"
+preflight.F04-event-world green=restored_pass
+preflight.F07 red=observed_failure message="preflight deliberate bait red"
+preflight.F07 green=restored_pass
+preflight.F08 red=observed_failure message="preflight deliberate bait red"
+preflight.F08 green=restored_pass
+preflight.F09-doctype red=observed_failure message="preflight deliberate bait red"
+preflight.F09-doctype green=restored_pass
+preflight.F09 red=observed_failure message="preflight deliberate bait red"
+preflight.F09 green=restored_pass
+preflight.F10 red=observed_failure message="preflight deliberate bait red"
+preflight.F10 green=restored_pass
+preflight.F03 red=observed_failure message="preflight deliberate bait red"
+preflight.F03 green=restored_pass
+preflight.F01 red=observed_failure message="preflight deliberate bait red"
+preflight.F01 green=restored_pass
+preflight.F02 red=observed_failure message="preflight deliberate bait red"
+preflight.F02 green=restored_pass
+preflight.F06 red=observed_failure message="preflight deliberate bait red"
+preflight.F06 green=restored_pass
+preflight.F04-live-membership red=observed_failure message="preflight deliberate bait red"
+preflight.F04-live-membership green=restored_pass
+preflight.F04 red=observed_failure message="preflight deliberate bait red"
+preflight.F04 green=restored_pass
+preflight.F05 red=observed_failure message="preflight deliberate bait red"
+preflight.F05 green=restored_pass
+preflight.F13 red=observed_failure message="preflight deliberate bait red"
+preflight.F13 green=restored_pass
+preflight.F11 red=observed_failure message="preflight deliberate bait red"
+preflight.F11 green=restored_pass
+preflight.F03-cold red=observed_failure message="preflight deliberate bait red"
+preflight.F03-cold green=restored_pass
+preflight.F14a red=observed_failure message="preflight deliberate bait red"
+preflight.F14a green=restored_pass
+g10_fast_preflight=PASS app_launches=0 duration_ms=10 receipt=C:\tmp\golden-g10-fast-preflight-9d724c60-c6a6-4695-97e7-20e455354713.jsonl sha256=9e94b25c03f51b65d400b535662c6d98b0d65f8c607430bffb9b0b57edbfad36

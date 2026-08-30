@@ -235,6 +235,10 @@ contextBridge.exposeInMainWorld("api", {
   },
   openFileDialog: (): Promise<string | null> =>
     ipcRenderer.invoke("dialog:open-file"),
+  focusAgentSession: (sessionId: string): void => {
+    if (typeof sessionId !== "string" || sessionId.length === 0) return;
+    ipcRenderer.send("canvas:focus-agent-session", sessionId);
+  },
   getConfig: () => ipcRenderer.invoke("config:get"),
   getAppVersion: () => ipcRenderer.invoke("app:version"),
   getDeviceId: () =>

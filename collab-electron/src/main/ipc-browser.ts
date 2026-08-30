@@ -135,11 +135,20 @@ export function registerBrowserIpc(): void {
     async (_event, { webContentsId, x, y }: {
       webContentsId: number; x: number; y: number;
     }) => {
-      // Fire-and-forget: CDP mouseWheel doesn't resolve
-      // reliably, so don't await it.
-      cdpSend(webContentsId, "Input.dispatchMouseEvent", {
-        type: "mouseWheel", x: 0, y: 0, deltaX: x, deltaY: y,
-      });
+      if (!Number.isFinite(x) || !Number.isFinite(y)) {
+        throw new Error("Invalid browser scroll delta");
+      }
+      const wc = getWc(webContentsId);
+      await wc.executeJavaScript(
+        `(() => {
+          const scrollingElement = document.scrollingElement;
+          if (!scrollingElement) throw new Error("document.scrollingElement is unavailable");
+          scrollingElement.scrollLeft += ${x};
+          scrollingElement.scrollTop += ${y};
+          return true;
+        })()`,
+        false,
+      );
       return {};
     },
   );

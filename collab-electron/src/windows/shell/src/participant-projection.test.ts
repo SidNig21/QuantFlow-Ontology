@@ -33,7 +33,7 @@ test("participant projection keeps session, runtime, work, and recovery independ
   expect(view.work).toBe("completed");
   expect(view.recovery).toBe("restartable");
   expect(participantFieldRows(view).map((row) => row.field)).toEqual([
-    "role", "runtime", "session", "runtime state", "work", "recovery", "recruiter / reason", "Task", "output",
+    "role", "runtime", "session", "runtime state", "work", "recovery", "recruiter / reason", "Task", "output", "Mission binding",
   ]);
 });
 
@@ -54,8 +54,12 @@ test("participant projection keeps current and historical sessions distinct by i
   const assignments = [
     { taskId: "review-task", title: "Independent research review", status: "done", assignmentState: "assigned", assignedToSessionId: "critic-old" },
   ];
-  const historical = participantViewForSession({ sessionId: "critic-old", sessions, definitions, assignments, world });
-  const current = participantViewForSession({ sessionId: "critic-current", sessions, definitions, assignments, world });
+  const runtimeSnapshot = [
+    { sessionId: "critic-current", live: true },
+    { sessionId: "critic-old", live: false },
+  ];
+  const historical = participantViewForSession({ sessionId: "critic-old", sessions, definitions, assignments, world, runtimeSnapshot });
+  const current = participantViewForSession({ sessionId: "critic-current", sessions, definitions, assignments, world, runtimeSnapshot });
 
   expect(historical.id).toBe("critic-old");
   expect(historical.runtimeState).toBe("stopped");

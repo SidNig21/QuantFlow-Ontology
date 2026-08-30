@@ -300,6 +300,10 @@ export interface CollabApi {
       | { ok: true; sessions: Record<string, unknown>[] }
       | { ok: false; error: { name: string; message: string } }
     >;
+    getRuntimeSnapshot: () => Promise<
+      | { ok: true; snapshot: Array<{ sessionId: string; live: boolean }> }
+      | { ok: false; error: { name: string; message: string } }
+    >;
     spawnSession: (args?: {
       definitionId?: string;
     }) => Promise<
@@ -368,6 +372,7 @@ export interface CollabApi {
   openFileDialog: () => Promise<string | null>;
 
   // Navigation
+  focusAgentSession: (sessionId: string) => void;
   openInTerminal: (path: string) => void;
   revealInFinder: (path: string) => void;
   createGraphTile: (folderPath: string) => void;

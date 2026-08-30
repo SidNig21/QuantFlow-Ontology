@@ -10,6 +10,7 @@ import {
   closeAgentSessionRow,
   deliverToAgentSession,
   hasLiveAgentSession,
+  getLiveSessionSnapshot,
   onSessionChunk,
   onSessionDone,
   runTurn,
@@ -875,6 +876,19 @@ export function registerKernelHandlers(): void {
     try {
       assertTrustedSender(event);
       return { ok: true as const, sessions: kernelListAgentSessions() };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:sessions:runtime-snapshot", (event) => {
+    try {
+      assertTrustedSender(event);
+      const sessions = kernelListAgentSessions();
+      return {
+        ok: true as const,
+        snapshot: getLiveSessionSnapshot(sessions.map((session) => String(session.id ?? ""))),
+      };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }

@@ -66,6 +66,26 @@ function parseJson(value: unknown): unknown {
   try { return JSON.parse(value); } catch { return value; }
 }
 
+function decodeUtf8Hex(value: unknown, field: string): string {
+  if (typeof value !== "string" || value.length % 2 !== 0 || !/^[0-9a-f]*$/i.test(value)) {
+    throw new Error(`Invalid UTF-8 hex in ${field}`);
+  }
+  const bytes = new Uint8Array(value.length / 2);
+  for (let index = 0; index < value.length; index += 2) {
+    bytes[index / 2] = Number.parseInt(value.slice(index, index + 2), 16);
+  }
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  } catch (error) {
+    throw new Error(`Invalid UTF-8 bytes in ${field}: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+function decodeOptionalUtf8Hex(value: unknown, field: string): string | null {
+  if (value === null || value === undefined || value === "") return null;
+  return decodeUtf8Hex(value, field);
+}
+
 function tableExists(db: KernelDb, table: string): boolean {
   return Boolean(db.query("SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = ?").get(table));
 }
@@ -142,19 +162,24 @@ function relationalSnapshot(db: KernelDb): RelationalSnapshot {
     const publications: RelationalSnapshot["publications"] = [];
     if (tableExists(db, "qf_review_publication")) {
       for (const row of db.query(
-        `SELECT source_work_key, report_artifact_id, authority_key, is_current,
-                supersedes_source_work_key, superseded_by_source_work_key
+        `SELECT hex(CAST(source_work_key AS BLOB)) AS source_work_key_hex,
+                report_artifact_id, authority_key, is_current,
+                hex(CAST(supersedes_source_work_key AS BLOB)) AS supersedes_source_work_key_hex,
+                hex(CAST(superseded_by_source_work_key AS BLOB)) AS superseded_by_source_work_key_hex
            FROM qf_review_publication
           ORDER BY created_at ASC, source_work_key ASC`,
-      ).all() as RelationalSnapshot["publications"]) {
-        if (typeof row.source_work_key === "string" && typeof row.report_artifact_id === "string" && typeof row.authority_key === "string") {
+      ).all() as Array<Record<string, unknown>>) {
+        const sourceWorkKey = decodeUtf8Hex(row.source_work_key_hex, "qf_review_publication.source_work_key");
+        const supersedesSourceWorkKey = decodeOptionalUtf8Hex(row.supersedes_source_work_key_hex, "qf_review_publication.supersedes_source_work_key");
+        const supersededBySourceWorkKey = decodeOptionalUtf8Hex(row.superseded_by_source_work_key_hex, "qf_review_publication.superseded_by_source_work_key");
+        if (typeof row.report_artifact_id === "string" && typeof row.authority_key === "string") {
           publications.push({
-            source_work_key: row.source_work_key,
+            source_work_key: sourceWorkKey,
             report_artifact_id: row.report_artifact_id,
             authority_key: row.authority_key,
             is_current: Number(row.is_current),
-            supersedes_source_work_key: row.supersedes_source_work_key ?? null,
-            superseded_by_source_work_key: row.superseded_by_source_work_key ?? null,
+            supersedes_source_work_key: supersedesSourceWorkKey,
+            superseded_by_source_work_key: supersededBySourceWorkKey,
           });
         }
       }
@@ -464,6 +489,9 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   addSelectedLink("uses", source.run_id, runFields.dataset_id);
   addSelectedLink("uses", source.run_id, selectedStrategyId);
   addSelectedLink("produces", source.run_id, runFields.result_artifact_id);
+  if (allLinks.some((link) => link.kind === "produces" && link.from_id === source.executor_session_id && link.to_id === source.result_artifact_id)) {
+    addSelectedLink("produces", source.executor_session_id, source.result_artifact_id);
+  }
   for (const gradeId of gradeArtifactIds) {
     for (const link of allLinks.filter((candidate) => candidate.from_id === gradeId && ["grades_ticket", "grades_run", "grades_strategy", "grades_run_result"].includes(candidate.kind))) {
       addSelectedLink(link.kind, link.from_id, link.to_id);
