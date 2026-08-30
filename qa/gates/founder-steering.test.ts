@@ -1,7 +1,37 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { normalizeHistoryFacts, normalizeVisibleTaskSessionLinkFacts } from "./founder-steering.ts";
+import { deliveryAckObserved, normalizeHistoryFacts, normalizeVisibleTaskSessionLinkFacts, steeringDeliveryObserved } from "./founder-steering.ts";
+
+test("founder steering accepts an exact acknowledgement first observed at the timeout boundary", () => {
+	const expected = "QF_SYNTHETIC delivery_ack role=worker task_id=task-1100ccac-66c4-429f-9265-b2da46a68ef9";
+	expect(deliveryAckObserved("", expected)).toBe(false);
+	expect(deliveryAckObserved(`\u001b[2K\r${expected}\r\n`, expected)).toBe(true);
+	expect(deliveryAckObserved(`${expected}\r\n`, expected, 2)).toBe(false);
+	expect(deliveryAckObserved(`${expected}\r\n${expected}\r\n`, expected, 2)).toBe(true);
+	const gate = readFileSync(join(import.meta.dir, "founder-steering.ts"), "utf8");
+	expect(gate).toContain("if (deliveryAckObserved(finalOutput, expected, count)) return;");
+});
+
+test("founder steering requires one exact causal Kernel receipt and a fresh role marker", () => {
+  const binding = { acceptedEventId: "accepted-clarify", taskId: "task-1", targetSessionId: "worker-1", expectedRole: "worker" };
+  const receipt = { accepted_event_id: "accepted-clarify", task_id: "task-1", target_session_id: "worker-1", outcome: "delivered" };
+  const stale = "QF_SYNTHETIC delivery_ack role=worker task_id=task-1";
+  const fresh = `${stale}\r\nQF_SYNTHETIC delivery_ack role=worker task_id=task-1`;
+
+  expect(steeringDeliveryObserved([receipt], binding, fresh, 1)).toBe(true);
+  expect(steeringDeliveryObserved([{ ...receipt, accepted_event_id: "wrong-event" }], binding, fresh, 1)).toBe(false);
+  expect(steeringDeliveryObserved([{ ...receipt, task_id: "wrong-task" }], binding, fresh, 1)).toBe(false);
+  expect(steeringDeliveryObserved([{ ...receipt, target_session_id: "wrong-worker" }], binding, fresh, 1)).toBe(false);
+  expect(steeringDeliveryObserved([{ ...receipt, outcome: "delivery_failed" }], binding, fresh, 1)).toBe(false);
+  expect(steeringDeliveryObserved([receipt], binding, stale, 1)).toBe(false);
+  expect(steeringDeliveryObserved([receipt], binding, "QF_SYNTHETIC delivery_ack role=critic task_id=task-1", 0)).toBe(false);
+  expect(steeringDeliveryObserved([], binding, fresh, 1)).toBe(false);
+  expect(steeringDeliveryObserved([receipt, receipt], binding, fresh, 1)).toBe(false);
+
+  const gate = readFileSync(join(import.meta.dir, "founder-steering.ts"), "utf8");
+  expect(gate).toContain("if (steeringDeliveryObserved(finalFacts, binding, finalOutput, markerCountBefore)) return;");
+});
 
 test("founder steering uses the ordinary form with exact preload Dataset and Technique", () => {
   const gate = readFileSync(join(import.meta.dir, "founder-steering.ts"), "utf8");

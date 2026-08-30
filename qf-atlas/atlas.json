@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "68b07f2a",
+    "commit": "a9608971",
     "generatedAt": "2026-08-30",
     "filesScanned": 411,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "48da35f0d1ccca39"
+    "fingerprint": "7b1660c172c8d8da"
   },
   "stats": {
     "live": 109,
@@ -3236,7 +3236,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1171.6,
+      "kb": 1174.6,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3307,7 +3307,7 @@
         },
         {
           "path": "qa/gates/founder-steering.ts",
-          "kb": 34.5,
+          "kb": 37.5,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -53122,12 +53122,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "ca088759",
+      "commit": "68b07f2a",
       "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "68b07f2a",
+      "commit": "a9608971",
       "generatedAt": "2026-08-30"
     },
     "verdict": "better",

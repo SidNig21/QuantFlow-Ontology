@@ -270,16 +270,47 @@ function compactPtyCapture(output: string): string {
     .replace(/(task_id|source_task_id|review_task_id)=([A-Za-z0-9_-])\2(?=[A-Za-z0-9_-]{35})/g, "$1=$2");
 }
 
+export function deliveryAckObserved(output: string, expected: string, count = 1): boolean {
+	return compactPtyCapture(output).split(expected).length - 1 >= count;
+}
+
+export type SteeringDeliveryFact = {
+  accepted_event_id?: unknown;
+  task_id?: unknown;
+  target_session_id?: unknown;
+  outcome?: unknown;
+};
+
+export function steeringDeliveryObserved(
+  facts: SteeringDeliveryFact[],
+  binding: { acceptedEventId: string; taskId: string; targetSessionId: string; expectedRole: string },
+  output: string,
+  markerCountBefore: number,
+): boolean {
+  const causal = facts.filter((fact) => fact.accepted_event_id === binding.acceptedEventId);
+  if (causal.length !== 1) return false;
+  const receipt = causal[0]!;
+  if (receipt.task_id !== binding.taskId || receipt.target_session_id !== binding.targetSessionId || receipt.outcome !== "delivered") return false;
+  const marker = `QF_SYNTHETIC delivery_ack role=${binding.expectedRole}`;
+  return compactPtyCapture(output).split(marker).length - 1 > markerCountBefore;
+}
+
+function steeringDeliveryFacts(kernelDb: string, taskId: string): SteeringDeliveryFact[] {
+  return dbRows(kernelDb, "SELECT payload FROM events WHERE type='task.steering_delivery' AND object_id=? ORDER BY rowid", taskId)
+    .map((row) => jsonPayload(String(row.payload)));
+}
+
 async function waitForDeliveryAck(endpoint: string, sessionId: string, expected: string, deadlineAt: number, count = 1, diagnostics?: { kernelDb: string; taskId: string }): Promise<void> {
 	try {
 		await waitFor(`delivery acknowledgement ${expected}`, async () => {
 			try {
-				const output = compactPtyCapture(await captureSession(endpoint, sessionId));
-				return output.split(expected).length - 1 >= count ? true : null;
+				return deliveryAckObserved(await captureSession(endpoint, sessionId), expected, count) ? true : null;
 			} catch { return null; }
 		}, deadlineAt);
 	} catch (error) {
-		const tail = compactPtyCapture(await captureSession(endpoint, sessionId).catch(() => "")).slice(-2_000);
+		const finalOutput = await captureSession(endpoint, sessionId).catch(() => "");
+		if (deliveryAckObserved(finalOutput, expected, count)) return;
+		const tail = compactPtyCapture(finalOutput).slice(-2_000);
 		console.error(`founder-steering: delivery-timeout-tail session_id=${sessionId} tail=${JSON.stringify(tail)}`);
 		if (diagnostics) {
 			const rows = dbRows(diagnostics.kernelDb, "SELECT json_extract(payload,'$.outcome') AS outcome, json_extract(payload,'$.target_session_id') AS target_session_id FROM events WHERE type='task.steering_delivery' AND object_id=? ORDER BY rowid DESC LIMIT 1", diagnostics.taskId);
@@ -287,6 +318,31 @@ async function waitForDeliveryAck(endpoint: string, sessionId: string, expected:
 		}
 		throw error;
 	}
+}
+
+async function waitForSteeringDelivery(
+  endpoint: string,
+  sessionId: string,
+  kernelDb: string,
+  binding: { acceptedEventId: string; taskId: string; targetSessionId: string; expectedRole: string },
+  markerCountBefore: number,
+  deadlineAt: number,
+): Promise<void> {
+  const observed = async () => steeringDeliveryObserved(
+    steeringDeliveryFacts(kernelDb, binding.taskId), binding,
+    await captureSession(endpoint, sessionId), markerCountBefore,
+  );
+  try {
+    await waitFor(`causal steering delivery ${binding.acceptedEventId}`, async () => {
+      try { return await observed() ? true : null; } catch { return null; }
+    }, deadlineAt);
+  } catch (error) {
+    const finalOutput = await captureSession(endpoint, sessionId).catch(() => "");
+    const finalFacts = steeringDeliveryFacts(kernelDb, binding.taskId);
+    if (steeringDeliveryObserved(finalFacts, binding, finalOutput, markerCountBefore)) return;
+    console.error(`founder-steering: steering-delivery-timeout binding=${JSON.stringify(binding)} facts=${JSON.stringify(finalFacts)} tail=${JSON.stringify(compactPtyCapture(finalOutput).slice(-2_000))}`);
+    throw error;
+  }
 }
 
 function falsifierName(): string | null {
@@ -363,17 +419,30 @@ export async function runFounderSteeringGate(): Promise<{ ok: boolean }> {
 		const workerStartup = compactPtyCapture(await captureSession(launchOne.endpoint, workerOneId));
 		assert(workerStartup.includes(`source_sha256=${RESPONDER_SHA256}`), "worker responder runtime source SHA does not match collab-electron/cli");
 		console.log(`responder_provenance=PASS source_sha256=${RESPONDER_SHA256}`);
+    const workerMarker = "QF_SYNTHETIC delivery_ack role=worker";
+    const clarifyMarkerCountBefore = workerStartup.split(workerMarker).length - 1;
     await clickTaskButton(launchOne.endpoint, "Clarify", String((dbRows(kernelDb, "SELECT title FROM task WHERE id = ?", taskId)[0] as { title: string }).title), { kind: "steer", value: CLARIFICATION });
-    await waitFor("clarify receipt", async () => dbRows(kernelDb, "SELECT id FROM events WHERE type='task.clarified' AND object_id=?", taskId).length === 1 ? true : null, Date.now() + 15_000);
-		await waitForDeliveryAck(launchOne.endpoint, workerOneId, `QF_SYNTHETIC delivery_ack role=worker task_id=${taskId}`, Date.now() + 15_000, 1, { kernelDb, taskId });
+    const clarifyEvent = await waitFor("clarify receipt", async () => {
+      const rows = dbRows(kernelDb, "SELECT id FROM events WHERE type='task.clarified' AND object_id=?", taskId);
+      return rows.length === 1 ? rows[0]! : null;
+    }, Date.now() + 15_000);
+    await waitForSteeringDelivery(launchOne.endpoint, workerOneId, kernelDb, {
+      acceptedEventId: String(clarifyEvent.id), taskId, targetSessionId: workerOneId, expectedRole: "worker",
+    }, clarifyMarkerCountBefore, Date.now() + 15_000);
     const beforeRedirect = String((dbRows(kernelDb, "SELECT description FROM task WHERE id = ?", taskId)[0] as { description: string }).description);
+    const redirectMarkerCountBefore = compactPtyCapture(await captureSession(launchOne.endpoint, workerOneId)).split(workerMarker).length - 1;
     await clickTaskButton(launchOne.endpoint, "Redirect", String((dbRows(kernelDb, "SELECT title FROM task WHERE id = ?", taskId)[0] as { title: string }).title), { kind: "steer", value: REDIRECT });
-    await waitFor("redirect receipt", async () => dbRows(kernelDb, "SELECT id FROM events WHERE type='task.redirected' AND object_id=?", taskId).length === 1 ? true : null, Date.now() + 15_000);
+    const redirectEvent = await waitFor("redirect receipt", async () => {
+      const rows = dbRows(kernelDb, "SELECT id FROM events WHERE type='task.redirected' AND object_id=?", taskId);
+      return rows.length === 1 ? rows[0]! : null;
+    }, Date.now() + 15_000);
     assert(String((dbRows(kernelDb, "SELECT description FROM task WHERE id = ?", taskId)[0] as { description: string }).description) === REDIRECT, "redirect did not update description exactly once");
     assert(beforeRedirect === QUESTION, "clarify mutated the Task description");
     const redirectPayload = jsonPayload(String(dbRows(kernelDb, "SELECT payload FROM events WHERE type='task.redirected' AND object_id=?", taskId)[0]!.payload));
     assert(redirectPayload.previous_description === beforeRedirect, "redirect previous_description is absent or incorrect");
-    await waitForDeliveryAck(launchOne.endpoint, workerOneId, `QF_SYNTHETIC delivery_ack role=worker task_id=${taskId}`, Date.now() + 15_000);
+    await waitForSteeringDelivery(launchOne.endpoint, workerOneId, kernelDb, {
+      acceptedEventId: String(redirectEvent.id), taskId, targetSessionId: workerOneId, expectedRole: "worker",
+    }, redirectMarkerCountBefore, Date.now() + 15_000);
     const admission = await rpcCall(launchOne.endpoint, "qf.dock.spawn", { definitionId: "hermes-worker-2" }, 20_000);
     if (!admission || typeof admission !== "object" || typeof (admission as Record<string, unknown>).sessionId !== "string") {
       throw new Error(`worker-2 Dock admission failed: ${JSON.stringify(admission)}`);
