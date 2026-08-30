@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from authority tree `0676258d6a78a0bbdb76cb1bd74e979f494eb370` for G11 receipt review by
+> Generated from `wo-golden-g2 @ 59a88940` on 2026-08-30 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -346,7 +346,7 @@ asked before the change, when nothing is red yet.
   collab-electron/src/main/index.ts
 ```
 
-`packages/qf-kernel/src/governed-review.ts` — **40 files depend on it**, it imports 8
+`packages/qf-kernel/src/governed-review.ts` — **41 files depend on it**, it imports 8
 
 ```
   packages/qf-kernel/src/index.ts
@@ -359,25 +359,25 @@ asked before the change, when nothing is red yet.
   qa/gates/dock-definition-launch/run.ts
   qa/gates/dock-profile-identity/run.ts
   qa/gates/golden-g10-canvas-runtime.ts
-  …30 more
+  …31 more
 ```
 
 ### Blast-radius coverage
 
 **222 of 223 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**530 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**532 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 307 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 309 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
 | File | Dependents | Imports | Wires |
 |---|---:|---:|---:|
-| `packages/qf-kernel/src/trace.ts` | 54+ | 1 | 0 |
+| `packages/qf-kernel/src/trace.ts` | 53+ | 1 | 0 |
 | `collab-electron/src/main/file-filter.ts` | 52+ | 2 | 0 |
-| `packages/qf-kernel/src/registry-drift.ts` | 52+ | 0 | 0 |
-| `packages/qf-kernel/src/upgrade.ts` | 52+ | 3 | 0 |
+| `packages/qf-kernel/src/registry-drift.ts` | 51+ | 0 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | 51+ | 3 | 0 |
 | `collab-electron/src/main/files.ts` | 49+ | 2 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
@@ -415,7 +415,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (530 files)
+## Per-analyzer coverage (532 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -423,17 +423,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 526 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 269 | 0 | 3 | 0 | 258 |
-| `ipcPush` | 7 | 0 | 3 | 0 | 520 |
-| `persistence` | 24 | 29 | 0 | 0 | 477 |
-| `lifetime` | 5 | 57 | 0 | 0 | 468 |
-| `packaging` | 221 | 0 | 0 | 102 | 207 |
-| `ownership` | 20 | 0 | 0 | 336 | 174 |
-| `reach` | 220 | 3 | 0 | 307 | 0 |
+| `imports` | 528 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 269 | 0 | 3 | 0 | 260 |
+| `ipcPush` | 7 | 0 | 3 | 0 | 522 |
+| `persistence` | 22 | 29 | 0 | 0 | 481 |
+| `lifetime` | 5 | 58 | 0 | 0 | 469 |
+| `packaging` | 221 | 0 | 0 | 102 | 209 |
+| `ownership` | 20 | 0 | 0 | 336 | 176 |
+| `reach` | 220 | 3 | 0 | 309 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 307 files means those trees are
+failure — `reach: unsupported` on 309 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 102 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.

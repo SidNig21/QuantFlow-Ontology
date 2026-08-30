@@ -1,17 +1,20 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import {
   LINUX_RELEASE_STAGES,
   WINDOWS_RELEASE_STAGES,
   nativeWindowsReleaseAllowed,
   releaseStagesForPlatform,
 } from "./verify-release.ts";
+import { G12_OPERATION_STEP_IDS } from "./gates/golden-g12-package-operations.ts";
 
 describe("verify-release stages", () => {
   test("requires the native Windows install, unit, package, and static-gate order", () => {
     expect(WINDOWS_RELEASE_STAGES.map((stage) => stage.id)).toEqual([
       "install",
       "unit",
-      "windows-cold-boot",
+      "golden-g12-package-operations",
       "repo-shape",
       "lockfile-committed",
       "kernel-sole-writer",
@@ -21,7 +24,6 @@ describe("verify-release stages", () => {
       "rung-ladder",
       "one-skin",
       "glacier-feel",
-      "acp-fs-confine",
       "schema-bundle-aliases",
       "verb-retirement",
       "kernel-task-delegation",
@@ -31,11 +33,25 @@ describe("verify-release stages", () => {
   });
 
   test("deleting Windows cold boot is detectable", () => {
-    const withoutColdBoot = WINDOWS_RELEASE_STAGES.filter(
-      (stage) => stage.id !== "windows-cold-boot",
+    const withoutColdBoot = G12_OPERATION_STEP_IDS.filter(
+      (stage) => stage !== "unpacked-readiness-shutdown",
     );
-    expect(withoutColdBoot.some((stage) => stage.id === "windows-cold-boot")).toBe(false);
-    expect(WINDOWS_RELEASE_STAGES.some((stage) => stage.id === "windows-cold-boot")).toBe(true);
+    expect(withoutColdBoot).not.toContain("unpacked-readiness-shutdown");
+    expect(G12_OPERATION_STEP_IDS).toContain("unpacked-readiness-shutdown");
+  });
+
+  test("omitting the G12 package and operations stage is detectable", () => {
+    const withoutG12 = WINDOWS_RELEASE_STAGES.filter(
+      (stage) => stage.id !== "golden-g12-package-operations",
+    );
+    expect(
+      withoutG12.some((stage) => stage.id === "golden-g12-package-operations"),
+    ).toBe(false);
+    expect(
+      WINDOWS_RELEASE_STAGES.some(
+        (stage) => stage.id === "golden-g12-package-operations",
+      ),
+    ).toBe(true);
   });
 
   test("keeps Linux as an explicit compatibility route", () => {
@@ -47,5 +63,14 @@ describe("verify-release stages", () => {
     expect(nativeWindowsReleaseAllowed("win32")).toBe(true);
     expect(nativeWindowsReleaseAllowed("linux")).toBe(false);
     expect(nativeWindowsReleaseAllowed("darwin")).toBe(false);
+  });
+
+  test("package signing inspection binds to the built-in PowerShell module", () => {
+    const packageScript = readFileSync(
+      join(import.meta.dir, "../collab-electron/scripts/package.mjs"),
+      "utf8",
+    );
+    expect(packageScript).toContain("Join-Path $PSHOME");
+    expect(packageScript).toContain("Microsoft.PowerShell.Security.psd1");
   });
 });

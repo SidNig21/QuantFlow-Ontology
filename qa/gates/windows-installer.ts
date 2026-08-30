@@ -104,9 +104,12 @@ function currentCommitSha(): string {
 
 function authenticodeStatus(path: string): string {
   const quoted = path.replaceAll("'", "''");
+  const command =
+    "Import-Module -Name (Join-Path $PSHOME 'Modules/Microsoft.PowerShell.Security/Microsoft.PowerShell.Security.psd1') -Force; " +
+    `(Get-AuthenticodeSignature -LiteralPath '${quoted}').Status.ToString()`;
   return execFileSync(
     "powershell.exe",
-    ["-NoProfile", "-NonInteractive", "-Command", `(Get-AuthenticodeSignature -LiteralPath '${quoted}').Status.ToString()`],
+    ["-NoProfile", "-NonInteractive", "-Command", command],
     { cwd: REPO_ROOT, encoding: "utf8", windowsHide: true },
   ).trim();
 }
@@ -136,7 +139,7 @@ async function launchInstalledArtifact(
   installRoot: string,
   tempRoot: string,
   expectedIdentity: { commitSha: string; packagedAt: string },
-): Promise<void> {
+): Promise<{ kernelDb: string; artifactRoot: string; profileIds: string[] }> {
   const executable = join(installRoot, "QuantFlow.exe");
   assert(existsSync(executable), `installed executable missing: ${executable}`);
   const resourcesRoot = join(installRoot, "resources");
@@ -201,7 +204,12 @@ async function launchInstalledArtifact(
       const lingering = (await processSnapshot()).filter((row) => owned.has(row.pid));
       if (lingering.length === 0) {
         console.log("windows-installer: install-owned processes=0");
-        return;
+        assert(!existsSync(endpointFile), "installed app left its endpoint breadcrumb after shutdown");
+        return {
+          kernelDb,
+          artifactRoot,
+          profileIds: ids.map(String).sort(),
+        };
       }
       await wait(250);
     }
@@ -277,7 +285,13 @@ export async function runWindowsInstallerGate(): Promise<{ ok: boolean }> {
     const installedExecutable = join(installRoot, "QuantFlow.exe");
     assert(existsSync(installedExecutable), `silent install did not produce ${installedExecutable}`);
     console.log(`windows-installer: installed-executable=${installedExecutable}`);
-    await launchInstalledArtifact(installRoot, tempRoot, identity);
+    const firstLaunch = await launchInstalledArtifact(installRoot, tempRoot, identity);
+    const relaunch = await launchInstalledArtifact(installRoot, tempRoot, identity);
+    assert(
+      JSON.stringify(relaunch) === JSON.stringify(firstLaunch),
+      `installed relaunch state identity disagreed: first=${JSON.stringify(firstLaunch)} second=${JSON.stringify(relaunch)}`,
+    );
+    console.log(`windows-installer: relaunch-same-state=${JSON.stringify(relaunch)}`);
     console.log("windows-installer: PASS");
     return { ok: true };
   } catch (error) {

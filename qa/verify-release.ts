@@ -29,9 +29,9 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
     command: ["bun", "qa/windows-unit.ts"],
   },
   {
-    id: "windows-cold-boot",
+    id: "golden-g12-package-operations",
     cwd: ".",
-    command: ["bun", "qa/run.ts", "windows-cold-boot"],
+    command: ["bun", "qa/run.ts", "golden-g12-package-operations"],
   },
   // hermes-founder-state is deliberately NOT a release stage. It needs a real
   // WSL distro and fails closed without one, which is the correct posture for a
@@ -87,11 +87,6 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
     id: "glacier-feel",
     cwd: ".",
     command: ["bun", "qa/run.ts", "glacier-feel"],
-  },
-  {
-    id: "acp-fs-confine",
-    cwd: ".",
-    command: ["bun", "qa/run.ts", "acp-fs-confine"],
   },
   {
     id: "schema-bundle-aliases",

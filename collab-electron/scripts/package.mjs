@@ -253,10 +253,12 @@ if (process.platform === "win32") {
   }
   const artifacts = candidates.map((path) => {
     const quotedPath = path.replaceAll("'", "''");
+    const command =
+      "Import-Module -Name (Join-Path $PSHOME 'Modules/Microsoft.PowerShell.Security/Microsoft.PowerShell.Security.psd1') -Force; " +
+      `(Get-AuthenticodeSignature -LiteralPath '${quotedPath}').Status.ToString()`;
     const check = spawnSync(
       "powershell.exe",
-      ["-NoProfile", "-NonInteractive", "-Command",
-        `(Get-AuthenticodeSignature -LiteralPath '${quotedPath}').Status.ToString()`],
+      ["-NoProfile", "-NonInteractive", "-Command", command],
       { encoding: "utf8", windowsHide: true },
     );
     return {

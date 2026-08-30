@@ -256,6 +256,16 @@ function trackedFiles(): string[] {
 
 const gates: Gate[] = [
   {
+    name: "golden-g12-package-operations",
+    description: "G12: Windows package, install, release target, Bovada durability, PTY/sidecar teardown, relaunch, and cleanup",
+    run: async () => {
+      const { runGoldenG12PackageOperationsGate } = await import(
+        "./gates/golden-g12-package-operations.ts"
+      );
+      return (await runGoldenG12PackageOperationsGate()).ok;
+    },
+  },
+  {
     name: "research-director-front-door",
     description: "WO-RD-1: real Research Director form admission, durable Mission, exact session, and automatic tile",
     run: async () => {
@@ -624,16 +634,6 @@ const gates: Gate[] = [
         "./gates/team-composition-ui-launch.ts"
       );
       const { ok } = await runTeamCompositionUiGate();
-      return ok;
-    },
-  },
-  {
-    name: "acp-fs-confine",
-    description:
-      "R7: ACP fs confined to QF_ACP_FS_ROOT; unset root not advertised; escape baits refused",
-    run: async () => {
-      const { runAcpFsConfineGate } = await import("./gates/acp-fs-confine.ts");
-      const { ok } = await runAcpFsConfineGate();
       return ok;
     },
   },

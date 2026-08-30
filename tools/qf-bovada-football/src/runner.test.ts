@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { readFileSync, readdirSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   contentHash,
@@ -35,7 +36,7 @@ afterEach(() => {
 
 function setup(): { db: KernelDb; root: string } {
   const db = openKernel(":memory:");
-  const root = mkdtempSync(join("/tmp", "qf-bovada-football-"));
+  const root = mkdtempSync(join(tmpdir(), "qf-bovada-football-"));
   databases.push(db);
   roots.push(root);
   return { db, root };

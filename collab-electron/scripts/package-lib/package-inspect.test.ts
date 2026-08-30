@@ -467,7 +467,11 @@ describe("inspectPackagedResources product identity", () => {
         join(root, "resources"),
         collabRoot,
         [],
-        { expectedResourcesRoot: join(root, "resources") },
+        {
+          expectedResourcesRoot: join(root, "resources"),
+          platform: "linux",
+          statMode: () => 0o100644,
+        },
       );
       expect(result.ok).toBe(false);
       if (!result.ok) expect(result.reason).toContain("is not executable");

@@ -25,6 +25,11 @@ export const WINDOWS_FOCUSED_TESTS = [
   "qa/verify-release.test.ts",
 ] as const;
 
+export const WINDOWS_NODE_TESTS = [
+  "src/main/sidecar/client.test.ts",
+  "src/main/sidecar/server.test.ts",
+] as const;
+
 if (import.meta.main) {
   if (process.platform !== "win32") {
     console.error(
@@ -42,6 +47,20 @@ if (import.meta.main) {
     },
   );
   const code = await child.exited;
-  console.log(`windows-unit: ${code === 0 ? "PASS" : "FAIL"}`);
-  process.exit(code);
+  if (code !== 0) {
+    console.log("windows-unit: FAIL");
+    process.exit(code);
+  }
+
+  const node = Bun.spawn(
+    ["node", "--import", "tsx", "--test", ...WINDOWS_NODE_TESTS],
+    {
+      cwd: join(REPO_ROOT, "collab-electron"),
+      stdout: "inherit",
+      stderr: "inherit",
+    },
+  );
+  const nodeCode = await node.exited;
+  console.log(`windows-unit: ${nodeCode === 0 ? "PASS" : "FAIL"}`);
+  process.exit(nodeCode);
 }

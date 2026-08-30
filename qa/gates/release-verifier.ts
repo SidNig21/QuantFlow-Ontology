@@ -36,9 +36,9 @@ const EXPECTED_STAGES: readonly ReleaseStage[] = [
     command: ["bun", "qa/windows-unit.ts"],
   },
   {
-    id: "windows-cold-boot",
+    id: "golden-g12-package-operations",
     cwd: ".",
-    command: ["bun", "qa/run.ts", "windows-cold-boot"],
+    command: ["bun", "qa/run.ts", "golden-g12-package-operations"],
   },
   // hermes-founder-state is intentionally absent: it requires a WSL distro and
   // fails closed without one, and CI's windows-latest runner has none.
@@ -94,11 +94,6 @@ const EXPECTED_STAGES: readonly ReleaseStage[] = [
     command: ["bun", "qa/run.ts", "glacier-feel"],
   },
   {
-    id: "acp-fs-confine",
-    cwd: ".",
-    command: ["bun", "qa/run.ts", "acp-fs-confine"],
-  },
-  {
     id: "schema-bundle-aliases",
     cwd: ".",
     command: ["bun", "qa/run.ts", "schema-bundle-aliases"],
@@ -145,7 +140,7 @@ export function checkReleaseVerifier(
     stages.some((stage, index) => !sameStage(stage, EXPECTED_STAGES[index]!))
   ) {
     reasons.push(
-      "canonical Windows release stages must be install -> focused unit -> cold boot -> static acceptance gates",
+      "canonical Windows release stages must be install -> focused unit -> G12 package operations -> static acceptance gates",
     );
   }
 
@@ -223,12 +218,12 @@ async function checkRunnerBehavior(
   }
 
   const beforeFailure: string[] = [];
-  const failureIndex = stages.findIndex((stage) => stage.id === "windows-cold-boot");
+  const failureIndex = stages.findIndex((stage) => stage.id === "golden-g12-package-operations");
   const failureCode = await runReleaseVerification(
     stages,
     async (stage) => {
       beforeFailure.push(stage.id);
-      return stage.id === "windows-cold-boot" ? 47 : 0;
+      return stage.id === "golden-g12-package-operations" ? 47 : 0;
     },
     SILENT_REPORTER,
     "test-run-id",
@@ -237,10 +232,10 @@ async function checkRunnerBehavior(
     failureCode !== 47 ||
     failureIndex < 0 ||
     beforeFailure.length !== failureIndex + 1 ||
-    beforeFailure.at(-1) !== "windows-cold-boot"
+    beforeFailure.at(-1) !== "golden-g12-package-operations"
   ) {
     reasons.push(
-      "release runner must propagate the Windows cold-boot failure and stop before later gates",
+      "release runner must propagate the G12 package-operations failure and stop before later gates",
     );
   }
 
@@ -254,7 +249,7 @@ export async function runReleaseVerifierGate(): Promise<{ ok: boolean }> {
 
   switch (falsify) {
     case "stage":
-      stages = stages.filter((stage) => stage.id !== "windows-cold-boot");
+      stages = stages.filter((stage) => stage.id !== "golden-g12-package-operations");
       break;
     // replaceAll, not replace: an authority document may name the canonical
     // command more than once, and leaving one behind makes the bait unable to

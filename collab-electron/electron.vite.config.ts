@@ -24,14 +24,6 @@ export default defineConfig({
           find: "@collab/shared",
           replacement: resolve(__dirname, "packages/shared/src"),
         },
-        // File dependencies are intentionally installed as copies by Bun. Keep
-        // the Electron build on the checked-out Kernel source so a new Kernel
-        // seam is bundled without requiring a package reinstall in a shared
-        // founder checkout.
-        {
-          find: /^qf-kernel\/portable$/,
-          replacement: resolve(__dirname, "../packages/qf-kernel/src/portable.ts"),
-        },
       ],
     },
     build: {

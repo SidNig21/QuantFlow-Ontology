@@ -1,4 +1,4 @@
-import { expect, mock, test } from "bun:test";
+import { afterAll, expect, mock, test } from "bun:test";
 import { Database } from "bun:sqlite";
 import { readFileSync } from "node:fs";
 import { actionToolForAction, readToolsForObject } from "qf-kernel-schema/mcp";
@@ -45,8 +45,24 @@ mock.module("electron", () => ({
     kernelExecute,
     kernelBindSourceWork,
     openAppKernel,
+    closeAppKernel,
   } = await import("./kernel");
 const { registerOntologyGatewayRpc } = await import("./ontology-gateway");
+
+const { existsSync, mkdtempSync, rmSync } = await import("node:fs");
+const { tmpdir } = await import("node:os");
+const { join } = await import("node:path");
+const gatewaySuiteRoot = mkdtempSync(join(tmpdir(), "qf-ontology-gateway-suite-"));
+const gatewayPreviousEnv = { kernelDb: process.env.QF_KERNEL_DB, artifactRoot: process.env.QF_ARTIFACT_ROOT, peerBusDb: process.env.QF_PEER_BUS_DB };
+process.env.QF_KERNEL_DB = join(gatewaySuiteRoot, "kernel.db");
+afterAll(() => {
+  closeAppKernel();
+  if (gatewayPreviousEnv.kernelDb === undefined) delete process.env.QF_KERNEL_DB; else process.env.QF_KERNEL_DB = gatewayPreviousEnv.kernelDb;
+  if (gatewayPreviousEnv.artifactRoot === undefined) delete process.env.QF_ARTIFACT_ROOT; else process.env.QF_ARTIFACT_ROOT = gatewayPreviousEnv.artifactRoot;
+  if (gatewayPreviousEnv.peerBusDb === undefined) delete process.env.QF_PEER_BUS_DB; else process.env.QF_PEER_BUS_DB = gatewayPreviousEnv.peerBusDb;
+  rmSync(gatewaySuiteRoot, { recursive: true, force: true });
+  expect(existsSync(gatewaySuiteRoot)).toBe(false);
+});
 
 test("only ontology reads receive the Kernel read marker", () => {
   const identity = { sessionId: "session-worker", role: "worker" };
@@ -115,10 +131,8 @@ test("native research roles receive a focused generated ontology surface", () =>
 });
 
 test("production list_tools serves action and read schemas for admitted seats", () => {
-  const previousKernelDb = process.env.QF_KERNEL_DB;
   const previousArtifactRoot = process.env.QF_ARTIFACT_ROOT;
   const previousPeerBusDb = process.env.QF_PEER_BUS_DB;
-  process.env.QF_KERNEL_DB = ":memory:";
   delete process.env.QF_ARTIFACT_ROOT;
   delete process.env.QF_PEER_BUS_DB;
   const issuedCapabilities = new Set<string>();
@@ -258,8 +272,6 @@ test("production list_tools serves action and read schemas for admitted seats", 
     for (const capability of issuedCapabilities) {
       revokeLiveSeatCapability(capability);
     }
-    if (previousKernelDb === undefined) delete process.env.QF_KERNEL_DB;
-    else process.env.QF_KERNEL_DB = previousKernelDb;
     if (previousArtifactRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
     else process.env.QF_ARTIFACT_ROOT = previousArtifactRoot;
     if (previousPeerBusDb === undefined) delete process.env.QF_PEER_BUS_DB;
@@ -285,10 +297,8 @@ test("an admitted governed critic receives and records the verified Artifact rec
   } = await import("./kernel");
 
   const artifactRoot = mkdtempSync(join(tmpdir(), "qf-r16-gateway-artifact-"));
-  const previousKernelDb = process.env.QF_KERNEL_DB;
   const previousArtifactRoot = process.env.QF_ARTIFACT_ROOT;
   const previousPeerBusDb = process.env.QF_PEER_BUS_DB;
-  process.env.QF_KERNEL_DB = ":memory:";
   process.env.QF_ARTIFACT_ROOT = artifactRoot;
   delete process.env.QF_PEER_BUS_DB;
   const trace = () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
@@ -710,8 +720,6 @@ test("an admitted governed critic receives and records the verified Artifact rec
       expect(historicalReport?.fields.semantic_markers).toEqual(["HISTORICAL"]);
     }
   } finally {
-    if (previousKernelDb === undefined) delete process.env.QF_KERNEL_DB;
-    else process.env.QF_KERNEL_DB = previousKernelDb;
     if (previousArtifactRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
     else process.env.QF_ARTIFACT_ROOT = previousArtifactRoot;
     if (previousPeerBusDb === undefined) delete process.env.QF_PEER_BUS_DB;

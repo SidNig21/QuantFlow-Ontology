@@ -1144,15 +1144,25 @@ export function destroyAll(): void {
 
 export async function shutdownSidecarIfIdle(): Promise<void> {
   if (!sidecarClient) return;
+  const client = sidecarClient;
+  sidecarClient = null;
   try {
-    const sessions = await sidecarClient.listSessions();
+    // During app shutdown, do not queue session.list behind kill requests that
+    // may already be past the bounded cleanup grace. sidecar.shutdown owns its
+    // PTY tree; closing the control socket also rejects every pending RPC timer.
+    if (shuttingDown) {
+      await client.shutdownSidecar();
+      return;
+    }
+    const sessions = await client.listSessions();
     if (sessions.length === 0) {
-      await sidecarClient.shutdownSidecar();
+      await client.shutdownSidecar();
     }
   } catch {
     // Sidecar already gone or unreachable — nothing to do.
+  } finally {
+    client.disconnect();
   }
-  sidecarClient = null;
 }
 
 export interface DiscoveredSession {

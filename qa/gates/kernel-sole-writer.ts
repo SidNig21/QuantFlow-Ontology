@@ -34,10 +34,12 @@ import { join, relative } from "node:path";
 
 const REPO_ROOT = join(import.meta.dir, "../..");
 
-const DRIVER_SQL_PATTERNS: Array<{ name: string; re: RegExp }> = [
+const DRIVER_PATTERNS: Array<{ name: string; re: RegExp }> = [
   { name: "bun:sqlite", re: /bun:sqlite/ },
   { name: "better-sqlite3", re: /better-sqlite3/ },
   { name: "node:sqlite", re: /node:sqlite/ },
+];
+const SQL_PATTERNS: Array<{ name: string; re: RegExp }> = [
   { name: "CREATE TABLE", re: /\bCREATE\s+TABLE\b/i },
   { name: "INSERT INTO", re: /\bINSERT\s+INTO\b/i },
   { name: "UPDATE ... SET", re: /\bUPDATE\s+[A-Za-z_][\w.]*\s+SET\b/i },
@@ -52,7 +54,7 @@ const OPEN_PATTERNS: Array<{ name: string; re: RegExp }> = [
 const WRITE_PATTERN = { name: "execute-call", re: /\bexecute\s*\(/ };
 
 /** Who may talk to SQLite / issue raw DDL/DML (driver/SQL claim only). */
-const DRIVER_SQL_ALLOW = [
+const DRIVER_ALLOW = [
   "packages/qf-kernel/",
   "qf-kernel-schema/",
   "qa/gates/kernel-sole-writer.ts",
@@ -114,7 +116,9 @@ const DRIVER_SQL_ALLOW = [
   "qa/gates/pre-r18-coherence.ts",
   // WO-RD-3: independent read-only oracle over the isolated founder-steering Kernel.
   "qa/gates/founder-steering.ts",
+  "qa/gates/golden-g10-canvas-runtime.ts",
 ];
+const SQL_ALLOW = DRIVER_ALLOW.filter((path) => path !== "qa/gates/golden-g10-canvas-runtime.ts");
 
 /**
  * Who may call openKernel / openAppKernel outside packages/qf-kernel/.
@@ -163,6 +167,8 @@ const OPEN_ALLOW = [
   "qa/gates/team-composition.ts",
   "qa/gates/windows-golden-run.ts",
   "qa/gates/windows-golden-seed.ts",
+  "qa/gates/golden-g10-canvas-runtime.ts",
+  "qa/gates/report-authority.ts",
 ];
 
 /**
@@ -205,6 +211,7 @@ const WRITE_ALLOW = [
   // WO-R17: focused Kernel receipt gate uses the sanctioned write boundary.
   "qa/gates/technique-outcome-loop.ts",
   "collab-electron/",
+  "qa/gates/report-authority.ts",
 ];
 
 /** Production openers that must never pass { create: true } (G3b). */
@@ -385,13 +392,20 @@ export function checkKernelSoleWriter(): { ok: boolean; offenders: string[] } {
       }
 
       // Claim 1 — driver/SQL (independent of open/write membership)
-      if (!onAllowlist(rel, DRIVER_SQL_ALLOW)) {
-        for (const p of DRIVER_SQL_PATTERNS) {
+      if (!onAllowlist(rel, DRIVER_ALLOW)) {
+        for (const p of DRIVER_PATTERNS) {
           if (p.re.test(text)) {
-            offenders.push({ rel, claim: "driver/sql", detail: p.name });
+            offenders.push({ rel, claim: "driver", detail: p.name });
             break;
           }
         }
+      }
+      if (!onAllowlist(rel, SQL_ALLOW)) {
+        for (const p of SQL_PATTERNS) if (p.re.test(text)) { offenders.push({ rel, claim: "sql", detail: p.name }); break; }
+      }
+      if (rel === "qa/gates/golden-g10-canvas-runtime.ts") {
+        const constructors = stripComments(text).split(/\r?\n/).filter((line) => /new\s+Database\s*\(/.test(line));
+        if (constructors.some((line) => !/\{\s*readonly\s*:\s*true\s*\}/.test(line))) offenders.push({ rel, claim: "driver", detail: "writable Database construction" });
       }
 
       // Claim 2 — open front door

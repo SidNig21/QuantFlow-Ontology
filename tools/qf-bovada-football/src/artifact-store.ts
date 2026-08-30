@@ -74,7 +74,13 @@ function fsyncDirectory(path: string): void {
   let fd: number | undefined;
   try {
     fd = openSync(path, fsConstants.O_RDONLY);
-    fsyncSync(fd);
+    try {
+      fsyncSync(fd);
+    } catch (error) {
+      // Windows does not expose a directory flush through fsync. The staged
+      // file itself was flushed above and linkSync remains the atomic publish.
+      if (process.platform !== "win32" || !hasCode(error, "EPERM")) throw error;
+    }
   } finally {
     if (fd !== undefined) closeSync(fd);
   }

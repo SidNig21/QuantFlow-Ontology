@@ -27,7 +27,7 @@ const TEST_CWD = process.platform === "win32" ? os.tmpdir() : "/tmp";
 const TEST_SHELL = process.platform === "win32"
   ? {
     command: "powershell.exe",
-    args: ["-NoLogo"],
+    args: ["-NoLogo", "-NoProfile", "-NonInteractive"],
     displayName: "PowerShell",
     target: "powershell",
     echo: (marker: string) => `Write-Output '${marker}'\n`,

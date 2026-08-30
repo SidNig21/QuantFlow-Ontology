@@ -106,6 +106,10 @@ export type InspectOptions = {
   expectedResourcesRoot?: string;
   /** QA-only package closure includes deterministic proof runtime fixtures. */
   qaMode?: boolean;
+  /** Filesystem semantics used for platform-specific package checks. */
+  platform?: NodeJS.Platform;
+  /** Injectable mode reader for deterministic cross-platform inspection tests. */
+  statMode?: (path: string) => number;
 };
 
 function fileSize(path: string): number {
@@ -338,7 +342,11 @@ export function inspectPackagedResources(
     checked.push(...sqlInspect.entries);
   }
 
-  const productIdentity = inspectPackagedProductIdentity(root);
+  const productIdentity = inspectPackagedProductIdentity(
+    root,
+    options.platform ?? process.platform,
+    options.statMode ?? ((path) => statSync(path).mode),
+  );
   if ("ok" in productIdentity && productIdentity.ok === false) {
     return productIdentity;
   }
@@ -529,12 +537,14 @@ function yamlScalar(source: string, key: string): string | null {
 
 function inspectPackagedProductIdentity(
   resourcesRoot: string,
+  platform: NodeJS.Platform,
+  statMode: (path: string) => number,
 ): InspectFailure | { entries: { path: string; bytes: number }[] } {
   const packageRoot = resolve(resourcesRoot, "..");
   const executablePath = join(packageRoot, QF_LINUX_EXECUTABLE);
   const executableFail = requireNonEmpty(executablePath, "QuantFlow executable");
   if (executableFail) return executableFail;
-  if ((statSync(executablePath).mode & 0o111) === 0) {
+  if (platform !== "win32" && (statMode(executablePath) & 0o111) === 0) {
     return {
       ok: false,
       reason: `QuantFlow executable is not executable: ${executablePath}`,

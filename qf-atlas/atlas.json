@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "20457ecb",
+    "commit": "59a88940",
     "generatedAt": "2026-08-30",
-    "filesScanned": 408,
+    "filesScanned": 410,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "9d437ef2b33f75c2"
+    "fingerprint": "f03168ddc3cc9dbc"
   },
   "stats": {
     "live": 109,
@@ -327,9 +327,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 530
+      "files": 532
     },
-    "coverageFiles": 530,
+    "coverageFiles": 532,
     "ownership": {
       "responsibilities": 10,
       "contested": 7,
@@ -870,9 +870,9 @@
       "id": "2:collab-electron/scripts/package-lib::package",
       "layer": 2,
       "name": "package-lib/package*",
-      "kb": 26.7,
-      "x": -2.48,
-      "z": -0.91,
+      "kb": 27.2,
+      "x": -2.6,
+      "z": 0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
@@ -881,7 +881,7 @@
       "files": [
         {
           "path": "collab-electron/scripts/package-lib/package-inspect.ts",
-          "kb": 22.8,
+          "kb": 23.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -928,7 +928,7 @@
       "id": "2:collab-electron/scripts::package",
       "layer": 2,
       "name": "scripts/package*",
-      "kb": 15.4,
+      "kb": 15.6,
       "x": 0.91,
       "z": -2.48,
       "status": "ok",
@@ -939,7 +939,7 @@
       "files": [
         {
           "path": "collab-electron/scripts/package.mjs",
-          "kb": 11.6,
+          "kb": 11.8,
           "spawns": 4,
           "spawnsLive": 0,
           "writes": 1,
@@ -1243,8 +1243,8 @@
       "layer": 2,
       "name": "main/host*",
       "kb": 27.1,
-      "x": -2.6,
-      "z": 0.45,
+      "x": -2.48,
+      "z": -0.91,
       "status": "gray",
       "spawns": 0,
       "writes": 0,
@@ -1874,7 +1874,7 @@
       "id": "2:collab-electron/src/main::pty",
       "layer": 2,
       "name": "pty*",
-      "kb": 36.6,
+      "kb": 36.9,
       "x": 0.23,
       "z": -1.3,
       "status": "ok",
@@ -1885,7 +1885,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/pty.ts",
-          "kb": 34.5,
+          "kb": 34.8,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 4,
@@ -3236,27 +3236,24 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1142.7,
+      "kb": 1120,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 87,
-      "writes": 52,
-      "dml": 63,
-      "executes": 73,
+      "spawns": 91,
+      "writes": 50,
+      "dml": 19,
+      "executes": 55,
       "files": [
         {
           "path": "qa/gates/golden-g10-canvas-runtime.ts",
-          "kb": 191.2,
-          "spawns": 4,
-          "spawnsLive": 3,
+          "kb": 195,
+          "spawns": 6,
+          "spawnsLive": 4,
           "writes": 3,
-          "dml": 2,
-          "dmlLines": [
-            2547,
-            2557
-          ],
-          "executes": 4
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
         },
         {
           "path": "qa/gates/pre-r18-coherence.ts",
@@ -3270,7 +3267,7 @@
         },
         {
           "path": "qa/gates/hermes-research.ts",
-          "kb": 102.8,
+          "kb": 103.5,
           "spawns": 5,
           "spawnsLive": 2,
           "writes": 1,
@@ -3309,23 +3306,6 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/report-authority.ts",
-          "kb": 45.5,
-          "spawns": 2,
-          "spawnsLive": 0,
-          "writes": 5,
-          "dml": 42,
-          "dmlLines": [
-            344,
-            345,
-            365,
-            366,
-            368,
-            386
-          ],
-          "executes": 20
-        },
-        {
           "path": "qa/gates/founder-steering.ts",
           "kb": 31.9,
           "spawns": 1,
@@ -3337,7 +3317,7 @@
         },
         {
           "path": "qa/gates/windows-cold-boot.ts",
-          "kb": 30.9,
+          "kb": 31.3,
           "spawns": 5,
           "spawnsLive": 5,
           "writes": 4,
@@ -3409,6 +3389,20 @@
           "executes": 19
         },
         {
+          "path": "qa/gates/kernel-sole-writer.ts",
+          "kb": 18.6,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 2,
+          "dml": 3,
+          "dmlLines": [
+            43,
+            44,
+            46
+          ],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/windows-dock-collaboration.ts",
           "kb": 18.5,
           "spawns": 2,
@@ -3429,22 +3423,18 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/kernel-sole-writer.ts",
-          "kb": 17.8,
+          "path": "qa/gates/kernel-market-lineage.ts",
+          "kb": 15.4,
           "spawns": 0,
           "spawnsLive": 0,
-          "writes": 2,
-          "dml": 3,
-          "dmlLines": [
-            41,
-            42,
-            44
-          ],
-          "executes": 0
+          "writes": 8,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 20
         },
         {
           "path": "qa/gates/windows-installer.ts",
-          "kb": 12.8,
+          "kb": 13.6,
           "spawns": 4,
           "spawnsLive": 2,
           "writes": 0,
@@ -3461,16 +3451,6 @@
           "dml": 0,
           "dmlLines": [],
           "executes": 0
-        },
-        {
-          "path": "qa/gates/kernel-market-lineage.ts",
-          "kb": 10.8,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 6,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 14
         },
         {
           "path": "qa/gates/team-composition.ts",
@@ -3682,6 +3662,26 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/golden-g11-authority.ts",
+          "kb": 5.2,
+          "spawns": 1,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/golden-g12-package-operations.ts",
+          "kb": 4.5,
+          "spawns": 2,
+          "spawnsLive": 1,
+          "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/windows-research-question.ts",
           "kb": 4.5,
           "spawns": 1,
@@ -3775,6 +3775,16 @@
           "path": "qa/gates/doc-action-surface.ts",
           "kb": 2.2,
           "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/report-authority.ts",
+          "kb": 2,
+          "spawns": 1,
           "spawnsLive": 0,
           "writes": 0,
           "dml": 0,
@@ -3952,38 +3962,12 @@
         {
           "kind": "outside-write-door",
           "scope": "qa",
-          "what": "42 SQL statements outside execute()",
-          "where": "qa/gates/report-authority.ts",
-          "lines": [
-            344,
-            345,
-            365,
-            366,
-            368,
-            386
-          ],
-          "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
-        },
-        {
-          "kind": "outside-write-door",
-          "scope": "qa",
           "what": "3 SQL statements outside execute()",
           "where": "qa/gates/kernel-sole-writer.ts",
           "lines": [
-            41,
-            42,
-            44
-          ],
-          "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
-        },
-        {
-          "kind": "outside-write-door",
-          "scope": "qa",
-          "what": "2 SQL statements outside execute()",
-          "where": "qa/gates/golden-g10-canvas-runtime.ts",
-          "lines": [
-            2547,
-            2557
+            43,
+            44,
+            46
           ],
           "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
         },
@@ -4276,7 +4260,7 @@
       "id": "5:qa::run",
       "layer": 5,
       "name": "qa/run.ts",
-      "kb": 38.2,
+      "kb": 38.6,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -4287,7 +4271,7 @@
       "files": [
         {
           "path": "qa/run.ts",
-          "kb": 38.2,
+          "kb": 38.6,
           "spawns": 3,
           "spawnsLive": 2,
           "writes": 0,
@@ -6192,7 +6176,7 @@
       "id": "0:residue",
       "layer": 0,
       "name": "35 small modules*",
-      "kb": 81.1,
+      "kb": 81.4,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6235,7 +6219,7 @@
         },
         {
           "path": "tools/qf-bovada-football/src/artifact-store.ts",
-          "kb": 5,
+          "kb": 5.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -6591,11 +6575,11 @@
       "id": "5:residue",
       "layer": 5,
       "name": "9 small modules*",
-      "kb": 22.9,
+      "kb": 23.4,
       "x": 0.23,
       "z": -1.3,
       "status": "ice",
-      "spawns": 2,
+      "spawns": 3,
       "writes": 0,
       "dml": 12,
       "executes": 9,
@@ -6649,9 +6633,9 @@
         },
         {
           "path": "qa/windows-unit.ts",
-          "kb": 1.6,
-          "spawns": 1,
-          "spawnsLive": 1,
+          "kb": 2.1,
+          "spawns": 2,
+          "spawnsLive": 2,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
@@ -10015,6 +9999,14 @@
     },
     {
       "path": "qa/gates/golden-g10-canvas-runtime.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/golden-g11-authority.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/golden-g12-package-operations.ts",
       "status": "out-of-scope"
     },
     {
@@ -15762,7 +15754,7 @@
       "packaging": "indexed",
       "ownership": "indexed",
       "reasons": {
-        "ipcRequest": "1 channel name(s) built from a variable or template (line 1293)",
+        "ipcRequest": "1 channel name(s) built from a variable or template (line 1303)",
         "ipcPush": "1 push channel name(s) built from a variable or template",
         "persistence": "no SQL DML or DDL in this file"
       },
@@ -20016,7 +20008,7 @@
       },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
-      "persistence": "indexed",
+      "persistence": "not-applicable",
       "lifetime": "partial",
       "packaging": "not-applicable",
       "ownership": "not-applicable",
@@ -20024,7 +20016,59 @@
         "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "lifetime": "3 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "4 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "qa/gates/golden-g11-authority.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "qa/gates/golden-g12-package-operations.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "partial",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
@@ -21000,7 +21044,7 @@
       },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
-      "persistence": "indexed",
+      "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "not-applicable",
       "ownership": "not-applicable",
@@ -21008,6 +21052,7 @@
         "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
@@ -21876,7 +21921,7 @@
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
+        "lifetime": "2 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
@@ -23967,41 +24012,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 526,
+      "indexed": 528,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 258,
+      "not-applicable": 260,
       "indexed": 269,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 520,
+      "not-applicable": 522,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 477,
+      "not-applicable": 481,
       "partial": 29,
-      "indexed": 24
+      "indexed": 22
     },
     "lifetime": {
-      "not-applicable": 468,
-      "partial": 57,
+      "not-applicable": 469,
+      "partial": 58,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 207,
+      "not-applicable": 209,
       "unsupported": 102,
       "indexed": 221
     },
     "ownership": {
-      "not-applicable": 174,
+      "not-applicable": 176,
       "unsupported": 336,
       "indexed": 20
     },
     "reach": {
-      "unsupported": 307,
+      "unsupported": 309,
       "indexed": 220,
       "partial": 3
     }
@@ -25397,12 +25442,12 @@
       "importers": [
         "collab-electron/src/main/index.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
-        "qa/gates/report-authority.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
-        "collab-electron/src/main/host-native-tui.ts"
+        "collab-electron/src/main/host-native-tui.ts",
+        "collab-electron/src/main/agent-host.ts"
       ],
-      "importerCount": 10,
+      "importerCount": 9,
       "imports": [
         "packages/qf-kernel/src/portable.ts",
         "qf-kernel-schema/src/schema.ts",
@@ -25688,11 +25733,10 @@
       "reach": "reachable",
       "importers": [
         "qa/gates/golden-g10-canvas-runtime.ts",
-        "qa/gates/report-authority.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/ontology-gateway.ts"
       ],
-      "importerCount": 4,
+      "importerCount": 3,
       "imports": [],
       "importCount": 0
     },
@@ -26710,14 +26754,14 @@
       "path": "packages/qf-kernel/src/events.ts",
       "reach": "reachable",
       "importers": [
-        "qa/gates/report-authority.ts",
         "packages/qf-kernel/src/create.ts",
         "packages/qf-kernel/src/execute.ts",
         "packages/qf-kernel/src/governed-review.ts",
         "packages/qf-kernel/src/market-context.ts",
-        "packages/qf-kernel/src/deterministic-execution.ts"
+        "packages/qf-kernel/src/deterministic-execution.ts",
+        "packages/qf-kernel/src/market-ingest.ts"
       ],
-      "importerCount": 8,
+      "importerCount": 7,
       "imports": [
         "packages/qf-kernel/src/db.ts"
       ],
@@ -26809,7 +26853,7 @@
         "qa/gates/dock-profile-identity/run.ts",
         "qa/gates/golden-g10-canvas-runtime.ts"
       ],
-      "importerCount": 28,
+      "importerCount": 27,
       "imports": [
         "packages/qf-kernel/src/db.ts",
         "packages/qf-kernel/src/resolve-path.ts",
@@ -28576,7 +28620,6 @@
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
-        "qa/gates/report-authority.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -29643,7 +29686,6 @@
       "directDependents": [
         "collab-electron/src/main/index.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
-        "qa/gates/report-authority.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -29946,7 +29988,6 @@
         "collab-electron/src/main/runtime-adapter.ts",
         "collab-electron/src/main/ipc-workspace.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
-        "qa/gates/report-authority.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/connections-ipc.ts",
@@ -30149,7 +30190,6 @@
       "reach": "reachable",
       "directDependents": [
         "qa/gates/golden-g10-canvas-runtime.ts",
-        "qa/gates/report-authority.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/ontology-gateway.ts"
       ],
@@ -30417,7 +30457,6 @@
         "qa/run.ts",
         "collab-electron/src/main/index.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
-        "qa/gates/report-authority.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -31593,7 +31632,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31617,7 +31655,9 @@
         "qa/gates/golden-g8-kernel-proof.ts",
         "packages/qf-kernel/src/create.ts",
         "qa/run.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -31662,7 +31702,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31685,7 +31724,9 @@
         "collab-electron/src/main/kernel.ts",
         "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -31713,7 +31754,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31777,7 +31817,6 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31828,7 +31867,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31851,7 +31889,9 @@
         "collab-electron/src/main/kernel.ts",
         "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -31906,7 +31946,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -31934,7 +31973,6 @@
     "packages/qf-kernel/src/events.ts": {
       "reach": "reachable",
       "directDependents": [
-        "qa/gates/report-authority.ts",
         "packages/qf-kernel/src/create.ts",
         "packages/qf-kernel/src/execute.ts",
         "packages/qf-kernel/src/governed-review.ts",
@@ -31944,7 +31982,6 @@
         "packages/qf-kernel/src/strategy-outcome.ts"
       ],
       "transitiveDependents": [
-        "qa/run.ts",
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "qa/gates/golden-g8-kernel-proof.ts",
@@ -31975,7 +32012,11 @@
         "tools/qf-read-tools/src/server.ts",
         "tools/qf-vault-projection/src/cli.ts",
         "tools/qf-vault-projection/src/gate.ts",
-        "tools/qf-vault-projection/src/project.ts"
+        "tools/qf-vault-projection/src/project.ts",
+        "collab-electron/scripts/package-lib/package-inspect.ts",
+        "tools/qf-bovada-football/src/artifact-store.ts",
+        "tools/qf-bovada-football/src/runner.ts",
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32006,7 +32047,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32030,7 +32070,9 @@
         "qa/run.ts",
         "packages/qf-kernel/src/create.ts",
         "packages/qf-kernel/src/execute.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32072,7 +32114,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32121,7 +32162,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32145,7 +32185,9 @@
         "packages/qf-kernel/src/governed-review.ts",
         "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32188,7 +32230,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32231,7 +32272,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32321,7 +32361,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32375,7 +32414,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32398,7 +32436,9 @@
         "collab-electron/src/main/kernel.ts",
         "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32436,7 +32476,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32460,7 +32499,9 @@
         "qa/gates/golden-g8-kernel-proof.ts",
         "packages/qf-kernel/src/governed-review.ts",
         "qa/run.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32499,7 +32540,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32522,7 +32562,9 @@
         "collab-electron/src/main/kernel.ts",
         "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32555,7 +32597,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32613,7 +32654,6 @@
         "tools/qf-bovada-football/src/index.ts",
         "collab-electron/src/main/index.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
-        "qa/gates/report-authority.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -32669,7 +32709,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32694,7 +32733,15 @@
         "tools/qf-read-tools/src/discovery.ts",
         "collab-electron/scripts/package-verify.ts",
         "qa/gates/package-closure/lazy-loader.ts",
-        "tools/qf-bovada-football/src/index.ts"
+        "tools/qf-bovada-football/src/index.ts",
+        "collab-electron/src/main/index.ts",
+        "collab-electron/src/main/ipc.ts",
+        "collab-electron/src/main/ontology-gateway.ts",
+        "collab-electron/src/main/host-native-tui.ts",
+        "collab-electron/src/main/agent-host.ts",
+        "collab-electron/src/main/connections-ipc.ts",
+        "collab-electron/src/main/ipc-kernel.ts",
+        "collab-electron/src/main/host-acp-turn.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32727,7 +32774,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32791,7 +32837,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32858,7 +32903,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32880,7 +32924,8 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "packages/qf-kernel/src/execute.ts",
-        "qa/run.ts"
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -32907,7 +32952,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -32974,7 +33018,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -33021,7 +33064,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -33090,7 +33132,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -33111,7 +33152,8 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "qa/run.ts"
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33169,7 +33211,6 @@
         "tools/qf-bovada-football/src/index.ts",
         "collab-electron/src/main/index.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
-        "qa/gates/report-authority.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -33230,7 +33271,6 @@
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
         "qa/gates/r17-founder-kernel-compatibility.ts",
-        "qa/gates/report-authority.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/hermes/a2a-4tile-smoke.ts",
@@ -50051,7 +50091,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/pty.ts",
-          "line": 1318,
+          "line": 1328,
           "kind": "helper"
         }
       ],
@@ -50572,7 +50612,7 @@
     },
     {
       "file": "collab-electron/src/main/pty.ts",
-      "line": 1293,
+      "line": 1303,
       "why": "push channel name is a variable or template literal, not resolvable from text",
       "coverage": "dynamic"
     }
@@ -52981,21 +53021,6 @@
     {
       "kind": "outside-write-door",
       "scope": "qa",
-      "what": "42 SQL statements outside execute()",
-      "where": "qa/gates/report-authority.ts",
-      "lines": [
-        344,
-        345,
-        365,
-        366,
-        368,
-        386
-      ],
-      "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
-    },
-    {
-      "kind": "outside-write-door",
-      "scope": "qa",
       "what": "12 SQL statements outside execute()",
       "where": "qa/gates/vault-projection/fixture-seed.ts",
       "lines": [
@@ -53027,20 +53052,9 @@
       "what": "3 SQL statements outside execute()",
       "where": "qa/gates/kernel-sole-writer.ts",
       "lines": [
-        41,
-        42,
-        44
-      ],
-      "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
-    },
-    {
-      "kind": "outside-write-door",
-      "scope": "qa",
-      "what": "2 SQL statements outside execute()",
-      "where": "qa/gates/golden-g10-canvas-runtime.ts",
-      "lines": [
-        2547,
-        2557
+        43,
+        44,
+        46
       ],
       "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
     },
@@ -53069,16 +53083,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "363219f1",
-      "generatedAt": "2026-08-28"
+      "commit": "91386807",
+      "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "20457ecb",
+      "commit": "59a88940",
       "generatedAt": "2026-08-30"
     },
-    "verdict": "worse",
-    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
+    "verdict": "better",
+    "why": "27 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -53167,38 +53181,10 @@
         "note": "was undecided"
       },
       {
-        "id": "unreached-ipc:browser:evaluate",
-        "kind": "unreached-ipc",
-        "what": "browser:evaluate",
-        "where": "collab-electron/src/main/ipc-browser.ts:198",
-        "note": "was undecided"
-      },
-      {
-        "id": "unreached-ipc:browser:info",
-        "kind": "unreached-ipc",
-        "what": "browser:info",
-        "where": "collab-electron/src/main/ipc-browser.ts:182",
-        "note": "was undecided"
-      },
-      {
-        "id": "unreached-ipc:browser:scroll",
-        "kind": "unreached-ipc",
-        "what": "browser:scroll",
-        "where": "collab-electron/src/main/ipc-browser.ts:133",
-        "note": "was undecided"
-      },
-      {
-        "id": "unreached-ipc:browser:wait",
-        "kind": "unreached-ipc",
-        "what": "browser:wait",
-        "where": "collab-electron/src/main/ipc-browser.ts:147",
-        "note": "was undecided"
-      },
-      {
         "id": "unused-bridge:deleteConnectionsForTile() → qf:connections:deleteForTile",
         "kind": "unused-bridge",
         "what": "deleteConnectionsForTile() → qf:connections:deleteForTile",
-        "where": "collab-electron/src/preload/shell.ts:128",
+        "where": "collab-electron/src/preload/shell.ts:129",
         "note": "was undecided"
       },
       {
@@ -53213,6 +53199,13 @@
         "kind": "unused-bridge",
         "what": "permissionDecision() → qf:sessions:permissionDecision",
         "where": "collab-electron/src/preload/universal.ts:157",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:getRuntimeSnapshot() → qf:sessions:runtime-snapshot",
+        "kind": "unused-bridge",
+        "what": "getRuntimeSnapshot() → qf:sessions:runtime-snapshot",
+        "where": "collab-electron/src/preload/shell.ts:99",
         "note": "was undecided"
       },
       {
@@ -53237,45 +53230,10 @@
         "note": "was undecided"
       },
       {
-        "id": "broken-bridge-call:browserEvaluate",
-        "kind": "broken-bridge-call",
-        "what": "browserEvaluate",
-        "where": "collab-electron/src/windows/shell/src/canvas-rpc.js:338",
-        "note": "was undecided"
-      },
-      {
-        "id": "broken-bridge-call:browserInfo",
-        "kind": "broken-bridge-call",
-        "what": "browserInfo",
-        "where": "collab-electron/src/windows/shell/src/canvas-rpc.js:358",
-        "note": "was undecided"
-      },
-      {
-        "id": "broken-bridge-call:browserScroll",
-        "kind": "broken-bridge-call",
-        "what": "browserScroll",
-        "where": "collab-electron/src/windows/shell/src/canvas-rpc.js:328",
-        "note": "was undecided"
-      },
-      {
-        "id": "broken-bridge-call:browserWait",
-        "kind": "broken-bridge-call",
-        "what": "browserWait",
-        "where": "collab-electron/src/windows/shell/src/canvas-rpc.js:348",
-        "note": "was undecided"
-      },
-      {
-        "id": "broken-bridge-call:focusAgentSession",
-        "kind": "broken-bridge-call",
-        "what": "focusAgentSession",
-        "where": "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx:388",
-        "note": "was undecided"
-      },
-      {
         "id": "push:shell:loading-status",
         "kind": "push-no-sender",
         "what": "shell:loading-status",
-        "where": "collab-electron/src/preload/shell.ts:178",
+        "where": "collab-electron/src/preload/shell.ts:179",
         "note": "was undecided"
       },
       {
@@ -53297,6 +53255,13 @@
         "kind": "duplicate-ownership",
         "what": "Exact task delivery",
         "where": "packages/qf-kernel/src/execute.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "ownership:canvas-projection",
+        "kind": "duplicate-ownership",
+        "what": "Canvas domain projection",
+        "where": "collab-electron/src/main/index.ts",
         "note": "was undecided"
       },
       {
@@ -53324,34 +53289,17 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [
-      {
-        "path": "collab-electron/src/main/index.ts",
-        "analyzer": "ownership",
-        "from": "unsupported",
-        "to": "indexed",
-        "direction": "better",
-        "reason": null
-      },
-      {
-        "path": "collab-electron/src/main/research-world.test.ts",
-        "analyzer": "persistence",
-        "from": "not-applicable",
-        "to": "partial",
-        "direction": "worse",
-        "reason": "16 of 31 SQL site(s) are not inside a named function, so no call path can be traced"
-      }
-    ],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
-      "resolved": 34,
+      "resolved": 27,
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 1,
-      "coverageBetter": 1,
-      "undecidedFrom": 34,
+      "coverageWorse": 0,
+      "coverageBetter": 0,
+      "undecidedFrom": 27,
       "undecidedTo": null
     }
   },

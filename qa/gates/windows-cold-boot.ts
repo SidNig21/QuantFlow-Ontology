@@ -21,7 +21,7 @@ import { join, parse, resolve } from "node:path";
 import { createConnection } from "node:net";
 import {
   prepareRuntimeStaging,
-  QA_RUNTIME_FILES,
+  PRODUCTION_RUNTIME_FILES,
 } from "../../collab-electron/scripts/package-lib/runtime-staging.ts";
 import { discoverDockProfileManifests } from
   "../../collab-electron/src/main/dock-profiles.ts";
@@ -60,10 +60,10 @@ export type ProcessOwnershipReceipt = {
 
 // Cold boot is an explicit QA fixture path; normal product boot is Hermes-only.
 const REQUIRED_DOCK_IDS = [
-  "qf-proof-orchestrator",
-  "hermes-orchestrator",
+  "hermes-research-director",
   "hermes-worker",
   "hermes-worker-2",
+  "hermes-critic",
 ] as const;
 
 const EVIDENCE_DIR = join(REPO_ROOT, "docs/orders/evidence/wo-win1");
@@ -615,7 +615,7 @@ export async function buildWindowsPackage(tempRoot: string): Promise<string> {
   prepareRuntimeStaging({
     stagingRoot: join(COLLAB_ROOT, ".package-staging"),
     repoRoot: REPO_ROOT,
-  }, { qaMode: true });
+  });
 
   const electronVite = packageBin("electron-vite", "electron-vite");
   const electronBuilder = packageBin("electron-builder", "electron-builder");
@@ -656,17 +656,14 @@ export async function buildWindowsPackage(tempRoot: string): Promise<string> {
   assert(existsSync(executable), `unpacked Windows executable missing: ${executable}`);
   const resourcesRoot = join(packageRoot, "resources");
   assert(existsSync(join(resourcesRoot, "app.asar")), "unpacked Windows app.asar missing");
-  for (const relativePath of QA_RUNTIME_FILES) {
+  for (const relativePath of PRODUCTION_RUNTIME_FILES) {
     const path = join(resourcesRoot, relativePath);
     assert(existsSync(path) && statSync(path).size > 0, `Windows runtime resource missing or empty: ${relativePath}`);
   }
   const expectedManifests = discoverDockProfileManifests(
     join(COLLAB_ROOT, ".package-staging"),
-    { qaMode: true },
   );
-  const packagedManifests = discoverDockProfileManifests(resourcesRoot, {
-    qaMode: true,
-  });
+  const packagedManifests = discoverDockProfileManifests(resourcesRoot);
   const expectedClosure = expectedManifests.map((manifest) => ({
     ref: manifest.manifestRef,
     adapterId: manifest.adapterId,
@@ -691,7 +688,7 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
   mkdirSync(storeRoot, { recursive: true });
   mkdirSync(artifactRoot, { recursive: true });
   const childEnv = isolatedEnvironment(tempRoot, kernelDb, artifactRoot);
-  childEnv.QF_DOCK_QA_MODE = "1";
+  delete childEnv.QF_DOCK_QA_MODE;
   const endpointFile = join(childEnv.USERPROFILE!, ".quantflow", "app", "socket-path");
   const defaultStateRoot = join(homedir(), ".quantflow");
   const defaultBefore = snapshotTree(defaultStateRoot);
@@ -816,7 +813,17 @@ export async function runWindowsColdBootGate(): Promise<{ ok: boolean }> {
   const priorReceipt = existsSync(receiptPath) ? readFileSync(receiptPath) : null;
   try {
     await runOwnershipFalsifier();
-    const packageRoot = await buildWindowsPackage(tempRoot);
+    const reusablePackageRoot = process.env.QF_G12_PACKAGE_ROOT?.trim();
+    const packageRoot = reusablePackageRoot
+      ? resolve(reusablePackageRoot)
+      : await buildWindowsPackage(tempRoot);
+    if (reusablePackageRoot) {
+      assert(
+        existsSync(join(packageRoot, "QuantFlow.exe")),
+        `reusable Windows package is missing QuantFlow.exe: ${packageRoot}`,
+      );
+      console.log(`windows-cold-boot: reusing package=${packageRoot}`);
+    }
     if (falsify === "missing-runtime") {
       const bait = join(packageRoot, "resources", "species", "hermes", "dock-profiles.json");
       rmSync(bait);

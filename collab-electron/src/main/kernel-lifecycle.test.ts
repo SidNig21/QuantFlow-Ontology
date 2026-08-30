@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:f
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
-const root = mkdtempSync(join(tmpdir(), "qf-kernel-lifecycle-"));
+const root = mkdtempSync(join(tmpdir(), "qf-app-lifecycle-"));
 const appRoot = join(root, "app-root");
 const appDir = join(appRoot, "app");
 const artifactRoot = join(root, "artifacts");

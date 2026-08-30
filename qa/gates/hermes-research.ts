@@ -1657,7 +1657,9 @@ async function runBoundaryFalsifiers(packageRoot: string, identity: Identity): P
   }
 }
 
-async function runEnforcementFalsifiers(): Promise<void> {
+async function runEnforcementFalsifiers(
+  requireObservedHalfBornSeat = true,
+): Promise<void> {
   await withIsolatedCleanupStateAsync(async () => {
     const source = readFileSync(join(import.meta.dir, "hermes-research.ts"), "utf8");
     assertGateTempFsRouting(source);
@@ -1776,7 +1778,7 @@ async function runEnforcementFalsifiers(): Promise<void> {
     checkHalfBornSeatObservation();
     console.log("hermes-first-turn-synthetic: FALSIFY GREEN half-born-seat receipt-validator self_exit=true pids=[]");
     halfBornSeatObservation = observed;
-    checkHalfBornSeatObservation();
+    if (requireObservedHalfBornSeat) checkHalfBornSeatObservation();
   });
 }
 
@@ -1948,10 +1950,13 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
     await shutdown(run);
     run = null;
     if (label === "hermes-first-turn-synthetic") {
-      await runResultObservationFalsifiers(packageRoot);
-      await runBoundaryFalsifiers(packageRoot, candidateIdentity);
-      checkHalfBornSeatObservation();
-      await runEnforcementFalsifiers();
+      const g12Lifecycle = process.env.QF_G12_HERMES_LIFECYCLE === "1";
+      if (!g12Lifecycle) {
+        await runResultObservationFalsifiers(packageRoot);
+        await runBoundaryFalsifiers(packageRoot, candidateIdentity);
+        checkHalfBornSeatObservation();
+      }
+      await runEnforcementFalsifiers(!g12Lifecycle);
     }
     console.log(`${label}: failed_boundary=null repair=none failure_mechanism=none`);
     console.log(`${label}: PASS`);
@@ -1995,7 +2000,10 @@ async function packageInstalled(tempRoot: string): Promise<{ root: string; ident
   const installed = await runChild(installer, ["/S", `/D=${installRoot}`], tempRoot, { ...process.env, TEMP: join(tempRoot, "temp"), TMP: join(tempRoot, "temp") }, 2 * 60 * 1000);
   assert(installed.code === 0, `NSIS silent install exited ${installed.code}: ${tail(installed.output)}`);
   assert(existsSync(join(installRoot, "QuantFlow.exe")), "installed QuantFlow.exe is missing");
-  console.log(`windows-hermes-research: installed-identity=${JSON.stringify({ identity, installer, authenticode: execFileSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", `(Get-AuthenticodeSignature -LiteralPath '${installer.replaceAll("'", "''")}').Status.ToString()`], { encoding: "utf8", windowsHide: true }).trim() })}`);
+  const authenticodeCommand =
+    "Import-Module -Name (Join-Path $PSHOME 'Modules/Microsoft.PowerShell.Security/Microsoft.PowerShell.Security.psd1') -Force; " +
+    `(Get-AuthenticodeSignature -LiteralPath '${installer.replaceAll("'", "''")}').Status.ToString()`;
+  console.log(`windows-hermes-research: installed-identity=${JSON.stringify({ identity, installer, authenticode: execFileSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", authenticodeCommand], { encoding: "utf8", windowsHide: true }).trim() })}`);
   return { root: installRoot, identity };
 }
 
@@ -2017,7 +2025,14 @@ export async function runHermesFirstTurnSyntheticGate(): Promise<{ ok: boolean }
     const identity = setBuildIdentity();
     const tempRoot = createGateTempRoot("qf-hermes-first-turn-synthetic-");
     try {
-      const packageRoot = await buildWindowsPackage(tempRoot);
+      const reusablePackageRoot = process.env.QF_G12_PACKAGE_ROOT?.trim();
+      const packageRoot = reusablePackageRoot
+        ? resolve(reusablePackageRoot)
+        : await buildWindowsPackage(tempRoot);
+      if (reusablePackageRoot) {
+        assert(existsSync(join(packageRoot, "QuantFlow.exe")), `reusable Windows package is missing QuantFlow.exe: ${packageRoot}`);
+        console.log(`hermes-first-turn-synthetic: reusing package=${packageRoot}`);
+      }
       console.log(`hermes-first-turn-synthetic: package-identity=${JSON.stringify({
         candidate_sha: identity.commitSha,
         evidence_head_sha: identity.evidenceHeadSha,

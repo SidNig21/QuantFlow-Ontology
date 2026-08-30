@@ -8,11 +8,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   closeKernel,
+  bindSourceWork,
   contentHash,
   execute,
   getLinks,
   getObject,
   openKernel,
+  recordGovernedToolReceipt,
+  requestGovernedReview,
 } from "qf-kernel";
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -29,11 +32,12 @@ function createSession(
   role: string,
   capabilityGroups: string[],
 ): void {
+  const definitionName = role === "critic" ? "hermes-critic" : `${id}-definition`;
   execute(
     db,
     "register_agent_definition",
     {
-      name: `${id}-definition`,
+      name: definitionName,
       role,
       package_ref: "species/hermes/packed/hermes.aospkg",
       runtime_profile: "default",
@@ -45,7 +49,7 @@ function createSession(
   execute(
     db,
     "create_agent_session",
-    { session_id: id, agent_definition_id: `${id}-definition`, label: id },
+    { session_id: id, agent_definition_id: definitionName, label: id },
     trace(),
   );
   execute(db, "start_agent_session", { session_id: id }, trace());
@@ -120,7 +124,16 @@ export async function runKernelMarketLineageGateBody(): Promise<{ ok: boolean }>
 
     // Trajectory of a market read (stand-in for gateway trajectory artifact).
     const readPath = join(artifactRoot, "read-trajectory.json");
-    const readBytes = Buffer.from(JSON.stringify({ tool: "qf_venue_get", id: "venue-r6" }));
+    const readBytes = Buffer.from(JSON.stringify({
+      contract: "qf.ontology.v1",
+      tool: "qf_venue_get",
+      arguments: { id: "venue-r6" },
+      result: { id: "venue-r6" },
+      session_id: "executor-r12",
+      role: "worker",
+      created_at: "2026-08-30T00:00:00.000Z",
+      nonce: "r12-market-lineage-read",
+    }));
     writeFileSync(readPath, readBytes);
     const readArt = execute(
       db,
@@ -141,6 +154,33 @@ export async function runKernelMarketLineageGateBody(): Promise<{ ok: boolean }>
     // deterministic result, and a separate running critic records the Evaluation.
     createSession(db, "executor-r12", "orchestrator", ["desk.orchestrate"]);
     createSession(db, "critic-r12", "critic", ["research.evaluate"]);
+    const mission = execute(db, "create_mission", {
+      mission_id: "mission-r12-market-lineage",
+      name: "R12 market lineage",
+      objective: "Validate the exact deterministic market-lineage result.",
+    }, trace()) as { object_id: string };
+    const workerReadBytes = new TextEncoder().encode(JSON.stringify({
+      contract: "qf.ontology.v1",
+      tool: "qf_venue_get",
+      arguments: { id: "venue-r6" },
+      result: { id: "venue-r6" },
+      session_id: "executor-r12",
+      role: "worker",
+      created_at: "2026-08-30T00:00:01.000Z",
+      nonce: "r12-market-lineage-worker-read",
+    }));
+    const workerReadPath = join(artifactRoot, "worker-read.json");
+    writeFileSync(workerReadPath, workerReadBytes);
+    const workerRead = execute(db, "publish_artifact", {
+      kind: "trajectory",
+      bytes: workerReadBytes,
+      storage_ref: workerReadPath,
+      links: [{ kind: "produces", from_id: "executor-r12" }],
+    }, {
+      ...trace(),
+      actor_session_id: "executor-r12",
+      ontology_read_tool: "qf_venue_get",
+    } as never) as { object_id: string };
     const hypothesis = execute(
       db,
       "create_hypothesis",
@@ -195,6 +235,7 @@ export async function runKernelMarketLineageGateBody(): Promise<{ ok: boolean }>
       {
         run_id: "run-r12-market-lineage",
         dataset_id: dataset.object_id,
+        hypothesis_id: hypothesis.object_id,
         strategy_spec: {
           contract: "qf.strategy.v1",
           version: 1,
@@ -210,18 +251,102 @@ export async function runKernelMarketLineageGateBody(): Promise<{ ok: boolean }>
       typeof resultArtifactId === "string",
       "deterministic run did not return a result artifact",
     );
+    const workerResultBytes = new TextEncoder().encode(JSON.stringify({
+      contract: "qf.collaboration.v1",
+      kind: "result",
+      task_id: "task-r12-market-lineage",
+      from_session_id: "executor-r12",
+      result_artifact_id: resultArtifactId,
+    }));
+    const workerResultPath = join(artifactRoot, "worker-result.json");
+    writeFileSync(workerResultPath, workerResultBytes);
+    const workerResult = execute(db, "publish_artifact", {
+      kind: "trajectory",
+      bytes: workerResultBytes,
+      storage_ref: workerResultPath,
+      links: [
+        { kind: "produces", from_id: "executor-r12" },
+        { kind: "derived_from", to_id: workerRead.object_id },
+      ],
+    }, { ...trace(), actor_session_id: "executor-r12" }) as { object_id: string };
+    const sourceTask = execute(db, "create_task", {
+      task_id: "task-r12-market-lineage",
+      title: "Review the deterministic market-lineage result",
+      description: "Bind the exact run result to an independent governed review.",
+      assignee_session_id: "executor-r12",
+    }, {
+      ...trace(),
+      actor_session_id: "executor-r12",
+      mission_id: mission.object_id,
+    }) as { object_id: string };
+    const sourceWork = {
+      source_task_id: sourceTask.object_id,
+      hypothesis_id: hypothesis.object_id,
+      run_id: deterministicRun.object_id,
+      result_artifact_id: workerResult.object_id,
+      executor_session_id: "executor-r12",
+    };
+    bindSourceWork(db, sourceWork, trace());
+    execute(db, "complete_task", {
+      task_id: sourceTask.object_id,
+      result_artifact_id: workerResult.object_id,
+    }, { ...trace(), actor_session_id: "executor-r12" });
+    const admission = requestGovernedReview(
+      db,
+      sourceTask.object_id,
+      "r12-market-lineage-attempt",
+      "critic-r12",
+      trace(),
+    );
+    assert(admission.kind === "admitted", `review admission refused: ${JSON.stringify(admission)}`);
+    const reviewTaskId = String(admission.review_task_id);
+    execute(db, "governed_review_task", {
+      operation: "deliver",
+      review_task_id: reviewTaskId,
+      outcome: "delivered",
+    }, trace());
+    const receipts = [
+      ["qf_hypothesis_get", { id: hypothesis.object_id }],
+      ["qf_run_get", { id: deterministicRun.object_id }],
+      ["qf_artifact_get", { id: workerResult.object_id }],
+      ["qf_record_evaluation", { verdict: "supports" }],
+    ] as const;
+    for (const [index, [toolName, args]] of receipts.entries()) {
+      recordGovernedToolReceipt(db, {
+        invocation_id: `r12-market-lineage-receipt-${index + 1}`,
+        session_id: "critic-r12",
+        task_id: reviewTaskId,
+        tool_name: toolName,
+        arguments: args,
+        result: { ok: true },
+        broker_sequence: index + 1,
+      }, trace());
+    }
     const evaluation = execute(
       db,
       "record_evaluation",
       {
         hypothesis_id: hypothesis.object_id,
         run_id: deterministicRun.object_id,
-        artifact_id: resultArtifactId,
+        artifact_id: workerResult.object_id,
+        review_task_id: reviewTaskId,
+        source_work: sourceWork,
+        broker_invocation_id: "r12-market-lineage-receipt-4",
         verdict: "supports",
+        rubric: {
+          faithfulness: 0.9,
+          answer_relevancy: 0.9,
+          context_precision: 0.9,
+          context_recall: 0.9,
+        },
         confidence: 0.9,
         rationale: "The recorded metrics and market lineage support the fixture claim.",
-        findings:
-          "Verified the deterministic result bytes, metric definitions, and positive ROI.",
+        findings: [{
+          code: "R12_MARKET_LINEAGE",
+          severity: "info",
+          message: "Verified the deterministic result bytes, metric definitions, and positive ROI.",
+          evidence_refs: [workerResult.object_id],
+        }],
       },
       { ...trace(), actor_session_id: "critic-r12" },
     ) as { object_id: string };

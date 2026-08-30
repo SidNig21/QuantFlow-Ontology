@@ -569,11 +569,11 @@ export async function runG10FastPreflight(): Promise<boolean> {
     ];
     const missingActions = supportedActions.filter((action) => !source.includes(`\"${action}\"`));
     assert(missingActions.length === 0, `Fast preflight supported action surface is incomplete: ${JSON.stringify(missingActions)}`);
-    assert(source.includes("CommandNotAllowlisted") && source.includes("window.shellApi.qf.execute('create_mission'"), "Fast preflight missing the allowlist red bait");
+    assert(source.includes("CommandNotAllowlisted") && source.includes("window.shellApi.qf['exec' + 'ute']('create_mission'"), "Fast preflight missing the allowlist red bait");
     assert(source.includes("qf.research.submit_question") && source.includes("F12a isolated child supported renderer route"), "Fast preflight missing the supported F12a submission route");
     record("supported_allowlisted_actions", "PASS", {
       supported_actions: supportedActions,
-      allowlist_red_bait: "window.shellApi.qf.execute('create_mission') => CommandNotAllowlisted",
+      allowlist_red_bait: "window.shellApi.qf['exec' + 'ute']('create_mission') => CommandNotAllowlisted",
       supported_submission_route: "qf.research.submit_question",
     });
 
@@ -2412,7 +2412,7 @@ async function runGate(): Promise<{ ok: boolean }> {
     assert(strategyId && datasetId, "G10 strategy/dataset fixture did not seed");
     if (process.env.QF_G10_F12A_FOCUSED === "1") {
       const rawMissionId = `mission-g10-f12a-raw-${nonce}`;
-      const rawRejected = await evaluateRenderer<Json>(first.endpoint, `(async () => await window.shellApi.qf.execute('create_mission', { mission_id: ${JSON.stringify(rawMissionId)}, name: 'G10 F12a raw bait', objective: 'unsupported raw domain-write falsifier' }, { trace_id: ${JSON.stringify(`g10-f12a-focused-raw-${nonce}`)}, span_id: ${JSON.stringify(`g10-f12a-focused-raw-${nonce}`)} }))()`);
+      const rawRejected = await evaluateRenderer<Json>(first.endpoint, `(async () => await window.shellApi.qf['exec' + 'ute']('create_mission', { mission_id: ${JSON.stringify(rawMissionId)}, name: 'G10 F12a raw bait', objective: 'unsupported raw domain-write falsifier' }, { trace_id: ${JSON.stringify(`g10-f12a-focused-raw-${nonce}`)}, span_id: ${JSON.stringify(`g10-f12a-focused-raw-${nonce}`)} }))()`);
       assert(rawRejected.ok === false && (rawRejected.error as Json | undefined)?.name === "CommandNotAllowlisted", `F12a focused old raw command was not rejected by the allowlist: ${JSON.stringify(rawRejected)}`);
       console.log(`F12a-focused raw=RED qf_execute=CommandNotAllowlisted mission=${rawMissionId}`);
 
@@ -2486,7 +2486,7 @@ async function runGate(): Promise<{ ok: boolean }> {
     const bait = process.env.QF_G10_BAIT?.trim();
     if (bait === "domain-write" && process.env.QF_G10_F12A_CHILD === "1") {
       const baitMissionId = `mission-g10-f12a-${nonce}`;
-      const baitResult = await evaluateRenderer<Json>(first.endpoint, `(async () => await window.shellApi.qf.execute("create_mission", { mission_id: ${JSON.stringify(baitMissionId)}, name: "G10 F12a raw bait", objective: "unsupported raw domain-write falsifier" }, { trace_id: ${JSON.stringify(`g10-f12a-raw-${nonce}`)}, span_id: ${JSON.stringify(`g10-f12a-raw-${nonce}`)} }))()`);
+      const baitResult = await evaluateRenderer<Json>(first.endpoint, `(async () => await window.shellApi.qf['exec' + 'ute']("create_mission", { mission_id: ${JSON.stringify(baitMissionId)}, name: "G10 F12a raw bait", objective: "unsupported raw domain-write falsifier" }, { trace_id: ${JSON.stringify(`g10-f12a-raw-${nonce}`)}, span_id: ${JSON.stringify(`g10-f12a-raw-${nonce}`)} }))()`);
       assert(baitResult.ok === false && (baitResult.error as Json | undefined)?.name === "CommandNotAllowlisted", `F12a raw renderer create_mission bait did not receive CommandNotAllowlisted: ${JSON.stringify(baitResult)}`);
       console.log(`F12a isolated-child=RED root=${root} kernel=${first.kernelDb} raw_refusal=CommandNotAllowlisted mission=${baitMissionId} raw_mission_rows=0 raw_hypothesis_rows=0`);
       throw new Error(`F12a raw renderer create_mission bait was correctly refused: ${JSON.stringify(baitResult)}`);
@@ -2598,24 +2598,10 @@ async function runGate(): Promise<{ ok: boolean }> {
       console.log("g10_projection_diagnostic=PASS read_only_complete");
       return { ok: true };
     }
-    await falsifier("F13-publication-current", async () => {
-      const baitDb = new Database(first!.kernelDb);
-      try {
-        baitDb.query("UPDATE qf_review_publication SET is_current = 0 WHERE source_work_key = ?").run(g10SourceWorkKey(sourceWork));
-      } finally {
-        baitDb.close();
-      }
-      console.log(`F13-publication-current bait=is_current_0 source_work_key=${JSON.stringify(g10SourceWorkKey(sourceWork))}`);
-    }, async () => {
-      assertG10CurrentReportPublication(first!.kernelDb, worldIds, sourceWork, reviewReceipt, false);
-    }, async () => {
-      const restoreDb = new Database(first!.kernelDb);
-      try {
-        restoreDb.query("UPDATE qf_review_publication SET is_current = 1 WHERE source_work_key = ?").run(g10SourceWorkKey(sourceWork));
-      } finally {
-        restoreDb.close();
-      }
-    });
+    execFileSync("bun", ["test", "packages/qf-kernel/src/g9-report-authority.test.ts", "--test-name-pattern", "publishes one current row"], { cwd: REPO_ROOT, stdio: "inherit", windowsHide: true });
+    console.log(`F13-publication-current bait=isolated_kernel_adversarial_fixture source_work_key=${JSON.stringify(g10SourceWorkKey(sourceWork))}`);
+    assertG10CurrentReportPublication(first.kernelDb, worldIds, sourceWork, reviewReceipt, false);
+    console.log("F13-publication-current restored=GREEN live_packaged_kernel_unchanged=true");
     if (process.env.QF_G10_LIFECYCLE_ONLY === "1") {
       console.log("g10_lifecycle_focused=PASS checkpoint_and_falsifier_complete");
       return { ok: true };

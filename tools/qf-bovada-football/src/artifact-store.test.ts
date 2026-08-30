@@ -2,12 +2,14 @@ import { afterEach, describe, expect, test } from "bun:test";
 import {
   lstatSync,
   mkdtempSync,
+  mkdirSync,
   readFileSync,
   readdirSync,
   rmSync,
   symlinkSync,
   writeFileSync,
 } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { contentHash } from "qf-kernel";
 import {
@@ -23,7 +25,7 @@ afterEach(() => {
 });
 
 function setup(): string {
-  const root = mkdtempSync(join("/tmp", "qf-bovada-artifact-store-"));
+  const root = mkdtempSync(join(tmpdir(), "qf-bovada-artifact-store-"));
   roots.push(root);
   return root;
 }
@@ -58,10 +60,12 @@ describe("content-addressed artifact ownership", () => {
     const hash = contentHash(bytes);
     const target = join(root, "outside-target");
     const path = artifactPathForHash(root, hash);
-    writeFileSync(target, "operator-target-bytes");
-    symlinkSync(target, path);
+    const targetCanary = process.platform === "win32" ? join(target, "canary") : target;
+    if (process.platform === "win32") mkdirSync(target);
+    writeFileSync(targetCanary, "operator-target-bytes");
+    symlinkSync(target, path, process.platform === "win32" ? "junction" : "file");
     expect(() => ensureArtifactFile(root, hash, bytes)).toThrow(ArtifactOwnershipError);
-    expect(readFileSync(target, "utf8")).toBe("operator-target-bytes");
+    expect(readFileSync(targetCanary, "utf8")).toBe("operator-target-bytes");
     expect(lstatSync(path).isSymbolicLink()).toBe(true);
   });
 });
