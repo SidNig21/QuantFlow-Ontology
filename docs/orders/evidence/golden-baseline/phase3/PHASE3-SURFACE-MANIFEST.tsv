@@ -15,6 +15,6 @@ PHASE3_CANDIDATE	completed P01-P17 receipts under docs/orders/evidence/golden-ba
 HISTORICAL_GATE	golden-g11-authority at 1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c	ARCHIVE_EXACT_SHA; NEVER_REWRITE; WRONG_SHA_RED
 PRODUCT_REPAIR	any current source/Kernel/UI/behavior/test/gate/config file outside exact PACKAGE_REPAIR and PHASE3_GATE rows	STOP_AND_ROUTE_EXACT_DEFECT_BEFORE_EDIT
 AUTHORITY	docs/orders/WO-GOLDEN-PHASE3.md; docs/orders/NEXT.md; docs/orders/GOLDEN-RUN.md; docs/adr/0004-repository-golden-baseline.md	ROUTER_DOCS_ONLY_UNTIL_READER_YES_YES
-FORBIDDEN	R18 or later capability; credentials; real trade/bet execution; dependency/service additions; weakened/deleted tests; unsupported-platform expansion	NO_CHANGE
+FORBIDDEN	R18 or later capability; credentials; network additions/updates; real trade/bet execution; every dependency/version/service addition except exact PACKAGE_REPAIR @agentclientprotocol/sdk 0.18.2; weakened/deleted tests; unsupported-platform expansion	NO_CHANGE
 ISOLATED_RUN	new exact-SHA git-archive source plus unique DB/temp/user/artifact/profile/cache/output/install/receipt roots	RUN_CREATED_OWNERSHIP_MARKED_ONLY
 GOLDEN_DESCENDANT	Verifier acceptance with candidate identity/freeze observation; Golden designation receipt; NEXT closure text	RECEIPT_ONLY_AFTER_PASS; SOLE_PARENT_EXACT_CANDIDATE

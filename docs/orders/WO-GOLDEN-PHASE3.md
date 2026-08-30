@@ -99,7 +99,7 @@ Stop immediately and return the smallest exact route when any of these occurs:
 - any current item cannot be accounted for or any defect remains unexplained;
 - a product, semantic authority, supported-platform, compatibility, scope, or acceptance-meaning change is required;
 - any existing test/gate must be weakened, deleted, skipped, or reinterpreted to pass;
-- a new dependency, service, credential, network update, signing path, trade/bet execution, R18 capability, or unsupported platform would be required;
+- any dependency or version addition other than the exact authorized `PACKAGE_REPAIR` (`collab-electron/package.json` plus lockfile declaring runtime `@agentclientprotocol/sdk` exactly `0.18.2`), or any service, credential, network update, signing path, trade/bet execution, R18 capability, or unsupported platform would be required;
 - clean install/build/package, canonical release, UI↔Kernel agreement, live research, persistence, Atlas/law, or cleanup is red;
 - evidence cannot distinguish live capability from fixture/mock proof;
 - any non-receipt byte changes after the candidate is frozen.
