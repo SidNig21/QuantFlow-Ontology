@@ -1,10 +1,10 @@
 # NEXT — R18 GOLDEN BASELINE / PHASE 2 CLOSED / PHASE 3 CURRENT FOUNDER PATH
 
-status: G1–G12 CLOSED / PHASE 2 ACCEPTED / PHASE 3 FOUNDER-PATH F01 BOUNDED REPAIR OPEN / P14-B RED / R18 CLOSED
+status: G1–G12 CLOSED / PHASE 2 ACCEPTED / PHASE 3 FOUNDER-PATH F01 ACCEPTED / ROUTER COMPUTER USE OPEN / P14-B RED / R18 CLOSED
 rotated-at: 2026-08-30
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-PHASE3](WO-GOLDEN-PHASE3.md)
-builder-authority: **OPEN at accepted amendment `ec6b326a` only for `task-delegation-projection.ts`, its unit test, `qa/gates/team-composition.ts`, `qa/gates/research-director-delegation.ts`, the existing bounded build receipt, and changed generated Atlas outputs; preserve candidate `295fa47d` F02-F07 product/UI bytes and all existing meanings; no other product source, schema, ontology, provider/model, credential, Bovada, R18, premium redesign, or acceptance weakening; a second F01 semantic red is a hard stop**
+builder-authority: **CLOSED — bounded F01 candidate `0a1dd9e8` independently accepted; no product writer may open during Router-owned packaged Computer Use; the separate inherited wrong-specialist synthetic gate red remains explicit and must be adjudicated before Golden designation**
 router-authority: **OPEN ONLY TO FREEZE THE READER RECEIPT, ROUTE ONE BUILDER, INDEPENDENTLY VERIFY THE IMMUTABLE PRODUCT CANDIDATE, RUN ROUTER-OWNED COMPUTER USE, AND THEN RESUME THE ALREADY-ACCEPTED P14-B/PHASE-3 CHAIN. No provider prompt before provider-free acceptance is green. Candidate/Golden/main/remotes/R18 and bet/trade remain closed until their existing Phase-3 conditions are met**
 golden-fast-mode: **STANDING EXECUTION POLICY — freeze the starting matrix once; make fast preflight and focused checks green before one complete registered group gate; reuse exact product-bundle SHA builds; use the lowest falsifying proof tier; route PRODUCT RED versus HARNESS RED; require Reader only for semantics/authority/scope/group-boundary changes; use run-scoped IDs, isolated roots/DB, explicit readiness, generated receipts, parallel read-only checks, then one independent Verifier; packaged lifecycle is reserved for G12/Phase 3; standards, assertions, and independence are unchanged**
 g10-status: **CLOSED — accepted candidate `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`; independent Verifier task `01a0508a-43f5-7101-9416-0683ba081449`; final `processes=0 roots_remaining=0 leaked=[]`; its then-inherited G12 red is now cured by accepted G12**
