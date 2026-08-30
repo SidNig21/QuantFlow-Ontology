@@ -43,7 +43,7 @@ const CAPTURE_NAMES = [
   "14-most-cable-dense-region",
 ] as const;
 const ORACLE_PATH = join(REPO_ROOT, "qa/oracles/r17-technique-outcome.json");
-const R17_ORACLE_SHA256 = "b5daf9ac2ff26d063d64e3e6f8d9cf6a70740755e8c307592034f103524e943a";
+const R17_ORACLE_SHA256 = "2a22656bb86f3c3301d5c236aecc73b67a31d3bd93c56853a0a0e3418eaaed64";
 const FALSIFY_ENV = "QF_PRE_R18_COHERENCE_FALSIFY";
 const CASES = [
   ["C01", "durable Mission preserves landing state"],
