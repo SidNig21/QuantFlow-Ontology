@@ -270,7 +270,7 @@ function sourceWorkKey(source: Record<string, unknown>): string {
     .join("\u0000");
 }
 
-type ReportContext = { currentReportId: string | null; reportIds: string[] };
+type ReportContext = { currentReportId: string | null; reportIds: string[]; runId?: string; runResultArtifactId?: string };
 
 function reportContext(snapshot: RelationalSnapshot, source: Record<string, unknown>): ReportContext {
   const ids = new Set<string>();
@@ -322,6 +322,9 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
     const producer = incoming.find((link) => link.kind === "produces");
     fields.producer_id = producer?.from_id ?? null;
     fields.producer_type = producer ? objectType(snapshot, producer.from_id) : null;
+    if (context?.runResultArtifactId === id && incoming.some((link) =>
+      link.kind === "produces" && link.from_id === context.runId
+    )) fields.run_id = context.runId;
     const source = [...snapshot.sourceWork.values()].flat().find((candidate) => candidate.result_artifact_id === id);
     fields.source_run_id = source?.run_id ?? null;
     fields.source_task_id = source?.source_task_id ?? null;
@@ -423,6 +426,7 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   const runParams = parseJson(run.params);
   const runFields = runParams && typeof runParams === "object" && !Array.isArray(runParams)
     ? runParams as Record<string, unknown> : {};
+  const projectionContext = { ...reports, runId: String(source.run_id), runResultArtifactId: String(runFields.result_artifact_id) };
   addId(ids, "dataset", runFields.dataset_id);
   addId(ids, "artifact", runFields.result_artifact_id);
 
@@ -523,9 +527,7 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   requireLink("run", String(source.run_id), "uses", (link) => link.kind === "uses" && link.from_id === source.run_id && objectType(snapshot, link.to_id) === "dataset");
   requireLink("run", String(source.run_id), "produces", (link) => link.kind === "produces" && link.from_id === source.run_id && link.to_id === runFields.result_artifact_id);
   const objects: ResearchWorldObject[] = [];
-  for (const type of OBJECT_TYPES) for (const id of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, id, reports));
-  const resultArtifact = objects.find((object) => object.type === "artifact" && object.id === String(source.result_artifact_id));
-  if (resultArtifact) resultArtifact.fields.run_id = String(source.run_id);
+  for (const type of OBJECT_TYPES) for (const id of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, id, projectionContext));
   objects.sort((a, b) => a.type.localeCompare(b.type) || a.id.localeCompare(b.id));
   missing.sort((a, b) => a.owning_type.localeCompare(b.owning_type) || a.owning_id.localeCompare(b.owning_id) || a.kind.localeCompare(b.kind));
   return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects, links: worldLinks, missing_lineage: missing, current_report_id: reports.currentReportId, report_ids: reports.reportIds }) };
