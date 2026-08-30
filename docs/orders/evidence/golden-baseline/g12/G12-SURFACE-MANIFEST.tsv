@@ -6,7 +6,6 @@ INSTALL_UPDATE	qa/package-install.ts;qa/gates/windows-installer.ts;collab-electr
 LIFECYCLE	qa/gates/windows-cold-boot.ts;collab-electron/src/main/index.ts;collab-electron/src/main/pty.ts;collab-electron/src/main/sidecar/**	ALLOW_IF_CAUSAL
 DOMAIN_WINDOWS_FS	tools/qf-bovada-football/**;qa/gates/bovada-football/**	ALLOW_IF_CAUSAL
 RELEASE_ROUTE	qa/verify-release.ts;qa/verify-release.test.ts;qa/windows-unit.ts;qa/run.ts;.github/workflows/ci.yml;.github/workflows/packaged-app.yml	ALLOW_IF_CAUSAL
-G12_PROOF	qa/gates/golden-g12-package-operations.ts;qa/gates/golden-g12-package-operations/**;docs/orders/WO-GOLDEN-G12.md;docs/orders/evidence/golden-baseline/g12/**	ALLOW_CREATE_OR_EDIT
+G12_PROOF	qa/gates/golden-g12-package-operations.ts;qa/gates/golden-g12-package-operations/**;docs/orders/evidence/golden-baseline/g12/**	ALLOW_CREATE_OR_EDIT
 GENERATED	collab-electron/bun.lock;docs/orders/evidence/wo-win1/windows-cold-boot-latest.json;qf-atlas/atlas.json;qf-atlas/ATLAS.md	ONLY_IF_DIRECTLY_GENERATED_AND_REQUIRED
-PROTECTED	packages/qf-kernel/**;qf-kernel-schema/src/**;collab-electron/src/windows/**;docs/orders/evidence/golden-baseline/g1/**..g11/**;docs/orders/WO-R18-GROUND.md;docs/orders/evidence/r18/**	BYTE_IMMUTABLE
-
+PROTECTED	packages/qf-kernel/**;qf-kernel-schema/src/**;collab-electron/src/windows/**;docs/orders/WO-GOLDEN-G12.md;docs/orders/evidence/golden-baseline/g1/**;docs/orders/evidence/golden-baseline/g2/**;docs/orders/evidence/golden-baseline/g3/**;docs/orders/evidence/golden-baseline/g4/**;docs/orders/evidence/golden-baseline/g5/**;docs/orders/evidence/golden-baseline/g6/**;docs/orders/evidence/golden-baseline/g7/**;docs/orders/evidence/golden-baseline/g8/**;docs/orders/evidence/golden-baseline/g9/**;docs/orders/evidence/golden-baseline/g10/**;docs/orders/evidence/golden-baseline/g11/**;docs/orders/WO-R18-GROUND.md;docs/orders/evidence/r18/**	BYTE_IMMUTABLE

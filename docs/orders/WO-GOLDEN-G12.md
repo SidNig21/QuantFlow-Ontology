@@ -16,8 +16,9 @@ r18: **FROZEN — no R18 acquisition, domain expansion, or first-use work**
 
 | Item | Exact value |
 |---|---|
-| G12 starting commit | `1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c` |
-| G12 starting tree | `921b5e90ea91c914b4027f85d1d50d8ae62dde63` |
+| Frozen G11 product baseline commit | `1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c` |
+| Frozen G11 product baseline tree | `921b5e90ea91c914b4027f85d1d50d8ae62dde63` |
+| G12 Builder authority checkout | exact Router amendment commit/tree returned YES / YES by Reader task `01a0510a-0cec-7671-9845-47ced0e7e925`; supplied as `QF_G12_AUTHORITY_HEAD` after this non-self-referential commit exists |
 | G11 Verifier task | `01a050fc-c682-7333-8079-c021c8c0743c` |
 | Starting checkout | clean native-Windows worktree |
 | Reusable unchanged product bundle | SHA256 `3006C94B2B7638B295F09CACF2BE5CD4F70831230BCE203DAABCE71B14BCD681` until a product/config byte changes |
@@ -63,6 +64,11 @@ Before mutation the Builder copies
 into a generated run receipt with command, exit, duration, full-output SHA256,
 run ID, isolated roots, owned PIDs, and exact failure stage. No row may be
 silently omitted. Known reds are evidence, not permission to broaden scope.
+S01/S02 freeze the Reader-approved authority checkout, while S02A/S02B prove
+all product/config bytes at that authority are identical to the immutable G11
+product baseline. The Builder records `git rev-parse HEAD` and
+`git show -s --format=%T HEAD` as the starting receipt's exact candidate parent;
+the order never attempts to embed its own future commit SHA.
 
 Golden Fast Mode order:
 
@@ -129,16 +135,18 @@ run's isolated root, proves attribution before removal, and refuses ambient or
 pre-existing paths. Failure preserves the receipt and returns RED; it never
 claims cleanup zero.
 
-Rollback is one normal inverse commit from the immutable candidate to the G12
-starting identity. Generated package artifacts and run roots are excluded from
-Git and removed only by the same attribution-safe cleanup. No reset, rebase,
-force-push, main mutation, dependency addition, or release publication is
-authorized.
+Rollback is a normal inverse of only the G12 product/config changes, restoring
+those bytes to frozen G11 product tree
+`921b5e90ea91c914b4027f85d1d50d8ae62dde63` while preserving the Router/Reader
+authority and evidence commits. Generated package artifacts and run roots are
+excluded from Git and removed only by the same attribution-safe cleanup. No
+reset, rebase, force-push, main mutation, dependency addition, or release
+publication is authorized.
 
-Atlas ordering is precomputed: run read-only Atlas checks at the clean starting
-tree; after the candidate code/proof commit, regenerate `bun qf-atlas/generate.mjs`
-only if the tracked map changes; commit any generated Atlas delta before final
-verification; then run clean-tree Atlas verification. Evidence that embeds the
+Atlas ordering is precomputed: run read-only Atlas checks at the clean
+Reader-approved authority tree; after the candidate code/proof commit, always
+run `bun qf-atlas/generate.mjs`; commit its output only if bytes changed, before
+final verification; then run clean-tree Atlas verification. Evidence that embeds the
 candidate SHA is written only after the candidate exists and, if committed,
 forms an evidence-only head whose product/config identity is explicitly
 proved. One immutable product candidate—not a chain of repaired candidates—is
@@ -159,4 +167,3 @@ closure, and the cited G5 inherited-red receipts. It answers exactly:
 
 Required verdict: **YES / YES**. Any NO or ambiguity keeps Builder authority
 closed and returns the finite defect list to the Router.
-

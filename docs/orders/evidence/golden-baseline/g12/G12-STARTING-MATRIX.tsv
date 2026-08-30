@@ -1,6 +1,8 @@
 id	command	starting_expectation	owner
-S01	git rev-parse HEAD	exact 1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c	identity
-S02	git show -s --format=%T HEAD	exact 921b5e90ea91c914b4027f85d1d50d8ae62dde63	identity
+S01	git rev-parse HEAD	exact QF_G12_AUTHORITY_HEAD returned YES / YES by Reader 01a0510a-0cec-7671-9845-47ced0e7e925; record as Builder candidate parent	authority identity
+S02	git show -s --format=%T HEAD	exact tree of QF_G12_AUTHORITY_HEAD recorded by Router and Reader	authority identity
+S02A	git diff --exit-code 1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c HEAD -- collab-electron packages qf-kernel-schema tools qa .github	exit 0 and empty; product/config bytes identical to frozen G11 baseline	product identity
+S02B	git diff --name-only 1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c HEAD -- . ':!docs/**'	exit 0 and empty; authority overlay is documentation/manifests only	product identity
 S03	git status --short	empty	identity
 S04	bun qa/run.ts repo-shape	PASS	unchanged-floor
 S05	bun qa/run.ts doc-links	PASS	unchanged-floor
@@ -13,4 +15,3 @@ S11	bun qa/run.ts windows-cold-boot	starting result must be recorded; no repair 
 S12	bun qa/run.ts windows-installer	starting result must be recorded; no repair before freeze	G12 installed lifecycle
 S13	bun qa/run.ts hermes-first-turn-synthetic	KNOWN RED cleanup shape: EACCES/orphan pty-sidecar/root after current-product assertions	G12 operations
 S14	bun qa/verify-release.ts	starting per-stage matrix; no wrapper-only green	G12 release route
-
