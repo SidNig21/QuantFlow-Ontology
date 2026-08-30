@@ -9,12 +9,15 @@ PHASE3_PROOF	docs/orders/evidence/golden-baseline/phase3/**	ALLOW_CREATE_OR_EDIT
 PHASE3_GATE	qa/gates/golden-phase3-requalification.ts; qa/run.ts exact one registration	ONLY_ALLOWED_NON_EVIDENCE_DELTA; PREPARED_NOT_IMPLEMENTED; READER_REQUIRED
 EXECUTION_SOURCE	NEW_PHASE3_EXECUTION_SOURCE_SHA	CLEAN_COMMIT; SOLE_PARENT_EXACT_AMENDMENT_AUTHORITY; ONLY_PACKAGE_REPAIR+PHASE3_GATE+EVIDENCE+GENERATED_ATLAS_DELTA
 REJECTED_EXECUTION_SOURCE	9ee5c688	IMMUTABLE_RED_EVIDENCE; WINDOWS_UNIT_59_PASS_1_FAIL; NEVER_REUSE
+REJECTED_INSTALL_TOPOLOGY	9721db6d22e789715e1c1780c65dc36aef53ccac / tree 5363a8332c500fec5b94aad80f79c2654e07f2c7 / parent 28dd91f8e2c1ebc92e0afef0974bad3a1b06a4f9	IMMUTABLE_CLEAN_TOPOLOGY_RED; ELECTRON_ONLY_INSTALL; NEVER_REUSE
 PACKAGE_REPAIR	collab-electron/package.json; collab-electron/bun.lock	EXACT_DIRECT_RUNTIME_@agentclientprotocol/sdk_0.18.2; HOST_ACP_COMPATIBILITY_PRESERVED
+HERMES_OWNER	species/hermes/package.json; species/hermes/bun.lock	EXISTING_DIRECT_RUNTIME_@agentclientprotocol/sdk_0.18.2; HOST_ACP_SOURCE_OWNER; LOCK_BYTE_IDENTICAL_UNLESS_FROZEN_INSTALL_PROVES_DRIFT
+INSTALL_ORCHESTRATION	qa/verify-release.ts; qa/verify-release.test.ts	ONLY_FROZEN_INSTALL_STAGES+CWD_TYPE+EXACT_ORDER_COUNT+OMISSION_FALSIFIER
 ATLAS_GENERATED	qf-atlas/ATLAS.md; qf-atlas/atlas.html; qf-atlas/atlas.json	GENERATE_UNCONDITIONALLY; COMMIT_CHANGED_OUTPUTS; CHECK_RATCHET_HARD_RED_0
 PHASE3_CANDIDATE	completed P01-P17 receipts under docs/orders/evidence/golden-baseline/phase3/**	RECEIPT_ONLY_DESCENDANT_OF_EXECUTION_SOURCE; NO_SELF_SHA_TREE_PARENT_OR_FREEZE_TIME
 HISTORICAL_GATE	golden-g11-authority at 1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c	ARCHIVE_EXACT_SHA; NEVER_REWRITE; WRONG_SHA_RED
 PRODUCT_REPAIR	any current source/Kernel/UI/behavior/test/gate/config file outside exact PACKAGE_REPAIR and PHASE3_GATE rows	STOP_AND_ROUTE_EXACT_DEFECT_BEFORE_EDIT
 AUTHORITY	docs/orders/WO-GOLDEN-PHASE3.md; docs/orders/NEXT.md; docs/orders/GOLDEN-RUN.md; docs/adr/0004-repository-golden-baseline.md	ROUTER_DOCS_ONLY_UNTIL_READER_YES_YES
-FORBIDDEN	R18 or later capability; credentials; network additions/updates; real trade/bet execution; every dependency/version/service addition except exact PACKAGE_REPAIR @agentclientprotocol/sdk 0.18.2; weakened/deleted tests; unsupported-platform expansion	NO_CHANGE
+FORBIDDEN	third/root SDK declaration; any dependency/version beyond two exact 0.18.2 owners; resolver alias/NODE_PATH; source relocation; new service/credential/network; architecture expansion; R18; trade/bet; weakened/deleted tests; unsupported platform	NO_CHANGE
 ISOLATED_RUN	new exact-SHA git-archive source plus unique DB/temp/user/artifact/profile/cache/output/install/receipt roots	RUN_CREATED_OWNERSHIP_MARKED_ONLY
 GOLDEN_DESCENDANT	Verifier acceptance with candidate identity/freeze observation; Golden designation receipt; NEXT closure text	RECEIPT_ONLY_AFTER_PASS; SOLE_PARENT_EXACT_CANDIDATE
