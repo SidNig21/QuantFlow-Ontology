@@ -100,17 +100,25 @@ The sole authorized semantic repair is:
 
 1. Extend the existing read-only Task-assignment projection to read the exact
    assignee `agent_session` from Kernel truth.
-2. For an **open** Task, `assignmentState: "assigned"` requires the exact assignee
+2. Keep structural/link/delegator exactness independent from runtime availability.
+   When both Task links and delegator identity are exact, preserve the real
+   `delegatedBySessionId`, `assignedToSessionId`, and `delegatorDisplayName` even
+   when the assignee runtime is unavailable. Dock Inspect must never replace those
+   existing Kernel relationships with `Not recorded`.
+3. For an **open** Task, `assignmentState: "assigned"` requires the exact assignee
    session to exist with `status: "running"`. Missing, `starting`, `blocked`,
-   `cancelled`, `failed`, or `closed` assignees project `unavailable`; no Task or
-   lineage link is mutated.
-3. Done and cancelled Tasks retain their historical assignee projection; this
-   amendment does not erase settled provenance merely because the historical
-   session later stopped.
-4. Add a focused falsifier proving failed/missing/non-running open-Task assignees
+   `cancelled`, `failed`, or `closed` assignees set only
+   `assignmentState: "unavailable"`, and `unavailableSessionIds` contains exactly
+   the assignee ID named by the exact `assigned_to` link. No Task or lineage link
+   is mutated.
+4. Done and cancelled Tasks retain `assignmentState: "assigned"`, their exact
+   lineage fields, and an empty `unavailableSessionIds` regardless of whether the
+   historical session still exists or runs. This amendment does not erase settled
+   provenance merely because the historical session later stopped.
+5. Add a focused falsifier proving failed/missing/non-running open-Task assignees
    RED and an exact running assignee GREEN. The test must also prove done/cancelled
    historical assignment remains intact.
-5. Update only the two existing gate readers named in the file list so they provide
+6. Update only the two existing gate readers named in the file list so they provide
    the real or fixture session status. Do not alter their assertions, timeouts,
    topology, product meaning, or PASS criteria.
 
