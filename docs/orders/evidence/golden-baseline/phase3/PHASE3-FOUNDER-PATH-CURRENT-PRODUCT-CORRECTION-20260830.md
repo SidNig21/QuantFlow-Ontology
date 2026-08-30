@@ -36,7 +36,7 @@ delegated_by task -> f644910c-3318-4d86-a7e8-6846f56987c2
 assigned_to task -> f644910c-3318-4d86-a7e8-6846f56987c2
 ```
 
-`reconcileStaleSessions()` currently skips every open-Task owner before reconciling active statuses. A cold reopen therefore has no path to correct this exact row before Dock projection. Preserve the Task and its links, but reconcile the absent runtime honestly. The permitted result is a non-live session state with the existing Task becoming unavailable/reassignable; it is not deletion, reassignment, cancellation, or fabricated runtime state.
+`reconcileStaleSessions()` currently skips every open-Task owner before reconciling active statuses. A cold reopen therefore has no path to correct this exact row before Dock projection. The exact required transition is one existing `fail_agent_session` command with `reason=app_terminated`, leaving `agent_session.status=failed`. Do not call `close_agent_session`. Preserve the exact open Task and both `delegated_by` and `assigned_to` links; the existing projection must then make the Task unavailable/reassignable and show the participant failed/stopped after cold reopen. Cancelled, closed, or generic UI-only non-live state does not satisfy this correction.
 
 ### F02 — successful Create Task leaves the creation form obstructively open
 
@@ -48,7 +48,7 @@ Assigning the Director's Task to the same Director renders a zero-length `ORCHES
 
 ### F04 — the visible Task cannot select its semantic object
 
-Clicking the visible Task projection did not select the Task. Dock Inspect remained pinned to the participant. The Task row must dispatch selection of the exact projected Kernel Task; Dock Inspect must then show that Task identity, status, description, delegator, assignee, and relationship meaning. This is an ephemeral selection projection only. It may not persist state or construct a second graph.
+Clicking the visible Task projection did not select the Task. Dock Inspect remained pinned to the participant. The Task row must call an explicit `onSelectTask(taskId)` callback. `renderer.js` forwards that ID to the Dock controller; Dock resolves it only against the latest `listTaskSurface()` assignment projection, then Inspect shows that Task identity, status, description, delegator, assignee, and relationship meaning. This is an ephemeral selection projection only. It may not persist state, accept an embedded Task payload as authority, or construct a second graph. Pointer click and normal button activation must use the same route; wrong or stale IDs must clear/refuse rather than inspect another Task. Existing participant selection remains unchanged.
 
 ### F05 — runtime presentation contradicts itself
 
@@ -75,10 +75,15 @@ The Builder may change only the smallest subset of these existing surfaces neede
 - `collab-electron/src/windows/shell/src/handoff-layer.js`
 - `collab-electron/src/windows/shell/src/handoff-layer.test.js`
 - `collab-electron/src/windows/shell/src/dock.js`
-- the existing Dock-focused test file that already owns its rendered behavior
+- `collab-electron/src/windows/shell/src/dock.test.ts`
+- `collab-electron/src/windows/shell/src/renderer.js`
 - `collab-electron/src/windows/shell/src/shell.css`
 - `collab-electron/src/windows/shell/index.html`
-- focused Phase-3 gate/test receipts only where needed to prove these exact behaviors
+- `qa/gates/hermes-production-inference.ts` and `qa/gates/hermes-production-inference.test.ts` only for already-authorized credential-safe failure preservation and the later visible P14-B inference receipt; they may not implement or substitute the product corrections
+- `qa/gates/pre-r18-coherence.ts` only to rerun its unchanged C14/current-product acceptance after the product repair; its assertions, fixtures, timings, and meaning are immutable
+- `docs/orders/evidence/golden-baseline/phase3/PHASE3-FOUNDER-PATH-CURRENT-PRODUCT-READER-ACCEPTANCE-20260830.md`
+- `docs/orders/evidence/golden-baseline/phase3/PHASE3-FOUNDER-PATH-CURRENT-PRODUCT-BUILD-RECEIPT-20260830.md`
+- `docs/orders/evidence/golden-baseline/phase3/PHASE3-FOUNDER-PATH-COMPUTER-USE-RECEIPT-20260830.md`
 - generated Atlas outputs after product changes
 
 If a required implementation file is absent from this list, stop and return the exact reason before changing it.
@@ -87,7 +92,7 @@ If a required implementation file is absent from this list, stop and return the 
 
 1. The Kernel remains the only durable truth. No UI state, sidecar, new table, cache, or parallel graph may be added.
 2. Task status, assignment, delegation, steering, close refusal, and result-delivery semantics do not change.
-3. A stale seat with an open Task is not silently closed as if its work completed. It becomes truthfully non-live while the Task and lineage remain durable and available for founder intervention.
+3. A stale seat with an open Task receives exactly one `fail_agent_session(reason=app_terminated)` transition and remains `failed`; it is not cancelled or closed. The Task and lineage remain durable and available for founder intervention.
 4. Only a same-session zero-length handoff overlay may be suppressed. Every real cross-session handoff and semantic link remains visible and unchanged.
 5. Task Inspect reads the existing projected Kernel Task/links. Selection itself is process-local and disposable.
 6. No provider/model, Hermes launcher, credential, Bovada, R18, schema, ontology type/link, Canvas engine, Dock inventory, premium redesign, release, installer, or roadmap change.
@@ -98,10 +103,10 @@ If a required implementation file is absent from this list, stop and return the 
 
 ### Deterministic tests and falsifiers
 
-- An active session with an open assigned Task and no runtime must RED when projected/reopened as live; GREEN requires non-live session truth, intact Task/links, and an unavailable/reassignable Task projection.
+- An active session with an open assigned Task and no runtime must RED when projected/reopened as live; GREEN requires exactly one `fail_agent_session(reason=app_terminated)`, durable `status=failed`, no `close_agent_session`, intact Task/links, and an unavailable/reassignable Task projection. Running, cancelled, closed, missing fail receipt, and duplicate fail receipt each RED.
 - A successful Create Task must RED if the blank creation form remains; GREEN restores the one-button affordance. A rejected create must retain the form values and error.
 - A same-session handoff must RED if it creates a card/line; a cross-session handoff must still render exactly once.
-- Clicking or activating the projected Task must select its exact Task ID; wrong/stale Task identity must RED.
+- Clicking or activating the projected Task must call `onSelectTask(taskId)`; renderer must forward that ID to Dock; Dock must resolve only the exact latest Kernel-derived Task projection. Wrong/stale Task identity, embedded-payload authority, and participant-selection regression must RED.
 - Runtime profile `default` plus a live native-TUI observation must not render as bare `default`; absence of a runtime observation must not invent one.
 - The resize cue must correspond to the existing south-east resize handle and must not cover terminal content or become a new control path.
 - History-without-Mission wording must not claim a Mission exists.
@@ -150,4 +155,3 @@ Only after the provider-free current-package path is green:
 - A new truth store, schema change, ontology change, provider change, or file outside the boundary is required.
 - A real provider call would be spent before the provider-free path is green.
 - Any final Phase-3 or independent-Verifier red remains.
-
