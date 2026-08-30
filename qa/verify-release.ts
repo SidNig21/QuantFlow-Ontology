@@ -13,14 +13,19 @@ const REPO_ROOT = join(import.meta.dir, "..");
 
 export type ReleaseStage = {
   id: string;
-  cwd: "." | "collab-electron";
+  cwd: "." | "collab-electron" | "species/hermes";
   command: readonly [string, ...string[]];
 };
 
 export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
   {
-    id: "install",
+    id: "install-electron",
     cwd: "collab-electron",
+    command: ["bun", "install", "--frozen-lockfile"],
+  },
+  {
+    id: "install-hermes",
+    cwd: "species/hermes",
     command: ["bun", "install", "--frozen-lockfile"],
   },
   {

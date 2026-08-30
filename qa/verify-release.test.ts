@@ -12,7 +12,8 @@ import { G12_OPERATION_STEP_IDS } from "./gates/golden-g12-package-operations.ts
 describe("verify-release stages", () => {
   test("requires the native Windows install, unit, package, and static-gate order", () => {
     expect(WINDOWS_RELEASE_STAGES.map((stage) => stage.id)).toEqual([
-      "install",
+      "install-electron",
+      "install-hermes",
       "unit",
       "golden-g12-package-operations",
       "repo-shape",
@@ -30,6 +31,23 @@ describe("verify-release stages", () => {
       "kernel-market-lineage",
       "observe-door",
     ]);
+    expect(WINDOWS_RELEASE_STAGES).toHaveLength(18);
+    expect(
+      WINDOWS_RELEASE_STAGES.filter((stage) =>
+        stage.command.join(" ") === "bun install --frozen-lockfile"
+      ).map((stage) => stage.cwd),
+    ).toEqual(["collab-electron", "species/hermes"]);
+  });
+
+  test("omitting the Hermes frozen install before Windows unit is detectable", () => {
+    const withoutHermesInstall = WINDOWS_RELEASE_STAGES.filter(
+      (stage) => stage.id !== "install-hermes",
+    );
+    expect(withoutHermesInstall.map((stage) => stage.id)).not.toContain("install-hermes");
+    expect(WINDOWS_RELEASE_STAGES.map((stage) => stage.id)).toContain("install-hermes");
+    expect(WINDOWS_RELEASE_STAGES.findIndex((stage) => stage.id === "install-hermes")).toBeLessThan(
+      WINDOWS_RELEASE_STAGES.findIndex((stage) => stage.id === "unit"),
+    );
   });
 
   test("deleting Windows cold boot is detectable", () => {
