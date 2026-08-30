@@ -1,0 +1,2 @@
+artifact	absolute_source	expected_sha256	exact_probe	disposition
+INDEPENDENT-COMPLETENESS-REVIEW-PASS.md	C:\Users\rybow\Obsidian\QuantFlow Vault\2026-08-24\QuantFlow Repository Golden Baseline 5882ab2\phase-1-audit\INDEPENDENT-COMPLETENESS-REVIEW-PASS.md	000BA6BE7DE6227FF850F61EE2DB35E3F72AB49DECAC670893F774ECB3E8CC38	(Get-FileHash -Algorithm SHA256 -LiteralPath 'C:\Users\rybow\Obsidian\QuantFlow Vault\2026-08-24\QuantFlow Repository Golden Baseline 5882ab2\phase-1-audit\INDEPENDENT-COMPLETENESS-REVIEW-PASS.md').Hash	EXTERNAL_CONTENT_ADDRESSED_READ_ONLY

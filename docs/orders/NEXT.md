@@ -4,12 +4,12 @@ status: G8 CLOSED / G9 NARROW CURRENT-REPORT FINALIZATION CLOSED / G10 CLOSED IN
 rotated-at: 2026-08-29
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-G11](WO-GOLDEN-G11.md)
-builder-authority: **CLOSED PENDING SAME READER TASK `01a050af-ba96-7ef2-80be-60487be78c75` — no Builder may mutate until that task rereads the exact amendment commit and returns YES / YES**
-router-authority: **ORDER-ONLY — G10 closure is recorded; Router may commit only the amended G11 order, this pointer, and the three exact G11 manifests, then route the same Reader; no implementation is authorized**
+builder-authority: **CLOSED PENDING REPLACEMENT READER TASK `01a050eb-06dd-7450-978e-d684f0063538` — no Builder may mutate until that task rereads the exact amendment commit and returns YES / YES**
+router-authority: **ORDER-ONLY — G10 closure is recorded; Router may commit only the amended G11 order, this pointer, and the four exact G11 manifests, then route the replacement Reader; no implementation is authorized**
 golden-fast-mode: **STANDING EXECUTION POLICY — freeze the starting matrix once; make fast preflight and focused checks green before one complete registered group gate; reuse exact product-bundle SHA builds; use the lowest falsifying proof tier; route PRODUCT RED versus HARNESS RED; require Reader only for semantics/authority/scope/group-boundary changes; use run-scoped IDs, isolated roots/DB, explicit readiness, generated receipts, parallel read-only checks, then one independent Verifier; packaged lifecycle is reserved for G12/Phase 3; standards, assertions, and independence are unchanged**
 g10-status: **CLOSED — accepted candidate `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`; independent Verifier task `01a0508a-43f5-7101-9416-0683ba081449`; final `processes=0 roots_remaining=0 leaked=[]`; G12 inherited red remains open**
 g10-closure: [independent G10 acceptance](evidence/golden-baseline/g10/VERIFIER-ACCEPTANCE-20260829.md) | [receipt-hash clarification](evidence/golden-baseline/g10/RECEIPT-HASH-CLARIFICATION-20260829.md)
-g11-status: **AMENDED AFTER READER NO / NO — same Reader task `01a050af-ba96-7ef2-80be-60487be78c75` must return YES / YES before any G11 Builder**
+g11-status: **AMENDED AFTER REPLACEMENT READER FOUND FIVE ORDER-ONLY DEFECTS — replacement Reader task `01a050eb-06dd-7450-978e-d684f0063538` must return YES / YES before any G11 Builder**
 g11-order: [WO-GOLDEN-G11](WO-GOLDEN-G11.md)
 g11-starting-authority: `b1720c086bb2d93942448a3fdd352b7d58af9483` / tree `97b2768e3bc79d45c321336e73ec30167c6c8959`; exact denominator `1,421` tracked paths including the prepared order; immutable product baseline remains `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`
 

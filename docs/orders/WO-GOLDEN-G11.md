@@ -7,8 +7,8 @@ status: AMENDED AFTER READER NO / NO — SAME READER REREAD REQUIRED; no G11 Bui
 kind: Golden Baseline Phase 2 bounded authority/history group
 owner: Router
 depends: WO-GOLDEN-G10 CLOSED / independent Verifier PASS
-build-authority: **CLOSED until the same Reader task `01a050af-ba96-7ef2-80be-60487be78c75` rereads the exact amendment commit and returns YES / YES; this packet does not implement G11**
-router-authority: **ORDER-ONLY — may amend this order and its exact manifests, commit only those authority paths, and route the same Reader; may not implement product, tests, gates, Canvas, Kernel, R18, packaging, or operations**
+build-authority: **CLOSED until replacement Reader task `01a050eb-06dd-7450-978e-d684f0063538` rereads the exact amendment commit and returns YES / YES; this packet does not implement G11**
+router-authority: **ORDER-ONLY — may amend this order and its exact manifests, commit only those authority paths, and route the replacement Reader; may not implement product, tests, gates, Canvas, Kernel, R18, packaging, or operations**
 verifier-authority: **One independent G11 Verifier must inspect the eventual candidate and all falsifier transcripts; the Builder and Router cannot accept their own work**
 golden-fast-mode: **BOUND BY `docs/orders/GOLDEN-RUN.md` §Golden Fast Mode; this group is documentation/history-only and does not authorize a product rebuild or package lifecycle run**
 
@@ -56,8 +56,8 @@ This packet implements the founder-approved Surgical Disposition Group G11:
 Before any Builder action, one fresh semantic Reader must read
 `START_HERE.md`, `docs/orders/PROTOCOL.md`, `docs/orders/GOLDEN-RUN.md`,
 `docs/orders/NEXT.md`, this order, and the Phase-1 disposition packet. The
-Reader must answer both questions. The required Reader is the same task
-`01a050af-ba96-7ef2-80be-60487be78c75`; no substitute Reader may open Builder
+Reader must answer both questions. The required replacement Reader is task
+`01a050eb-06dd-7450-978e-d684f0063538`; no substitute Reader may open Builder
 authority:
 
 1. Does `NEXT.md` point to exactly this bounded G11 order, with G10 closed and
@@ -88,7 +88,7 @@ every path are frozen in
 `evidence/golden-baseline/g11/G11-CURRENT-DISPOSITION.tsv`. There is no implicit
 complement and no directory glob that grants mutation authority.
 
-**Administrative-path convention.** The three amendment manifests created
+**Administrative-path convention.** The four amendment manifests created
 after the 1,421-path start are administrative additions, not denominator
 members:
 
@@ -96,11 +96,12 @@ members:
 docs/orders/evidence/golden-baseline/g11/G11-CURRENT-DISPOSITION.tsv
 docs/orders/evidence/golden-baseline/g11/G11-IMMUTABLE-PRESERVATION.tsv
 docs/orders/evidence/golden-baseline/g11/G11-ARCHIVE-MAP.tsv
+docs/orders/evidence/golden-baseline/g11/G11-PHASE1-EXTERNAL.tsv
 ```
 
 They may record the frozen tree and later receipts but cannot classify
 themselves, authorize another mutation, or hide a denominator change. The
-Builder begins at the exact amendment commit accepted by the same Reader; that
+Builder begins at the exact amendment commit accepted by the replacement Reader; that
 commit is an administrative overlay on this frozen denominator. The Builder
 must independently reproduce the exact 1,421 baseline rows and blob identities
 before changing anything, using:
@@ -134,7 +135,6 @@ docs/proposals/CAPABILITY-REGISTRY.md
 docs/PRODUCT.md
 docs/RESEARCH.md
 qf-atlas/ATLAS.md
-.mcp.json
 ```
 
 `NEXT.md` may change only to close G10, point to this prepared G11 order, and
@@ -151,6 +151,7 @@ These literal path sets have one outcome in this order:
 tools/qf-vault-projection/**
 collab-electron/packages/collab-canvas-skill/**
 design/glacier/**
+.mcp.json
 ```
 
 | Literal path set | Exact G11 outcome | Reason |
@@ -158,6 +159,7 @@ design/glacier/**
 | `tools/qf-vault-projection/**` | `RETAIN_FAIL_CLOSED` | no complete non-QA/future-route proof exists |
 | `collab-electron/packages/collab-canvas-skill/**` | `RETAIN_FAIL_CLOSED` | no complete package/runtime consumer proof exists |
 | `design/glacier/**` | `RETAIN_FAIL_CLOSED` | ADR-0004 calls for archive, but direct per-path package/runtime/QA/future-route proof is incomplete |
+| `.mcp.json` | `RETAIN_CURRENT_WORKFLOW` | current explicitly invoked `colorsandfonts` MCP developer workflow; unchanged |
 
 They remain instruments, not Kernel truth, product runtime authority, or
 acceptance authority. This finite G11 does not isolate, retire, move, or edit
@@ -195,11 +197,17 @@ docs/adr/**
 The archive map is one-to-one. Its destination must not exist at start; a
 duplicate destination, case-folded collision, ambiguous old/new reference, or
 unresolved exact tracked reference is RED before mutation. The Builder moves
-the file byte-exactly, rewrites every tracked exact reference to its one
-destination, runs `doc-links`, and proves the destination SHA256 equals the
-recorded source SHA256. Required Phase-1, G1–G10, Pre-R18, R18, and
-accepted-floor receipts are enumerated with original SHA256 and location in
-`G11-IMMUTABLE-PRESERVATION.tsv`; every row is `RETAIN_IMMUTABLE`.
+the file byte-exactly and rewrites every tracked exact reference outside the
+archived payload to its one destination. The payload's own line naming its
+former source path is deliberately excluded from rewrite and ambiguous-
+reference checks because changing it would violate byte preservation; it is
+historical content, not a live pointer. Run `doc-links` and prove the
+destination SHA256 equals the recorded source SHA256. Exactly 380 tracked
+Phase-1 authority, G1–G10, Pre-R18, R18, and accepted-floor files are
+enumerated with original SHA256 and location in
+`G11-IMMUTABLE-PRESERVATION.tsv`; every row is `RETAIN_IMMUTABLE`. The external
+Phase-1 packet is a separate content-addressed check defined by
+`G11-PHASE1-EXTERNAL.tsv`; it is not counted as a tracked file.
 
 The sole archive row earns all required proof independently. The Builder runs
 these exact read-only probes at the frozen start and stores output hashes:
@@ -254,7 +262,9 @@ and recoverable evidence. G11 does not claim a product or package release.
 ### Exact runnable starting matrix
 
 The Builder records command, exit code, duration, unedited output, and SHA256
-of each output. Rows 1–10 must be green before mutation. This is the complete
+of each output. Rows 1–7 and 10 are the pre-mutation matrix. Rows 8–9 become
+runnable only after the authorized static verifier exists. After implementation
+the Builder reruns the complete restored rows 1–10, and all must be green. This is the complete
 G11 matrix; no package, Electron lifecycle, installer, PTY, process-root, or
 release command is permitted.
 
@@ -262,7 +272,7 @@ release command is permitted.
 |---|---|---|
 | 1 | `git rev-parse b1720c086bb2d93942448a3fdd352b7d58af9483` | exact denominator start `b1720c086bb2d93942448a3fdd352b7d58af9483` |
 | 2 | `git rev-parse b1720c086bb2d93942448a3fdd352b7d58af9483^{tree}` | exact denominator tree `97b2768e3bc79d45c321336e73ec30167c6c8959` |
-| 3 | `git status --short` | empty at the same-Reader-approved amendment commit |
+| 3 | `git status --short` | empty at the replacement-Reader-approved amendment commit |
 | 4 | `git ls-tree -r --name-only b1720c086bb2d93942448a3fdd352b7d58af9483 | Measure-Object` | `Count = 1421` |
 | 5 | `bun qa/run.ts repo-shape` | exit `0`, PASS |
 | 6 | `bun qa/run.ts doc-links` | exit `0`, PASS |
@@ -338,9 +348,12 @@ static scope/receipt bait and never exercises G12 lifecycle.
 
 ## Rollback and recovery
 
-The immutable start is
+The frozen 1,421-path denominator remains
 `b1720c086bb2d93942448a3fdd352b7d58af9483` / tree
-`97b2768e3bc79d45c321336e73ec30167c6c8959`. The Builder records exactly one
+`97b2768e3bc79d45c321336e73ec30167c6c8959` and is revalidated separately.
+The exact rollback comparison baseline is the amended authority commit
+`3a4b45fca5c965b643f7d64a68f35abf2cb7c8d1` / tree
+`39d64367fb43c153418562e274a8b9cf097fab92`. The Builder records exactly one
 candidate commit `<G11_CANDIDATE>` and tree `<G11_CANDIDATE_TREE>` in the
 receipt; neither placeholder may remain at verification.
 
@@ -353,8 +366,10 @@ source SHA256 is
 Then restore every modified A-path from the named start commit and remove only
 the candidate-created G11 receipt/static-verifier paths. The rollback is green
 only when `git diff --exit-code
-b1720c086bb2d93942448a3fdd352b7d58af9483`, the 1,421-row/blob reproduction,
-all 381 immutable-manifest SHA256 rows, `doc-links`, `repo-shape`, and
+3a4b45fca5c965b643f7d64a68f35abf2cb7c8d1`, the separate 1,421-row/blob
+reproduction against `b1720c086bb2d93942448a3fdd352b7d58af9483`, all
+380 tracked immutable-manifest SHA256 rows, the external Phase-1 content check,
+`doc-links`, `repo-shape`, and
 `rung-ladder` agree byte-for-byte. Any collision, missing map row, ambiguous
 reference, or hash mismatch stops without guessing.
 
