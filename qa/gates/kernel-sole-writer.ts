@@ -59,6 +59,10 @@ const DRIVER_ALLOW = [
   "qf-kernel-schema/",
   "qa/gates/kernel-sole-writer.ts",
   "qa/gates/kernel-sole-writer-app.ts",
+  // Phase 3 P14-A/P14-B: independent read-only oracles over their isolated
+  // production-proof Kernels. Raw SQL remains outside SQL_ALLOW below.
+  "qa/gates/bovada-football/run.ts",
+  "qa/gates/hermes-production-inference.ts",
   // WO-R17: independent read-only oracle reads the isolated UI-proof Kernel
   // with Database(..., { readonly: true }); it does not write domain state.
   "qa/gates/technique-outcome-loop.ts",
@@ -118,7 +122,11 @@ const DRIVER_ALLOW = [
   "qa/gates/founder-steering.ts",
   "qa/gates/golden-g10-canvas-runtime.ts",
 ];
-const SQL_ALLOW = DRIVER_ALLOW.filter((path) => path !== "qa/gates/golden-g10-canvas-runtime.ts");
+const SQL_ALLOW = DRIVER_ALLOW.filter((path) => ![
+  "qa/gates/golden-g10-canvas-runtime.ts",
+  "qa/gates/bovada-football/run.ts",
+  "qa/gates/hermes-production-inference.ts",
+].includes(path));
 
 /**
  * Who may call openKernel / openAppKernel outside packages/qf-kernel/.

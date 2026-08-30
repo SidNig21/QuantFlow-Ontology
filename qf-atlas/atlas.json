@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "57ed228a",
+    "commit": "8295828b",
     "generatedAt": "2026-08-30",
-    "filesScanned": 411,
+    "filesScanned": 412,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "c8eb71adbc1ac0a9"
+    "fingerprint": "6deb80ee0661acc3"
   },
   "stats": {
     "live": 109,
@@ -327,9 +327,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 533
+      "files": 535
     },
-    "coverageFiles": 533,
+    "coverageFiles": 535,
     "ownership": {
       "responsibilities": 10,
       "contested": 7,
@@ -3236,12 +3236,12 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1175.4,
+      "kb": 1202.8,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 92,
-      "writes": 55,
+      "spawns": 95,
+      "writes": 56,
       "dml": 19,
       "executes": 55,
       "files": [
@@ -3336,6 +3336,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/hermes-production-inference.ts",
+          "kb": 27.1,
+          "spawns": 3,
+          "spawnsLive": 2,
+          "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/team-composition-ui.ts",
           "kb": 24.1,
           "spawns": 5,
@@ -3376,6 +3386,20 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/kernel-sole-writer.ts",
+          "kb": 18.9,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 2,
+          "dml": 3,
+          "dmlLines": [
+            43,
+            44,
+            46
+          ],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/kernel-task-delegation.ts",
           "kb": 18.7,
           "spawns": 0,
@@ -3387,20 +3411,6 @@
             558
           ],
           "executes": 19
-        },
-        {
-          "path": "qa/gates/kernel-sole-writer.ts",
-          "kb": 18.6,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 2,
-          "dml": 3,
-          "dmlLines": [
-            43,
-            44,
-            46
-          ],
-          "executes": 0
         },
         {
           "path": "qa/gates/windows-dock-collaboration.ts",
@@ -4270,7 +4280,7 @@
       "id": "5:qa::run",
       "layer": 5,
       "name": "qa/run.ts",
-      "kb": 39,
+      "kb": 39.4,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -4281,7 +4291,7 @@
       "files": [
         {
           "path": "qa/run.ts",
-          "kb": 39,
+          "kb": 39.4,
           "spawns": 3,
           "spawnsLive": 2,
           "writes": 0,
@@ -10061,6 +10071,10 @@
     },
     {
       "path": "qa/gates/hermes-launch-policy.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/hermes-production-inference.ts",
       "status": "out-of-scope"
     },
     {
@@ -20390,6 +20404,57 @@
       "unexplained": []
     },
     {
+      "path": "qa/gates/hermes-production-inference.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "qa/gates/hermes-production-inference.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "partial",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "2 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
       "path": "qa/gates/hermes-research.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -24051,41 +24116,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 529,
+      "indexed": 531,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 261,
+      "not-applicable": 263,
       "indexed": 269,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 523,
+      "not-applicable": 525,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 482,
+      "not-applicable": 484,
       "partial": 29,
       "indexed": 22
     },
     "lifetime": {
-      "not-applicable": 470,
-      "partial": 58,
+      "not-applicable": 471,
+      "partial": 59,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 210,
+      "not-applicable": 212,
       "unsupported": 102,
       "indexed": 221
     },
     "ownership": {
-      "not-applicable": 177,
+      "not-applicable": 179,
       "unsupported": 336,
       "indexed": 20
     },
     "reach": {
-      "unsupported": 310,
+      "unsupported": 312,
       "indexed": 220,
       "partial": 3
     }
@@ -28805,6 +28870,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
+        "qa/gates/hermes-production-inference.ts",
         "qa/gates/hermes-research.ts",
         "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
@@ -28915,6 +28981,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
+        "qa/gates/hermes-production-inference.ts",
         "qa/gates/hermes-research.ts",
         "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
@@ -28988,6 +29055,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
+        "qa/gates/hermes-production-inference.ts",
         "qa/gates/hermes-research.ts",
         "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
@@ -29053,6 +29121,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
+        "qa/gates/hermes-production-inference.ts",
         "qa/gates/hermes-research.ts",
         "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
@@ -29981,6 +30050,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
+        "qa/gates/hermes-production-inference.ts",
         "qa/gates/hermes-research.ts",
         "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
@@ -29992,8 +30062,7 @@
         "qa/gates/windows-dock-ontology.ts",
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts",
-        "qa/gates/package-closure.ts",
-        "qa/gates/report-authority.ts"
+        "qa/gates/package-closure.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -30278,6 +30347,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/golden-g10-canvas-runtime.ts",
+        "qa/gates/hermes-production-inference.ts",
         "qa/gates/hermes-research.ts",
         "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
@@ -53122,12 +53192,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "a9608971",
+      "commit": "57ed228a",
       "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "57ed228a",
+      "commit": "8295828b",
       "generatedAt": "2026-08-30"
     },
     "verdict": "better",

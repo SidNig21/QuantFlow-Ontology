@@ -358,6 +358,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "hermes-production-inference",
+    description: "Phase 3 P14-B: one packaged production Director nonce turn with trusted provider, token, Turn, Kernel, and cleanup proof",
+    run: async () => {
+      const { runHermesProductionInferenceGate } = await import("./gates/hermes-production-inference.ts");
+      const { ok } = await runHermesProductionInferenceGate();
+      return ok;
+    },
+  },
+  {
     name: "governed-review",
     description: "R15: production request-review handoff, strict Kernel evaluation, findings, publication, refusal, and replay proof",
     run: async () => {
