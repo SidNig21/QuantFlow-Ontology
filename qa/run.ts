@@ -256,6 +256,17 @@ function trackedFiles(): string[] {
 
 const gates: Gate[] = [
   {
+    name: "golden-phase3-requalification",
+    description:
+      "Golden Phase 3: finite whole-repository census, exact gate classification, claim ownership, and omission falsifiers",
+    run: async () => {
+      const { runGoldenPhase3RequalificationGate } = await import(
+        "./gates/golden-phase3-requalification.ts"
+      );
+      return (await runGoldenPhase3RequalificationGate()).ok;
+    },
+  },
+  {
     name: "golden-g12-package-operations",
     description: "G12: Windows package, install, release target, Bovada durability, PTY/sidecar teardown, relaunch, and cleanup",
     run: async () => {
