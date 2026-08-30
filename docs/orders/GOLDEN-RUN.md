@@ -49,6 +49,13 @@ no Phase-3 Builder or R18 authority is open. R18 remains **FROZEN / PENDING
 GOLDEN CLOSURE**; even a Phase-3 PASS and Golden designation cannot activate it.
 Only a separate later `NEXT.md` rotation may open R18.
 
+The real point-in-time capture→Dataset→named Technique→independently evaluated
+result journey below is the **R18 destination**, not a claim that Phase 3's
+current floor already composes those seams. Phase 3 separately requalifies live
+capture, a real packaged Director turn, and the accepted R17 deterministic
+sample loop, then proves the missing composition refuses with zero downstream
+mutation. R18 remains frozen/pending after that honest current-floor proof.
+
 ---
 
 ## Part I — The golden run
