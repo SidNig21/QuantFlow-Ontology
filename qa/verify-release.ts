@@ -14,9 +14,9 @@ const REPO_ROOT = join(import.meta.dir, "..");
 
 export type ReleaseStage = {
   id: string;
-  cwd: "." | "collab-electron" | "species/hermes";
+  cwd: "." | "collab-electron" | "species/hermes" | "tools/qf-bovada-football";
   command: readonly [string, ...string[]];
-  installCache?: "electron" | "hermes";
+  installCache?: "electron" | "hermes" | "bovada";
 };
 
 export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
@@ -29,8 +29,16 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
   {
     id: "install-hermes",
     cwd: "species/hermes",
-    command: ["bun", "install", "--frozen-lockfile", "--linker=isolated"],
+    command: ["bun", "install", "--frozen-lockfile", "--linker", "isolated"],
     installCache: "hermes",
+  },
+  {
+    id: "install-bovada",
+    cwd: "tools/qf-bovada-football",
+    command: [
+      "bun", "install", "--frozen-lockfile", "--backend", "copyfile", "--linker", "isolated",
+    ],
+    installCache: "bovada",
   },
   {
     id: "unit",

@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "9c709c58",
+    "commit": "5a39d149",
     "generatedAt": "2026-08-30",
     "filesScanned": 411,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "91ce44b46835534a"
+    "fingerprint": "3a743908537a556b"
   },
   "stats": {
     "live": 109,
@@ -4298,7 +4298,7 @@
       "id": "5:qa::verify",
       "layer": 5,
       "name": "verify*",
-      "kb": 7.3,
+      "kb": 7.5,
       "x": 2.6,
       "z": -0.45,
       "status": "ok",
@@ -4309,7 +4309,7 @@
       "files": [
         {
           "path": "qa/verify-release.ts",
-          "kb": 6.9,
+          "kb": 7.1,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -53122,12 +53122,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "a4f93e31",
+      "commit": "9c709c58",
       "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "9c709c58",
+      "commit": "5a39d149",
       "generatedAt": "2026-08-30"
     },
     "verdict": "better",
