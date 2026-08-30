@@ -133,3 +133,9 @@ A fresh independent Verifier repeats the mandatory matrix and falsifiers under P
 2. Does this packet have exactly one meaning—complete current Windows product requalification from the immutable purified source, inheriting rather than ceremonially rerunning G1–G12, with any repair stopped and separately routed before one final candidate, independent Verifier, and Golden SHA?
 
 The Reader returns `YES / YES` or a finite defect list against the exact authority commit. No Builder creation, product/test/gate edit, Phase-3 execution, Golden designation, or R18 work is authorized before YES / YES.
+
+## Superseding current-defect Builder authority — 2026-08-30
+
+Reader task `01a05212-f0e4-7101-a0d9-8e59df8a3f08` returned the finite A/B/C verdict recorded in [the current-defect amendment](evidence/golden-baseline/phase3/PHASE3-CURRENT-DEFECT-AMENDMENT-20260830.md). That amendment supersedes only the final Builder-closed sentence above and opens exactly its enumerated paths and actions. Every other deliverable, acceptance criterion, falsifier, stop, isolation rule, candidate chain, and R18 freeze in this order remains unchanged.
+
+The Builder must run focused falsifiers first, then fresh P14-C, P13/P16, and P15 on final bytes. Exactly one isolated P14-A production recapture is permitted because the earlier source Artifact was removed by compliant cleanup; its no-refetch analyzer is tuple-allowlisted and parser mutation remains closed pending adjudication. P18, candidate freeze, Verifier acceptance, Golden designation, `main`, remotes, and R18 remain closed until all P01-P17 rows are green.
