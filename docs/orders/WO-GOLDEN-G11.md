@@ -351,11 +351,13 @@ static scope/receipt bait and never exercises G12 lifecycle.
 The frozen 1,421-path denominator remains
 `b1720c086bb2d93942448a3fdd352b7d58af9483` / tree
 `97b2768e3bc79d45c321336e73ec30167c6c8959` and is revalidated separately.
-The exact rollback comparison baseline is the five-correction amended
-authority commit `81fd841828707c652eae91c98522adb9f287bc2c` / tree
-`e66af95375d80071ed8c1be8506626fdde2dbc01`. The Builder records exactly one
-candidate commit `<G11_CANDIDATE>` and tree `<G11_CANDIDATE_TREE>` in the
-receipt; neither placeholder may remain at verification.
+The exact rollback comparison baseline is the eventual single G11 Builder
+candidate's first parent commit and tree. Before mutation, the Builder captures
+that parent as `<G11_AUTHORITY_PARENT>` / `<G11_AUTHORITY_PARENT_TREE>` in the
+immutable starting receipt and proves it equals the Reader-approved authority
+`HEAD` observed when the Builder opens. The Builder records exactly one
+candidate commit `<G11_CANDIDATE>` and tree `<G11_CANDIDATE_TREE>`; no
+placeholder may remain at verification.
 
 On RED, preserve the candidate SHA, then create a normal inverse commit—never
 reset, checkout-overwrite, rebase, or force-push. Reverse only the exact
@@ -365,8 +367,8 @@ source SHA256 is
 `05965A70032DDB6E96B986682FCD39A7EF6773F69F499E4FA1201C353EAB6202`.
 Then restore every modified A-path from the named start commit and remove only
 the candidate-created G11 receipt/static-verifier paths. The rollback is green
-only when `git diff --exit-code
-81fd841828707c652eae91c98522adb9f287bc2c`, the separate 1,421-row/blob
+only when `git diff --exit-code <G11_AUTHORITY_PARENT>` and the restored tree
+equals `<G11_AUTHORITY_PARENT_TREE>` byte-for-byte, while the separate 1,421-row/blob
 reproduction against `b1720c086bb2d93942448a3fdd352b7d58af9483`, all
 380 tracked immutable-manifest SHA256 rows, the external Phase-1 content check,
 `doc-links`, `repo-shape`, and
