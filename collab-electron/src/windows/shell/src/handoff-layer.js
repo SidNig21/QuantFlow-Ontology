@@ -11,6 +11,12 @@ const TERMINAL_SESSION_STATUSES = new Set([
 	"closed", "failed", "cancelled",
 ]);
 
+export function visibleTaskHandoffs(handoffs) {
+	return (Array.isArray(handoffs) ? handoffs : []).filter((handoff) =>
+		String(handoff?.fromSessionId ?? "") !== String(handoff?.toSessionId ?? ""),
+	);
+}
+
 export function sessionsForTaskDelegationCanvas(sessions, handoffs) {
 	const historicalIds = new Set();
 	for (const handoff of handoffs) {
@@ -43,7 +49,7 @@ export async function refreshTaskDelegationCanvas({
 	if (!handoffResponse?.ok || !Array.isArray(handoffResponse.handoffs)) return;
 	const sessionResponse = await listSessions();
 	if (!sessionResponse?.ok || !Array.isArray(sessionResponse.sessions)) return;
-	const handoffs = handoffResponse.handoffs;
+	const handoffs = visibleTaskHandoffs(handoffResponse.handoffs);
 	for (const session of sessionsForTaskDelegationCanvas(
 		sessionResponse.sessions,
 		handoffs,
@@ -112,7 +118,7 @@ export function createHandoffLayer({ layerEl, viewportState, getTiles }) {
 
 	return {
 		setHandoffs(next) {
-			handoffs = Array.isArray(next) ? next : [];
+			handoffs = visibleTaskHandoffs(next);
 			update();
 		},
 		update,

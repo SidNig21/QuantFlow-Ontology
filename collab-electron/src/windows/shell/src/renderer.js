@@ -303,7 +303,7 @@ async function init() {
 		}, 2800);
 	}
 
-	initDock(panelAgent, {
+	const dockController = initDock(panelAgent, {
 		onTidy: () => tidyTilesToGrid(),
 		getRuntimeSnapshot: () => runtimeSnapshot,
 		refreshRuntimeSnapshot,
@@ -843,6 +843,7 @@ async function init() {
 					if (!result?.ok) { await refreshTaskSurface(); throw new Error(result?.error?.message ?? "Second critic failed"); }
 					await refreshTaskSurface();
 				},
+				onSelectTask: (taskId) => dockController?.selectTask(taskId),
 			});
 		}
 	}

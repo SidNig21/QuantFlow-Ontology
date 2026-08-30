@@ -37,6 +37,22 @@ test("participant projection keeps session, runtime, work, and recovery independ
   ]);
 });
 
+test("live native TUI is presented with its configured profile without inventing a runtime observation", () => {
+  const live = participantView({
+    session: { id: "director-1", status: "running" },
+    definition: { role: "orchestrator", runtime_profile: "default" },
+    runtimeObservation: { live: true, runtime: "Native TUI" },
+  });
+  const absent = participantView({
+    session: { id: "director-2", status: "running" },
+    definition: { role: "orchestrator", runtime_profile: "default" },
+    runtimeObservation: { live: false },
+  });
+  expect(live.runtime).toBe("Native TUI · profile default");
+  expect(absent.runtime).toBe("default");
+  expect(absent.runtime).not.toContain("Native TUI");
+});
+
 test("participant projection keeps current and historical sessions distinct by id", () => {
   const world = {
     root: { type: "mission", id: "mission-review" },
@@ -80,4 +96,13 @@ test("Dock and Canvas consume the same participant projection seam", async () =>
   expect(renderer).toContain("participantViewForSession");
   expect(dock).not.toContain("runtimeObservation: { live: session?.status === \"running\" }");
   expect(renderer).not.toContain("runtimeObservation: { live: Boolean(term?.ptySessionId)");
+});
+
+test("founder-path chrome exposes the existing south-east resize handle and no-Mission history copy", async () => {
+  const css = await Bun.file(new URL("./shell.css", import.meta.url)).text();
+  const html = await Bun.file(new URL("../index.html", import.meta.url)).text();
+  expect(css).toContain(".canvas-tile .tile-resize-handle.corner-se::after");
+  expect(css).toContain("pointer-events: none");
+  expect(html).toContain("No research history yet.");
+  expect(html).not.toContain("No historical research for this Mission.");
 });

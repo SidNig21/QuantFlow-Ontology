@@ -74,7 +74,17 @@ export function participantView({
 			? "restartable"
 			: "not restartable";
 	const role = text(definition.role ?? session.role ?? definition.display_name);
-	const runtimeProfile = text(definition.runtime_profile ?? runtimeObservation.runtime);
+	const configuredProfile = recorded(definition.runtime_profile)
+		? String(definition.runtime_profile)
+		: null;
+	const observedRuntime = runtimeObservation.live === true && recorded(runtimeObservation.runtime)
+		? String(runtimeObservation.runtime)
+		: null;
+	const runtimeProfile = observedRuntime
+		? configuredProfile
+			? `${observedRuntime} · profile ${configuredProfile}`
+			: observedRuntime
+		: text(configuredProfile);
 	const reason = text(missionBinding.reason ?? session.creation_reason ?? session.reason);
 	const capabilityGroups = Array.isArray(definition.capability_groups)
 		? definition.capability_groups.map(text)

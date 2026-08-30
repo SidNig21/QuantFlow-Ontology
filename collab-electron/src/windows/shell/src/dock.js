@@ -118,6 +118,33 @@ export function unavailableTaskForSession(assignments, sessionId) {
 	) ?? null;
 }
 
+export function taskInspectProjection(assignments, taskId, sessions = []) {
+	const id = String(taskId ?? "");
+	const task = (Array.isArray(assignments) ? assignments : []).find((row) =>
+		String(row?.taskId ?? "") === id,
+	);
+	if (!task || !id) return null;
+	const sessionName = (sessionId) => {
+		const session = (Array.isArray(sessions) ? sessions : []).find((row) =>
+			String(row?.id ?? "") === String(sessionId ?? ""),
+		);
+		return session
+			? String(session.display_name ?? session.label ?? session.role ?? session.id)
+			: String(sessionId ?? "Not recorded");
+	};
+	const delegatorId = task.delegatedBySessionId ?? null;
+	const assigneeId = task.assignedToSessionId ?? null;
+	return Object.freeze({
+		id,
+		title: String(task.title ?? "Task"),
+		status: String(task.status ?? "Not recorded"),
+		description: String(task.description ?? "Not recorded"),
+		delegator: delegatorId ? sessionName(delegatorId) : "Not recorded",
+		assignee: assigneeId ? sessionName(assigneeId) : "Not recorded",
+		relationship: `delegated_by: Task -> ${delegatorId ?? "Not recorded"}; assigned_to: Task -> ${assigneeId ?? "Not recorded"}`,
+	});
+}
+
 /** Terminal statuses that Clear may hide from the Dock rail. */
 export function isDockTerminalSessionStatus(status) {
 	return ["closed", "cancelled", "failed"].includes(String(status ?? ""));
@@ -219,11 +246,14 @@ export function initDock(panelEl, options = {}) {
 	/** @type {boolean} */
 	let closedCollapsed = true;
 	let selectedSessionId = null;
+	let selectedTaskId = null;
 	let planningDirector = null;
 	let missionWorld = null;
 	let latestDefinitions = [];
 	let activeMissionId = null;
 	let runtimeSnapshot = [];
+	let latestTaskAssignments = [];
+	let latestSessions = [];
 
 	function syncStartDiscovery() {
 		if (teamSummaryEl) teamSummaryEl.textContent = formatLaunchableTeamSummary(latestDefinitions);
@@ -285,6 +315,49 @@ export function initDock(panelEl, options = {}) {
 		inspectPane.appendChild(facts);
 	}
 
+	function renderTaskInspect(task) {
+		inspectPane.replaceChildren();
+		if (!task) {
+			inspectPane.appendChild(el("div", "qf-empty", "Select a participant or Task."));
+			return;
+		}
+		const heading = el("h3", "dock-inspect-heading", task.title);
+		heading.title = task.id;
+		inspectPane.appendChild(heading);
+		inspectPane.appendChild(el("div", "dock-inspect-id", task.id));
+		const facts = el("div", "dock-inspect-facts");
+		for (const [field, value] of [
+			["status", task.status],
+			["description", task.description],
+			["delegator", task.delegator],
+			["assignee", task.assignee],
+			["relationship", task.relationship],
+		]) {
+			const row = el("div", "qf-world-field");
+			row.appendChild(el("span", "qf-world-field-label", field));
+			row.appendChild(el("span", "qf-world-field-value", value));
+			facts.appendChild(row);
+		}
+		inspectPane.appendChild(facts);
+	}
+
+	async function selectTask(taskId) {
+		selectedSessionId = null;
+		selectedTaskId = null;
+		const surface = await window.shellApi.qf.listTaskSurface();
+		latestTaskAssignments = surface?.ok && Array.isArray(surface.assignments)
+			? surface.assignments
+			: [];
+		latestSessions = surface?.ok && Array.isArray(surface.sessions)
+			? surface.sessions
+			: [];
+		const task = taskInspectProjection(latestTaskAssignments, taskId, latestSessions);
+		selectedTaskId = task?.id ?? null;
+		renderTaskInspect(task);
+		setMode("INSPECT");
+		return Boolean(task);
+	}
+
 	function setTally({ live, closed, launchable }) {
 		if (!tallyEl) return;
 		tallyEl.replaceChildren();
@@ -310,6 +383,7 @@ export function initDock(panelEl, options = {}) {
 			const taskAssignments = surfaceRes?.ok && Array.isArray(surfaceRes.assignments)
 				? surfaceRes.assignments
 				: [];
+			latestTaskAssignments = taskAssignments;
 
 			speciesList.replaceChildren();
 			let launchable = 0;
@@ -394,6 +468,7 @@ export function initDock(panelEl, options = {}) {
 				const allSessions = surfaceRes?.ok && Array.isArray(surfaceRes.sessions)
 					? surfaceRes.sessions
 					: (Array.isArray(sessRes.sessions) ? sessRes.sessions : []);
+				latestSessions = allSessions;
 				const sessions = visibleDockSessions(allSessions, sessionsClearedThroughIso);
 				const live = [];
 				const closed = [];
@@ -434,6 +509,7 @@ export function initDock(panelEl, options = {}) {
 					card.appendChild(el("span", "own", `${view.task} · ${view.work}`));
 					card.appendChild(el("span", "st", `${view.runtimeState} · ${state.text}`));
 					card.addEventListener("click", () => {
+						selectedTaskId = null;
 						selectedSessionId = id;
 						renderInspect(row, view);
 						setMode("INSPECT");
@@ -441,6 +517,7 @@ export function initDock(panelEl, options = {}) {
 					card.addEventListener("keydown", (event) => {
 						if (event.key === "Enter" || event.key === " ") {
 							event.preventDefault();
+							selectedTaskId = null;
 							selectedSessionId = id;
 							renderInspect(row, view);
 							setMode("INSPECT");
@@ -471,6 +548,10 @@ export function initDock(panelEl, options = {}) {
 				if (selectedSessionId) {
 					const selected = allSessions.find((row) => String(row.id ?? "") === selectedSessionId);
 					if (selected) renderInspect(selected, participantFor(selected, taskAssignments, allSessions));
+				} else if (selectedTaskId) {
+					const selected = taskInspectProjection(taskAssignments, selectedTaskId, allSessions);
+					selectedTaskId = selected?.id ?? null;
+					renderTaskInspect(selected);
 				}
 			}
 
@@ -592,4 +673,5 @@ export function initDock(panelEl, options = {}) {
 		void refresh();
 	});
 	void refresh();
+	return { refresh, selectTask };
 }

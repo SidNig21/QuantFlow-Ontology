@@ -6,9 +6,40 @@ import {
 	formatDockSessionState,
 	launchableDockDefinitions,
 	researchDirectorRunningStatus,
+	taskInspectProjection,
   visibleDockDefinitions,
   visibleDockSessions,
 } from "./dock.js";
+
+test("Task Inspect resolves only an exact latest assignment and exposes relationship meaning", async () => {
+	const assignments = [{
+		taskId: "task-exact",
+		title: "Founder task",
+		status: "open",
+		description: "Prove the current founder path.",
+		delegatedBySessionId: "director-1",
+		assignedToSessionId: "worker-1",
+	}];
+	const sessions = [
+		{ id: "director-1", display_name: "Research Director" },
+		{ id: "worker-1", display_name: "Market Researcher" },
+	];
+	const projection = taskInspectProjection(assignments, "task-exact", sessions);
+	expect(projection).toEqual({
+		id: "task-exact",
+		title: "Founder task",
+		status: "open",
+		description: "Prove the current founder path.",
+		delegator: "Research Director",
+		assignee: "Market Researcher",
+		relationship: "delegated_by: Task -> director-1; assigned_to: Task -> worker-1",
+	});
+	expect(taskInspectProjection(assignments, "task-stale", sessions)).toBeNull();
+
+	const renderer = await Bun.file(new URL("./renderer.js", import.meta.url)).text();
+	expect(renderer).toContain("onSelectTask: (taskId) => dockController?.selectTask(taskId)");
+	expect(renderer).not.toContain("onSelectTask: (task) =>");
+});
 
 const deferred = () => {
 	let resolve!: () => void;

@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "8295828b",
+    "commit": "c469f89e",
     "generatedAt": "2026-08-30",
     "filesScanned": 412,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "6deb80ee0661acc3"
+    "fingerprint": "8872e8a409998505"
   },
   "stats": {
     "live": 109,
@@ -563,8 +563,8 @@
       "layer": 4,
       "name": "Editor.tsx",
       "kb": 23.7,
-      "x": 0.45,
-      "z": 2.6,
+      "x": -0.91,
+      "z": 2.48,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -759,8 +759,8 @@
       "layer": 4,
       "name": "ReplayTimeline.tsx",
       "kb": 15,
-      "x": 0.91,
-      "z": -2.48,
+      "x": 2.03,
+      "z": -1.69,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -994,7 +994,7 @@
       "id": "2:collab-electron/src/main::agent",
       "layer": 2,
       "name": "agent*",
-      "kb": 31.7,
+      "kb": 32,
       "x": -0.91,
       "z": 2.48,
       "status": "ok",
@@ -1005,7 +1005,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/agent-host.ts",
-          "kb": 27.2,
+          "kb": 27.5,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2571,9 +2571,9 @@
       "id": "4:collab-electron/src/windows/shell/src::dock",
       "layer": 4,
       "name": "dock.js",
-      "kb": 23.5,
-      "x": -0.91,
-      "z": 2.48,
+      "kb": 26.4,
+      "x": 0.45,
+      "z": 2.6,
       "status": "ok",
       "spawns": 2,
       "writes": 0,
@@ -2582,7 +2582,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/dock.js",
-          "kb": 23.5,
+          "kb": 26.4,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 0,
@@ -2655,7 +2655,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 60,
+      "kb": 60.1,
       "x": -1.24,
       "z": 0.45,
       "status": "ice",
@@ -2666,7 +2666,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 60,
+          "kb": 60.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2711,9 +2711,9 @@
       "id": "4:collab-electron/src/windows/shell/src::task",
       "layer": 4,
       "name": "task-composition.js",
-      "kb": 14.9,
-      "x": 2.03,
-      "z": -1.69,
+      "kb": 15.1,
+      "x": 0.91,
+      "z": -2.48,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2722,7 +2722,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/task-composition.js",
-          "kb": 14.9,
+          "kb": 15.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5062,7 +5062,7 @@
       "id": "4:residue",
       "layer": 4,
       "name": "68 small modules*",
-      "kb": 145.6,
+      "kb": 146.3,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -5082,8 +5082,8 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/packages/components/src/Editor/WikiLinkAutocomplete.tsx",
-          "kb": 6,
+          "path": "collab-electron/src/windows/shell/src/participant-projection.js",
+          "kb": 6.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5092,8 +5092,8 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/src/windows/shell/src/participant-projection.js",
-          "kb": 5.9,
+          "path": "collab-electron/packages/components/src/Editor/WikiLinkAutocomplete.tsx",
+          "kb": 6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5212,8 +5212,8 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/packages/components/src/Editor/ImageBlock.tsx",
-          "kb": 4.1,
+          "path": "collab-electron/src/windows/shell/src/handoff-layer.js",
+          "kb": 4.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5222,8 +5222,8 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/src/windows/shell/src/handoff-layer.js",
-          "kb": 3.9,
+          "path": "collab-electron/packages/components/src/Editor/ImageBlock.tsx",
+          "kb": 4.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -10817,9 +10817,9 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports startPrecreatedNativeTuiSession() at line 522",
-            "exports cancelAgentSession() at line 749",
-            "exports closeAgentSessionRow() at line 807"
+            "exports startPrecreatedNativeTuiSession() at line 531",
+            "exports cancelAgentSession() at line 758",
+            "exports closeAgentSessionRow() at line 816"
           ],
           "strong": [],
           "weight": "weak"
@@ -10858,7 +10858,7 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports admitAndStartSession() at line 447"
+            "exports admitAndStartSession() at line 456"
           ],
           "strong": [],
           "weight": "weak"
@@ -53192,12 +53192,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "57ed228a",
+      "commit": "8295828b",
       "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "8295828b",
+      "commit": "c469f89e",
       "generatedAt": "2026-08-30"
     },
     "verdict": "better",

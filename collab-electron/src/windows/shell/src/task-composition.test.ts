@@ -112,11 +112,18 @@ function withDocument<T>(run: (document: { createElement: (tagName: string) => F
     configurable: true,
     value: { createElement: (tagName: string) => new FakeElement(tagName) },
   });
-  try {
-    return run((globalThis as Record<string, unknown>).document as { createElement: (tagName: string) => FakeElement });
-  } finally {
+  const restore = (): void => {
     if (previous === undefined) delete (globalThis as Record<string, unknown>).document;
     else Object.defineProperty(globalThis, "document", { configurable: true, value: previous });
+  };
+  try {
+    const result = run((globalThis as Record<string, unknown>).document as { createElement: (tagName: string) => FakeElement });
+    if (result instanceof Promise) return result.finally(restore) as T;
+    restore();
+    return result;
+  } catch (error) {
+    restore();
+    throw error;
   }
 }
 
@@ -214,6 +221,59 @@ function seedFormAndError(foot: FakeElement): void {
 }
 
 describe("Task footer projection", () => {
+	test("assigned Task pointer activation selects the exact projected Task id", () => {
+		withDocument(() => {
+			const foot = new FakeElement();
+			const selected: string[] = [];
+			renderTaskFoot(
+				{ taskFoot: foot },
+				{ id: "tile-worker", sessionId: "worker-1" },
+				{ assignments: [assigned], onSelectTask: (taskId) => selected.push(taskId) },
+			);
+			const row = foot.querySelector(".task-fact");
+			expect(row?.tagName).toBe("BUTTON");
+			expect(row?.type).toBe("button");
+			row?.listeners.get("click")?.({ stopPropagation() {} });
+			expect(selected).toEqual(["task-1"]);
+		});
+	});
+
+	test("successful create collapses to one affordance while rejection retains values and error", async () => {
+		await withDocument(async () => {
+			const sessions = [
+				{ id: "director-1", display_name: "Research Director", status: "running" },
+				{ id: "worker-1", display_name: "Worker", status: "running" },
+			];
+			const tile = { id: "tile-director", sessionId: "director-1", role: "orchestrator" };
+			const foot = new FakeElement();
+			renderTaskFoot({ taskFoot: foot }, tile, { sessions, onCreate: async () => {} });
+			foot.querySelector(".task-create-button")?.listeners.get("click")?.({ stopPropagation() {} });
+			const form = foot.querySelector(".task-create-form");
+			if (!form) throw new Error("create form missing");
+			form.querySelector(".task-title")!.value = "Bounded task";
+			form.querySelector(".task-description")!.value = "Exact completion";
+			await form.listeners.get("submit")?.({ preventDefault() {}, stopPropagation() {} });
+			expect(foot.querySelector(".task-create-form")).toBeNull();
+			expect(foot.querySelectorAll(".task-create-button")).toHaveLength(1);
+
+			const rejectedFoot = new FakeElement();
+			renderTaskFoot({ taskFoot: rejectedFoot }, tile, {
+				sessions,
+				onCreate: async () => { throw new Error("Kernel refused"); },
+			});
+			rejectedFoot.querySelector(".task-create-button")?.listeners.get("click")?.({ stopPropagation() {} });
+			const rejectedForm = rejectedFoot.querySelector(".task-create-form");
+			if (!rejectedForm) throw new Error("rejected create form missing");
+			rejectedForm.querySelector(".task-title")!.value = "Keep title";
+			rejectedForm.querySelector(".task-description")!.value = "Keep description";
+			await rejectedForm.listeners.get("submit")?.({ preventDefault() {}, stopPropagation() {} });
+			expect(rejectedFoot.querySelector(".task-create-form")).toBe(rejectedForm);
+			expect(rejectedFoot.querySelector(".task-title")?.value).toBe("Keep title");
+			expect(rejectedFoot.querySelector(".task-description")?.value).toBe("Keep description");
+			expect(rejectedFoot.querySelector(".task-foot-error")?.textContent).toBe("Kernel refused");
+		});
+	});
+
 	test("preserves the compact research participant card during task refresh", () => {
 		withDocument(() => {
 			const foot = new FakeElement();
@@ -386,16 +446,16 @@ describe("Task footer projection", () => {
         {},
         {},
         [
-          expectedElement(
-            "DIV",
-            "task-fact task-fact-open",
+		  expectedElement(
+			"BUTTON",
+			"task-fact task-fact-open",
             "direct taskOPENAssigned by Research Directordirect description",
             {
               taskId: "task-director",
               delegatedBySessionId: "director-1",
               assignedToSessionId: "director-1",
             },
-            {},
+			{ type: "button" },
             [
               expectedElement("SPAN", "qf-task-title", "direct task"),
               expectedElement("SPAN", "qf-task-status", "OPEN"),

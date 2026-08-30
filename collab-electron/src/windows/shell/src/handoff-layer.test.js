@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	refreshTaskDelegationCanvas,
 	sessionsForTaskDelegationCanvas,
+	visibleTaskHandoffs,
 } from "./handoff-layer.js";
 
 const completedHandoff = {
@@ -21,6 +22,32 @@ const closedEndpointSessions = [
 ];
 
 describe("task delegation canvas projection", () => {
+	test("suppresses only zero-length same-session overlays", () => {
+		const sameSeat = {
+			...completedHandoff,
+			fromSessionId: "session-orchestrator",
+			toSessionId: "session-orchestrator",
+		};
+		expect(visibleTaskHandoffs([sameSeat, completedHandoff])).toEqual([completedHandoff]);
+	});
+
+	test("refresh projects a cross-session handoff exactly once and omits same-seat projection", async () => {
+		const sameSeat = {
+			...completedHandoff,
+			taskId: "task-same-seat",
+			fromSessionId: "session-orchestrator",
+			toSessionId: "session-orchestrator",
+		};
+		let renderedHandoffs = [];
+		await refreshTaskDelegationCanvas({
+			listHandoffs: async () => ({ ok: true, handoffs: [sameSeat, completedHandoff] }),
+			listSessions: async () => ({ ok: true, sessions: closedEndpointSessions }),
+			ensureSessionTile() {},
+			setHandoffs(handoffs) { renderedHandoffs = handoffs; },
+		});
+		expect(renderedHandoffs).toEqual([completedHandoff]);
+	});
+
 	test("keeps both closed task endpoints without restoring unrelated history", () => {
 		expect(sessionsForTaskDelegationCanvas(
 			closedEndpointSessions,

@@ -7,6 +7,8 @@ const definitions = new Map<string, Record<string, unknown>>();
 const sessions = new Map<string, Record<string, unknown>>();
 const tasks = new Map<string, Record<string, unknown>>();
 const pendingResults = new Set<string>();
+const taskAssignments: Record<string, unknown>[] = [];
+const kernelCommands: Array<{ command: string; input: Record<string, unknown> }> = [];
 
 mock.module("./peer-delivery", () => ({
   hasUndeliveredResult: (_role: string, sessionId: string, _dbPath: string) => pendingResults.has(sessionId),
@@ -15,8 +17,8 @@ mock.module("./peer-delivery", () => ({
 mock.module("./kernel", () => ({
   getArtifactRoot: () => "",
   kernelGetLinks: () => [],
-  kernelListAgentSessions: () => [],
-  kernelListTaskAssignments: () => [],
+  kernelListAgentSessions: () => [...sessions.values()],
+  kernelListTaskAssignments: () => taskAssignments,
   kernelGetObject: (type: string, id: string) => {
     if (type === "agent_definition") return definitions.get(id) ?? null;
     if (type === "agent_session") return sessions.get(id) ?? null;
@@ -24,6 +26,7 @@ mock.module("./kernel", () => ({
     return null;
   },
   kernelExecute: (command: string, input: Record<string, unknown>) => {
+    kernelCommands.push({ command, input: { ...input } });
     const id = String(input.session_id ?? input.task_id ?? input.mission_id ?? input.name ?? "object");
     if (command === "register_agent_definition") {
       definitions.set(id, { id, ...input });
@@ -46,6 +49,9 @@ mock.module("./kernel", () => ({
     } else if (command === "cancel_agent_session") {
       const session = sessions.get(id);
       if (session) session.status = "cancelled";
+    } else if (command === "fail_agent_session") {
+      const session = sessions.get(id);
+      if (session) session.status = "failed";
     }
     return { object_id: id, command };
   },
@@ -278,5 +284,42 @@ describe("agent-host native-TUI lifecycle admission", () => {
     expect(hasLiveAgentSession(id)).toBe(false);
     expect(roles.get("orchestrator")).toBeUndefined();
     expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("cancelled");
+  });
+
+  test("cold reconciliation fails an absent open-Task owner exactly once without closing its lineage", async () => {
+    const id = "stale-open-task-owner";
+    const taskId = "durable-open-task";
+    sessions.set(id, { id, status: "running", definition_id: "hermes-research-director" });
+    tasks.set(taskId, { id: taskId, status: "open", title: "Founder task" });
+    taskAssignments.splice(0, taskAssignments.length, {
+      taskId,
+      status: "open",
+      assignmentState: "assigned",
+      assignedToSessionId: id,
+      delegatedBySessionId: id,
+    });
+    kernelCommands.length = 0;
+
+    const { reconcileStaleSessions } = await import("./agent-host");
+    reconcileStaleSessions();
+
+    expect(sessions.get(id)?.status).toBe("failed");
+    expect(tasks.get(taskId)?.status).toBe("open");
+    expect(taskAssignments[0]).toMatchObject({
+      taskId,
+      assignedToSessionId: id,
+      delegatedBySessionId: id,
+    });
+    expect(kernelCommands.filter((row) => row.command === "fail_agent_session")).toEqual([{
+      command: "fail_agent_session",
+      input: { session_id: id, reason: "app_terminated" },
+    }]);
+    expect(kernelCommands.some((row) =>
+      row.command === "close_agent_session" && row.input.session_id === id
+    )).toBe(false);
+
+    kernelCommands.length = 0;
+    reconcileStaleSessions();
+    expect(kernelCommands.filter((row) => row.input.session_id === id)).toEqual([]);
   });
 });

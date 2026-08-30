@@ -1834,6 +1834,20 @@ body.platform-win {
 	border-radius: var(--qf-gl-r);
 }
 
+button.task-fact {
+	width: 100%;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+button.task-fact:focus-visible {
+	outline: 1px solid var(--qf-gl-ice);
+	outline-offset: 2px;
+}
+
 .task-fact-label {
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -2663,6 +2677,19 @@ body.platform-win {
 	bottom: -4.5px;
 	right: -4.5px;
 	cursor: nwse-resize;
+}
+
+.canvas-tile .tile-resize-handle.corner-se::after {
+	content: "";
+	position: absolute;
+	right: 4px;
+	bottom: 4px;
+	width: 7px;
+	height: 7px;
+	border-right: 1px solid color-mix(in srgb, var(--qf-accent) 58%, transparent);
+	border-bottom: 1px solid color-mix(in srgb, var(--qf-accent) 58%, transparent);
+	pointer-events: none;
+	opacity: 0.72;
 }
 
 #tile-layer {

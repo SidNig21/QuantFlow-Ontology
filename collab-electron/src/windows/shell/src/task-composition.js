@@ -96,6 +96,7 @@ export function renderTaskFoot(dom, tile, {
 	onRequestReview,
 	onRequestRevision,
 	onSecondCritic,
+	onSelectTask,
 } = {}) {
 	const foot = dom?.taskFoot;
 	if (!foot) return;
@@ -129,8 +130,12 @@ export function renderTaskFoot(dom, tile, {
 
 	const session = (Array.isArray(sessions) ? sessions : []).find((row) => row?.id === tile.sessionId);
 	const fact = taskFactForSession(assignments, tile.sessionId);
-	const factRow = node("div", `task-fact task-fact-${fact.state}`);
+	const factRow = node(
+		fact.task?.assignmentState === "assigned" ? "button" : "div",
+		`task-fact task-fact-${fact.state}`,
+	);
 	if (fact.task?.assignmentState === "assigned") {
+		factRow.type = "button";
 		factRow.dataset.taskId = fact.task.taskId;
 		factRow.dataset.delegatedBySessionId = fact.task.delegatedBySessionId;
 		factRow.dataset.assignedToSessionId = fact.task.assignedToSessionId;
@@ -138,6 +143,10 @@ export function renderTaskFoot(dom, tile, {
 		factRow.appendChild(node("span", "qf-task-status", String(fact.task.status).toUpperCase()));
 		factRow.appendChild(node("span", "qf-task-delegator", `Assigned by ${fact.task.delegatorDisplayName}`));
 		factRow.appendChild(node("span", "qf-task-reason", fact.task.description));
+		factRow.addEventListener("click", (event) => {
+			event.stopPropagation();
+			onSelectTask?.(fact.task.taskId);
+		});
 	} else {
 		factRow.appendChild(node("span", "task-fact-label", fact.text));
 	}
@@ -289,6 +298,7 @@ export function renderTaskFoot(dom, tile, {
 	}
 
 	if (isOrchestrator(tile, session)) {
+		let renderCreateButton;
 		const renderCreateForm = (formState = null) => {
 			const form = node("form", "task-create-form");
 			const title = node("input", "task-title");
@@ -331,10 +341,7 @@ export function renderTaskFoot(dom, tile, {
 						assigneeSessionId: assignee.value,
 					});
 					const liveForm = foot.querySelector(".task-create-form");
-					liveForm?.querySelector(".task-title") &&
-						(liveForm.querySelector(".task-title").value = "");
-					liveForm?.querySelector(".task-description") &&
-						(liveForm.querySelector(".task-description").value = "");
+					if (liveForm) liveForm.replaceWith(renderCreateButton());
 				} catch (error) {
 					setSubmitting(false);
 					errorLine(foot, error?.message ?? String(error));
@@ -342,11 +349,7 @@ export function renderTaskFoot(dom, tile, {
 			});
 			return { form, title };
 		};
-
-		if (preservedForm) {
-			const { form } = renderCreateForm(preservedForm);
-			foot.appendChild(form);
-		} else {
+		renderCreateButton = () => {
 			const create = node("button", "task-create-button", "Create Task");
 			create.type = "button";
 			create.addEventListener("click", (event) => {
@@ -355,7 +358,14 @@ export function renderTaskFoot(dom, tile, {
 				create.replaceWith(form);
 				title.focus();
 			});
-			foot.appendChild(create);
+			return create;
+		};
+
+		if (preservedForm) {
+			const { form } = renderCreateForm(preservedForm);
+			foot.appendChild(form);
+		} else {
+			foot.appendChild(renderCreateButton());
 		}
 	}
 

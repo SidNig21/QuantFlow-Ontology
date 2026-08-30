@@ -401,7 +401,7 @@ export function reconcileStaleSessions(): void {
   for (const row of rows) {
     const id = String(row.id);
     const status = String(row.status);
-    if (openTaskOwners.has(id)) continue;
+    const ownsOpenTask = openTaskOwners.has(id);
     const trace = newTrace();
     if (status === "starting" || status === "running" || status === "blocked") {
       kernelExecute(
@@ -409,18 +409,27 @@ export function reconcileStaleSessions(): void {
         { session_id: id, reason: "app_terminated" },
         trace,
       );
+      // An open Task keeps its durable assignment and delegation lineage. The
+      // absent runtime is failed, not closed, so the Task projects as
+      // unavailable/reassignable on cold reopen.
+      if (ownsOpenTask) {
+        n += 1;
+        continue;
+      }
       kernelExecute(
         "close_agent_session",
         { session_id: id },
         { ...trace, span_id: crypto.randomUUID() },
       );
       n += 1;
+    } else if (ownsOpenTask) {
+      continue;
     } else if (status === "cancelled" || status === "failed") {
       kernelExecute("close_agent_session", { session_id: id }, trace);
       n += 1;
     }
   }
-  console.log(`agent-host: reconcile closed ${n} stale session(s)`);
+  console.log(`agent-host: reconciled ${n} stale session(s)`);
 }
 
 export type AdmitResult = {
