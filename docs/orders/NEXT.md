@@ -1,11 +1,11 @@
-# NEXT — R18 GOLDEN BASELINE / PHASE 2 CLOSED / PHASE 3 CURRENT-DEFECT BUILDER
+# NEXT — R18 GOLDEN BASELINE / PHASE 2 CLOSED / PHASE 3 CURRENT-DEFECT READER REQUIRED
 
-status: G1–G12 CLOSED / PHASE 2 ACCEPTED / PHASE 3 CURRENT-DEFECT BUILDER OPEN / P14-A PARSER PENDING / R18 CLOSED
+status: G1–G12 CLOSED / PHASE 2 ACCEPTED / PHASE 3 CURRENT-DEFECT AMENDMENT PREPARED / FRESH READER YES / YES REQUIRED / R18 CLOSED
 rotated-at: 2026-08-30
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-PHASE3](WO-GOLDEN-PHASE3.md)
-builder-authority: **OPEN ONLY FOR CURRENT-DEFECT AMENDMENT A/B/C — Reader task `01a05212-f0e4-7101-a0d9-8e59df8a3f08`; exact files, falsifiers, reruns, and stops are in the linked amendment; P14-A parser mutation, P18/candidate/Golden, main/remotes, and R18 remain CLOSED**
-router-authority: **CLOSED DURING THIS FINITE BUILDER — any path or meaning beyond amendment A/B/C returns to a fresh Reader**
+builder-authority: **CLOSED — the corrected current-defect amendment requires an actual fresh semantic Reader YES / YES, followed by a separate receipt/rotation commit, before any A/B/C execution or mutation**
+router-authority: **OPEN FOR FRESH PHASE-3 CURRENT-DEFECT READER ROUTING ONLY — no product, test, gate, capture, analyzer, package, candidate, Golden, R18, or unrelated mutation is authorized**
 golden-fast-mode: **STANDING EXECUTION POLICY — freeze the starting matrix once; make fast preflight and focused checks green before one complete registered group gate; reuse exact product-bundle SHA builds; use the lowest falsifying proof tier; route PRODUCT RED versus HARNESS RED; require Reader only for semantics/authority/scope/group-boundary changes; use run-scoped IDs, isolated roots/DB, explicit readiness, generated receipts, parallel read-only checks, then one independent Verifier; packaged lifecycle is reserved for G12/Phase 3; standards, assertions, and independence are unchanged**
 g10-status: **CLOSED — accepted candidate `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`; independent Verifier task `01a0508a-43f5-7101-9416-0683ba081449`; final `processes=0 roots_remaining=0 leaked=[]`; its then-inherited G12 red is now cured by accepted G12**
 g10-closure: [independent G10 acceptance](evidence/golden-baseline/g10/VERIFIER-ACCEPTANCE-20260829.md) | [receipt-hash clarification](evidence/golden-baseline/g10/RECEIPT-HASH-CLARIFICATION-20260829.md)
@@ -16,9 +16,9 @@ g12-status: **CLOSED / PASS — accepted candidate `d14ceb36659d86f157b4856b9275
 g12-order: [WO-GOLDEN-G12](WO-GOLDEN-G12.md)
 g12-closure: [independent G12 acceptance](evidence/golden-baseline/g12/VERIFIER-ACCEPTANCE-20260830.md)
 g12-starting-authority: `1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c` / tree `921b5e90ea91c914b4027f85d1d50d8ae62dde63`
-phase3-status: **CURRENT-DEFECT BUILDER OPEN — preserve whole-repository/current-product Windows requalification and all Phase-3 acceptance; no candidate until P01-P17 are green**
+phase3-status: **CURRENT-DEFECT AMENDMENT PREPARED / READER PENDING / BUILDER CLOSED — preserve whole-repository/current-product Windows requalification and all Phase-3 acceptance; no candidate until P01-P17 are green**
 phase3-order: [WO-GOLDEN-PHASE3](WO-GOLDEN-PHASE3.md)
-phase3-current-defect-amendment: [finite A/B/C authority](evidence/golden-baseline/phase3/PHASE3-CURRENT-DEFECT-AMENDMENT-20260830.md) — **one isolated P14-A recapture plus tuple-only no-refetch evidence; mechanical lineage/founder-steering proof repairs; bounded native-TUI terminal lifecycle repair; focused falsifiers first; fresh P14-C, P13/P16, P15; parser RED/pending**
+phase3-current-defect-amendment: [proposed finite A/B/C authority](evidence/golden-baseline/phase3/PHASE3-CURRENT-DEFECT-AMENDMENT-20260830.md) — **READER PENDING / BUILDER CLOSED; exact preload/form founder-steering setup; one isolated P14-A recapture plus tuple-only no-refetch evidence; mechanical lineage proof repairs; bounded native-TUI terminal lifecycle repair; parser RED/pending; a later receipt/rotation may open work only after fresh YES / YES**
 phase3-source: `d14ceb36659d86f157b4856b927581616dbaaa56` / tree `b84d4641a5f37e76c3e62a7df54d8019e0869ffe`
 phase3-amendment: **the first fresh Reader's five finite defects are closed in the current authority packet: finite census/completeness, exact Windows traversal and Kernel oracle, isolated cold-source lifecycle, immutable candidate/Verifier/Golden chain, and explicit R18 freeze; a fresh YES / YES against this amended commit is still required**
 phase3-clean-install-amendment: **BUILDER CLOSED / FRESH READER YES / YES REQUIRED — `9ee5c688` is rejected RED evidence (`windows-unit` 59/1); exact repair is only Electron direct runtime `@agentclientprotocol/sdk` 0.18.2 plus lock, existing Phase-3 proof/evidence, and unconditional generated Atlas outputs; new execution source and full P09–P17 rerun required; no source/Kernel/UI/behavior change**
