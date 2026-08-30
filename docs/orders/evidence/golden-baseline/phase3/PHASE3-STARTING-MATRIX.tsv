@@ -3,19 +3,19 @@ P01	git rev-parse HEAD	exact Reader-accepted Phase-3 authority SHA; candidate d1
 P02	git show -s --format=%T d14ceb36659d86f157b4856b927581616dbaaa56	b84d4641a5f37e76c3e62a7df54d8019e0869ffe	AUTHORITY
 P03	git show -s --format=%P d14ceb36659d86f157b4856b927581616dbaaa56	200d45a92fbef4238b65436f2695b50e54434199 only	AUTHORITY
 P04	git status --short	clean before freeze and before candidate declaration	STATE
-P05	current tracked-file/direct-dependency/Electron-package-hook/operational-root census	100% accounted; every delta from Phase-1 provenance explained by accepted G1-G12 disposition	ACCOUNTING
-P06	current whole-repository purpose and defect disposition	zero unexplained production/package/compatibility/future/authority/test defects	ACCOUNTING
+P05	generate all ledgers using exact commands/rules in PHASE3-CENSUS-SCHEMA.tsv	frozen b55f totals reproduced; one stable row per item; every delta from Phase-1 provenance and d14ceb explained	ACCOUNTING
+P06	join every ledger key to exactly one dispositions.tsv row	zero missing/duplicate/unknown/unexplained production/package/compatibility/future/authority/test rows; omission/duplicate/unknown falsifiers RED	ACCOUNTING
 P07	bun qf-atlas/generate.mjs --check; bun qf-atlas/ratchet.mjs	generated Atlas exact; HARD RED 0; laws and ownership agree	ATLAS
-P08	bun qa/run.ts --list	all current gates enumerated and each mapped to the current product claim it proves	GATE_COMPOSITION
-P09	frozen clean install from purified source	frozen lockfiles install successfully without ambient dependency reuse	COLD_SOURCE
-P10	clean build and Windows package/installer lifecycle	build, package, install, launch, shutdown, relaunch all PASS from P09 source	WINDOWS_PACKAGE
+P08	bun qa/run.ts --list plus claims.tsv and claim-proof-map.tsv	72 starting gates plus enumerated Phase-3 gate delta; every current claim maps to supported consumer, gate/test, named RED falsifier, proof tier, and Kernel oracle	GATE_COMPOSITION
+P09	git archive exact candidate into new isolated ownership-marked run root; empty dedicated Bun cache; canonical frozen installs	archive/candidate/tree/parent/hash receipt; no shared dependency/output/cache reuse or deletion; all 15 lock roots accounted	COLD_SOURCE
+P10	in isolated source run bun run build; bun run package:unsigned; windows-cold-boot; windows-installer with unique DB/temp/user/artifact/profile/output/install roots	build/package/install/launch/shutdown/relaunch PASS; pre/post owned process census; ownership cleanup zero; shared checkout untouched	WINDOWS_PACKAGE
 P11	bun qa/verify-release.ts	canonical verifier PASS with every constituent stage honest; no wrapper-only green	RELEASE
-P12	all current package tests, schema tests/generation drift checks, and registered gates	PASS; no skipped, weakened, duplicate, dead, or falsely composed acceptance claim	TESTS
-P13	naive Windows app consumer traversal	all visible current claims reachable through supported UI and agree with read-only Kernel truth	CONSUMER
-P14	founder-standard real current research journey	bounded mission through exact specialists, tasks, evidence, artifact, independent evaluation, report/no-candidate, and no trade	RESEARCH
-P15	accepted and refused steering during P14	both visible and durably recorded; no UI-only truth	STEERING
-P16	close application then reopen same canonical Kernel	mission, sessions, tasks, evidence, evaluation, result, and steering preserved and UI agrees	PERSISTENCE
+P12	122 starting tracked test/spec files plus 72 registered gates, schema generation drift, and enumerated Phase-3 proof delta	all PASS and occur exactly once in ledgers/maps; no skip/weaken/dead/fixture-as-live; omission/unregistered/fixture falsifiers RED	TESTS
+P13	execute every row of PHASE3-WINDOWS-TRAVERSAL.tsv on installed Windows app	all supported screens/controls/claims reachable and equal read-only generated Kernel oracle; ui-kernel-mismatch RED	CONSUMER
+P14	real model and real current data research journey for exact bounded market after Technique ID/version/hash selection	success branch has exact deterministic lineage/cardinality and no trade; coverage-refusal branch is honest but cannot satisfy successful-research requirement	RESEARCH
+P15	exercise accepted redirect/reassign or second-opinion control and refused invalid control	both visible and durable with exact event/action receipts; steering-ui-only RED	STEERING
+P16	close app then reopen same isolated canonical Kernel and repeat traversal oracle	all exact IDs/cardinalities/current authority survive; persistence-drop and wrong-current-report RED	PERSISTENCE
 P17	normal application shutdown after final traversal	processes=0; roots_remaining=0; leaked=[]	CLEANUP
-P18	final git/tree/diff/receipt identity	one immutable Phase-3 candidate, complete receipts, accepted G1-G12 bytes inherited, clean worktree	CANDIDATE
-P19	fresh independent Verifier at P18 candidate	PASS before any Golden SHA designation	INDEPENDENCE
-P20	Router evidence-only Golden designation after P19	one immutable Golden SHA/tree/parent recorded; R18 remains closed until NEXT is separately rotated	GOLDEN
+P18	freeze candidate and compare all non-allowed bytes to d14ceb plus g1-g12 evidence byte-for-byte	SHA/tree/sole-parent/clean status and enumerated delta limited to allowed Phase-3 proof/gate-registration paths; no post-freeze edits	CANDIDATE
+P19	fresh Verifier executes P01-P19, completeness falsifiers, ui-kernel-mismatch, steering-ui-only, persistence-drop, fixture-as-live, package/research/cleanup	PASS without edits/regeneration/repair from separate isolated root before Golden designation	INDEPENDENCE
+P20	Router creates receipt-only descendant whose sole parent is exact passed candidate	tree delta only Verifier acceptance, Golden receipt, NEXT closure; main/remotes/R18 untouched; later separate NEXT rotation required for R18	GOLDEN

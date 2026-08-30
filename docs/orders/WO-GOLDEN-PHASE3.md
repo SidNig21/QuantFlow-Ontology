@@ -19,7 +19,7 @@ Prove from a clean start that the whole product Ryan has today is intentional, i
 - G12 independent Verifier: task `01a051b0-75f7-7272-954b-b52d8c64bc20`
 - G12/Phase-2 closure: [immutable acceptance](evidence/golden-baseline/g12/VERIFIER-ACCEPTANCE-20260830.md)
 
-Read `START_HERE.md`, `docs/orders/NEXT.md`, this order, `docs/orders/PROTOCOL.md`, ADR-0004, `docs/orders/GOLDEN-RUN.md`, `qf-atlas/ATLAS.md`, and the two Phase-3 TSVs in full. The exact authority commit containing this packet must receive a fresh semantic Reader YES / YES before a Builder exists.
+Read `START_HERE.md`, `docs/orders/NEXT.md`, this order, `docs/orders/PROTOCOL.md`, ADR-0004, `docs/orders/GOLDEN-RUN.md`, `qf-atlas/ATLAS.md`, and every Phase-3 TSV in full. The exact authority commit containing this packet must receive a fresh semantic Reader YES / YES before a Builder exists.
 
 ## One meaning
 
@@ -38,7 +38,46 @@ Phase 3 is whole-repository/current-product requalification, not a thirteenth pu
 9. Exact Atlas, law, gate, command, output-hash, duration, candidate/tree/parent, changed-path, and cleanup receipts. Atlas must be generated-current, pass its check and ratchet, and report HARD RED 0.
 10. One immutable Phase-3 candidate followed by one fresh independent Verifier. Only a later evidence-only Router rotation after that PASS may name the Golden SHA.
 
-The exact matrix is [`PHASE3-STARTING-MATRIX.tsv`](evidence/golden-baseline/phase3/PHASE3-STARTING-MATRIX.tsv). The exact scope/disposition map is [`PHASE3-SURFACE-MANIFEST.tsv`](evidence/golden-baseline/phase3/PHASE3-SURFACE-MANIFEST.tsv).
+The exact matrix is [`PHASE3-STARTING-MATRIX.tsv`](evidence/golden-baseline/phase3/PHASE3-STARTING-MATRIX.tsv). The exact scope/disposition map is [`PHASE3-SURFACE-MANIFEST.tsv`](evidence/golden-baseline/phase3/PHASE3-SURFACE-MANIFEST.tsv). The finite denominator and output schemas are [`PHASE3-CENSUS-SCHEMA.tsv`](evidence/golden-baseline/phase3/PHASE3-CENSUS-SCHEMA.tsv) and [`PHASE3-WINDOWS-TRAVERSAL.tsv`](evidence/golden-baseline/phase3/PHASE3-WINDOWS-TRAVERSAL.tsv).
+
+## Finite accounting contract — P05, P06, P08, P12
+
+Authority SHA `b55f491b` freezes these current seed totals: **1,438 tracked files, 20 exact-leaf `package.json` manifests, 103 rows across `dependencies` / `devDependencies` / `peerDependencies` / `optionalDependencies`, 6 Electron build/package hook scripts, 15 exact-leaf `bun.lock` roots, 122 tracked `*.test|*.spec` JS/TS files, and 72 registered `bun qa/run.ts --list` gates**. The Census TSV defines the exact PowerShell commands, inclusion rules, and output paths. `agentos-package.json` is a packaged resource, not a package manifest. Historical Phase-1 totals remain provenance.
+
+The Builder may add only `qa/gates/golden-phase3-requalification.ts`, its `qa/run.ts` registration, and Phase-3 evidence under the manifest. That prepared gate must mechanically emit:
+
+- `tracked-files.tsv`, `direct-dependencies.tsv`, `package-hooks.tsv`, `package-lock-roots.tsv`, `packaged-generated-resources.tsv`, `tests.tsv`, `gates.tsv`, `claims.tsv`, and `supported-consumers.tsv`, one stable sorted row per item;
+- `dispositions.tsv`, exactly one row for every item in those ledgers with `current-production`, `package`, `compatibility`, `authority/evidence`, `test/proof`, or `retired-by-accepted-Gn` disposition plus exact evidence;
+- `claim-proof-map.tsv`, exactly one row per current claim with its supported consumer, test/gate, named falsifier selector and expected RED, live-versus-fixture tier, and Kernel oracle where visible;
+- `completeness.txt`, which is PASS only when every ledger key occurs exactly once in dispositions, every current claim has at least one fail-capable proof/falsifier, no unknown extra row exists, and recomputed totals equal the frozen starting census plus the enumerated Phase-3 proof-only delta.
+
+Falsifiers must delete one ledger row, duplicate one disposition, remove one claim mapping, point one claim at a fixture-only proof, and add one unregistered gate. Each must RED. P06 is satisfied only by zero blank, `unknown`, `legacy`, `future`, `unreachable`, or unsupported dispositions.
+
+## Isolated exact-SHA Windows execution — P09 and P10
+
+All cold work occurs in a new run-scoped directory outside the shared checkout, materialized from the exact immutable candidate with `git archive <candidate>`, and records archive SHA-256 plus candidate/tree/sole-parent. It must use a new empty Bun cache/install cache and may use only the committed lockfiles with frozen installs. It must not delete, modify, or reuse shared-checkout `node_modules`, build output, package output, database, profile, or cache.
+
+The receipt records the exact commands: frozen installs for every lock root through the canonical `bun qa/verify-release.ts` orchestration; `bun run build`, `bun run package:unsigned`, `bun qa/run.ts windows-cold-boot`, `bun qa/run.ts windows-installer`, and the canonical verifier from the isolated source. The run receives unique absolute `QF_KERNEL_DB`, temp, user-data, artifact, profile, package-output, install, and receipt roots. Before launch and after final shutdown, record PID/parent/name/command-line censuses. Cleanup may remove only roots created and ownership-marked by this run after proving their resolved paths lie beneath the run root. Any pre-existing or unowned process/root is observed, never killed or deleted. Final owned counts are zero.
+
+## Exact Windows consumer and research traversal — P13 through P16
+
+[`PHASE3-WINDOWS-TRAVERSAL.tsv`](evidence/golden-baseline/phase3/PHASE3-WINDOWS-TRAVERSAL.tsv) is the checklist. It covers Research Director admission, Mission canvas/card and inspect view, Dock inventory and specialist tiles, Task plan/assignment/status/steering history, Dataset/Run/Artifact/Evaluation/Report lineage, current-versus-history state, close, reopen, and normal shutdown. Every visible claim is transcribed and compared to a read-only query through the generated Kernel read surface against the same isolated DB; direct UI writes or a second oracle are forbidden.
+
+The bounded market is exactly one `market_event`, its related `instrument`, and the point-in-time `quote` rows admitted to one Dataset. Before admission the operator selects a Technique with stable object ID, semantic version, and content hash. If any is absent, the only accepted branch is a visible coverage refusal that creates no fabricated Dataset/Run/Artifact/Evaluation/Report and preserves the durable Mission/refusal receipt. A successful-research PASS requires real current data evidence (source identity, observed/source timestamps and admitted IDs) and a real model turn (session/turn identity and artifact bytes/hash); fixtures or synthetic model output are never sufficient.
+
+Cardinality is derived deterministically from the Kernel after settle: one active Mission for the run-scoped mission key; the exact selected Technique; the exact admitted market graph; exact assigned specialist session IDs; all Tasks reachable from the Mission; all worker evidence linked to their producing sessions; exactly one selected terminal Evaluation and at most one current Report chosen by the accepted current-authority key. Unexpected extra objects or links RED rather than being filtered.
+
+Named falsifiers are: `ui-kernel-mismatch`, `steering-ui-only`, `persistence-drop`, `fixture-as-live`, `missing-technique-identity`, `fabricated-coverage`, `extra-lineage-object`, and `wrong-current-report`. The first four are mandatory Verifier reruns. Successful research and permitted coverage refusal are separate receipt outcomes; refusal proves only the refusal path and cannot close the successful live-research requirement.
+
+## Candidate, Verifier, rollback, and Golden chain — P18 through P20
+
+Allowed Phase-3 mutation is limited to the two prepared gate-registration paths named above and `docs/orders/evidence/golden-baseline/phase3/**`. At freeze, compare every other tracked byte to purified source `d14ceb36659d86f157b4856b927581616dbaaa56`; compare all accepted `g1/**` through `g12/**` evidence byte-for-byte. The candidate receipt records SHA, tree, sole parent, complete enumerated tree delta, and clean status. No edit follows freeze.
+
+The fresh Verifier runs the complete P01–P19 matrix, all completeness falsifiers, the four mandatory Windows falsifiers, clean package lifecycle, canonical verifier, live research, close/reopen, and cleanup from a separate isolated run root. It does not edit, regenerate candidate bytes, kill unowned processes, or repair a red.
+
+Rollback exists only inside the isolated execution root and deletes only ownership-marked run-created files after path confinement proof. It never rewrites the candidate, shared checkout, accepted evidence, `main`, or any remote ref.
+
+After Verifier PASS, Golden designation is one receipt-only descendant whose sole parent is the exact passed candidate. Its tree delta is enumerated and limited to the Verifier acceptance, Golden designation receipt, and `NEXT.md` closure text; it may contain no product/test/gate/config change. `main`, remotes, and R18 remain untouched. R18 stays frozen until a separate later `NEXT.md` rotation.
 
 ## Execution and stop conditions
 
@@ -65,7 +104,7 @@ Before any authorized repair, record the exact authority HEAD/tree and changed-p
 
 The Builder reports evidence, never PASS: exact SHA/tree/sole parent, full changed-path manifest, each P01–P18 result and receipt path/hash, red/green bait transcripts for any new or changed gate, current accounting totals, Atlas HARD RED count, UI↔Kernel comparison, research lineage IDs, close/reopen proof, and final process/root counts. The worktree must be clean.
 
-A fresh independent Verifier repeats the critical boundaries and P19. If and only if it returns PASS on the immutable candidate, the Router may write a receipt-only Golden designation under P20. Phase 3 does not open R18; `NEXT.md` must be separately rotated after Golden closure.
+A fresh independent Verifier repeats the mandatory matrix and falsifiers under P19. If and only if it returns PASS on the immutable candidate, the Router may write the strictly bounded receipt-only descendant under P20. Phase 3 does not open R18; `NEXT.md` must be separately rotated after Golden closure.
 
 ## Reader brief — exactly two questions
 

@@ -1,0 +1,14 @@
+id	screen_or_control	visible_claim	read_only_kernel_oracle	mandatory_falsifier
+W01	Research Director mission form	bounded question and selected Technique are admitted as one durable Mission	get Mission by run-scoped mission key; exact prompt and Technique selection links	missing-technique-identity
+W02	Mission canvas card and Inspect	current Mission id/status/question/participant count	read Mission plus exact participant links	ui-kernel-mismatch
+W03	Dock inventory and spawned tiles	exact Director and specialist definitions/sessions, status, ownership	list agent_definition/agent_session and spawned_from/participates_in links	extra-lineage-object
+W04	Task plan and assignment view	exact Task ids, descriptions, assignee session ids, statuses, reasons	list Mission-reachable Tasks and assigned_to links	ui-kernel-mismatch
+W05	steering controls	accepted redirect/reassign/second-opinion and refused invalid control are visible	read action events and resulting Task/session links; refusal has no forbidden mutation	steering-ui-only
+W06	Technique selection	stable Technique id, semantic version, content hash shown before admission	read exact Technique and Mission selection link	missing-technique-identity
+W07	market coverage	one market_event, related instrument, point-in-time quote rows in one Dataset, or explicit visible refusal	read exact objects/links/timestamps; refusal proves zero fabricated downstream rows	fabricated-coverage
+W08	Run and evidence view	real source identity/times/IDs, real model session/turn, worker evidence and Artifact hashes	read Dataset/Run/session/Artifact objects and produces/cites links; hash disk bytes	fixture-as-live
+W09	independent review	critic is distinct exact session and selected Evaluation reads exact lineage	read critic session, Evaluation, evaluates/cites links and metrics	extra-lineage-object
+W10	result/Report and history	one current Report by accepted authority key or explicit no-candidate; no trade placed	read terminal Evaluation and current Report cardinality plus gates/lineage links	wrong-current-report
+W11	close application	window closes through normal control and owned processes settle	read-only pre-close snapshot plus owned PID/root receipt	persistence-drop
+W12	reopen same profile/database	same Mission/sessions/Tasks/evidence/Evaluation/result/steering ids and values return	repeat W02-W10 queries against identical QF_KERNEL_DB	persistence-drop
+W13	normal final shutdown	no owned app/Hermes/PTY/sidecar processes or run roots remain	owned pre/post process census and ownership-marked root inventory	cleanup-owned-leak

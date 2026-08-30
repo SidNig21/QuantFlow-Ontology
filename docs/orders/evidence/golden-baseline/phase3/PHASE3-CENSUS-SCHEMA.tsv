@@ -1,0 +1,14 @@
+ledger	b55f_total	counting_rule	mechanical_source	output
+tracked-files	1438	exact `git ls-files` rows at authority; one normalized repo-relative path per row	git ls-files -z	tracked-files.tsv
+package-manifests	20	exact leaf name package.json only; agentos-package.json excluded and counted as packaged resource	git ls-files piped to leaf-name equality	packaged-generated-resources.tsv
+direct-dependencies	103	one row per property in dependencies/devDependencies/peerDependencies/optionalDependencies of exact package manifests; key=manifest+section+name	PowerShell ConvertFrom-Json over manifest ledger	direct-dependencies.tsv
+electron-package-hooks	6	collab-electron script rows named/value-matching build|package|dist|postinstall; frozen names build,package,package:verify,package:unsigned,release,postinstall	PowerShell ConvertFrom-Json collab-electron/package.json	package-hooks.tsv
+lock-roots	15	exact leaf name bun.lock; key=parent directory	git ls-files piped to leaf-name equality	package-lock-roots.tsv
+packaged-generated-resources	DERIVED	one row for each tracked package input/resource copied or asserted by package inspector/config plus each generator-owned output under qf-kernel-schema/golden and qf-atlas generated outputs; include generator/consumer evidence	static AST/config/package-inspector census over tracked tree	packaged-generated-resources.tsv
+tests	122	tracked exact suffix .test/.spec followed by ts/tsx/js/mjs/cjs; generated conformance test included	git ls-files plus anchored suffix predicate	tests.tsv
+registered-gates	72	one row per tab-delimited `bun qa/run.ts --list` entry; key=gate name	bun qa/run.ts --list	gates.tsv
+claims	DERIVED	one row per user-visible, package, lifecycle, Kernel/law, research, compatibility, or authority claim asserted by current docs/product/gates; exact source path+line and claim text/hash required	AST/text extraction plus supported-consumer checklist	claims.tsv
+supported-consumers	DERIVED	one row per checklist screen/control/visible claim in PHASE3-WINDOWS-TRAVERSAL.tsv; key=check id	PHASE3-WINDOWS-TRAVERSAL.tsv	supported-consumers.tsv
+dispositions	SUM_OF_UNION	exactly one row per key from all ledgers; allowed classes current-production,package,compatibility,authority/evidence,test/proof,retired-by-accepted-Gn; evidence mandatory	join of all ledger keys	dispositions.tsv
+claim-proof-map	EQUAL_CLAIMS	exactly one row per claims key with consumer,test-or-gate,falsifier,expected-red,proof-tier,Kernel-oracle	join claims to gates/tests/traversal	claim-proof-map.tsv
+completeness	1	PASS iff set equality, uniqueness, frozen totals+enumerated delta, no unknown disposition, and every claim has fail-capable mapping; delete/duplicate/unknown/unregistered/fixture baits RED	prepared golden-phase3-requalification gate	completeness.txt

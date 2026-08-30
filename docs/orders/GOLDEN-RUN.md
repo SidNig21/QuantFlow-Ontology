@@ -45,7 +45,9 @@ skip a required falsifier, reduce cleanup proof, or merge the Builder and
 Verifier roles. G1–G12 and Phase 2 are independently closed on the immutable
 G12 candidate recorded in `NEXT.md`. Phase 3 is the selected separate mandatory
 complete clean-source Windows requalification pending a fresh Reader YES / YES;
-no Phase-3 Builder or R18 authority is open.
+no Phase-3 Builder or R18 authority is open. R18 remains **FROZEN / PENDING
+GOLDEN CLOSURE**; even a Phase-3 PASS and Golden designation cannot activate it.
+Only a separate later `NEXT.md` rotation may open R18.
 
 ---
 
