@@ -69,5 +69,6 @@ boot-reconcile	CURRENT_HEAD	PHASE3_EXECUTION_SOURCE_SHA	current registration and
 kernel-drift	CURRENT_HEAD	PHASE3_EXECUTION_SOURCE_SHA	current registration and implementation bytes
 artifact-root	CURRENT_HEAD	PHASE3_EXECUTION_SOURCE_SHA	current registration and implementation bytes
 bovada-football	CURRENT_HEAD	PHASE3_EXECUTION_SOURCE_SHA	current registration and implementation bytes
+hermes-production-inference	CURRENT_HEAD	PHASE3_EXECUTION_SOURCE_SHA	new bounded P14-B registration and implementation bytes; exact fresh packaged-Windows inference contract
 product-identity	CURRENT_HEAD	PHASE3_EXECUTION_SOURCE_SHA	current registration and implementation bytes
 vault-projection	CURRENT_HEAD	PHASE3_EXECUTION_SOURCE_SHA	current registration and implementation bytes
