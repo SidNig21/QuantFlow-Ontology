@@ -2237,15 +2237,72 @@ async function removeOwnedG10Root(root: string): Promise<void> {
   const tempPrefix = join(resolve(tmpdir()), "qf-g10-");
   assert(root.startsWith(tempPrefix), `refusing to remove non-G10 temp root: ${root}`);
   let lastError = "";
-  for (let attempt = 1; attempt <= 3 && existsSync(root); attempt += 1) {
+  for (let attempt = 1; attempt <= 10 && existsSync(root); attempt += 1) {
     try {
       rmSync(root, { recursive: true, force: true });
     } catch (error) {
       lastError = message(error);
     }
-    if (existsSync(root) && attempt < 3) await wait(attempt * 100);
+    if (existsSync(root) && attempt < 10) await wait(250);
   }
-  if (existsSync(root) && lastError) console.error(`g10 root cleanup retry failure=${JSON.stringify(lastError)}`);
+  if (existsSync(root)) {
+    throw new Error(`G10 owned root cleanup failed after bounded retries: ${root}${lastError ? ` (${lastError})` : ""}`);
+  }
+}
+
+async function runCleanupFocusedFalsifier(): Promise<void> {
+  const nonce = randomUUID();
+  const preexistingRoot = resolve(mkdtempSync(join(tmpdir(), `qf-g10-preexisting-${nonce}-`)));
+  const before = await processSnapshot();
+  const root = resolve(mkdtempSync(join(tmpdir(), `qf-g10-${nonce}-`)));
+  const runMarker = `g10-cleanup-run=${nonce}`;
+  const rootMarker = `g10-cleanup-root=${root}`;
+  const child = spawn(process.execPath, [
+    "-e",
+    "setTimeout(() => {}, 5000)",
+    "--",
+    runMarker,
+    rootMarker,
+  ], {
+    cwd: REPO_ROOT,
+    env: { ...process.env, QF_G10_CLEANUP_RUN_ID: nonce, QF_G10_CLEANUP_ROOT: root },
+    windowsHide: true,
+    stdio: "ignore",
+  });
+  assert(child.pid !== undefined, "F14b cleanup-focused child did not provide a PID");
+  const ownedPids = new Set<number>();
+  try {
+    await wait(250);
+    const after = await processSnapshot();
+    for (const pid of collectOwnedPids(before, after, child.pid)) ownedPids.add(pid);
+    const childRow = after.find((row) => row.pid === child.pid);
+    assert(childRow && childRow.commandLine.includes(nonce) && childRow.commandLine.includes(root), `F14b cleanup-focused run correlation missing: ${JSON.stringify({ childPid: child.pid, childRow, nonce, root })}`);
+    assert(ownedPids.has(child.pid), `F14b cleanup-focused child was not recorded as owned: ${JSON.stringify({ childPid: child.pid, ownedPids: [...ownedPids] })}`);
+    const ambientPid = process.pid;
+    assert(before.some((row) => row.pid === ambientPid) && after.some((row) => row.pid === ambientPid), `F14b cleanup-focused ambient Builder PID was not observable: ${ambientPid}`);
+    assert(!ownedPids.has(ambientPid), `F14b cleanup-focused ambient Builder PID was misclassified as owned: ${ambientPid}`);
+    assert(existsSync(root), `F14b cleanup-focused owned root disappeared before the red check: ${root}`);
+    assert(existsSync(preexistingRoot), `F14b cleanup-focused pre-existing root disappeared before the red check: ${preexistingRoot}`);
+    const retainedVerifierRow = [...before, ...after].find((row) => row.pid === 11348) ?? null;
+    const oldTeardownRows = after.filter((row) => row.pid === ambientPid || row.pid === 11348);
+    assert(oldTeardownRows.length > 0, "F14b cleanup-focused old global census bait did not observe an unrelated process");
+    console.log(`F14b-cleanup old=RED retained_verifier_pid=11348 retained_verifier_present=${retainedVerifierRow !== null} old_global_pids=${JSON.stringify(oldTeardownRows.map((row) => row.pid).sort((a, b) => a - b))} owned_pid=${child.pid} owned_root_present=true preexisting_root=${preexistingRoot} run_id=${nonce}`);
+    const beforeCleanup = ownedProcessRows(after, ownedPids);
+    assert(beforeCleanup.length > 0, `F14b cleanup-focused corrected census unexpectedly had no owned rows: ${JSON.stringify({ childPid: child.pid, ownedPids: [...ownedPids] })}`);
+    await terminateOwnedProcesses(ownedPids, 5_000);
+    const afterCleanup = await processSnapshot();
+    const remaining = ownedProcessRows(afterCleanup, ownedPids);
+    assert(remaining.length === 0, `F14b cleanup-focused corrected census retained owned rows: ${JSON.stringify(remaining)}`);
+    assert(afterCleanup.some((row) => row.pid === ambientPid), `F14b cleanup-focused ambient Builder PID disappeared during owned cleanup: ${ambientPid}`);
+    await removeOwnedG10Root(root);
+    assert(!existsSync(root), `F14b cleanup-focused root remained after exact restore cleanup: ${root}`);
+    assert(existsSync(preexistingRoot), `F14b cleanup-focused unrelated pre-existing root was removed by exact owned cleanup: ${preexistingRoot}`);
+    console.log(`F14b-cleanup restored=GREEN owned_pids=${JSON.stringify([...ownedPids].sort((a, b) => a - b))} remaining_owned=0 ambient_pid=${ambientPid} ambient_excluded=true owned_root_removed=true preexisting_root_preserved=true roots_remaining=0`);
+  } finally {
+    if (child.exitCode === null && child.pid !== undefined) await terminateOwnedProcessTree(child.pid);
+    await removeOwnedG10Root(root);
+    await removeOwnedG10Root(preexistingRoot);
+  }
 }
 
 async function readParticipantParity(endpoint: string, sessionId: string): Promise<Json> {
@@ -3310,6 +3367,10 @@ if (import.meta.main) {
   }
   if (process.env.QF_G10_F13_MARKER_FOCUSED === "1") {
     runF13MarkerFocusedFalsifier();
+    process.exit(0);
+  }
+  if (process.env.QF_G10_CLEANUP_FOCUSED === "1") {
+    await runCleanupFocusedFalsifier();
     process.exit(0);
   }
   process.exit((await runGoldenG10CanvasRuntimeGate()).ok ? 0 : 1);
