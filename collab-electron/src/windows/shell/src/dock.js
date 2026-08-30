@@ -177,6 +177,30 @@ function sessionSpeciesLabel(row) {
  * @param {HTMLElement} panelEl
  * @param {{ onTidy?: () => void, onResearchSubmitted?: (result: object) => void, qaMode?: boolean }} [options]
  */
+export function createCoalescedRefresh(runPass, { onError = (error) => console.error("[dock] refresh failed", error) } = {}) {
+	let running = false;
+	let pending = false;
+	return async function requestRefresh() {
+		if (running) {
+			pending = true;
+			return;
+		}
+		running = true;
+		try {
+			do {
+				pending = false;
+				try {
+					await runPass();
+				} catch (error) {
+					onError(error);
+				}
+			} while (pending);
+		} finally {
+			running = false;
+		}
+	};
+}
+
 export function initDock(panelEl, options = {}) {
 	const speciesList = panelEl.querySelector("#dock-species-list");
 	const sessionsList = panelEl.querySelector("#dock-sessions-list");
@@ -190,7 +214,6 @@ export function initDock(panelEl, options = {}) {
 		return;
 	}
 
-	let refreshing = false;
 	/** @type {string | null} ISO watermark — hide terminal sessions at-or-before. */
 	let sessionsClearedThroughIso = null;
 	/** @type {boolean} */
@@ -273,23 +296,17 @@ export function initDock(panelEl, options = {}) {
 		tallyEl.appendChild(document.createTextNode(`${launchable} launchable`));
 	}
 
-	async function refresh() {
-		if (refreshing) return;
-		refreshing = true;
-		try {
-			if (options.refreshRuntimeSnapshot) {
-				runtimeSnapshot = await options.refreshRuntimeSnapshot();
-			} else {
-				const runtimeResult = await window.shellApi.qf.getRuntimeSnapshot?.();
-				runtimeSnapshot = runtimeResult?.ok && Array.isArray(runtimeResult.snapshot)
-					? runtimeResult.snapshot
-					: [];
-			}
-			const [defsRes, sessRes, surfaceRes] = await Promise.all([
+	async function refreshPass() {
+			const runtimeRequest = options.refreshRuntimeSnapshot
+				? options.refreshRuntimeSnapshot()
+				: Promise.resolve(window.shellApi.qf.getRuntimeSnapshot?.()).then((runtimeResult) => runtimeResult?.ok && Array.isArray(runtimeResult.snapshot) ? runtimeResult.snapshot : []);
+			const [nextRuntimeSnapshot, defsRes, sessRes, surfaceRes] = await Promise.all([
+				runtimeRequest,
 				window.shellApi.qf.listDefinitions(),
 				window.shellApi.qf.listSessions(),
 				window.shellApi.qf.listTaskSurface(),
 			]);
+			runtimeSnapshot = Array.isArray(nextRuntimeSnapshot) ? nextRuntimeSnapshot : [];
 			const taskAssignments = surfaceRes?.ok && Array.isArray(surfaceRes.assignments)
 				? surfaceRes.assignments
 				: [];
@@ -458,10 +475,8 @@ export function initDock(panelEl, options = {}) {
 			}
 
 			setTally({ live: liveCount, closed: closedCount, launchable });
-		} finally {
-			refreshing = false;
-		}
 	}
+	const refresh = createCoalescedRefresh(refreshPass);
 
 	panelEl.querySelector("#dock-tidy")?.addEventListener("click", () => {
 		options.onTidy?.();

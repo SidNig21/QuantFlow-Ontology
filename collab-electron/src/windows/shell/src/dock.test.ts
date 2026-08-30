@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+	createCoalescedRefresh,
 	dockDefinitionDisplayName,
 	formatDockTeamSummary,
 	formatDockSessionState,
@@ -8,6 +9,79 @@ import {
   visibleDockDefinitions,
   visibleDockSessions,
 } from "./dock.js";
+
+const deferred = () => {
+	let resolve!: () => void;
+	let reject!: (error?: unknown) => void;
+	const promise = new Promise<void>((resolvePromise, rejectPromise) => {
+		resolve = resolvePromise;
+		reject = rejectPromise;
+	});
+	return { promise, resolve, reject };
+};
+
+describe("Dock refresh coalescing", () => {
+	test("a terminal invalidation during an active pass runs one newer complete pass", async () => {
+		const first = deferred();
+		const snapshots: string[] = [];
+		let passes = 0;
+		let concurrent = 0;
+		let maxConcurrent = 0;
+		const refresh = createCoalescedRefresh(async () => {
+			passes += 1;
+			concurrent += 1;
+			maxConcurrent = Math.max(maxConcurrent, concurrent);
+			if (passes === 1) await first.promise;
+			snapshots.push(passes === 1 ? "active/running" : "closed/stopped");
+			concurrent -= 1;
+		});
+		const initial = refresh();
+		await Promise.resolve();
+		void refresh();
+		first.resolve();
+		await initial;
+		expect(snapshots).toEqual(["active/running", "closed/stopped"]);
+		expect(maxConcurrent).toBe(1);
+	});
+
+	test("an overlap storm coalesces to one pending pass", async () => {
+		const first = deferred();
+		let passes = 0;
+		const refresh = createCoalescedRefresh(async () => {
+			passes += 1;
+			if (passes === 1) await first.promise;
+		});
+		const initial = refresh();
+		await Promise.resolve();
+		for (let index = 0; index < 100; index += 1) void refresh();
+		first.resolve();
+		await initial;
+		expect(passes).toBe(2);
+	});
+
+	test("a failed pass publishes no partial result and does not wedge a pending refresh", async () => {
+		const first = deferred();
+		const published: string[] = [];
+		const errors: string[] = [];
+		let passes = 0;
+		const refresh = createCoalescedRefresh(async () => {
+			passes += 1;
+			if (passes === 1) {
+				await first.promise;
+				throw new Error("runtime read failed");
+			}
+			published.push("complete terminal snapshot");
+		}, { onError: (error: Error) => errors.push(error.message) });
+		const initial = refresh();
+		await Promise.resolve();
+		void refresh();
+		first.resolve();
+		await initial;
+		expect(errors).toEqual(["runtime read failed"]);
+		expect(published).toEqual(["complete terminal snapshot"]);
+		expect(passes).toBe(2);
+	});
+});
 
 describe("Research Dock launchable inventory projection", () => {
 	const definitions = [
