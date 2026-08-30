@@ -61,31 +61,72 @@ test("production synthetic responder selects the exact role behavior", () => {
   expect(() => responder.selectRoleHandler("unknown")).toThrow("unsupported synthetic Hermes role: unknown");
 });
 
-test("production worker hold keeps delivery consumption live without query or send_result", async () => {
-  process.env[HOLD_FLAG] = "1";
-  const reader = new ControlledReader();
-  let ontologyListTools = 0;
-  let collaborationListTools = 0;
-  let collaborationCalls = 0;
-  const ontology = {
+test("production worker hold owns two exact steering acknowledgements through reader close", async () => {
+	process.env[HOLD_FLAG] = "1";
+	class PushableReader {
+		closed = false;
+		#lines: string[] = ["[QuantFlow TASK task-test from orchestrator] Test task"];
+		#waiters: Array<{ resolve: (line: string) => void; reject: (error: Error) => void }> = [];
+		next() {
+			if (this.#lines.length > 0) return Promise.resolve(this.#lines.shift());
+			if (this.closed) return Promise.reject(new Error("reader closed"));
+			return new Promise<string>((resolve, reject) => this.#waiters.push({ resolve, reject }));
+		}
+		push(line: string) {
+			const waiter = this.#waiters.shift();
+			if (waiter) waiter.resolve(line); else this.#lines.push(line);
+		}
+		close() {
+			this.closed = true;
+			while (this.#waiters.length > 0) this.#waiters.shift()?.reject(new Error("reader closed"));
+		}
+	}
+	const reader = new PushableReader();
+	let ontologyListTools = 0;
+	let collaborationListTools = 0;
+	let collaborationCalls = 0;
+	const output: string[] = [];
+	const outputWaiters: Array<() => void> = [];
+	const originalWrite = process.stdout.write;
+	process.stdout.write = ((chunk: any) => {
+		output.push(String(chunk));
+		while (outputWaiters.length > 0) outputWaiters.shift()?.();
+		return true;
+	}) as typeof process.stdout.write;
+	const waitForText = async (text: string, count = 1) => {
+		while (output.join("").split(text).length - 1 < count) await new Promise<void>((resolve) => outputWaiters.push(resolve));
+	};
+	const ontology = {
     async listTools() { ontologyListTools += 1; return []; },
     async callTool() { throw new Error("hold must not call ontology tools"); },
   };
   const collaboration = {
     async listTools() { collaborationListTools += 1; return []; },
     async callTool() { collaborationCalls += 1; throw new Error("hold must not call collaboration tools"); },
-  };
-  try {
-    const running = responder.worker(reader, ontology, collaboration);
-    await waitUntil(() => reader.deliveryConsumed && reader.waitForCloseStarted);
-    expect(ontologyListTools).toBe(0);
-    expect(collaborationListTools).toBe(0);
-    expect(collaborationCalls).toBe(0);
-    reader.close();
-    await running;
-  } finally {
-    delete process.env[HOLD_FLAG];
-  }
+	};
+	try {
+		const running = responder.worker(reader, ontology, collaboration);
+		await waitForText("QF_SYNTHETIC readiness=steering_hold task_id=task-test");
+		reader.push(JSON.stringify({ contract: "qf.task.steering.v1", task_id: "task-test", mode: "clarify", instruction: "hold" }));
+		await waitForText("QF_SYNTHETIC delivery_ack role=undefined task_id=task-test", 1);
+		reader.push(JSON.stringify({ contract: "qf.task.steering.v1", task_id: "task-redirect", mode: "redirect", instruction: "redirect" }));
+		await waitForText("QF_SYNTHETIC delivery_ack role=undefined task_id=task-redirect", 1);
+		reader.push(JSON.stringify({ contract: "qf.task.steering.v2", task_id: "task-malformed", mode: "redirect", instruction: "ignore" }));
+		reader.close();
+		await running;
+		const receipts = output.join("");
+		expect(receipts.match(/delivery_received role=undefined contract=qf.task.steering.v1 task_id=task-test/g)).toHaveLength(1);
+		expect(receipts.match(/delivery_ack role=undefined task_id=task-test/g)).toHaveLength(1);
+		expect(receipts.match(/delivery_received role=undefined contract=qf.task.steering.v1 task_id=task-redirect/g)).toHaveLength(1);
+		expect(receipts.match(/delivery_ack role=undefined task_id=task-redirect/g)).toHaveLength(1);
+		expect(receipts).not.toContain("task-malformed");
+		expect(ontologyListTools).toBe(0);
+		expect(collaborationListTools).toBe(0);
+		expect(collaborationCalls).toBe(0);
+	} finally {
+		process.stdout.write = originalWrite;
+		delete process.env[HOLD_FLAG];
+	}
 });
 
 test("production worker accepts the real assignment envelope as worker2 activation", async () => {
@@ -104,10 +145,10 @@ test("production worker accepts the real assignment envelope as worker2 activati
     async listTools() { throw new Error("assignment hold must not list collaboration tools"); },
     async callTool() { throw new Error("assignment hold must not call collaboration tools"); },
   };
-  try {
-    const running = responder.worker(reader, ontology, collaboration);
-    await waitUntil(() => reader.deliveryConsumed && reader.waitForCloseStarted);
-    reader.close();
+	try {
+		const running = responder.worker(reader, ontology, collaboration);
+		await waitUntil(() => reader.deliveryConsumed);
+		reader.close();
     await running;
   } finally {
     delete process.env[HOLD_FLAG];
@@ -181,6 +222,63 @@ function makeCriticOntology(options: any = {}) {
   };
   return ontology;
 }
+
+class ReviewReader {
+	closed = false;
+	#lines: string[];
+
+	constructor(lines: string[]) { this.#lines = [...lines]; }
+	async next() {
+		if (this.#lines.length > 0) return this.#lines.shift();
+		this.closed = true;
+		throw new Error("review input exhausted");
+	}
+	waitForClose() { this.closed = true; return Promise.resolve(); }
+}
+
+const SECOND_OPINION = {
+	contract: "qf.task.second_opinion.v1",
+	source_task_id: "source-task-second-opinion",
+	review_task_id: "review-task-second-opinion",
+	title: "Independent second opinion",
+	instruction: "Review the exact source task independently.",
+};
+
+test("nextReview acknowledges one exact structured second opinion with exact bindings", async () => {
+	const parsed = await responder.nextReview(new ReviewReader([JSON.stringify(SECOND_OPINION)]));
+	expect(parsed).toEqual({ secondOpinion: SECOND_OPINION });
+	const output: string[] = [];
+	const originalWrite = process.stdout.write;
+	process.stdout.write = ((chunk: any) => { output.push(String(chunk)); return true; }) as typeof process.stdout.write;
+	try {
+		await responder.selectRoleHandler("critic")(new ReviewReader([JSON.stringify(SECOND_OPINION)]), {}, {});
+	} finally {
+		process.stdout.write = originalWrite;
+	}
+	const text = output.join("");
+	expect(text.match(/delivery_ack role=[^ ]+ task_id=review-task-second-opinion/g)).toHaveLength(1);
+	expect(text).toContain("delivery_binding source_task_id=source-task-second-opinion");
+	expect(text).toContain("delivery_binding review_task_id=review-task-second-opinion");
+});
+
+test("nextReview rejects malformed wrong-contract raw and carried second-opinion input", async () => {
+	const invalid = [
+		JSON.stringify({ ...SECOND_OPINION, contract: "qf.task.second_opinion.v2" }),
+		JSON.stringify({ ...SECOND_OPINION, review_task_id: 7 }),
+		JSON.stringify({ review_task_id: SECOND_OPINION.review_task_id, source_task_id: SECOND_OPINION.source_task_id }),
+		`prefix ${JSON.stringify(SECOND_OPINION)}`,
+	];
+	for (const line of invalid) {
+		await expect(responder.nextReview(new ReviewReader([line]))).rejects.toThrow("review input exhausted");
+	}
+	await expect(responder.nextReview(new ReviewReader([
+		JSON.stringify(SECOND_OPINION),
+		JSON.stringify({ ...SECOND_OPINION, contract: "qf.task.second_opinion.v2" }),
+	]))).resolves.toEqual({ secondOpinion: SECOND_OPINION });
+	await expect(responder.nextReview(new ReviewReader([
+		JSON.stringify({ ...SECOND_OPINION, contract: "qf.task.second_opinion.v2" }),
+	]))).rejects.toThrow("review input exhausted");
+});
 
 async function runDirectCritic(ontology: any, includeReviewTask = true) {
   const output: string[] = [];

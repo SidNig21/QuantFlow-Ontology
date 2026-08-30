@@ -239,15 +239,18 @@ function parseObservedAt(observedAt: string): number {
 }
 
 function candidatePath(coupon: ProviderCoupon): { sport: ProviderPathNode; league: ProviderPathNode } | null {
-  const sports = coupon.path.filter((node) => node.type === "SPORT" && node.id === "FOOT");
-  const leagues = coupon.path.filter(
-    (node) => node.type === "LEAGUE" && node.description === "NFL",
-  );
-  if (sports.length === 0 || leagues.length === 0) return null;
-  if (sports.length !== 1 || leagues.length !== 1) {
-    throw new BovadaSelectionError("coupon path contains ambiguous FOOT/NFL identity");
-  }
-  return { sport: sports[0]!, league: leagues[0]! };
+	const matches: Array<{ sport: ProviderPathNode; league: ProviderPathNode }> = [];
+	for (let index = 0; index < coupon.path.length - 1; index += 1) {
+		const first = coupon.path[index]!;
+		const second = coupon.path[index + 1]!;
+		if (first.type === "SPORT" && first.id === "FOOT" && first.description === "Football" &&
+			second.type === "LEAGUE" && second.id === "241" && second.description === "NFL") matches.push({ sport: first, league: second });
+		if (first.type === "LEAGUE" && first.id === "241" && first.description === "NFL" &&
+			second.type === "SPORT" && second.id === "1" && second.description === "Football") matches.push({ sport: second, league: first });
+	}
+	if (matches.length === 0) return null;
+	if (matches.length > 1) throw new BovadaSelectionError("coupon path contains ambiguous adjacent Football/NFL identity");
+	return matches[0]!;
 }
 
 function eligibleCompetitors(event: ProviderEvent): {

@@ -30,6 +30,21 @@ export const RESEARCH_PROJECTION_STATES = Object.freeze({
 const PROJECTION_ORDINARY = RESEARCH_PROJECTION_STATES.ORDINARY_CANVAS;
 const PROJECTION_MISSION = RESEARCH_PROJECTION_STATES.CURRENT_MISSION;
 const PROJECTION_FULL = RESEARCH_PROJECTION_STATES.FULL_LINEAGE;
+
+export function researchCurrentMissionLinkKeys(workflow, inspecting = false) {
+	const objectIds = new Set(workflow?.currentMissionIds || []);
+	const keys = inspecting
+		? (workflow?.links || []).map((link) => `${link.kind}\u0000${link.from_id}\u0000${link.to_id}`)
+		: [...(workflow?.primaryLinkKeys || [])];
+	return new Set(keys.filter((key) => {
+		const [, fromId, toId] = key.split("\u0000");
+		return objectIds.has(fromId) && objectIds.has(toId);
+	}));
+}
+
+export function researchCableProjectionOpacity({ selected = false, local = false, currentMission = false } = {}) {
+	return selected || local ? 0.9 : currentMission ? 0.28 : 0.16;
+}
 const WORKFLOW_STAGE_LABELS = Object.freeze(["Mission", "Work", "Evidence", "Evaluation", "Current Report"]);
 const WORLD_TYPE_ORDER = new Map([
 	["mission", 0], ["task", 1], ["hypothesis", 2], ["dataset", 3],
@@ -121,23 +136,13 @@ export function researchCablePorts(fromTile, toTile, obstacleTiles = []) {
 		for (const toSide of CABLE_SIDES) {
 			let bodyHits = 0;
 			let nearHits = 0;
-			const distance = Math.hypot(to.x - from.x, to.y - from.y);
-			const nominalCurve = Math.min(360, Math.max(70, distance * 0.4));
-			const curveLengths = [...new Set([
-				Math.max(70, nominalCurve - 80),
-				Math.max(70, nominalCurve - 40),
-				nominalCurve,
-				Math.min(360, nominalCurve + 40),
-			])];
-			for (const curveLength of curveLengths) {
-				for (const point of cableCurvePoints(fromTile, fromSide, toTile, toSide, 96, curveLength)) {
-					for (const obstacle of obstacles) {
-						if (point.x > obstacle.x && point.x < obstacle.x + obstacle.width && point.y > obstacle.y && point.y < obstacle.y + obstacle.height) bodyHits += 1;
-						else if (point.x > obstacle.x - 14 && point.x < obstacle.x + obstacle.width + 14 && point.y > obstacle.y - 14 && point.y < obstacle.y + obstacle.height + 14) nearHits += 1;
-					}
+			const points = cableCurvePoints(fromTile, fromSide, toTile, toSide);
+			for (const point of points) {
+				for (const obstacle of obstacles) {
+					if (point.x > obstacle.x && point.x < obstacle.x + obstacle.width && point.y > obstacle.y && point.y < obstacle.y + obstacle.height) bodyHits += 1;
+					else if (point.x > obstacle.x - 14 && point.x < obstacle.x + obstacle.width + 14 && point.y > obstacle.y - 14 && point.y < obstacle.y + obstacle.height + 14) nearHits += 1;
 				}
 			}
-			const points = cableCurvePoints(fromTile, fromSide, toTile, toSide);
 			const fromPort = cablePortPoint(fromTile, fromSide);
 			const toPort = cablePortPoint(toTile, toSide);
 			const fromFacesTarget = fromPort.dx * targetVector.x + fromPort.dy * targetVector.y >= 0;
@@ -343,12 +348,20 @@ export function researchWorldLayout(workflow) {
 	const byId = new Map();
 	const rowStep = WORLD_TILE_HEIGHT + WORLD_ROW_GAP;
 	const stageX = WORKFLOW_STAGE_LABELS.map((_, index) => index * WORKFLOW_STAGE_STEP);
+	stageX[3] += 120;
 	const place = (object, x, y, width = WORLD_TILE_WIDTH, height = WORLD_TILE_HEIGHT) => {
 		if (!object) return;
 		byId.set(tileId(object.type, object.id), { x, y, width, height });
 	};
 	const startY = 80;
 	for (const [stage, members] of workflow.stages.entries()) {
+		if (stage === 1 && workflow.reviewTask && workflow.critic) {
+			members.forEach((object, index) => {
+				const row = object.id === workflow.critic.id ? 0 : object.id === workflow.reviewTask.id ? 1 : index;
+				place(object, stageX[stage], startY + row * rowStep);
+			});
+			continue;
+		}
 		if (stage === 2) {
 			const evidenceRows = [0, 2, 3, 4, 5];
 			members.forEach((object, index) => place(object, stageX[stage], startY + (evidenceRows[index] ?? index + 1) * rowStep));
@@ -359,6 +372,16 @@ export function researchWorldLayout(workflow) {
 			continue;
 		}
 		members.forEach((object, index) => place(object, stageX[stage], startY + index * rowStep));
+	}
+	const workerEvidenceId = String(workflow.evaluation?.fields?.source_work?.result_artifact_id ?? "");
+	if (workerEvidenceId && workerEvidenceId !== workflow.rawArtifact?.id) {
+		const workerEvidence = workflow.objects.find((object) => object.type === "artifact" && object.id === workerEvidenceId);
+		if (workerEvidence) place(workerEvidence, stageX[2], startY + rowStep);
+	}
+	const findingsArtifactId = String(workflow.evaluation?.fields?.findings_artifact_id ?? "");
+	if (findingsArtifactId) {
+		const findingsArtifact = workflow.objects.find((object) => object.type === "artifact" && object.id === findingsArtifactId && object.fields?.kind === "evaluation_findings");
+		if (findingsArtifact) place(findingsArtifact, stageX[4], startY);
 	}
 	const fallbackRows = workflow.stages.map((members, stage) => stage === 2 ? 6 : Math.max(members.length, stage >= 3 ? 2 : 0));
 	for (const object of workflow.objects.filter((candidate) => !byId.has(tileId(candidate.type, candidate.id))).sort(stableObjectOrder)) {
@@ -998,19 +1021,14 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		if (!lastWorkflow) return new Set();
 		if (projectionState === PROJECTION_ORDINARY) return new Set(lastWorkflow.objects.map((object) => object.id));
 		if (projectionState === PROJECTION_FULL) return new Set(lastWorkflow.objects.map((object) => object.id));
-		const ids = new Set(lastWorkflow.currentMissionIds);
-		if (selectedSubject) for (const id of localLineage(selectedSubject).objectIds) ids.add(id);
-		return ids;
+		return new Set(lastWorkflow.currentMissionIds);
 	}
 
 	function visibleLinkKeys() {
 		if (!lastWorkflow) return new Set();
 		const objectIds = visibleObjectIds();
 		if (projectionState === PROJECTION_ORDINARY) return new Set();
-		if (projectionState === PROJECTION_MISSION) return new Set([...lastWorkflow.primaryLinkKeys].filter((key) => {
-			const [, fromId, toId] = key.split("\u0000");
-			return objectIds.has(fromId) && objectIds.has(toId);
-		}));
+		if (projectionState === PROJECTION_MISSION) return researchCurrentMissionLinkKeys(lastWorkflow, Boolean(selectedSubject));
 		return new Set(lastWorkflow.links
 			.filter((link) => objectIds.has(link.from_id) && objectIds.has(link.to_id))
 			.map((link) => `${link.kind}\u0000${link.from_id}\u0000${link.to_id}`));
@@ -1045,7 +1063,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			const local = inspecting && localKeys.has(key);
 			const visibility = inspecting ? (local ? "normal" : "dim") : "background";
 			path.dataset.qfProjectionVisibility = selected ? "selected" : visibility;
-			path.style.opacity = String(selected || local ? 0.9 : projectionState === PROJECTION_MISSION ? 0.28 : 0.16);
+			path.style.opacity = String(researchCableProjectionOpacity({ selected, local, currentMission: projectionState === PROJECTION_MISSION }));
 		}
 	}
 

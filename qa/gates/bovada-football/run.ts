@@ -4,6 +4,7 @@
  * fixed shipped operator path, and unchanged generated agent surface.
  */
 import { createHash } from "node:crypto";
+import { spawn } from "node:child_process";
 import {
   copyFileSync,
   existsSync,
@@ -16,6 +17,8 @@ import {
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { execFileSync } from "node:child_process";
+import { Database } from "bun:sqlite";
 import {
   closeKernel,
   execute,
@@ -37,6 +40,18 @@ import { inspectBovadaPackagedSurface } from
   "../../../collab-electron/scripts/package-lib/package-inspect.ts";
 import { validatePackageReceipt } from
   "../../../collab-electron/scripts/package-lib/package-receipt.ts";
+import {
+  buildWindowsPackage,
+  collectOwnedPids,
+  isolatedEnvironment,
+  ownedProcessRows,
+  processSnapshot,
+  rpcCall,
+  terminateOwnedProcessTree,
+  wait,
+  waitForExit,
+  waitForReady,
+} from "../windows-cold-boot.ts";
 
 const REPO = join(import.meta.dir, "../../..");
 const COLLAB = join(REPO, "collab-electron");
@@ -316,7 +331,159 @@ export async function runBovadaFootballGate(): Promise<{ ok: boolean }> {
   }
 }
 
+type P14Tuple = {
+  type: string;
+  id: string;
+  description_sha256: string;
+  cardinality: number;
+  order: number;
+  parent_position: number;
+  execution_sha: string;
+  artifact_hash: string;
+};
+
+export async function runP14ALiveMeasurement(): Promise<{ ok: boolean }> {
+  const root = mkdtempSync(join(tmpdir(), "qf-p14-a-once-"));
+  const storeRoot = join(root, "stores");
+  const kernelDb = join(storeRoot, "kernel.db");
+  const artifactRoot = join(storeRoot, "artifacts");
+  mkdirSync(artifactRoot, { recursive: true });
+  const executionSha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: REPO, encoding: "utf8" }).trim();
+  let child: ReturnType<typeof spawn> | null = null;
+  let owned = new Set<number>();
+  let endpoint = "";
+  let evidence: string[] = [];
+  let ok = false;
+  let reasonCode = "measurement_failed";
+  const tableNames = ["artifact", "venue", "market_event", "instrument", "quote", "links"] as const;
+  try {
+    const originalLog = console.log;
+    let packageRoot = "";
+    try {
+      console.log = () => {};
+      packageRoot = await buildWindowsPackage(root);
+    } finally {
+      console.log = originalLog;
+    }
+    const executable = join(packageRoot, "QuantFlow.exe");
+    const resourcesRoot = join(packageRoot, "resources");
+    const cliPath = join(resourcesRoot, "collab-cli.mjs");
+    assert(existsSync(executable) && existsSync(cliPath), "packaged measurement surface missing");
+    const packageSha = createHash("sha256").update(readFileSync(join(resourcesRoot, "app.asar"))).digest("hex");
+    const cliSha = createHash("sha256").update(readFileSync(cliPath)).digest("hex");
+    const env = isolatedEnvironment(root, kernelDb, artifactRoot);
+    delete env.QF_DOCK_QA_MODE;
+    const endpointFile = join(env.USERPROFILE!, ".quantflow", "app", "socket-path");
+    const beforeProcesses = await processSnapshot();
+    child = spawn(executable, ["--disable-gpu"], { cwd: packageRoot, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    const appOutput: string[] = [];
+    child.stdout?.on("data", (chunk) => appOutput.push(String(chunk)));
+    child.stderr?.on("data", (chunk) => appOutput.push(String(chunk)));
+    const ready = await waitForReady(child, endpointFile);
+    endpoint = ready.endpoint;
+    owned = new Set(collectOwnedPids(beforeProcesses, await processSnapshot(), child.pid!));
+    const readCounts = () => {
+      const db = new Database(kernelDb, { readonly: true });
+      try { return Object.fromEntries(tableNames.map((table) => [table, Number((db.query(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n)])); }
+      finally { db.close(); }
+    };
+    const pre = readCounts();
+    const beforeDb = new Database(kernelDb, { readonly: true });
+    const beforeIds = new Set((beforeDb.query("SELECT id FROM artifact").all() as Array<{ id: string }>).map((row) => row.id));
+    beforeDb.close();
+    const cli = Bun.spawn(["node", cliPath, "market", "bovada-football", "--once"], { cwd: packageRoot, env, stdout: "pipe", stderr: "pipe" });
+    const [cliStdout, cliStderr, cliCode] = await Promise.all([new Response(cli.stdout).text(), new Response(cli.stderr).text(), cli.exited]);
+    const processReceipt = cliStdout + cliStderr;
+    const db = new Database(kernelDb, { readonly: true });
+    const newArtifacts = (db.query("SELECT id, content_hash, storage_ref, created_at, kind FROM artifact ORDER BY created_at, id").all() as Array<Record<string, unknown>>)
+      .filter((row) => !beforeIds.has(String(row.id)) && row.kind === "result_set");
+    assert(newArtifacts.length === 1, "new source Artifact cardinality invalid");
+    const source = newArtifacts[0]!;
+    const artifactId = String(source.id);
+    const artifactHash = String(source.content_hash);
+    assert(artifactId === artifactHash && /^[0-9a-f]{64}$/.test(artifactHash), "source Artifact identity binding invalid");
+    const storedPath = String(source.storage_ref);
+    assert(storedPath.startsWith(artifactRoot) && existsSync(storedPath), "source Artifact storage binding invalid");
+    const bytes = new Uint8Array(readFileSync(storedPath));
+    assert(createHash("sha256").update(bytes).digest("hex") === artifactHash, "stored source bytes hash mismatch");
+    const rootValue = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) as unknown;
+    assert(Array.isArray(rootValue), "source schema root invalid");
+    const coupons = rootValue as Array<Record<string, unknown>>;
+    const nflCoupons = coupons.filter((coupon) => Array.isArray(coupon?.path) && (coupon.path as Array<Record<string, unknown>>)
+      .some((node) => node?.type === "LEAGUE" && node?.description === "NFL"));
+    assert(nflCoupons.length === 1, "exact NFL coupon cardinality invalid");
+    const coupon = nflCoupons[0]!;
+    const path = coupon.path as Array<Record<string, unknown>>;
+    assert(path.filter((node) => node?.type === "LEAGUE" && node?.description === "NFL").length === 1, "exact NFL path-node cardinality invalid");
+    const tuples: P14Tuple[] = path.map((node, order) => {
+      assert(node && typeof node.type === "string" && typeof node.id === "string" && typeof node.description === "string", "path-node schema invalid");
+      return {
+        type: node.type,
+        id: node.id,
+        description_sha256: createHash("sha256").update(node.description).digest("hex"),
+        cardinality: path.length,
+        order,
+        parent_position: coupons.indexOf(coupon),
+        execution_sha: executionSha,
+        artifact_hash: artifactHash,
+      };
+    });
+    assert(new Set(tuples.map((tuple) => JSON.stringify(tuple))).size === tuples.length, "path-node tuples are not distinct");
+    const events = Array.isArray(coupon.events) ? coupon.events as Array<Record<string, unknown>> : [];
+    const observedAt = Date.parse(String(source.created_at));
+    const funnel = {
+      coupons: coupons.length,
+      nfl_coupons: nflCoupons.length,
+      foot_nfl_paths: nflCoupons.filter((candidate) => (candidate.path as Array<Record<string, unknown>>).some((node) => node?.type === "SPORT" && node?.id === "FOOT")).length,
+      events: events.length,
+      competition: events.filter((event) => event.competitionId === path.find((node) => node.type === "LEAGUE" && node.description === "NFL")?.id).length,
+      non_live: events.filter((event) => event.live === false).length,
+      open_status: events.filter((event) => event.status === "U").length,
+      future: events.filter((event) => typeof event.startTime === "number" && event.startTime > observedAt).length,
+      two_competitors: events.filter((event) => Array.isArray(event.competitors) && event.competitors.length === 2).length,
+      eligible: cliCode === 0 ? 1 : 0,
+    };
+    const post = Object.fromEntries(tableNames.map((table) => [table, Number((db.query(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n)]));
+    db.close();
+    const delta = Object.fromEntries(tableNames.map((table) => [table, post[table] - pre[table]]));
+    const transport = {
+      http_status: /(?:status|http_status)[=: ]+200\b/i.test(processReceipt) ? 200 : null,
+      approved_final_origin: /approved[_ -]final[_ -]origin[=: ]+(?:true|pass)/i.test(processReceipt) ? true : null,
+      json_media_type: /json[_ -]media[_ -]type[=: ]+(?:true|pass)/i.test(processReceipt) ? true : null,
+    };
+    const parserOutcome = cliCode === 0 ? "admitted" : processReceipt.includes("no future open NFL Game-Line moneyline satisfied every predicate") ? "no_eligible_market" : "capture_failed";
+    evidence = [
+      `execution_identity=${JSON.stringify({ execution_sha: executionSha, package_sha256: packageSha, packaged_cli_sha256: cliSha, artifact_id: artifactId, artifact_hash: artifactHash, artifact_bytes: bytes.byteLength })}`,
+      ...tuples.map((tuple) => `coupon_path_node=${JSON.stringify(tuple)}`),
+      `parser_counts=${JSON.stringify({ outcome: parserOutcome, ...funnel })}`,
+      `ontology_counts=${JSON.stringify({ pre, post, delta })}`,
+      `transport_receipt=${JSON.stringify(transport)}`,
+    ];
+    reasonCode = parserOutcome === "admitted" && delta.market_event > 0 && delta.instrument > 0 && delta.quote > 0 && delta.links > 0 ? "admitted" : "diagnostic_red_no_admission";
+    ok = reasonCode === "admitted";
+  } catch {
+    reasonCode = "measurement_binding_or_schema_red";
+  } finally {
+    if (endpoint) await rpcCall(endpoint, "app.shutdown", {}).catch(() => null);
+    if (child?.exitCode === null && child.pid) await terminateOwnedProcessTree(child.pid).catch(() => null);
+    if (child) await waitForExit(child, 20_000).catch(() => null);
+    const deadline = Date.now() + 20_000;
+    while (Date.now() < deadline && ownedProcessRows(await processSnapshot(), owned).length > 0) await wait(250);
+    let remaining = ownedProcessRows(await processSnapshot(), owned).length;
+    for (let attempt = 0; attempt < 20 && existsSync(root); attempt += 1) {
+      try { rmSync(root, { recursive: true, force: true }); } catch { await wait(250); }
+    }
+    const roots = existsSync(root) ? 1 : 0;
+    if (remaining !== 0 || roots !== 0) { ok = false; reasonCode = "cleanup_red"; }
+    for (const line of evidence) console.log(line);
+    console.log(`measurement_status=${JSON.stringify({ outcome: reasonCode, processes: remaining, roots, leaked: roots })}`);
+  }
+  return { ok };
+}
+
 if (import.meta.main) {
-  const { ok } = await runBovadaFootballGate();
+  const { ok } = process.argv[2] === "--p14-a-measure-once"
+    ? await runP14ALiveMeasurement()
+    : await runBovadaFootballGate();
   process.exit(ok ? 0 : 1);
 }

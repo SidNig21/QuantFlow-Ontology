@@ -30,24 +30,30 @@ const LABEL_CANDIDATES = Object.freeze([
 	{ dx: -96, dy: 72 },
 	{ dx: 96, dy: 72 },
 ]);
+export const LABEL_PATH_FRACTIONS = Object.freeze([0.50, 0.375, 0.625, 0.25, 0.75]);
 
 function rectsOverlap(a, b) {
 	return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 }
 
-export function chooseCableLabelPosition({ baseX, baseY, baseRect, obstacles, candidates = LABEL_CANDIDATES }) {
-	const positionRect = ({ dx, dy }) => ({
-		left: baseRect.left + dx,
-		top: baseRect.top + dy,
-		right: baseRect.right + dx,
-		bottom: baseRect.bottom + dy,
-	});
-	const candidate = candidates.find((offset) => !obstacles.some((obstacle) =>
-		rectsOverlap(positionRect(offset), obstacle),
-	)) || candidates[0];
+export function chooseCableLabelPosition({ baseX, baseY, baseRect, obstacles, candidates = LABEL_CANDIDATES, anchors = [{ x: baseX, y: baseY }] }) {
+	const enumerated = anchors.flatMap((anchor) => candidates.map((offset) => ({ anchor, offset })));
+	const positionRect = ({ anchor, offset }) => {
+		const dx = anchor.x - baseX + offset.dx;
+		const dy = anchor.y - baseY + offset.dy;
+		return {
+			left: baseRect.left + dx,
+			top: baseRect.top + dy,
+			right: baseRect.right + dx,
+			bottom: baseRect.bottom + dy,
+		};
+	};
+	const candidate = enumerated.find((entry) => !obstacles.some((obstacle) =>
+		rectsOverlap(positionRect(entry), obstacle),
+	)) || enumerated[0];
 	return {
-		x: baseX + candidate.dx,
-		y: baseY + candidate.dy,
+		x: candidate.anchor.x + candidate.offset.dx,
+		y: candidate.anchor.y + candidate.offset.dy,
 	};
 }
 
@@ -171,13 +177,18 @@ export function createCableOverlay(svgEl, {
 				label.setAttribute("class", "cable-label");
 				label.textContent = displayLabel;
 				content.appendChild(label);
+				const endpointTileIds = new Set([parsePortRef(conn.from_ref)?.tileId, parsePortRef(conn.to_ref)?.tileId].filter(Boolean));
 				const obstacles = [...document.querySelectorAll(".canvas-tile")]
+					.filter((node) => !endpointTileIds.has(node.dataset?.tileId))
 					.map((node) => node.getBoundingClientRect());
+				const pathLength = path.getTotalLength();
+				const anchors = LABEL_PATH_FRACTIONS.map((fraction) => path.getPointAtLength(pathLength * fraction));
 				const position = chooseCableLabelPosition({
 					baseX: midX,
 					baseY: midY,
 					baseRect: label.getBoundingClientRect(),
 					obstacles,
+					anchors,
 				});
 				label.setAttribute("x", String(position.x));
 				label.setAttribute("y", String(position.y));

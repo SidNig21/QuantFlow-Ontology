@@ -7,9 +7,10 @@
  * while making no network/model call. It is reachable only when the app has
  * explicitly set QF_HERMES_SYNTHETIC_TEST=1.
  */
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
-import { pathToFileURL } from "node:url";
+import { readFileSync } from "node:fs";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const MAX_LINE_BYTES = 8 * 1024;
 const MCP_TIMEOUT_MS = 30_000;
@@ -420,19 +421,30 @@ function emitDeliveryReceipt(delivery) {
 }
 
 async function consumeDeliveries(reader) {
-  while (!reader.closed) {
-    try {
-      const delivery = parseDelivery(cleanPtyLine(await reader.next()));
-      if (delivery) emitDeliveryReceipt(delivery);
+	while (!reader.closed) {
+		try {
+			const raw = await reader.next();
+			const cleaned = cleanPtyLine(raw);
+			const delivery = parseDelivery(cleaned);
+			const classification = delivery?.contract === "qf.task.steering.v1" ? "steering"
+				: delivery?.contract === "qf.task.assignment.v1" ? "assignment"
+					: delivery?.contract === "qf.task.second_opinion.v1" ? "second_opinion" : "invalid";
+			emit({ delivery_line: true, role: ROLE, raw_bytes: byteLength(raw), cleaned_bytes: byteLength(cleaned), sha256: createHash("sha256").update(raw).digest("hex"), classification });
+			if (delivery) emitDeliveryReceipt(delivery);
     } catch {
       return;
     }
   }
 }
 
-async function nextReview(reader) {
-  const activation = await nextMatching(reader, (line) => parseCriticMission(line));
-  return {
+export async function nextReview(reader) {
+	const activation = await nextMatching(reader, (line) => {
+		const delivery = parseDelivery(line);
+		if (delivery?.contract === "qf.task.second_opinion.v1") return { secondOpinion: delivery };
+		return parseCriticMission(line);
+	});
+	if (activation.secondOpinion) return activation;
+	return {
     review_task_id: activation.review_task_id,
     source_work: activation.source_work,
     hypothesis_id: activation.hypothesis_id,
@@ -490,15 +502,16 @@ export { orchestrator };
 
 export async function worker(reader, ontology, collaboration) {
   emit({ boundary: "activation_wait", role: ROLE });
-  const task = await nextWorkerActivation(reader);
-  emitBoundary("activation_delivery", { role: ROLE, task_id: task.taskId });
-  void consumeDeliveries(reader);
-  if (task.delivery) emitDeliveryReceipt(task.delivery);
-  if (process.env[STEERING_HOLD_FLAG] === "1") {
-    emitTerminalReceipt(`QF_SYNTHETIC readiness=steering_hold task_id=${task.taskId}`);
-    await reader.waitForClose();
-    return;
-  }
+	const task = await nextWorkerActivation(reader);
+	emitBoundary("activation_delivery", { role: ROLE, task_id: task.taskId });
+	if (task.delivery) emitDeliveryReceipt(task.delivery);
+	if (process.env[STEERING_HOLD_FLAG] === "1") {
+		emitTerminalReceipt(`QF_SYNTHETIC readiness=steering_hold task_id=${task.taskId}`);
+		emit({ delivery_wait_started: true, role: ROLE, task_id: task.taskId });
+		await consumeDeliveries(reader);
+		return;
+	}
+	void consumeDeliveries(reader);
   const ontologyTools = await ontology.listTools();
   const collaborationTools = await collaboration.listTools();
   requireTools(ontologyTools, ["qf_market_event_get", "qf_market_event_query"], "worker ontology");
@@ -640,8 +653,9 @@ function cleanPtyLine(line) {
 }
 
 async function run() {
-  requireConfig();
-  emit({ responder: "started", role: ROLE, endpoint: process.env.QF_APP_RPC_ENDPOINT ?? "missing", ontology_bridge: ONTOLOGY_BRIDGE });
+	requireConfig();
+	const sourcePath = fileURLToPath(import.meta.url);
+	emit({ responder: "started", role: ROLE, hold: process.env[STEERING_HOLD_FLAG] === "1" ? 1 : 0, source_path: sourcePath.replaceAll("\\", "/"), source_sha256: createHash("sha256").update(readFileSync(sourcePath)).digest("hex"), endpoint: process.env.QF_APP_RPC_ENDPOINT ?? "missing", ontology_bridge: ONTOLOGY_BRIDGE });
   // Preserve the native Hermes TUI readiness seam. The host waits for the
   // alternate-screen transition in addition to the launcher's two receipts.
   process.stdout.write("\u001b[?1049h");

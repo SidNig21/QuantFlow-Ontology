@@ -3,6 +3,8 @@ import {
   createResearchWorldController,
   deriveResearchWorkflow,
   latestSavedWorldRoot,
+	researchCableProjectionOpacity,
+	researchCurrentMissionLinkKeys,
 	researchCablePorts,
   researchSessionReceiptFields,
 	researchTilePresentation,
@@ -171,6 +173,30 @@ function routedCableHitsTile(fromTile: Record<string, number>, fromSide: string,
 }
 
 describe("research world renderer seam", () => {
+	test("LOCAL renders every endpoint-in-current cable while overview stays primary", () => {
+		const currentIds = new Set(Array.from({ length: 17 }, (_, index) => `current-${index}`));
+		const primary = Array.from({ length: 12 }, (_, index) => ({ kind: `primary-${index}`, from_id: `current-${index}`, to_id: `current-${index + 1}` }));
+		const internal = Array.from({ length: 9 }, (_, index) => ({ kind: `internal-${index}`, from_id: `current-${index}`, to_id: `current-${index + 2}` }));
+		const historical = { kind: "historical", from_id: "current-0", to_id: "historical-1" };
+		const workflow = {
+			currentMissionIds: currentIds,
+			primaryLinkKeys: new Set(primary.map(({ kind, from_id, to_id }) => `${kind}\u0000${from_id}\u0000${to_id}`)),
+			links: [...primary, ...internal, historical],
+		};
+		expect([...researchCurrentMissionLinkKeys(workflow, false)].sort()).toEqual([...workflow.primaryLinkKeys].sort());
+		expect([...researchCurrentMissionLinkKeys(workflow, true)].sort()).toEqual([...primary, ...internal]
+			.map(({ kind, from_id, to_id }) => `${kind}\u0000${from_id}\u0000${to_id}`).sort());
+		expect(researchCurrentMissionLinkKeys(workflow, true).size).toBe(21);
+		expect([...researchCurrentMissionLinkKeys(workflow, true)]).not.toContain("historical\u0000current-0\u0000historical-1");
+	});
+
+	test("LOCAL cable paint distinguishes selected lineage from other current cables", () => {
+		expect(researchCableProjectionOpacity({ local: true, currentMission: true })).toBe(0.9);
+		expect(researchCableProjectionOpacity({ selected: true, currentMission: true })).toBe(0.9);
+		expect(researchCableProjectionOpacity({ currentMission: true })).toBe(0.28);
+		expect(researchCableProjectionOpacity()).toBe(0.16);
+	});
+
 	test("derives the five-stage primary workflow and exact primary links from Kernel objects and links", () => {
 		const worldObjects = objects.map((object) => ({
 			...object,
@@ -179,7 +205,7 @@ describe("research world renderer seam", () => {
 				: object.id === "review-task-1" ? { title: "Independent review", status: "done", assignee_session_id: "critic-session-1", delegator_session_id: "director-session-1" }
 				: object.type === "run" ? { kind: "backtest", status: "succeeded", executor_session_id: "executor-session-1", result_artifact_id: "result-artifact-1" }
 				: object.id === "result-artifact-1" ? { kind: "result_set", run_id: "run-1" }
-				: object.type === "evaluation" ? { verdict: "supports", confidence: 0.9, critic_session_id: "critic-session-1", review_task_id: "review-task-1", publication_report_id: "report-artifact-1" }
+				: object.type === "evaluation" ? { verdict: "supports", confidence: 0.9, critic_session_id: "critic-session-1", review_task_id: "review-task-1", publication_report_id: "report-artifact-1", findings_artifact_id: "findings-artifact-1" }
 				: object.id === "report-artifact-1" ? { kind: "report", current_authority: true, semantic_markers: ["HISTORICAL", "CURRENT AUTHORITY"] }
 				: object.type === "strategy" ? { family: "settled-results", status: "locked" }
 				: object.type === "hypothesis" ? { claim: "Edge survives review", status: "open" }
@@ -199,6 +225,12 @@ describe("research world renderer seam", () => {
 		expect(workflow.primaryIds.has("executor-session-1")).toBe(true);
 		expect(workflow.currentMissionIds.has("executor-session-1")).toBe(true);
 		expect(workflow.historyIds.has("report-artifact-1")).toBe(false);
+		const layout = researchWorldLayout(workflow);
+		expect(layout.get("ontology:agent_session:critic-session-1")).toEqual({ x: 460, y: 80, width: 300, height: 190 });
+		expect(layout.get("ontology:task:review-task-1")).toEqual({ x: 460, y: 310, width: 300, height: 190 });
+		expect(layout.get("ontology:task:source-task-1")?.y).toBe(540);
+		expect(layout.get("ontology:agent_session:executor-session-1")?.y).toBe(770);
+		expect(layout.get("ontology:agent_session:director-session-1")?.y).toBe(1000);
 		expect([...workflow.primaryLinkKeys].sort()).toEqual(links
 			.filter((link) => !["evaluated_by:hypothesis-1", "evaluated_by:run-1", "produces:critic-session-1"].some((prefix) => `${link.kind}:${link.from_id}` === prefix))
 			.map((link) => `${link.kind}\u0000${link.from_id}\u0000${link.to_id}`).sort());
@@ -217,11 +249,11 @@ describe("research world renderer seam", () => {
 		expect(projectedSemanticMarkers(workflow.currentReport, workflow)).toEqual(["CURRENT AUTHORITY"]);
 		expect(JSON.stringify(researchTilePresentation(workflow.mission, workflow, participant))).not.toContain("mission-1");
 
-		const layout = researchWorldLayout(workflow);
 		const findingsLayout = layout.get("ontology:artifact:findings-artifact-1")!;
 		const reportLayout = layout.get("ontology:artifact:report-artifact-1")!;
 		expect(findingsLayout.x).toBe(reportLayout.x);
-		expect(findingsLayout.y).toBeGreaterThan(reportLayout.y);
+		expect(findingsLayout.y).toBe(80);
+		expect(reportLayout.y).toBe(310);
 		const stageCenters = workflow.stages.map((stage) => stage.map((object) => {
 			const rect = layout.get(`ontology:${object.type}:${object.id}`)!;
 			return rect.x + rect.width / 2;
@@ -270,11 +302,117 @@ describe("research world renderer seam", () => {
 			tile(1840, 310),
 		];
 		const route = researchCablePorts(grade, run, obstacles);
-		for (const curveLength of [280, 320, 360]) {
-			for (const obstacle of obstacles.filter((candidate) => candidate !== grade && candidate !== run)) {
-				expect(routedCableHitsTile(grade, route.from, run, route.to, obstacle, curveLength)).toBe(false);
+		for (const obstacle of obstacles.filter((candidate) => candidate !== grade && candidate !== run)) {
+			expect(routedCableHitsTile(grade, route.from, run, route.to, obstacle, 160)).toBe(false);
+		}
+	});
+
+	test("routes worker evidence to Evaluation around the unrelated Strategy using production geometry", () => {
+		const workerEvidence = { x: 920, y: 80, width: 300, height: 190 };
+		const evaluation = { x: 920, y: 770, width: 300, height: 190 };
+		const strategy = { x: 920, y: 310, width: 300, height: 190 };
+		expect(routedCableHitsTile(workerEvidence, "s", evaluation, "n", strategy, 160)).toBe(true);
+		const route = researchCablePorts(workerEvidence, evaluation, [workerEvidence, strategy, evaluation]);
+		expect(routedCableHitsTile(workerEvidence, route.from, evaluation, route.to, strategy, 160)).toBe(false);
+	});
+
+	test("reserves the stage-three gutter needed by the worst fitted Run-result route", () => {
+		const workflow = { stages: [[], [], [], [{ type: "evaluation", id: "evaluation-1" }, { type: "ticket", id: "ticket-1" }], [{ type: "artifact", id: "report-1" }]], objects: [], stageById: new Map(), links: [] };
+		const layout = researchWorldLayout(workflow);
+		expect(layout.get("ontology:evaluation:evaluation-1")?.x).toBe(1500);
+		expect(layout.get("ontology:ticket:ticket-1")?.x).toBe(1500);
+		expect(layout.get("ontology:artifact:report-1")?.x).toBe(1840);
+		expect(1840 - (1500 + 300)).toBe(40);
+		const scale = 136 / 300;
+		const run = { x: 920 * scale, y: 80 * scale, width: 136, height: 190 * scale };
+		const result = { x: 920 * scale, y: 540 * scale, width: 136, height: 190 * scale };
+		const oldEvaluation = { x: 1380 * scale, y: 310 * scale, width: 136, height: 190 * scale };
+		const shiftedEvaluation = { ...oldEvaluation, x: 1500 * scale };
+		expect(routedCableHitsTile(run, "e", result, "e", oldEvaluation, 160)).toBe(true);
+		const route = researchCablePorts(run, result, [run, shiftedEvaluation, result]);
+		expect(routedCableHitsTile(run, route.from, result, route.to, shiftedEvaluation, 160)).toBe(false);
+	});
+
+	test("places exact worker evidence in Evidence row one and clears the three production routes", () => {
+		const workerEvidence = { type: "artifact", id: "worker-evidence", fields: {} };
+		const rawResult = { type: "artifact", id: "raw-result", fields: {} };
+		const evaluation = { type: "evaluation", id: "evaluation", fields: { source_work: { result_artifact_id: workerEvidence.id } } };
+		const workflow = { stages: [[], [], [], [evaluation], []], objects: [workerEvidence, rawResult, evaluation], stageById: new Map(), links: [], evaluation, rawArtifact: rawResult };
+		const layout = researchWorldLayout(workflow);
+		expect(layout.get("ontology:artifact:worker-evidence")).toEqual({ x: 920, y: 310, width: 300, height: 190 });
+		const oldWorker = { x: 460, y: 1230, width: 300, height: 190 };
+		const newWorker = { x: 920, y: 310, width: 300, height: 190 };
+		const evaluationRect = { x: 1500, y: 310, width: 300, height: 190 };
+		const run = { x: 920, y: 80, width: 300, height: 190 };
+		const raw = { x: 920, y: 1230, width: 300, height: 190 };
+		const executor = { x: 460, y: 310, width: 300, height: 190 };
+		const evidenceColumn = [run, { x: 920, y: 540, width: 300, height: 190 }, { x: 920, y: 770, width: 300, height: 190 }, { x: 920, y: 1000, width: 300, height: 190 }, raw, { x: 920, y: 1460, width: 300, height: 190 }];
+		const sides = ["n", "e", "s", "w"];
+		const blocked = sides.flatMap((from) => sides.map((to) => evidenceColumn.some((tile) => routedCableHitsTile(oldWorker, from, evaluationRect, to, tile, 160))));
+		expect(blocked.every(Boolean)).toBe(true);
+		expect(routedCableHitsTile(oldWorker, "e", evaluationRect, "e", raw, 160)).toBe(true);
+		const workerRoute = researchCablePorts(newWorker, evaluationRect, [newWorker, ...evidenceColumn, evaluationRect]);
+		expect(evidenceColumn.every((tile) => !routedCableHitsTile(newWorker, workerRoute.from, evaluationRect, workerRoute.to, tile, 160))).toBe(true);
+		const executorRoute = researchCablePorts(executor, newWorker, [executor, ...evidenceColumn, newWorker]);
+		expect(evidenceColumn.every((tile) => !routedCableHitsTile(executor, executorRoute.from, newWorker, executorRoute.to, tile, 160))).toBe(true);
+		const resultRoute = researchCablePorts(run, raw, [run, newWorker, ...evidenceColumn, raw]);
+		expect([newWorker, ...evidenceColumn].filter((tile) => tile !== run && tile !== raw).every((tile) => !routedCableHitsTile(run, resultRoute.from, raw, resultRoute.to, tile, 160))).toBe(true);
+	});
+
+	test("swaps only the review pair and clears its five production relationships", () => {
+		const scale = 136 / 300;
+		const tile = (x: number, y: number) => ({ x: x * scale, y: y * scale, width: 136, height: 190 * scale });
+		const oldCritic = tile(460, 310);
+		const critic = tile(460, 80);
+		const reviewTask = tile(460, 310);
+		const sourceTask = tile(460, 540);
+		const executor = tile(460, 770);
+		const director = tile(460, 1000);
+		const run = tile(920, 80);
+		const workerEvidence = tile(920, 310);
+		const hypothesis = tile(920, 540);
+		const dataset = tile(920, 770);
+		const strategy = tile(920, 1000);
+		const rawResult = tile(920, 1230);
+		const grade = tile(920, 1460);
+		const evaluation = tile(1500, 310);
+		const ticket = tile(1500, 540);
+		const oldFindings = tile(1840, 540);
+		const findings = tile(1840, 80);
+		const report = tile(1840, 310);
+		const obstacles = [critic, reviewTask, sourceTask, executor, director, run, workerEvidence, hypothesis, dataset, strategy, rawResult, grade, evaluation, ticket, findings, report];
+		const sides = ["n", "e", "s", "w"];
+		const oldBlocked = sides.flatMap((from) => sides.map((to) => obstacles
+			.filter((candidate) => candidate !== evaluation)
+			.some((candidate) => routedCableHitsTile(evaluation, from, oldCritic, to, candidate, 160))));
+		expect(oldBlocked.every(Boolean)).toBe(true);
+		expect(routedCableHitsTile(evaluation, "n", oldCritic, "w", run, 160)).toBe(true);
+		const oldFindingsBlocked = sides.flatMap((from) => sides.map((to) => obstacles
+			.filter((candidate) => candidate !== critic && candidate !== findings)
+			.some((candidate) => routedCableHitsTile(critic, from, oldFindings, to, candidate, 160))));
+		expect(oldFindingsBlocked.every(Boolean)).toBe(true);
+		expect(routedCableHitsTile(critic, "n", oldFindings, "s", run, 160)).toBe(true);
+		const relationships = [
+			[reviewTask, critic],
+			[reviewTask, director],
+			[evaluation, critic],
+			[critic, findings],
+			[workerEvidence, evaluation],
+			[run, rawResult],
+		];
+		for (const [from, to] of relationships) {
+			const route = researchCablePorts(from, to, obstacles);
+			for (const obstacle of obstacles.filter((candidate) => candidate !== from && candidate !== to)) {
+				expect(routedCableHitsTile(from, route.from, to, route.to, obstacle, 160)).toBe(false);
 			}
 		}
+		const performedBy = researchCablePorts(evaluation, critic, obstacles);
+		expect(performedBy).toEqual({ from: "n", to: "n" });
+		const producesFindings = researchCablePorts(critic, findings, obstacles);
+		expect(obstacles.filter((candidate) => candidate !== critic && candidate !== findings)
+			.every((candidate) => !routedCableHitsTile(critic, producesFindings.from, findings, producesFindings.to, candidate, 160))).toBe(true);
+		expect(obstacles.filter((candidate) => candidate !== critic && candidate !== findings)
+			.every((candidate) => !routedCableHitsTile(critic, "n", findings, "n", candidate, 160))).toBe(true);
 	});
 
   test("formats the exact session receipt field order and display values", () => {

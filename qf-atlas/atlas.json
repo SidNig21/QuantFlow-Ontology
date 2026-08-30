@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "ca088759",
+    "commit": "68b07f2a",
     "generatedAt": "2026-08-30",
     "filesScanned": 411,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "284e1373273fce03"
+    "fingerprint": "48da35f0d1ccca39"
   },
   "stats": {
     "live": 109,
@@ -458,7 +458,7 @@
       "id": "2:collab-electron/cli::qf",
       "layer": 2,
       "name": "qf*",
-      "kb": 40.5,
+      "kb": 41.6,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -469,7 +469,7 @@
       "files": [
         {
           "path": "collab-electron/cli/qf-hermes-synthetic-responder.mjs",
-          "kb": 28.5,
+          "kb": 29.6,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -1912,7 +1912,7 @@
       "id": "2:collab-electron/src/main::research",
       "layer": 2,
       "name": "research*",
-      "kb": 28,
+      "kb": 28.1,
       "x": -2.03,
       "z": 1.69,
       "status": "ok",
@@ -1923,7 +1923,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/research-world-projection.ts",
-          "kb": 26.9,
+          "kb": 27,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2435,7 +2435,7 @@
       "id": "4:collab-electron/src/windows/shell/src::cable",
       "layer": 4,
       "name": "cable*",
-      "kb": 19.2,
+      "kb": 19.9,
       "x": -2.48,
       "z": -0.91,
       "status": "ok",
@@ -2446,7 +2446,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/cable-overlay.js",
-          "kb": 7.9,
+          "kb": 8.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2571,7 +2571,7 @@
       "id": "4:collab-electron/src/windows/shell/src::dock",
       "layer": 4,
       "name": "dock.js",
-      "kb": 23,
+      "kb": 23.5,
       "x": -0.91,
       "z": 2.48,
       "status": "ok",
@@ -2582,7 +2582,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/dock.js",
-          "kb": 23,
+          "kb": 23.5,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 0,
@@ -2683,7 +2683,7 @@
       "id": "4:collab-electron/src/windows/shell/src::research",
       "layer": 4,
       "name": "research-world.js",
-      "kb": 69.2,
+      "kb": 70.3,
       "x": 1.01,
       "z": 0.85,
       "status": "ok",
@@ -2694,7 +2694,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/research-world.js",
-          "kb": 69.2,
+          "kb": 70.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3236,7 +3236,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1139.1,
+      "kb": 1171.6,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3257,7 +3257,7 @@
         },
         {
           "path": "qa/gates/pre-r18-coherence.ts",
-          "kb": 149.3,
+          "kb": 172.6,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 1,
@@ -3286,6 +3286,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/technique-outcome-loop.ts",
+          "kb": 54.7,
+          "spawns": 4,
+          "spawnsLive": 2,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/research-director-front-door.ts",
           "kb": 52.7,
           "spawns": 3,
@@ -3296,18 +3306,8 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/technique-outcome-loop.ts",
-          "kb": 46.8,
-          "spawns": 4,
-          "spawnsLive": 2,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "qa/gates/founder-steering.ts",
-          "kb": 33.2,
+          "kb": 34.5,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -4010,8 +4010,8 @@
       "layer": 5,
       "name": "artifact-root/run.ts",
       "kb": 18.7,
-      "x": 1.24,
-      "z": -0.45,
+      "x": 0.45,
+      "z": 2.6,
       "status": "ice",
       "spawns": 0,
       "writes": 1,
@@ -4037,20 +4037,20 @@
       "id": "5:qa/gates/bovada-football::run",
       "layer": 5,
       "name": "bovada-football/run.ts",
-      "kb": 10.6,
-      "x": -0.45,
-      "z": -2.6,
+      "kb": 20.1,
+      "x": 1.24,
+      "z": -0.45,
       "status": "ok",
-      "spawns": 2,
+      "spawns": 5,
       "writes": 2,
       "dml": 0,
       "executes": 0,
       "files": [
         {
           "path": "qa/gates/bovada-football/run.ts",
-          "kb": 10.6,
-          "spawns": 2,
-          "spawnsLive": 2,
+          "kb": 20.1,
+          "spawns": 5,
+          "spawnsLive": 4,
           "writes": 2,
           "dml": 0,
           "dmlLines": [],
@@ -4145,8 +4145,8 @@
       "layer": 5,
       "name": "kernel-drift/run.ts",
       "kb": 12.6,
-      "x": -2.6,
-      "z": 0.45,
+      "x": -0.45,
+      "z": -2.6,
       "status": "ice",
       "spawns": 0,
       "writes": 0,
@@ -4243,8 +4243,8 @@
       "layer": 5,
       "name": "executors.ts",
       "kb": 14.1,
-      "x": 0.45,
-      "z": 2.6,
+      "x": -2.6,
+      "z": 0.45,
       "status": "ok",
       "spawns": 3,
       "writes": 0,
@@ -4788,7 +4788,7 @@
       "id": "0:tools/qf-bovada-football/src::parser",
       "layer": 0,
       "name": "parser.ts",
-      "kb": 13.2,
+      "kb": 13.5,
       "x": 0.91,
       "z": -2.48,
       "status": "ok",
@@ -4799,7 +4799,7 @@
       "files": [
         {
           "path": "tools/qf-bovada-football/src/parser.ts",
-          "kb": 13.2,
+          "kb": 13.5,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -17870,7 +17870,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 832 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 855 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -19700,7 +19700,7 @@
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "2 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
+        "lifetime": "4 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
@@ -53122,12 +53122,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "ebd57d8d",
+      "commit": "ca088759",
       "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "ca088759",
+      "commit": "68b07f2a",
       "generatedAt": "2026-08-30"
     },
     "verdict": "better",

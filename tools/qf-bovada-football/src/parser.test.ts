@@ -58,7 +58,96 @@ function responseFor(
   };
 }
 
+function parseValue(value: Record<string, unknown>[]) {
+	return parseBovadaFootballResponse(new TextEncoder().encode(JSON.stringify(value)), observedAt);
+}
+
+function pathFor(value: Record<string, unknown>[]): Record<string, unknown>[] {
+	return value[0]!.path as Record<string, unknown>[];
+}
+
 describe("fixed Bovada football parser", () => {
+	test("accepts the legacy adjacent Football FOOT then 241 NFL pair", () => {
+		expect(parseValue(fixtureValue()).competitionId).toBe("241");
+	});
+
+	test("accepts measured tuple B and returns the same semantic league", () => {
+		const value = fixtureValue();
+		pathFor(value).reverse();
+		pathFor(value)[1]!.id = "1";
+		expect(parseValue(value).competitionId).toBe("241");
+	});
+
+	test("rejects unproven SPORT 1 forward cross combination", () => {
+		const value = fixtureValue();
+		pathFor(value)[0]!.id = "1";
+		expect(() => parseValue(value)).toThrow(BovadaSelectionError);
+	});
+
+	test("rejects unproven LEAGUE then SPORT FOOT reverse cross combination", () => {
+		const value = fixtureValue();
+		pathFor(value).reverse();
+		expect(() => parseValue(value)).toThrow(BovadaSelectionError);
+	});
+
+	test.each([
+		["separated", (value: Record<string, unknown>[]) => pathFor(value).splice(1, 0, { type: "REGION", id: "x", description: "separator" })],
+		["non-A/non-B reorder", (value: Record<string, unknown>[]) => pathFor(value).reverse()],
+		["split coupons", (value: Record<string, unknown>[]) => { const second = JSON.parse(JSON.stringify(value[0])) as Record<string, unknown>; value[0]!.path = [pathFor(value)[0]!]; second.path = [(second.path as Record<string, unknown>[])[1]!]; value.push(second); }],
+	])("does not independently join coupling failure: %s", (_label, mutate) => {
+		const value = fixtureValue(); mutate(value);
+		expect(() => parseValue(value)).toThrow(BovadaSelectionError);
+	});
+
+	test.each([
+		["SPORT 2", 0, "id", "2"],
+		["LEAGUE 242", 1, "id", "242"],
+	])("rejects wrong id %s", (_label, index, field, replacement) => {
+		const value = fixtureValue(); pathFor(value)[index]![field] = replacement;
+		expect(() => parseValue(value)).toThrow(BovadaSelectionError);
+	});
+
+	test.each([
+		["Football description", 0, "description", "Association Football"],
+		["NFL description", 1, "description", "National Football League"],
+	])("rejects wrong %s", (_label, index, field, replacement) => {
+		const value = fixtureValue(); pathFor(value)[index]![field] = replacement;
+		expect(() => parseValue(value)).toThrow(BovadaSelectionError);
+	});
+
+	test.each([
+		["SPORT", 0, "type", "sport"], ["LEAGUE", 1, "type", "league"],
+		["Football", 0, "description", "football"], ["NFL", 1, "description", "nfl"],
+	])("rejects case change in %s", (_label, index, field, replacement) => {
+		const value = fixtureValue(); pathFor(value)[index]![field] = replacement;
+		expect(() => parseValue(value)).toThrow(BovadaSelectionError);
+	});
+
+	test.each(["A+A", "B+B", "A+B"])("rejects %s recognized windows as ambiguity", (shape) => {
+		const value = fixtureValue();
+		const a = JSON.parse(JSON.stringify(pathFor(value))) as Record<string, unknown>[];
+		const b = [{ type: "LEAGUE", id: "241", description: "NFL" }, { type: "SPORT", id: "1", description: "Football" }];
+		pathFor(value).splice(0, pathFor(value).length, ...(shape === "A+A" ? [...a, ...a] : shape === "B+B" ? [...b, ...b] : [...a, ...b]));
+		expect(() => parseValue(value)).toThrow(BovadaSelectionError);
+	});
+
+	test.each([
+		["missing type", 0, "type", undefined],
+		["non-string type", 0, "type", 1],
+		["missing id", 1, "id", undefined],
+		["non-string id", 1, "id", 241],
+		["missing description", 0, "description", undefined],
+		["non-string description", 0, "description", false],
+		["tuple B missing id", 1, "id", undefined],
+		["tuple B non-string type", 0, "type", 7],
+	])("rejects %s as schema error", (_label, index, field, replacement) => {
+		const value = fixtureValue();
+		if (_label.startsWith("tuple B")) { pathFor(value).reverse(); pathFor(value)[1]!.id = "1"; }
+		if (replacement === undefined) delete pathFor(value)[index]![field];
+		else pathFor(value)[index]![field] = replacement;
+		expect(() => parseValue(value)).toThrow(BovadaSchemaError);
+	});
+
   test("selects the earliest future open Game-Line moneyline and preserves provider strings", () => {
     const selected = parseBovadaFootballResponse(fixtureBytes, observedAt);
     expect(selected.event.id).toBe("25568702");
