@@ -1,6 +1,6 @@
 # Phase 3 current-product founder-path correction authority
 
-status: **FRESH SEMANTIC READER REQUIRED / PRODUCT BUILDER CLOSED**
+status: **VERIFIER F01 RED / BOUNDED PROJECTION AMENDMENT READER REQUIRED / PRODUCT BUILDER CLOSED**
 
 ## Objective
 
@@ -68,6 +68,7 @@ The Builder may change only the smallest subset of these existing surfaces neede
 
 - `collab-electron/src/main/agent-host.ts`
 - `collab-electron/src/main/agent-host-lifecycle.test.ts`
+- `collab-electron/src/main/task-delegation-projection.ts` and `collab-electron/src/main/task-delegation-projection.test.ts` only for the F01 open-Task assignee-runtime availability projection described below
 - `collab-electron/src/windows/shell/src/participant-projection.js`
 - `collab-electron/src/windows/shell/src/participant-projection.test.ts`
 - `collab-electron/src/windows/shell/src/task-composition.js`
@@ -80,10 +81,44 @@ The Builder may change only the smallest subset of these existing surfaces neede
 - `collab-electron/src/windows/shell/src/shell.css`
 - `collab-electron/src/windows/shell/index.html`
 - `qa/gates/hermes-production-inference.ts` and `qa/gates/hermes-production-inference.test.ts` only for already-authorized credential-safe failure preservation and the later visible P14-B inference receipt; they may not implement or substitute the product corrections
+- `qa/gates/team-composition.ts` and `qa/gates/research-director-delegation.ts` only to supply real or fixture `agent_session.status` to the existing Task assignment projection and preserve their current meanings
 - `docs/orders/evidence/golden-baseline/phase3/PHASE3-FOUNDER-PATH-CURRENT-PRODUCT-BUILD-RECEIPT-20260830.md`
 - generated Atlas outputs after product changes
 
 If a required implementation file is absent from this list, stop and return the exact reason before changing it.
+
+## Independent-Verifier F01 amendment
+
+Independent verification of immutable candidate `295fa47d11e731af778895adc2a7019ede7129bd`
+proved that the lifecycle write is correct but the required unavailable/reassignable
+projection is not. `projectTaskAssignments()` currently decides assignment solely
+from exact link cardinality and delegator identity. It never reads the assignee
+`agent_session.status`, so an open Task owned by the newly failed seat remains
+`assigned` and the participant remains `working`.
+
+The sole authorized semantic repair is:
+
+1. Extend the existing read-only Task-assignment projection to read the exact
+   assignee `agent_session` from Kernel truth.
+2. For an **open** Task, `assignmentState: "assigned"` requires the exact assignee
+   session to exist with `status: "running"`. Missing, `starting`, `blocked`,
+   `cancelled`, `failed`, or `closed` assignees project `unavailable`; no Task or
+   lineage link is mutated.
+3. Done and cancelled Tasks retain their historical assignee projection; this
+   amendment does not erase settled provenance merely because the historical
+   session later stopped.
+4. Add a focused falsifier proving failed/missing/non-running open-Task assignees
+   RED and an exact running assignee GREEN. The test must also prove done/cancelled
+   historical assignment remains intact.
+5. Update only the two existing gate readers named in the file list so they provide
+   the real or fixture session status. Do not alter their assertions, timeouts,
+   topology, product meaning, or PASS criteria.
+
+No UI-local state, automatic reassignment, Task mutation, link mutation, new
+action, schema change, or compatibility behavior is authorized. F02-F07 candidate
+bytes remain frozen. The repaired candidate must rerun the focused matrix, all
+seven static gates, Atlas, and unmodified C01-C14 before a new independent
+Verifier. A second F01 semantic red after this repair is a hard stop.
 
 ## Read-only prerequisites and Router-owned evidence
 
