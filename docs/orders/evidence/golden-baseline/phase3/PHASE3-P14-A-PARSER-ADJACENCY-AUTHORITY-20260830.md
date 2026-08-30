@@ -1,21 +1,22 @@
 # Phase 3 P14-A parser adjacency authority — 2026-08-30
 
-Completed live tuple adjudication proved Bovada's NFL path uses measured SPORT ID `1`, so the parser may add only that exact alias while retaining strict ordered adjacency and every downstream predicate.
+Completed live tuple adjudication proves exactly two coupled contiguous path windows—one fixture tuple and one measured-live tuple—without authorizing their cross-product.
 
 status: **FRESH SEMANTIC READER YES / YES / TWO-FILE PARSER REPAIR OPEN / LIVE REPROOF REQUIRED**
 
 - Reader task: `01a05212-f0e4-7101-a0d9-8e59df8a3f08`
-- Reader adjudication: **YES / YES — P14-A tuple adjudication complete; finite parser alias/adjacency repair**
-- authority base commit: `fa3c5a26265f61934cc49d5b8616cea13580392a`
-- authority base tree: `11bdfc906a798ccb0053fee8f48fec59a87a2ef3`
+- Reader adjudication: **YES / YES — prior forward alias cross-product falsified; exactly two coupled ordered tuples accepted**
+- initial authority base commit: `fa3c5a26265f61934cc49d5b8616cea13580392a`
+- correction authority base commit: `8b74807cd4d6ec033aaa05fd5462cbcd74c11cc3`
+- correction authority base tree: `a218f958e4cf6cb24870ac20b8ad4037fa28ea4c`
 - parser path: `tools/qf-bovada-football/src/parser.ts`
 - focused test path: `tools/qf-bovada-football/src/parser.test.ts`
 
-Scope reason: the safe live measurement identified the exact ordered parent/child path `SPORT { description: "Football", id: "1" }` immediately followed by `LEAGUE { id: "241", description: "NFL" }`. The existing legacy SPORT ID `FOOT` remains valid. Only the measured alias and strict pair recognition are in scope; event selection and all later market predicates remain correct and unchanged.
+Scope reason: the fixture proves tuple A, `SPORT/FOOT/Football` immediately followed by `LEAGUE/241/NFL`. The safe live measurement proves tuple B in the opposite order, `LEAGUE/241/NFL` immediately followed by `SPORT/1/Football`. These are coupled tuple alternatives, not independent SPORT-ID and ordering aliases. Event selection and every later market predicate remain correct and unchanged.
 
 ## Preserved current dirty set
 
-This docs/evidence task does not touch or stage the twelve existing authorized dirty paths:
+This correction docs/evidence task does not touch or stage the fourteen existing authorized dirty paths:
 
 | Unstaged path | Working blob | Per-file binary-diff hash |
 | --- | --- | --- |
@@ -31,19 +32,21 @@ This docs/evidence task does not touch or stage the twelve existing authorized d
 | `qf-atlas/ATLAS.md` | `4e05cc86392d7326b006632dc08bdc39b1014354` | `cd1eaa550216b0de257b738724bf0bd2ae9d3dcb` |
 | `qf-atlas/atlas.html` | `f5f7c068de450a808fa2224a7691628608463e74` | `af1687c72eb71e7c5f82e2866428d630a9ea3af8` |
 | `qf-atlas/atlas.json` | `285ec3c902b9fef4b9dc470428a906abcc30bc24` | `dad52614ea6a466026a492eb6c533f380a94c55d` |
+| `tools/qf-bovada-football/src/parser.test.ts` | `f1a31d6b252d847b582a0a461fbed0b02ee3dba8` | `29708f8c7394539bbb9040c2c4b172279d1522ce` |
+| `tools/qf-bovada-football/src/parser.ts` | `f1da867e0bd49eb98ecb876c06ed5be9c84f32a1` | `627a5545a8133c150971ae10cd6b684fd2c3af14` |
 
 The Builder may resume that dirty set under existing authority and add only the parser and parser-test paths above.
 
 ## Exact candidate-path grammar
 
-A candidate NFL path is exactly one adjacent ordered sibling pair under the same parent:
+A candidate NFL path is exactly one recognized adjacent ordered sibling window under the same parent. The only recognized windows are:
 
-1. `SPORT` with exact case-sensitive `description === "Football"` and exact `id === "FOOT" || id === "1"`;
-2. immediately followed at the next parent position by `LEAGUE` with exact case-sensitive `id === "241"` and `description === "NFL"`.
+- **Tuple A — fixture:** `SPORT { id: "FOOT", description: "Football" }` immediately followed by `LEAGUE { id: "241", description: "NFL" }`.
+- **Tuple B — measured live:** `LEAGUE { id: "241", description: "NFL" }` immediately followed by `SPORT { id: "1", description: "Football" }`.
 
-`FOOT` is the preserved legacy positive; `1` is the sole measured alias. No other numeric/string alias, normalization, case folding, trimmed comparison, descendant search, independent-node join, reversed pair, or separated pair is accepted.
+Both tuples return the same semantic sport/league result. `SPORT/1/Football → LEAGUE/241/NFL` is explicitly unproven and rejected. `LEAGUE/241/NFL → SPORT/FOOT/Football` is explicitly unproven and rejected. Do not form a cross-product, sort nodes, convert them to sets, search SPORT and LEAGUE independently, join across parents/coupons, normalize case, trim values, or derive any other alias/order.
 
-Exactly zero matching pairs makes that coupon/path a noncandidate. More than one exact matching pair throws `BovadaSelectionError` for ambiguity; it must not choose first/last or merge them. Missing or non-string required `type`, `id`, or `description` fields remain `SchemaError`, not noncandidate or selection ambiguity.
+Exactly zero recognized windows makes that coupon/path a noncandidate. More than one recognized window in the selection domain throws `BovadaSelectionError` for ambiguity; it must not choose first/last, merge, or deduplicate them. Missing or non-string required `type`, `id`, or `description` fields remain structurally fail-closed as `SchemaError`, not noncandidate or selection ambiguity.
 
 Once the unique path is found, event `competition.id === "241"` and every later existing predicate remain byte/meaning unchanged: competition, live, status, future time, competitors, Game Lines, Moneyline, market status, period description, live, main, outcomes, and ambiguity handling.
 
@@ -51,27 +54,27 @@ Once the unique path is found, event `competition.id === "241"` and every later 
 
 The focused parser tests must cover these ten exact categories:
 
-1. Legacy positive: adjacent exact `SPORT Football/FOOT` then exact `LEAGUE 241/NFL` is a candidate.
-2. Measured positive: adjacent exact `SPORT Football/1` then exact `LEAGUE 241/NFL` is a candidate.
-3. Wrong SPORT description, including case change, is a noncandidate.
-4. Wrong LEAGUE identity: independent subcases for wrong ID and wrong/case-changed description are noncandidates.
-5. SPORT ID `2` is a noncandidate.
-6. Reversed exact LEAGUE→SPORT order is a noncandidate.
-7. Exact SPORT and LEAGUE separated by another sibling are a noncandidate.
-8. Exact SPORT and LEAGUE in independent parents/branches are a noncandidate.
-9. Two exact adjacent candidate pairs throw `BovadaSelectionError` ambiguity.
-10. Missing or non-string required fields, with field/type subcases, throw `SchemaError`.
+1. Tuple A positive: exact contiguous `SPORT/FOOT/Football → LEAGUE/241/NFL` returns the expected semantic sport/league.
+2. Tuple B positive: exact contiguous `LEAGUE/241/NFL → SPORT/1/Football` returns the same semantic sport/league.
+3. Unproven cross negative: `SPORT/1/Football → LEAGUE/241/NFL` is a noncandidate.
+4. Unproven cross negative: `LEAGUE/241/NFL → SPORT/FOOT/Football` is a noncandidate.
+5. Coupling failures: separated nodes, a non-A/non-B reorder, and SPORT/LEAGUE halves split across coupons/parents are noncandidates and never independently joined.
+6. Wrong IDs, including SPORT `2` or LEAGUE other than `241`, are noncandidates.
+7. Wrong descriptions are noncandidates.
+8. Any case change in `SPORT`, `LEAGUE`, `Football`, or `NFL` is a noncandidate.
+9. A+A, B+B, and A+B recognized-window inputs each throw `BovadaSelectionError` ambiguity.
+10. Missing or non-string required fields, with field/type subcases in either tuple, throw `SchemaError`.
 
 Mutation cases must assert error class and exact candidate/noncandidate meaning, not only counts or generic throw. Existing downstream predicate tests remain unchanged and must still fail when any later predicate is mutated.
 
 ## Fresh live proof and stops
 
-After focused parser tests and their red/green baits, run exactly one fresh isolated live capture through the authorized one-shot measurement path. Normal Kernel success may be reported only if the unchanged later predicates admit exactly one eligible event/market and create the exact MarketEvent, Instrument, Quote, and link delta. If the unique NFL path is recognized but a later unchanged predicate rejects or yields ambiguity, preserve that exact later RED and its safe aggregate evidence; do not broaden the parser or reinterpret it as success.
+After the corrected focused parser tests and their red/green baits, run exactly one final fresh isolated live capture through the authorized one-shot measurement path. Normal Kernel success may be reported only if the unchanged later predicates admit exactly one eligible event/market and create the exact MarketEvent, Instrument, Quote, and link delta. If tuple B is recognized but a later unchanged predicate rejects or yields ambiguity, preserve that exact later RED and its safe aggregate evidence; do not broaden the parser or reinterpret it as success.
 
 No raw payload, name, team, odds, header, or credential may be emitted. No second capture is authorized by this amendment solely to chase a later RED.
 
 ## Preserved authority and stops
 
-No fixture file, gate runner, one-shot runner, Kernel, schema, packaged CLI, network, admission object/link mapping, timeout, retry, or later predicate change is authorized. No dependency, regex/loose matcher, raw-data log, hard-coded event, or alternate parser path is permitted.
+No fixture file, gate runner, one-shot runner, Kernel, schema, packaged CLI, network, admission object/link mapping, timeout, retry, or later predicate change is authorized. No cross-product, sorting/set normalization, independent node search, dependency, regex/loose matcher, raw-data log, hard-coded event, or alternate parser path is permitted.
 
 P18/candidate freeze, independent Verifier acceptance, Golden designation, `main`, every remote ref, and R18 remain closed. No candidate is permitted until P01-P17 are green. Any third new executable path, additional alias, or later-predicate repair stops for new authority.
