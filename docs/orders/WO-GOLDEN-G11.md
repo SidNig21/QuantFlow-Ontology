@@ -365,7 +365,7 @@ reset, checkout-overwrite, rebase, or force-push. Reverse only the exact
 source, reverse its recorded exact reference rewrites, and verify the restored
 source SHA256 is
 `05965A70032DDB6E96B986682FCD39A7EF6773F69F499E4FA1201C353EAB6202`.
-Then restore every modified A-path from the named start commit and remove only
+Then restore every modified A-path from `<G11_AUTHORITY_PARENT>` and remove only
 the candidate-created G11 receipt/static-verifier paths. The rollback is green
 only when `git diff --exit-code <G11_AUTHORITY_PARENT>` and the restored tree
 equals `<G11_AUTHORITY_PARENT_TREE>` byte-for-byte, while the separate 1,421-row/blob
