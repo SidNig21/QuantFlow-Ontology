@@ -24,15 +24,15 @@ No product file is editable. The gate must not initiate the fixture's second rev
 
 The terminal pre-settlement world is exactly 15 objects and 17 links. Settlement alone adds exactly the Ticket, grade Artifact, and four grade links, producing exactly 17 objects and 21 links. The literal oracle remains exact across settlement and reopen; dynamic binding changes identity substitution, not membership meaning or acceptance strength.
 
-R15 uniqueness remains exact per `(action_kind, source_task_id, attempt_id)`. Independent review and publication remain mandatory. The gate may not filter a duplicate, weaken counts, ignore an extra object/link, alter completion meaning, create a synthetic replacement, or substitute fixture review output for the scheduled production continuation.
+R15 uniqueness remains exact per `(action_kind, source_task_id, attempt_id)`, so two distinct attempts may each be individually unique under R15. Separately, the Phase-3 journey requires exactly one `request_review` attempt. Independent review and publication remain mandatory. The gate may not filter a second attempt, weaken counts, ignore an extra object/link, alter completion meaning, create a synthetic replacement, or substitute fixture review output for the scheduled production continuation.
 
 ## Required falsifiers
 
-1. Initiate a second review attempt after the Run exists: the world expands and REDs on exact membership/cardinality and R15 attempt uniqueness.
+1. Initiate a second distinct review attempt after the Run exists: even if each attempt remains individually R15-unique, the journey REDs because it requires exactly one `request_review` attempt and exact 15/17 membership.
 2. Suppress or leave the scheduled continuation incomplete: RED because the single review Task is not terminal or its Evaluation, findings Artifact, or current Report is missing.
 3. Bind any wrong dynamic Task, Evaluation, findings, or Report identity into the oracle: RED on exact literal identity/link comparison.
-4. Submit settlement before the one production continuation is terminal and complete: RED before Ticket or grade mutation, with exact zero forbidden settlement delta.
-5. Restore the one-attempt path: exactly one terminal review Task, Evaluation, findings Artifact, and current Report bind into the 15/17 oracle; settlement alone yields exact 17/21; exact identities, independent review/publication, conflicts, zero deltas, and reopen are GREEN.
+4. Move the gate's settlement IPC call before the complete terminal continuation has been observed: RED on gate sequencing because no settlement IPC call is permitted before that observation. This falsifier makes no claim that the product refuses an early call and requires no product-level zero-delta behavior.
+5. Restore the one-attempt path: the gate observes exactly one `request_review` attempt and one terminal review Task, Evaluation, findings Artifact, and current Report before making any settlement IPC call; those identities bind into the exact 15/17 oracle; settlement then yields exact 17/21; exact identities, independent review/publication, existing conflicts/zero deltas, and reopen are GREEN.
 
 ## Preserved authority and stops
 
