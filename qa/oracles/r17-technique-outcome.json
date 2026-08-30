@@ -30,14 +30,14 @@
       "id": "${review_task_id}",
       "fields": {
         "id": "${review_task_id}",
-        "title": "Independent research review",
-        "description": "Review the immutable source work task-r17-gate using the governed critic contract.",
-        "status": "done",
-        "assignee_session_id": "r17-critic",
+        "title": "${field:review_task:title}",
+        "description": "${field:review_task:description}",
+        "status": "${field:review_task:status}",
+        "assignee_session_id": "${critic_session_id}",
         "delegator_session_id": "${field:review_task:delegator_session_id}",
         "mission_id": null,
-        "steering_state": "done",
-        "review_state": "done"
+        "steering_state": "${field:review_task:status}",
+        "review_state": "${field:review_task:status}"
       }
     },
     {
@@ -48,7 +48,7 @@
         "claim": "R17 live technique outcome",
         "success_criteria": "Kernel-held evidence and, when a settled Dataset exists, deterministic metrics independently reviewed by a critic.",
         "sources": ["${dataset_id}"],
-        "status": "open"
+        "status": "${field:hypothesis:status}"
       }
     },
     {
@@ -121,7 +121,12 @@
         "kind": "result_set",
         "content_hash": "${field:result_artifact:content_hash}",
         "receipt": "${field:result_artifact:receipt}",
-        "run_id": "run-r17-gate"
+        "run_id": "run-r17-gate",
+        "semantic_markers": "${field:result_artifact:semantic_markers}",
+        "producer_id": "${field:result_artifact:producer_id}",
+        "producer_type": "${field:result_artifact:producer_type}",
+        "source_run_id": "${field:result_artifact:source_run_id}",
+        "source_task_id": "${field:result_artifact:source_task_id}"
       }
     },
     {
@@ -131,7 +136,12 @@
         "id": "${worker_evidence_artifact_id}",
         "kind": "trajectory",
         "content_hash": "${field:worker_evidence_artifact:content_hash}",
-        "receipt": "${field:worker_evidence_artifact:receipt}"
+        "receipt": "${field:worker_evidence_artifact:receipt}",
+        "semantic_markers": "${field:worker_evidence_artifact:semantic_markers}",
+        "producer_id": "${field:worker_evidence_artifact:producer_id}",
+        "producer_type": "${field:worker_evidence_artifact:producer_type}",
+        "source_run_id": "${field:worker_evidence_artifact:source_run_id}",
+        "source_task_id": "${field:worker_evidence_artifact:source_task_id}"
       }
     },
     {
@@ -141,7 +151,12 @@
         "id": "${grade_artifact_id}",
         "kind": "result_set",
         "content_hash": "${field:grade_artifact:content_hash}",
-        "receipt": "${field:grade_artifact:receipt}"
+        "receipt": "${field:grade_artifact:receipt}",
+        "semantic_markers": "${field:grade_artifact:semantic_markers}",
+        "producer_id": "${field:grade_artifact:producer_id}",
+        "producer_type": "${field:grade_artifact:producer_type}",
+        "source_run_id": "${field:grade_artifact:source_run_id}",
+        "source_task_id": "${field:grade_artifact:source_task_id}"
       }
     },
     {
@@ -151,7 +166,11 @@
         "id": "${findings_artifact_id}",
         "kind": "evaluation_findings",
         "content_hash": "${field:findings_artifact:content_hash}",
-        "receipt": "${field:findings_artifact:receipt}"
+        "receipt": "${field:findings_artifact:receipt}",
+        "producer_id": "${field:findings_artifact:producer_id}",
+        "producer_type": "${field:findings_artifact:producer_type}",
+        "source_run_id": "${field:findings_artifact:source_run_id}",
+        "source_task_id": "${field:findings_artifact:source_task_id}"
       }
     },
     {
@@ -161,7 +180,15 @@
         "id": "${report_artifact_id}",
         "kind": "report",
         "content_hash": "${field:report_artifact:content_hash}",
-        "receipt": "${field:report_artifact:receipt}"
+        "semantic_markers": "${field:report_artifact:semantic_markers}",
+        "receipt": "${field:report_artifact:receipt}",
+        "producer_id": "${field:report_artifact:producer_id}",
+        "producer_type": "${field:report_artifact:producer_type}",
+        "source_run_id": "${field:report_artifact:source_run_id}",
+        "source_task_id": "${field:report_artifact:source_task_id}",
+        "gating_evaluation_id": "${field:report_artifact:gating_evaluation_id}",
+        "current_authority": "${field:report_artifact:current_authority}",
+        "historical": "${field:report_artifact:historical}"
       }
     },
     {
@@ -173,17 +200,19 @@
         "critic_findings_ref": "${field:evaluation:critic_findings_ref}",
         "verdict": "supports",
         "confidence": 0.9,
-        "rationale": "The bounded deterministic fixture preserves the complete visible research lineage.",
+        "rationale": "${field:evaluation:rationale}",
         "rubric": "${field:evaluation:rubric}",
         "overall": "${field:evaluation:overall}",
         "run_metrics": "${field:evaluation:run_metrics}",
         "findings_artifact_id": "${field:evaluation:findings_artifact_id}",
-        "broker_invocation_id": null,
+        "broker_invocation_id": "${field:evaluation:broker_invocation_id}",
         "review_task_id": "${field:evaluation:review_task_id}",
         "source_work": "${field:evaluation:source_work}",
         "publication_report_id": "${field:evaluation:publication_report_id}",
         "block_reason": null,
-        "critic_session_id": "r17-critic",
+        "semantic_markers": "${field:evaluation:semantic_markers}",
+        "critic_session_id": "${critic_session_id}",
+        "target_artifact_id": "${field:evaluation:target_artifact_id}",
         "report_artifact_id": "${field:evaluation:report_artifact_id}"
       }
     },
@@ -192,26 +221,41 @@
       "id": "${director_session_id}",
       "fields": {
         "id": "${director_session_id}",
-        "status": "running",
-        "label": "hermes-research-director"
+        "status": "${field:director_session:status}",
+        "label": "${field:director_session:label}",
+        "definition_id": "${field:director_session:definition_id}",
+        "role": "${field:director_session:role}",
+        "display_name": "${field:director_session:display_name}",
+        "runtime_profile": "${field:director_session:runtime_profile}",
+        "capability_groups": "${field:director_session:capability_groups}"
       }
     },
     {
       "type": "agent_session",
-      "id": "r17-executor",
+      "id": "${executor_session_id}",
       "fields": {
-        "id": "r17-executor",
-        "status": "closed",
-        "label": "R17 fixture executor"
+        "id": "${executor_session_id}",
+        "status": "${field:executor_session:status}",
+        "label": "${field:executor_session:label}",
+        "definition_id": "${field:executor_session:definition_id}",
+        "role": "${field:executor_session:role}",
+        "display_name": "${field:executor_session:display_name}",
+        "runtime_profile": "${field:executor_session:runtime_profile}",
+        "capability_groups": "${field:executor_session:capability_groups}"
       }
     },
     {
       "type": "agent_session",
-      "id": "r17-critic",
+      "id": "${critic_session_id}",
       "fields": {
-        "id": "r17-critic",
-        "status": "running",
-        "label": "R17 fixture critic"
+        "id": "${critic_session_id}",
+        "status": "${field:critic_session:status}",
+        "label": "${field:critic_session:label}",
+        "definition_id": "${field:critic_session:definition_id}",
+        "role": "${field:critic_session:role}",
+        "display_name": "${field:critic_session:display_name}",
+        "runtime_profile": "${field:critic_session:runtime_profile}",
+        "capability_groups": "${field:critic_session:capability_groups}"
       }
     }
   ],
@@ -224,7 +268,7 @@
     {
       "kind": "assigned_to",
       "from_id": "task-r17-gate",
-      "to_id": "r17-executor"
+      "to_id": "${executor_session_id}"
     },
     {
       "kind": "delegated_by",
@@ -234,7 +278,7 @@
     {
       "kind": "delegates_to",
       "from_id": "${director_session_id}",
-      "to_id": "r17-executor"
+      "to_id": "${executor_session_id}"
     },
     {
       "kind": "tests",
@@ -293,13 +337,13 @@
     },
     {
       "kind": "evaluated_by",
-      "from_id": "${result_artifact_id}",
+      "from_id": "${worker_evidence_artifact_id}",
       "to_id": "${evaluation_id}"
     },
     {
       "kind": "performed_by",
       "from_id": "${evaluation_id}",
-      "to_id": "r17-critic"
+      "to_id": "${critic_session_id}"
     },
     {
       "kind": "gates",
@@ -308,13 +352,13 @@
     },
     {
       "kind": "produces",
-      "from_id": "r17-critic",
+      "from_id": "${critic_session_id}",
       "to_id": "${findings_artifact_id}"
     },
     {
       "kind": "assigned_to",
       "from_id": "${review_task_id}",
-      "to_id": "r17-critic"
+      "to_id": "${critic_session_id}"
     },
     {
       "kind": "delegated_by",
