@@ -37,6 +37,69 @@ test("participant projection keeps session, runtime, work, and recovery independ
   ]);
 });
 
+test("an exact unavailable Task remains blocked on its true stopped participant", () => {
+  const unavailable = participantViewForSession({
+    sessionId: "director-1",
+    sessions: [{ id: "director-1", status: "closed", runtime_profile: "default", availability: { available: true } }],
+    assignments: [{
+      taskId: "task-1",
+      title: "Founder Task",
+      description: "Preserve this exact durable work.",
+      status: "open",
+      assignmentState: "unavailable",
+      delegatedBySessionId: "director-1",
+      delegatorDisplayName: "Research Director",
+      assignedToSessionId: "director-1",
+      unavailableSessionIds: ["director-1"],
+    }],
+    runtimeSnapshot: [],
+  });
+  expect(unavailable).toMatchObject({
+    session: "closed",
+    runtime: "default",
+    runtimeState: "stopped",
+    work: "blocked",
+    recovery: "restartable",
+    task: "Founder Task",
+    taskId: "task-1",
+    recruiterReason: "Preserve this exact durable work.",
+  });
+  expect(unavailable.runtime).not.toContain("Native TUI");
+
+  const wrongSession = participantViewForSession({
+    sessionId: "other-session",
+    sessions: [{ id: "other-session", status: "closed", runtime_profile: "default" }],
+    assignments: [{
+      taskId: "task-1",
+      title: "Founder Task",
+      description: "Preserve this exact durable work.",
+      status: "open",
+      assignmentState: "unavailable",
+      delegatedBySessionId: "director-1",
+      delegatorDisplayName: "Research Director",
+      assignedToSessionId: "director-1",
+      unavailableSessionIds: ["director-1"],
+    }],
+  });
+  expect(wrongSession).toMatchObject({ task: "Not recorded", taskId: "Not recorded", work: "unassigned" });
+
+  const malformed = participantViewForSession({
+    sessionId: "director-1",
+    sessions: [{ id: "director-1", status: "closed", runtime_profile: "default" }],
+    assignments: [{
+      taskId: "task-1",
+      title: "Founder Task",
+      description: "Preserve this exact durable work.",
+      status: "open",
+      assignmentState: "unavailable",
+      delegatedBySessionId: null,
+      assignedToSessionId: null,
+      unavailableSessionIds: ["director-1"],
+    }],
+  });
+  expect(malformed).toMatchObject({ task: "Not recorded", taskId: "Not recorded", work: "unassigned" });
+});
+
 test("live native TUI is presented with its configured profile without inventing a runtime observation", () => {
   const live = participantView({
     session: { id: "director-1", status: "running" },

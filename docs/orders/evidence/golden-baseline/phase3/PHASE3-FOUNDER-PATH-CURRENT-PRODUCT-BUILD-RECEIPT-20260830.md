@@ -2,7 +2,7 @@
 
 The current QuantFlow product now keeps a durable founder Task operable after its runtime disappears, makes that Task inspectable, and removes the measured UI contradictions without changing research semantics.
 
-status: **F01 PROJECTION REPAIR BUILDER COMPLETE / INDEPENDENT VERIFICATION REQUIRED / UNRELATED RESEARCH-DIRECTOR GATE RED RECORDED**
+status: **FINAL FOUNDER-PATH PROJECTION REPAIR BUILDER COMPLETE / INDEPENDENT VERIFICATION REQUIRED / UNRELATED RESEARCH-DIRECTOR GATE RED RECORDED**
 
 ## Authority and source
 
@@ -204,3 +204,51 @@ VERDICT UNCHANGED versus repair parent
 ```
 
 The projection repair reads one more existing Kernel object (`agent_session`) and derives availability without writing or persisting UI state. Structural/link/delegator exactness is decided before runtime availability, so a stopped runtime cannot erase durable lineage and a malformed lineage cannot become an assignment merely because a session runs.
+
+## Final participant/runtime projection repair
+
+- repair parent: `3e31b9945a08e44614590f374063315419c5b78e`
+- provider calls submitted: **zero**
+- Computer Use performed by Builder: **no**
+
+Two fail-capable tests were added before the projection implementation changed:
+
+```text
+bun test kernel-lifecycle.test.ts participant-projection.test.ts
+8 pass
+2 fail
+
+RED 1: task-surface session omitted exact configured runtime_profile=default
+RED 2: exact unavailable open Task projected work=unassigned and Task=Not recorded
+```
+
+After the bounded repair, the identical pair was green:
+
+```text
+10 pass
+0 fail
+53 expect() calls
+```
+
+The green proof requires the exact unavailable Task to retain its ID, title, and description only on its exact participant and to project `work=blocked`; wrong-session and malformed/missing-lineage rows retain no Task identity. The closed participant remains `session=closed`, `runtimeState=stopped`, and `recovery=restartable`. Its exact configured profile may render as `default`, but no absent runtime observation may invent `Native TUI`.
+
+The compatible existing founder-path batch remained green:
+
+```text
+44 pass
+0 fail
+206 expect() calls
+```
+
+`kernel-lifecycle.test.ts` is intentionally run separately from `agent-host-lifecycle.test.ts`: the latter module-mocks `./kernel`, so aggregating those files replaces the former's real Kernel exports and is not a valid product test. The separate real-Kernel suite is green `3 pass / 0 fail`; the six-suite founder-path batch is green as shown above.
+
+Current-product-safe verification:
+
+```text
+seven static gates: PASS
+team-composition: PASS
+bun run build: PASS (306 main / 2 preload / 7783 renderer modules)
+bun qa/run.ts pre-r18-coherence: C01-C14 PASS; objects=17; links=21; cleanup clean
+```
+
+The implementation adds only `runtime_profile` from the already exact one-link `spawned_from` AgentDefinition resolution in `kernelListTaskSurface()` and extends the shared participant projection to consume an exact unavailable assignment. It adds no action, mutation, schema, link, Dock state, or alternate truth.

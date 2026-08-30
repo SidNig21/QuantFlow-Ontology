@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ 1723d600` on 2026-08-30 by
+> Generated from `wo-golden-g2 @ 3e31b994` on 2026-08-30 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -485,7 +485,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 577
 - `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 531
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 396
-- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 851
+- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 852
 
 ### Exact task delivery
 
@@ -503,7 +503,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 971
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1322
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 889
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 890
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 228

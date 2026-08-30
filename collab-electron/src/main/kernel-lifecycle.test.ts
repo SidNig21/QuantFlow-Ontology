@@ -88,6 +88,37 @@ describe("app Kernel handle lifecycle", () => {
     expect(shutdown.indexOf("stopJsonRpcServer()" )).toBeGreaterThan(shutdown.indexOf("await disposeAgentHost()"));
     expect(shutdown.indexOf("closeAppKernel()" )).toBeGreaterThan(shutdown.indexOf("stopJsonRpcServer()"));
   });
+
+  test("task surface carries the exact configured runtime profile for a closed seat", () => {
+    kernel.openAppKernel();
+    kernel.kernelExecute("register_agent_definition", {
+      name: "kernel-lifecycle-director",
+      role: "orchestrator",
+      display_name: "Research Director",
+      package_ref: "species/hermes/packed/hermes.aospkg",
+      runtime_profile: "default",
+      capability_groups: ["desk.orchestrate"],
+    }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+    kernel.kernelExecute("create_agent_session", {
+      session_id: "kernel-lifecycle-session",
+      agent_definition_id: "kernel-lifecycle-director",
+    }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+    kernel.kernelExecute("start_agent_session", {
+      session_id: "kernel-lifecycle-session",
+    }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+    kernel.kernelExecute("close_agent_session", {
+      session_id: "kernel-lifecycle-session",
+    }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+
+    expect(kernel.kernelListTaskSurface().sessions.find((session) =>
+      session.id === "kernel-lifecycle-session"
+    )).toMatchObject({
+      status: "closed",
+      definition_id: "kernel-lifecycle-director",
+      runtime_profile: "default",
+    });
+    kernel.closeAppKernel();
+  });
 });
 
 afterAll(() => {

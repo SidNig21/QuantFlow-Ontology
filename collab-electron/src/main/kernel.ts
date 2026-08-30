@@ -827,6 +827,7 @@ export function kernelListTaskSurface(): {
       definition_id: spawned.length === 1 ? spawned[0]!.to_id : null,
       role: definition?.role ?? null,
       display_name: definition?.display_name ?? null,
+      runtime_profile: definition?.runtime_profile ?? null,
       capability_groups: Array.isArray(capabilityGroups) ? capabilityGroups : [],
     };
   });

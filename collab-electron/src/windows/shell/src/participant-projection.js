@@ -48,9 +48,11 @@ export function participantView({
 				: CLOSED_SESSION_STATUSES.has(sessionStatus)
 					? "stopped"
 					: "Not recorded";
-	const exactAssignment = task?.assignmentState === "assigned" && task?.assignedToSessionId === session.id;
+	const exactTask = (task?.assignmentState === "assigned" || task?.assignmentState === "unavailable") &&
+		task?.assignedToSessionId === session.id;
+	const assignmentUnavailable = exactTask && task?.assignmentState === "unavailable";
 	const taskStatus = String(task?.status ?? "");
-	const work = exactAssignment
+	const work = exactTask
 		? taskStatus === "done"
 			? "completed"
 			: taskStatus === "cancelled"
@@ -58,11 +60,11 @@ export function participantView({
 				: task?.reviewProjection?.state === "PUBLICATION BLOCKED"
 					? "blocked"
 					: taskStatus === "open"
-						? "working"
+						? assignmentUnavailable ? "blocked" : "working"
 						: "Not recorded"
 		: "unassigned";
 	const missionNoTask = planningDirector?.missionId && planningDirector.missionId === missionBinding.missionId && missionBinding.hasTask === false;
-	const taskDisplay = exactAssignment
+	const taskDisplay = exactTask
 		? text(task.title)
 		: planningDirector?.sessionId === session.id && missionNoTask
 			? "Planning mission"
@@ -102,7 +104,7 @@ export function participantView({
 		work,
 		recovery,
 		task: taskDisplay,
-		taskId: exactAssignment ? text(task.taskId) : "Not recorded",
+		taskId: exactTask ? text(task.taskId) : "Not recorded",
 		recruiterReason: reason,
 		output,
 		outputId: producedArtifact ? text(producedArtifact.id) : "Not recorded",
@@ -135,7 +137,8 @@ export function participantViewForSession({
 		(worldObject ? { id, ...worldObject.fields } : { id });
 	const definition = (Array.isArray(definitions) ? definitions : []).find((row) => String(row?.id ?? "") === String(session?.definition_id ?? "")) ?? session;
 	const task = (Array.isArray(assignments) ? assignments : []).find((row) =>
-		row?.assignmentState === "assigned" && String(row?.assignedToSessionId ?? "") === id,
+		(row?.assignmentState === "assigned" || row?.assignmentState === "unavailable") &&
+		String(row?.assignedToSessionId ?? "") === id,
 	) ?? null;
 	const producedLink = Array.isArray(world?.links)
 		? world.links.find((link) => link?.kind === "produces" && String(link?.from_id ?? "") === id)

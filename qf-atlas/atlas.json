@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "1723d600",
+    "commit": "3e31b994",
     "generatedAt": "2026-08-30",
     "filesScanned": 412,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "3cf304b5a25e2be9"
+    "fingerprint": "8bfb5b6b36e5d192"
   },
   "stats": {
     "live": 109,
@@ -5062,7 +5062,7 @@
       "id": "4:residue",
       "layer": 4,
       "name": "68 small modules*",
-      "kb": 146.3,
+      "kb": 146.4,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -5083,7 +5083,7 @@
         },
         {
           "path": "collab-electron/src/windows/shell/src/participant-projection.js",
-          "kb": 6.3,
+          "kb": 6.4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -10835,7 +10835,7 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelAssertSessionMayClose() at line 851"
+            "exports kernelAssertSessionMayClose() at line 852"
           ],
           "strong": [],
           "weight": "weak"
@@ -11063,9 +11063,9 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelRequestGovernedReview() at line 889",
-            "exports kernelGovernedReviewContextForSession() at line 989",
-            "exports kernelGovernedReviewNextSequence() at line 999"
+            "exports kernelRequestGovernedReview() at line 890",
+            "exports kernelGovernedReviewContextForSession() at line 990",
+            "exports kernelGovernedReviewNextSequence() at line 1000"
           ],
           "strong": [],
           "weight": "weak"
@@ -50933,7 +50933,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1063",
+            "from": "collab-electron/src/main/kernel.ts:1064",
             "fn": "kernelGovernedReviewProjection",
             "calls": "governedReviewProjection"
           }
@@ -50975,7 +50975,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1063",
+            "from": "collab-electron/src/main/kernel.ts:1064",
             "fn": "kernelGovernedReviewProjection",
             "calls": "governedReviewProjection"
           }
@@ -51017,7 +51017,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1063",
+            "from": "collab-electron/src/main/kernel.ts:1064",
             "fn": "kernelGovernedReviewProjection",
             "calls": "governedReviewProjection"
           }
@@ -51059,7 +51059,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1063",
+            "from": "collab-electron/src/main/kernel.ts:1064",
             "fn": "kernelGovernedReviewProjection",
             "calls": "governedReviewProjection"
           }
@@ -51101,7 +51101,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1063",
+            "from": "collab-electron/src/main/kernel.ts:1064",
             "fn": "kernelGovernedReviewProjection",
             "calls": "governedReviewProjection"
           }
@@ -51143,7 +51143,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1063",
+            "from": "collab-electron/src/main/kernel.ts:1064",
             "fn": "kernelGovernedReviewProjection",
             "calls": "governedReviewProjection"
           }
@@ -51190,7 +51190,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1063",
+            "from": "collab-electron/src/main/kernel.ts:1064",
             "fn": "kernelGovernedReviewProjection",
             "calls": "governedReviewProjection"
           }
@@ -51237,7 +51237,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1063",
+            "from": "collab-electron/src/main/kernel.ts:1064",
             "fn": "kernelGovernedReviewProjection",
             "calls": "governedReviewProjection"
           }
@@ -51284,7 +51284,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1063",
+            "from": "collab-electron/src/main/kernel.ts:1064",
             "fn": "kernelGovernedReviewProjection",
             "calls": "governedReviewProjection"
           }
@@ -53192,12 +53192,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "c469f89e",
+      "commit": "1723d600",
       "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "1723d600",
+      "commit": "3e31b994",
       "generatedAt": "2026-08-30"
     },
     "verdict": "better",
