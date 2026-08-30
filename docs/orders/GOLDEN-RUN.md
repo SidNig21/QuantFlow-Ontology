@@ -9,6 +9,43 @@
 
 ---
 
+## Golden Fast Mode — proof proportionality, not reduced standards
+
+Golden Fast Mode is the standing execution policy for the remaining Golden
+groups. Freeze the starting matrix once; run the fast fixture preflight and all
+focused checks; run exactly one complete registered group gate only after those
+checks are green; freeze the candidate; then use one independent Verifier.
+This changes execution cost and order only: standards, assertions, acceptance
+meaning, and Verifier independence are unchanged.
+
+- Reuse an exact product-bundle hash and its Electron build. Falsifiers,
+  fixtures, tests, and gate-only changes do not rebuild Electron unless the
+  product bundle bytes changed.
+- Use the lowest proof tier capable of falsifying the claim: static/pure,
+  Kernel/IPC, Electron, real runtime/PTY, or packaged Windows lifecycle. Use
+  real Electron whenever the claim is that the operator sees the behavior.
+- Route an actual product defect through PRODUCT RED and a proof-machinery
+  defect through HARNESS RED. Reader review is required only for changed
+  semantics, architecture, authority, scope, or group boundaries; mechanical
+  selector, fixture, receipt, isolation, readiness, and cleanup corrections
+  remain within existing authority.
+- Give every run and falsifier unique run-scoped IDs with isolated Kernel,
+  database, and temporary roots. Use explicit readiness/settle conditions, not
+  pessimistic sleeps or optimistic races.
+- Generate structured receipts mechanically with candidate/tree SHA, command,
+  exit code, duration, output hashes, counts, changed paths, and timestamp.
+  During long runs, parallel read-only Atlas, diff, and next-group mapping work
+  is allowed when it cannot mutate shared state.
+- The Verifier reuses exact-SHA evidence and independently reruns the critical
+  boundaries, invariants, cleanup, and red/green falsifiers. Packaged install,
+  shutdown, and relaunch lifecycle proof is reserved for G12 and Phase 3.
+
+No Fast Mode step may weaken an assertion, replace live behavior with a mock,
+skip a required falsifier, reduce cleanup proof, or merge the Builder and
+Verifier roles. G11 remains closed.
+
+---
+
 ## Part I — The golden run
 
 1. Ryan asks the custom Hermes Research Director about one bounded upcoming sports market and names the Technique/Strategy version to use.
