@@ -7,6 +7,7 @@
  * it is compatibility evidence and never the Windows acceptance door.
  */
 import { randomUUID } from "node:crypto";
+import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
 
 const REPO_ROOT = join(import.meta.dir, "..");
@@ -15,6 +16,7 @@ export type ReleaseStage = {
   id: string;
   cwd: "." | "collab-electron" | "species/hermes";
   command: readonly [string, ...string[]];
+  installCache?: "electron" | "hermes";
 };
 
 export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
@@ -22,11 +24,13 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
     id: "install-electron",
     cwd: "collab-electron",
     command: ["bun", "install", "--frozen-lockfile"],
+    installCache: "electron",
   },
   {
     id: "install-hermes",
     cwd: "species/hermes",
     command: ["bun", "install", "--frozen-lockfile"],
+    installCache: "hermes",
   },
   {
     id: "unit",
@@ -178,6 +182,16 @@ function executableCommand(
   return [program, ...args];
 }
 
+export function releaseInstallCacheDir(
+  stage: ReleaseStage,
+  runId: string,
+  cacheRoot: string = process.env.QF_RELEASE_CACHE_ROOT?.trim() || tmpdir(),
+): string | undefined {
+  return stage.installCache
+    ? join(cacheRoot, `qf-release-${runId}`, stage.installCache)
+    : undefined;
+}
+
 export const executeReleaseStage: ReleaseStageExecutor = async (
   stage,
   runId,
@@ -186,9 +200,15 @@ export const executeReleaseStage: ReleaseStageExecutor = async (
   const path = [currentBunDir, process.env.PATH]
     .filter((value): value is string => Boolean(value))
     .join(delimiter);
+  const installCache = releaseInstallCacheDir(stage, runId);
   const child = Bun.spawn(executableCommand(stage.command), {
     cwd: join(REPO_ROOT, stage.cwd),
-    env: { ...process.env, PATH: path, QF_RELEASE_RUN_ID: runId },
+    env: {
+      ...process.env,
+      PATH: path,
+      QF_RELEASE_RUN_ID: runId,
+      ...(installCache ? { BUN_INSTALL_CACHE_DIR: installCache } : {}),
+    },
     stdin: "inherit",
     stdout: "inherit",
     stderr: "inherit",

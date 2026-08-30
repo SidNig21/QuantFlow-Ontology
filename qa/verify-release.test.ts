@@ -5,6 +5,7 @@ import {
   LINUX_RELEASE_STAGES,
   WINDOWS_RELEASE_STAGES,
   nativeWindowsReleaseAllowed,
+  releaseInstallCacheDir,
   releaseStagesForPlatform,
 } from "./verify-release.ts";
 import { G12_OPERATION_STEP_IDS } from "./gates/golden-g12-package-operations.ts";
@@ -48,6 +49,16 @@ describe("verify-release stages", () => {
     expect(WINDOWS_RELEASE_STAGES.findIndex((stage) => stage.id === "install-hermes")).toBeLessThan(
       WINDOWS_RELEASE_STAGES.findIndex((stage) => stage.id === "unit"),
     );
+  });
+
+  test("Electron and Hermes frozen installs cannot reuse one cache", () => {
+    const electron = WINDOWS_RELEASE_STAGES.find((stage) => stage.id === "install-electron")!;
+    const hermes = WINDOWS_RELEASE_STAGES.find((stage) => stage.id === "install-hermes")!;
+    const electronCache = releaseInstallCacheDir(electron, "fixture-run", "C:\\fixture-cache");
+    const hermesCache = releaseInstallCacheDir(hermes, "fixture-run", "C:\\fixture-cache");
+    expect(electronCache).toBe("C:\\fixture-cache\\qf-release-fixture-run\\electron");
+    expect(hermesCache).toBe("C:\\fixture-cache\\qf-release-fixture-run\\hermes");
+    expect(electronCache).not.toBe(hermesCache);
   });
 
   test("deleting Windows cold boot is detectable", () => {
