@@ -1,0 +1,16 @@
+id	command	starting_expectation	owner
+S01	git rev-parse HEAD	exact 1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c	identity
+S02	git show -s --format=%T HEAD	exact 921b5e90ea91c914b4027f85d1d50d8ae62dde63	identity
+S03	git status --short	empty	identity
+S04	bun qa/run.ts repo-shape	PASS	unchanged-floor
+S05	bun qa/run.ts doc-links	PASS	unchanged-floor
+S06	bun qa/run.ts rung-ladder	PASS	authority
+S07	bun test qa/package-install.test.ts qa/verify-release.test.ts	PASS	install-release harness
+S08	bun test collab-electron/scripts/package-lib	PASS	package/runtime staging
+S09	bun test collab-electron/src/main/updater/update-manager.test.ts collab-electron/src/main/sidecar collab-electron/src/main/native-tui-orchestration.test.ts	PASS	update/process lifecycle
+S10	bun test tools/qf-bovada-football/src	KNOWN RED must be frozen verbatim if Windows fsync EPERM recurs	G12 product
+S11	bun qa/run.ts windows-cold-boot	starting result must be recorded; no repair before freeze	G12 package lifecycle
+S12	bun qa/run.ts windows-installer	starting result must be recorded; no repair before freeze	G12 installed lifecycle
+S13	bun qa/run.ts hermes-first-turn-synthetic	KNOWN RED cleanup shape: EACCES/orphan pty-sidecar/root after current-product assertions	G12 operations
+S14	bun qa/verify-release.ts	starting per-stage matrix; no wrapper-only green	G12 release route
+

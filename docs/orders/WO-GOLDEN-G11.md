@@ -3,12 +3,12 @@
 This order removes only proven stale instruction and history noise so a fresh
 agent sees one truthful route while every required receipt remains recoverable.
 
-status: BUILDER COMPLETE — immutable candidate awaiting independent Verifier
+status: CLOSED — independently accepted
 kind: Golden Baseline Phase 2 bounded authority/history group
 owner: Router
 depends: WO-GOLDEN-G10 CLOSED / independent Verifier PASS
-build-authority: **CLOSED — the one bounded G11 Builder candidate is complete; only independent Verifier task `01a050fc-c682-7333-8079-c021c8c0743c` may accept or reject it**
-router-authority: **CLOSED PENDING INDEPENDENT VERIFIER — no product, tests beyond the authorized G11 static verifier, Canvas, Kernel, R18, packaging, or operations work is authorized**
+build-authority: **CLOSED — independent Verifier task `01a050fc-c682-7333-8079-c021c8c0743c` accepted candidate `1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c` / tree `921b5e90ea91c914b4027f85d1d50d8ae62dde63`**
+router-authority: **CLOSED — G12 is selected separately by NEXT.md; no G11 product, package, process, Canvas, Kernel, or R18 work remains**
 verifier-authority: **One independent G11 Verifier must inspect the eventual candidate and all falsifier transcripts; the Builder and Router cannot accept their own work**
 golden-fast-mode: **BOUND BY `docs/orders/GOLDEN-RUN.md` §Golden Fast Mode; this group is documentation/history-only and does not authorize a product rebuild or package lifecycle run**
 
