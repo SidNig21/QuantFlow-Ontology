@@ -1,12 +1,24 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G9 CLOSED / G10 IDENTITY-SEQUENCE RESUMED
+# NEXT — R18 GOLDEN BASELINE / G10 CLOSED / G11 AUTHORITY AND HISTORY COMPRESSION PREPARED
 
-status: G8 CLOSED / G9 NARROW CURRENT-REPORT FINALIZATION CLOSED / G10 AUTHORIZED TO RESUME / PASS WITH G12 INHERITED RED
+status: G8 CLOSED / G9 NARROW CURRENT-REPORT FINALIZATION CLOSED / G10 CLOSED INDEPENDENT PASS / G11 PREPARED — READER REQUIRED / G12 INHERITED RED
 rotated-at: 2026-08-29
 rotated-by: Router under founder standing mechanical authority
-active-order: [WO-GOLDEN-G10](WO-GOLDEN-G10.md)
-builder-authority: **SAME G10 BUILDER RESUMES — begin with the focused F13 current-report proof against durable G9 currentness, then run exactly one complete registered `bun qa/run.ts golden-g10-canvas-runtime` gate; preserve every prior G10 scope and assertion, then one fresh independent G10 Verifier decides the candidate**
-router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
+active-order: [WO-GOLDEN-G11](WO-GOLDEN-G11.md)
+builder-authority: **CLOSED PENDING ONE FRESH SEMANTIC READER — G10 is closed; G11 is prepared only; no Builder may mutate until the Reader returns YES / YES on the bounded authority, denominator, and hard-boundary contract**
+router-authority: **EVIDENCE-ONLY — G10 closure is recorded; this pointer opens only the founder-approved G11 Reader route; no product, test, gate, Canvas, Kernel, R18, package, or operations work is authorized**
 golden-fast-mode: **STANDING EXECUTION POLICY — freeze the starting matrix once; make fast preflight and focused checks green before one complete registered group gate; reuse exact product-bundle SHA builds; use the lowest falsifying proof tier; route PRODUCT RED versus HARNESS RED; require Reader only for semantics/authority/scope/group-boundary changes; use run-scoped IDs, isolated roots/DB, explicit readiness, generated receipts, parallel read-only checks, then one independent Verifier; packaged lifecycle is reserved for G12/Phase 3; standards, assertions, and independence are unchanged**
+g10-status: **CLOSED — accepted candidate `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`; independent Verifier task `01a0508a-43f5-7101-9416-0683ba081449`; final `processes=0 roots_remaining=0 leaked=[]`; G12 inherited red remains open**
+g10-closure: [independent G10 acceptance](evidence/golden-baseline/g10/VERIFIER-ACCEPTANCE-20260829.md) | [receipt-hash clarification](evidence/golden-baseline/g10/RECEIPT-HASH-CLARIFICATION-20260829.md)
+g11-status: **PREPARED — one fresh semantic Reader must return YES / YES before any G11 Builder; the exact denominator, allowlist, rollback, falsifiers, and G12 boundary are in the order**
+g11-order: [WO-GOLDEN-G11](WO-GOLDEN-G11.md)
+g11-starting-authority: `a74aee915eb67b231118a00c8228b30620f89966` / tree `c6c47ca753169db7a6d2f0d6122984fc3ee0447b`; immutable product baseline remains `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`
+
+## Historical route ledger — retained evidence only
+
+The route records below preserve prior G9/G10 decisions and receipts. They are
+not current Builder authority; the current pointer is the header and the
+current-authority section at the end of this file.
+
 g9-status: **CLOSED — the narrowly reopened G10 F13 current-report finalization prerequisite independently passed; all accepted G9 history, report bytes/IDs, Evaluation→Report identity, gates linkage, and independent-support requirements remain binding**
 g9-f13-reader-task: `01a04da4-185a-7943-9a1b-1d36735f5cad`
 g9-f13-reader-verdict: **NO / NO — real supported closure produced Report `2998b24560a171c870e18f675f1485087d7bfa97045435efaf9b2a3931216e66` and its `gates` link, but durable publication/projection exposed `current_report_id=""` and `HISTORICAL`; G10 may not repair this**
@@ -16,7 +28,7 @@ g9-reopen-verifier-task: `01a04edc-8928-77d3-921f-50110f0458df`
 g9-reopen-verdict: **PASS WITH INHERITED G12 SHUTDOWN RED — closes only the narrowly reopened G9 prerequisite**
 g9-reopen-hermes-research-sha: `0C7AD489E94EA94A1CE5D3752A6D8E9891819DAE17BE868679D353CFDE8FA0D8` (unchanged)
 g9-reopen-surface: **CLOSED — the one semantic G9 current-report finalization repair is independently verified; no further G9 Builder authority or G10 projection workaround is opened**
-g10-status: **AUTHORIZED TO RESUME — start with focused F13 current-report proof, then run exactly one complete registered `bun qa/run.ts golden-g10-canvas-runtime` gate; preserve the accepted F09, projection, identity-sequence, and all prior G10 assertions; G11 remains closed**
+historical-g10-status: **AUTHORIZED TO RESUME — superseded by the accepted G10 closure above; retained as route history only**
 g10-f11-reader-task: `01a04f37-bbe5-7f61-b234-f542241ebf63`
 g10-f11-reader-verdict: **YES / YES — `focusAgentSession(id)` always focuses/raises the exact existing terminal tile; native webview focus/mouse forwarding is conditional on a connected guest; stopped/no-guest and wrong/duplicate identity cases are fail-capable**
 g10-f11-surface: **add only `collab-electron/src/windows/shell/src/tile-manager.js` to the active F11 seam; preserve mouse-first tile focus/raise, all existing assertions, and G11 closure**
@@ -1359,7 +1371,7 @@ assertion, new gate/group, G9 work, or R18 change is authorized.
 
 G9 remains after G8 and R18 remains frozen.
 
-## Current authority — G9 prerequisite closed; G10 resumes
+## Historical authority snapshot — G9 prerequisite closed; G10 resumed (superseded by G10 closure)
 
 The narrowly reopened G9 prerequisite is independently **PASS WITH INHERITED
 G12 SHUTDOWN RED**. The independent Verifier was task
@@ -1379,7 +1391,7 @@ scope, assertion, route, falsifier, identity, lifecycle, and cleanup contract
 remains binding. A fresh independent G10 Verifier must decide the resulting
 candidate; G11 remains closed.
 
-### Current G10 F11 tile-focus seam
+### Historical G10 F11 tile-focus seam
 
 Reader `01a04f37-bbe5-7f61-b234-f542241ebf63` returned **YES / YES** for the
 finite F11 amendment. The active G10 surface now includes only
@@ -1397,3 +1409,21 @@ case, never a fallback or chooser. The registered G10 gate must prove each
 stopped/no-guest, live-guest, wrong/duplicate-identity, and cleanup-zero case
 without weakening any existing assertion or changing F09, and a fresh
 independent G10 Verifier remains required.
+
+## Current authority — G10 closed; G11 prepared; Reader required
+
+The current route is the header above: G10 is closed on candidate
+`96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree
+`10ae35acc709b96da6c535dd88ff13f11297906d`, with independent Verifier task
+`01a0508a-43f5-7101-9416-0683ba081449` and final
+`processes=0 roots_remaining=0 leaked=[]`. The complete G10 evidence and the
+evidence-only stale-hash clarification are linked in the header and remain
+immutable.
+
+G11 is prepared at [WO-GOLDEN-G11](WO-GOLDEN-G11.md), starting from authority
+commit `a74aee915eb67b231118a00c8228b30620f89966` / tree
+`c6c47ca753169db7a6d2f0d6122984fc3ee0447b`. No G11 Builder authority exists
+until one fresh semantic Reader returns **YES / YES** to that order's two
+questions. G12's inherited package/process red remains RED and outside G11;
+no package, install, PTY, shutdown/relaunch, process-root, product, test, gate,
+Canvas, Kernel, or R18 work is authorized by this pointer.
