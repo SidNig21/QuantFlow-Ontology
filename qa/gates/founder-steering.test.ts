@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { deliveryAckObserved, normalizeHistoryFacts, normalizeVisibleTaskSessionLinkFacts, steeringDeliveryObserved } from "./founder-steering.ts";
+import { deliveryAckObserved, expectedSteeringDeliveryDigest, normalizeHistoryFacts, normalizeVisibleTaskSessionLinkFacts, steeringDeliveryObserved } from "./founder-steering.ts";
 
 test("founder steering accepts an exact acknowledgement first observed at the timeout boundary", () => {
 	const expected = "QF_SYNTHETIC delivery_ack role=worker task_id=task-1100ccac-66c4-429f-9265-b2da46a68ef9";
@@ -13,11 +13,12 @@ test("founder steering accepts an exact acknowledgement first observed at the ti
 	expect(gate).toContain("if (deliveryAckObserved(finalOutput, expected, count)) return;");
 });
 
-test("founder steering requires one exact causal Kernel receipt and a fresh role marker", () => {
-  const binding = { acceptedEventId: "accepted-clarify", taskId: "task-1", targetSessionId: "worker-1", expectedRole: "worker" };
+test("founder steering requires one exact causal Kernel receipt and a fresh exact delivery proof", () => {
+  const binding = { acceptedEventId: "accepted-clarify", taskId: "task-1", targetSessionId: "worker-1", expectedRole: "worker", mode: "clarify" as const, instruction: "Keep it bounded." };
   const receipt = { accepted_event_id: "accepted-clarify", task_id: "task-1", target_session_id: "worker-1", outcome: "delivered" };
-  const stale = "QF_SYNTHETIC delivery_ack role=worker task_id=task-1";
-  const fresh = `${stale}\r\nQF_SYNTHETIC delivery_ack role=worker task_id=task-1`;
+  const digest = expectedSteeringDeliveryDigest(binding.taskId, binding.mode, binding.instruction);
+  const stale = `QF_SYNTHETIC delivery_proof role=worker digest=${digest}`;
+  const fresh = `${stale}\r\n${stale}`;
 
   expect(steeringDeliveryObserved([receipt], binding, fresh, 1)).toBe(true);
   expect(steeringDeliveryObserved([{ ...receipt, accepted_event_id: "wrong-event" }], binding, fresh, 1)).toBe(false);
@@ -25,7 +26,17 @@ test("founder steering requires one exact causal Kernel receipt and a fresh role
   expect(steeringDeliveryObserved([{ ...receipt, target_session_id: "wrong-worker" }], binding, fresh, 1)).toBe(false);
   expect(steeringDeliveryObserved([{ ...receipt, outcome: "delivery_failed" }], binding, fresh, 1)).toBe(false);
   expect(steeringDeliveryObserved([receipt], binding, stale, 1)).toBe(false);
-  expect(steeringDeliveryObserved([receipt], binding, "QF_SYNTHETIC delivery_ack role=critic task_id=task-1", 0)).toBe(false);
+  expect(steeringDeliveryObserved([receipt], binding, `QF_SYNTHETIC delivery_proof role=critic digest=${digest}`, 0)).toBe(false);
+  const changedNibble = `${digest.slice(0, -1)}${digest.endsWith("0") ? "1" : "0"}`;
+  expect(steeringDeliveryObserved([receipt], binding, `QF_SYNTHETIC delivery_proof role=worker digest=${changedNibble}`, 0)).toBe(false);
+  expect(steeringDeliveryObserved([receipt], binding, `QF_SYNTHETIC delivery_proof role=worker digest=${digest.toUpperCase()}`, 0)).toBe(false);
+  expect(steeringDeliveryObserved([receipt], binding, `QF_SYNTHETIC delivery_proof role=worker digest=${digest.slice(0, 16)}`, 0)).toBe(false);
+  const redirectDigest = expectedSteeringDeliveryDigest(binding.taskId, "redirect", binding.instruction);
+  const otherTaskDigest = expectedSteeringDeliveryDigest("task-2", binding.mode, binding.instruction);
+  const changedInstructionDigest = expectedSteeringDeliveryDigest(binding.taskId, binding.mode, "Changed.");
+  expect(steeringDeliveryObserved([receipt], binding, `${stale}\r\nQF_SYNTHETIC delivery_proof role=worker digest=${redirectDigest}`, 1)).toBe(false);
+  expect(steeringDeliveryObserved([receipt], binding, `${stale}\r\nQF_SYNTHETIC delivery_proof role=worker digest=${otherTaskDigest}`, 1)).toBe(false);
+  expect(steeringDeliveryObserved([receipt], binding, `${stale}\r\nQF_SYNTHETIC delivery_proof role=worker digest=${changedInstructionDigest}`, 1)).toBe(false);
   expect(steeringDeliveryObserved([], binding, fresh, 1)).toBe(false);
   expect(steeringDeliveryObserved([receipt, receipt], binding, fresh, 1)).toBe(false);
 

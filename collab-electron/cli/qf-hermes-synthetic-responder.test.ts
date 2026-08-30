@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { createHash } from "node:crypto";
 
 const responder = await import("./qf-hermes-synthetic-responder.mjs");
 
@@ -115,10 +116,15 @@ test("production worker hold owns two exact steering acknowledgements through re
 		reader.close();
 		await running;
 		const receipts = output.join("");
+		const clarifyDigest = createHash("sha256").update(JSON.stringify(["qf.task.steering.v1", "task-test", "clarify", "hold"]), "utf8").digest("hex").slice(0, 32);
+		const redirectDigest = createHash("sha256").update(JSON.stringify(["qf.task.steering.v1", "task-redirect", "redirect", "redirect"]), "utf8").digest("hex").slice(0, 32);
 		expect(receipts.match(/delivery_received role=undefined contract=qf.task.steering.v1 task_id=task-test/g)).toHaveLength(1);
 		expect(receipts.match(/delivery_ack role=undefined task_id=task-test/g)).toHaveLength(1);
+		expect(receipts.match(new RegExp(`delivery_proof role=undefined digest=${clarifyDigest}`, "g"))).toHaveLength(1);
 		expect(receipts.match(/delivery_received role=undefined contract=qf.task.steering.v1 task_id=task-redirect/g)).toHaveLength(1);
 		expect(receipts.match(/delivery_ack role=undefined task_id=task-redirect/g)).toHaveLength(1);
+		expect(receipts.match(new RegExp(`delivery_proof role=undefined digest=${redirectDigest}`, "g"))).toHaveLength(1);
+		expect(receipts.match(/delivery_proof role=undefined digest=/g)).toHaveLength(2);
 		expect(receipts).not.toContain("task-malformed");
 		expect(ontologyListTools).toBe(0);
 		expect(collaborationListTools).toBe(0);
@@ -127,6 +133,16 @@ test("production worker hold owns two exact steering acknowledgements through re
 		process.stdout.write = originalWrite;
 		delete process.env[HOLD_FLAG];
 	}
+});
+
+test("steering delivery proof is exact, domain-fixed, and rejects malformed input", () => {
+  const exact = { contract: "qf.task.steering.v1", task_id: "task-a", mode: "redirect", instruction: "Do it exactly." };
+  const digest = responder.steeringDeliveryDigest(exact);
+  expect(digest).toMatch(/^[0-9a-f]{32}$/);
+  expect(digest).toBe(createHash("sha256").update(JSON.stringify([exact.contract, exact.task_id, exact.mode, exact.instruction]), "utf8").digest("hex").slice(0, 32));
+  expect(responder.steeringDeliveryDigest({ ...exact, contract: "qf.task.steering.v2" })).toBeNull();
+  expect(responder.steeringDeliveryDigest({ ...exact, mode: "settle" })).toBeNull();
+  expect(responder.steeringDeliveryDigest({ ...exact, instruction: 7 })).toBeNull();
 });
 
 test("production worker accepts the real assignment envelope as worker2 activation", async () => {

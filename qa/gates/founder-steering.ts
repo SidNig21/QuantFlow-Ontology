@@ -281,9 +281,16 @@ export type SteeringDeliveryFact = {
   outcome?: unknown;
 };
 
+export function expectedSteeringDeliveryDigest(taskId: string, mode: "clarify" | "redirect", instruction: string): string {
+  return createHash("sha256")
+    .update(JSON.stringify(["qf.task.steering.v1", taskId, mode, instruction]), "utf8")
+    .digest("hex")
+    .slice(0, 32);
+}
+
 export function steeringDeliveryObserved(
   facts: SteeringDeliveryFact[],
-  binding: { acceptedEventId: string; taskId: string; targetSessionId: string; expectedRole: string },
+  binding: { acceptedEventId: string; taskId: string; targetSessionId: string; expectedRole: string; mode: "clarify" | "redirect"; instruction: string },
   output: string,
   markerCountBefore: number,
 ): boolean {
@@ -291,7 +298,8 @@ export function steeringDeliveryObserved(
   if (causal.length !== 1) return false;
   const receipt = causal[0]!;
   if (receipt.task_id !== binding.taskId || receipt.target_session_id !== binding.targetSessionId || receipt.outcome !== "delivered") return false;
-  const marker = `QF_SYNTHETIC delivery_ack role=${binding.expectedRole}`;
+  const digest = expectedSteeringDeliveryDigest(binding.taskId, binding.mode, binding.instruction);
+  const marker = `QF_SYNTHETIC delivery_proof role=${binding.expectedRole} digest=${digest}`;
   return compactPtyCapture(output).split(marker).length - 1 > markerCountBefore;
 }
 
@@ -324,7 +332,7 @@ async function waitForSteeringDelivery(
   endpoint: string,
   sessionId: string,
   kernelDb: string,
-  binding: { acceptedEventId: string; taskId: string; targetSessionId: string; expectedRole: string },
+  binding: { acceptedEventId: string; taskId: string; targetSessionId: string; expectedRole: string; mode: "clarify" | "redirect"; instruction: string },
   markerCountBefore: number,
   deadlineAt: number,
 ): Promise<void> {
@@ -419,18 +427,19 @@ export async function runFounderSteeringGate(): Promise<{ ok: boolean }> {
 		const workerStartup = compactPtyCapture(await captureSession(launchOne.endpoint, workerOneId));
 		assert(workerStartup.includes(`source_sha256=${RESPONDER_SHA256}`), "worker responder runtime source SHA does not match collab-electron/cli");
 		console.log(`responder_provenance=PASS source_sha256=${RESPONDER_SHA256}`);
-    const workerMarker = "QF_SYNTHETIC delivery_ack role=worker";
-    const clarifyMarkerCountBefore = workerStartup.split(workerMarker).length - 1;
+    const clarifyMarker = `QF_SYNTHETIC delivery_proof role=worker digest=${expectedSteeringDeliveryDigest(taskId, "clarify", CLARIFICATION)}`;
+    const clarifyMarkerCountBefore = workerStartup.split(clarifyMarker).length - 1;
     await clickTaskButton(launchOne.endpoint, "Clarify", String((dbRows(kernelDb, "SELECT title FROM task WHERE id = ?", taskId)[0] as { title: string }).title), { kind: "steer", value: CLARIFICATION });
     const clarifyEvent = await waitFor("clarify receipt", async () => {
       const rows = dbRows(kernelDb, "SELECT id FROM events WHERE type='task.clarified' AND object_id=?", taskId);
       return rows.length === 1 ? rows[0]! : null;
     }, Date.now() + 15_000);
     await waitForSteeringDelivery(launchOne.endpoint, workerOneId, kernelDb, {
-      acceptedEventId: String(clarifyEvent.id), taskId, targetSessionId: workerOneId, expectedRole: "worker",
+      acceptedEventId: String(clarifyEvent.id), taskId, targetSessionId: workerOneId, expectedRole: "worker", mode: "clarify", instruction: CLARIFICATION,
     }, clarifyMarkerCountBefore, Date.now() + 15_000);
     const beforeRedirect = String((dbRows(kernelDb, "SELECT description FROM task WHERE id = ?", taskId)[0] as { description: string }).description);
-    const redirectMarkerCountBefore = compactPtyCapture(await captureSession(launchOne.endpoint, workerOneId)).split(workerMarker).length - 1;
+    const redirectMarker = `QF_SYNTHETIC delivery_proof role=worker digest=${expectedSteeringDeliveryDigest(taskId, "redirect", REDIRECT)}`;
+    const redirectMarkerCountBefore = compactPtyCapture(await captureSession(launchOne.endpoint, workerOneId)).split(redirectMarker).length - 1;
     await clickTaskButton(launchOne.endpoint, "Redirect", String((dbRows(kernelDb, "SELECT title FROM task WHERE id = ?", taskId)[0] as { title: string }).title), { kind: "steer", value: REDIRECT });
     const redirectEvent = await waitFor("redirect receipt", async () => {
       const rows = dbRows(kernelDb, "SELECT id FROM events WHERE type='task.redirected' AND object_id=?", taskId);
@@ -441,7 +450,7 @@ export async function runFounderSteeringGate(): Promise<{ ok: boolean }> {
     const redirectPayload = jsonPayload(String(dbRows(kernelDb, "SELECT payload FROM events WHERE type='task.redirected' AND object_id=?", taskId)[0]!.payload));
     assert(redirectPayload.previous_description === beforeRedirect, "redirect previous_description is absent or incorrect");
     await waitForSteeringDelivery(launchOne.endpoint, workerOneId, kernelDb, {
-      acceptedEventId: String(redirectEvent.id), taskId, targetSessionId: workerOneId, expectedRole: "worker",
+      acceptedEventId: String(redirectEvent.id), taskId, targetSessionId: workerOneId, expectedRole: "worker", mode: "redirect", instruction: REDIRECT,
     }, redirectMarkerCountBefore, Date.now() + 15_000);
     const admission = await rpcCall(launchOne.endpoint, "qf.dock.spawn", { definitionId: "hermes-worker-2" }, 20_000);
     if (!admission || typeof admission !== "object" || typeof (admission as Record<string, unknown>).sessionId !== "string") {

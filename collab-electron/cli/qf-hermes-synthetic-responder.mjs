@@ -39,6 +39,17 @@ function emitTerminalReceipt(line) {
   process.stdout.write(`\u001b[2K\r${line}\r\n`);
 }
 
+export function steeringDeliveryDigest(delivery) {
+  if (delivery?.contract !== "qf.task.steering.v1" ||
+      typeof delivery.task_id !== "string" ||
+      (delivery.mode !== "clarify" && delivery.mode !== "redirect") ||
+      typeof delivery.instruction !== "string") return null;
+  return createHash("sha256")
+    .update(JSON.stringify([delivery.contract, delivery.task_id, delivery.mode, delivery.instruction]), "utf8")
+    .digest("hex")
+    .slice(0, 32);
+}
+
 function emitBoundary(boundary, fields = {}) {
   if (SUPPRESS_BOUNDARY === boundary) return;
   emit({ boundary, ...fields });
@@ -414,6 +425,8 @@ function emitDeliveryReceipt(delivery) {
     : "";
   process.stdout.write(`QF_SYNTHETIC delivery_received role=${ROLE} contract=${delivery.contract} task_id=${taskId}${suffix}\n`);
   emitTerminalReceipt(`QF_SYNTHETIC delivery_ack role=${ROLE} task_id=${taskId}`);
+  const proofDigest = steeringDeliveryDigest(delivery);
+  if (proofDigest) emitTerminalReceipt(`QF_SYNTHETIC delivery_proof role=${ROLE} digest=${proofDigest}`);
   if (delivery.contract === "qf.task.second_opinion.v1") {
     emitTerminalReceipt(`QF_SYNTHETIC delivery_binding source_task_id=${delivery.source_task_id}`);
     emitTerminalReceipt(`QF_SYNTHETIC delivery_binding review_task_id=${delivery.review_task_id}`);
