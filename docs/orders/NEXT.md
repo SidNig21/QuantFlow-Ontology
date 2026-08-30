@@ -1,20 +1,24 @@
-# NEXT — R18 GOLDEN BASELINE / G11 CLOSED / G12 READER REQUIRED
+# NEXT — R18 GOLDEN BASELINE / PHASE 2 CLOSED / PHASE 3 READER REQUIRED
 
-status: G1–G11 CLOSED / G12 PREPARED — FRESH SEMANTIC READER YES / YES REQUIRED / PHASE 3 AND R18 CLOSED
-rotated-at: 2026-08-29
+status: G1–G12 CLOSED / PHASE 2 ACCEPTED / PHASE 3 PREPARED — FRESH SEMANTIC READER YES / YES REQUIRED / R18 CLOSED
+rotated-at: 2026-08-30
 rotated-by: Router under founder standing mechanical authority
-active-order: [WO-GOLDEN-G12](WO-GOLDEN-G12.md)
-builder-authority: **CLOSED — one fresh semantic Reader must return YES / YES against this exact G12 authority commit before any Builder; G12 is the final Phase-2 group**
-router-authority: **OPEN FOR READER ROUTING ONLY — no product, packaging, process, Phase-3, R18, or unrelated mutation is authorized**
+active-order: [WO-GOLDEN-PHASE3](WO-GOLDEN-PHASE3.md)
+builder-authority: **CLOSED — one fresh semantic Reader must return YES / YES against this exact Phase-3 authority commit before any Builder**
+router-authority: **OPEN FOR PHASE-3 READER ROUTING ONLY — no product, test, gate, package, Phase-3 execution, Golden designation, R18, or unrelated mutation is authorized**
 golden-fast-mode: **STANDING EXECUTION POLICY — freeze the starting matrix once; make fast preflight and focused checks green before one complete registered group gate; reuse exact product-bundle SHA builds; use the lowest falsifying proof tier; route PRODUCT RED versus HARNESS RED; require Reader only for semantics/authority/scope/group-boundary changes; use run-scoped IDs, isolated roots/DB, explicit readiness, generated receipts, parallel read-only checks, then one independent Verifier; packaged lifecycle is reserved for G12/Phase 3; standards, assertions, and independence are unchanged**
-g10-status: **CLOSED — accepted candidate `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`; independent Verifier task `01a0508a-43f5-7101-9416-0683ba081449`; final `processes=0 roots_remaining=0 leaked=[]`; G12 inherited red remains open**
+g10-status: **CLOSED — accepted candidate `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`; independent Verifier task `01a0508a-43f5-7101-9416-0683ba081449`; final `processes=0 roots_remaining=0 leaked=[]`; its then-inherited G12 red is now cured by accepted G12**
 g10-closure: [independent G10 acceptance](evidence/golden-baseline/g10/VERIFIER-ACCEPTANCE-20260829.md) | [receipt-hash clarification](evidence/golden-baseline/g10/RECEIPT-HASH-CLARIFICATION-20260829.md)
-g11-status: **CLOSED — independent Verifier task `01a050fc-c682-7333-8079-c021c8c0743c` accepted candidate `1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c` / tree `921b5e90ea91c914b4027f85d1d50d8ae62dde63`; inherited G12 red remains open**
+g11-status: **CLOSED — independent Verifier task `01a050fc-c682-7333-8079-c021c8c0743c` accepted candidate `1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c` / tree `921b5e90ea91c914b4027f85d1d50d8ae62dde63`; its then-inherited G12 red is now cured by accepted G12**
 g11-order: [WO-GOLDEN-G11](WO-GOLDEN-G11.md)
 g11-closure: [independent G11 acceptance](evidence/golden-baseline/g11/VERIFIER-ACCEPTANCE-20260829.md)
-g12-status: **PREPARED / READER REQUIRED — final Phase-2 package and operations group; no Builder until fresh Reader YES / YES; Phase 3 remains separate and closed**
+g12-status: **CLOSED / PASS — accepted candidate `d14ceb36659d86f157b4856b927581616dbaaa56` / tree `b84d4641a5f37e76c3e62a7df54d8019e0869ffe` / sole parent `200d45a92fbef4238b65436f2695b50e54434199`; canonical PASS; Atlas HARD RED 0; `processes=0 roots_remaining=0 leaked=[]`; independent Verifier task `01a051b0-75f7-7272-954b-b52d8c64bc20`; Phase 2 accepted**
 g12-order: [WO-GOLDEN-G12](WO-GOLDEN-G12.md)
+g12-closure: [independent G12 acceptance](evidence/golden-baseline/g12/VERIFIER-ACCEPTANCE-20260830.md)
 g12-starting-authority: `1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c` / tree `921b5e90ea91c914b4027f85d1d50d8ae62dde63`
+phase3-status: **PREPARED / READER REQUIRED — whole-repository/current-product Windows requalification from immutable G12 candidate; Builder CLOSED**
+phase3-order: [WO-GOLDEN-PHASE3](WO-GOLDEN-PHASE3.md)
+phase3-source: `d14ceb36659d86f157b4856b927581616dbaaa56` / tree `b84d4641a5f37e76c3e62a7df54d8019e0869ffe`
 g11-starting-authority: `b1720c086bb2d93942448a3fdd352b7d58af9483` / tree `97b2768e3bc79d45c321336e73ec30167c6c8959`; exact denominator `1,421` tracked paths including the prepared order; immutable product baseline remains `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`
 
 ## Historical route ledger — retained evidence only
@@ -1414,7 +1418,7 @@ stopped/no-guest, live-guest, wrong/duplicate-identity, and cleanup-zero case
 without weakening any existing assertion or changing F09, and a fresh
 independent G10 Verifier remains required.
 
-## Current authority — G10 closed; G11 prepared; Reader required
+## Historical authority snapshot — G10 closed; G11 prepared (superseded)
 
 The current route is the header above: G10 is closed on candidate
 `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree
@@ -1424,10 +1428,11 @@ The current route is the header above: G10 is closed on candidate
 evidence-only stale-hash clarification are linked in the header and remain
 immutable.
 
-G11 is prepared at [WO-GOLDEN-G11](WO-GOLDEN-G11.md), starting from authority
+At this historical snapshot, G11 was prepared at [WO-GOLDEN-G11](WO-GOLDEN-G11.md), starting from authority
 commit `a74aee915eb67b231118a00c8228b30620f89966` / tree
 `c6c47ca753169db7a6d2f0d6122984fc3ee0447b`. No G11 Builder authority exists
 until one fresh semantic Reader returns **YES / YES** to that order's two
 questions. G12's inherited package/process red remains RED and outside G11;
 no package, install, PTY, shutdown/relaunch, process-root, product, test, gate,
-Canvas, Kernel, or R18 work is authorized by this pointer.
+Canvas, Kernel, or R18 work was authorized by that pointer. The current authority
+is exclusively the Phase-3 header at the top of this file.

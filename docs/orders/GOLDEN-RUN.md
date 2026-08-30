@@ -42,9 +42,10 @@ meaning, and Verifier independence are unchanged.
 
 No Fast Mode step may weaken an assertion, replace live behavior with a mock,
 skip a required falsifier, reduce cleanup proof, or merge the Builder and
-Verifier roles. G11 is independently closed. G12 is the selected final Phase-2
-group pending Reader YES / YES; Phase 3 remains a separate mandatory complete
-clean-source Windows requalification.
+Verifier roles. G1–G12 and Phase 2 are independently closed on the immutable
+G12 candidate recorded in `NEXT.md`. Phase 3 is the selected separate mandatory
+complete clean-source Windows requalification pending a fresh Reader YES / YES;
+no Phase-3 Builder or R18 authority is open.
 
 ---
 

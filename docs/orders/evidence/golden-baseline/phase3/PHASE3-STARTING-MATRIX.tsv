@@ -1,0 +1,21 @@
+id	command_or_action	required_result	stop_class
+P01	git rev-parse HEAD	exact Reader-accepted Phase-3 authority SHA; candidate d14ceb36659d86f157b4856b927581616dbaaa56 remains immutable source	AUTHORITY
+P02	git show -s --format=%T d14ceb36659d86f157b4856b927581616dbaaa56	b84d4641a5f37e76c3e62a7df54d8019e0869ffe	AUTHORITY
+P03	git show -s --format=%P d14ceb36659d86f157b4856b927581616dbaaa56	200d45a92fbef4238b65436f2695b50e54434199 only	AUTHORITY
+P04	git status --short	clean before freeze and before candidate declaration	STATE
+P05	current tracked-file/direct-dependency/Electron-package-hook/operational-root census	100% accounted; every delta from Phase-1 provenance explained by accepted G1-G12 disposition	ACCOUNTING
+P06	current whole-repository purpose and defect disposition	zero unexplained production/package/compatibility/future/authority/test defects	ACCOUNTING
+P07	bun qf-atlas/generate.mjs --check; bun qf-atlas/ratchet.mjs	generated Atlas exact; HARD RED 0; laws and ownership agree	ATLAS
+P08	bun qa/run.ts --list	all current gates enumerated and each mapped to the current product claim it proves	GATE_COMPOSITION
+P09	frozen clean install from purified source	frozen lockfiles install successfully without ambient dependency reuse	COLD_SOURCE
+P10	clean build and Windows package/installer lifecycle	build, package, install, launch, shutdown, relaunch all PASS from P09 source	WINDOWS_PACKAGE
+P11	bun qa/verify-release.ts	canonical verifier PASS with every constituent stage honest; no wrapper-only green	RELEASE
+P12	all current package tests, schema tests/generation drift checks, and registered gates	PASS; no skipped, weakened, duplicate, dead, or falsely composed acceptance claim	TESTS
+P13	naive Windows app consumer traversal	all visible current claims reachable through supported UI and agree with read-only Kernel truth	CONSUMER
+P14	founder-standard real current research journey	bounded mission through exact specialists, tasks, evidence, artifact, independent evaluation, report/no-candidate, and no trade	RESEARCH
+P15	accepted and refused steering during P14	both visible and durably recorded; no UI-only truth	STEERING
+P16	close application then reopen same canonical Kernel	mission, sessions, tasks, evidence, evaluation, result, and steering preserved and UI agrees	PERSISTENCE
+P17	normal application shutdown after final traversal	processes=0; roots_remaining=0; leaked=[]	CLEANUP
+P18	final git/tree/diff/receipt identity	one immutable Phase-3 candidate, complete receipts, accepted G1-G12 bytes inherited, clean worktree	CANDIDATE
+P19	fresh independent Verifier at P18 candidate	PASS before any Golden SHA designation	INDEPENDENCE
+P20	Router evidence-only Golden designation after P19	one immutable Golden SHA/tree/parent recorded; R18 remains closed until NEXT is separately rotated	GOLDEN

@@ -1,0 +1,12 @@
+class	path_or_surface	disposition
+SOURCE_BASE	d14ceb36659d86f157b4856b927581616dbaaa56 / b84d4641a5f37e76c3e62a7df54d8019e0869ffe	IMMUTABLE_PURIFIED_SOURCE
+WHOLE_REPOSITORY	all tracked files, direct dependency declarations, package declarations/hooks, operational roots, generated surfaces, tests, gates, and authority pointers	ACCOUNT_AND_REQUALIFY
+CURRENT_PRODUCT	Kernel; schema/generated tool plane; Electron main/preload/renderer; Canvas; Dock; Hermes/WSL gateway; research tools; packaging/installer; supported Windows lifecycle	EXERCISE_END_TO_END
+CURRENT_UI	ordinary Windows consumer paths and all visible claims	READ_ONLY_AGREEMENT_WITH_KERNEL
+CURRENT_RESEARCH	one real bounded current research journey using supported data/model access available to the operator	LIVE_PROOF_OR_EXPLICIT_STOP
+INHERITED_ACCEPTANCE	docs/orders/evidence/golden-baseline/g1/** through g12/**	BYTE_IMMUTABLE_REUSE_EXACT_SHA
+PHASE3_PROOF	docs/orders/evidence/golden-baseline/phase3/**	ALLOW_CREATE_OR_EDIT
+PHASE3_GATE	qa/gates/golden-phase3-requalification.ts and qa/run.ts registration	ALLOW_ONLY_IF_EXISTING_COMPOSITION_CANNOT_PROVE_MATRIX
+PRODUCT_REPAIR	any current product/package/config/test/gate file	STOP_AND_ROUTE_EXACT_DEFECT_BEFORE_EDIT
+AUTHORITY	docs/orders/WO-GOLDEN-PHASE3.md; docs/orders/NEXT.md; docs/orders/GOLDEN-RUN.md; docs/adr/0004-repository-golden-baseline.md	ROUTER_DOCS_ONLY_UNTIL_READER_YES_YES
+FORBIDDEN	R18 or later capability; credentials; real trade/bet execution; dependency/service additions; weakened/deleted tests; unsupported-platform expansion	NO_CHANGE
