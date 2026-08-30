@@ -1,11 +1,11 @@
 # WO-GOLDEN-G10 — Current Canvas/Mission/runtime coherence
 
-status: G10 AUTHORIZED TO RESUME — G9 NARROW CURRENT-REPORT FINALIZATION PREREQUISITE INDEPENDENTLY VERIFIED; focused F13 proof then one complete registered gate
+status: G10 CLOSED — final candidate independently verified PASS; G12 inherited shutdown red remains open
 kind: Golden Baseline Phase 2 bounded current-product coherence group
 owner: Router
 depends: G9 NARROW CURRENT-REPORT FINALIZATION PREREQUISITE CLOSED / PASS WITH INHERITED G12 SHUTDOWN RED
-build-authority: **SAME G10 BUILDER RESUMES — start with focused F13 current-report proof against durable G9 currentness, then run exactly one complete registered `bun qa/run.ts golden-g10-canvas-runtime` gate; preserve all prior G10 scope/assertions, including the F11 tile-manager seam below, and require one fresh independent G10 Verifier afterward**
-router-authority: **STANDING — Router may continuously handle mechanical diagnostic, harness, same-meaning proof, teardown, receipt, selector, and lifecycle-order corrections for the remaining Golden goal without returning for founder authorization; product meaning, authority boundaries, and the Reader/Builder/Verifier separation remain unchanged**
+build-authority: **CLOSED — candidate `96ad59984a62dc8defe224c4404b34c7ca3b2157` is independently accepted; no further G10 Builder work is authorized**
+router-authority: **CLOSED FOR G10 — Router may record this evidence-only closure and prepare the founder-approved G11 authority packet; no product, test, gate, Canvas, Kernel, or G12 repair is authorized here**
 golden-fast-mode: **BOUND BY `docs/orders/GOLDEN-RUN.md` §Golden Fast Mode — freeze the starting matrix once; fast preflight and focused checks green before one complete registered G10 gate; exact product-bundle SHA/build reuse; lowest capable proof tier; PRODUCT RED versus HARNESS RED; Reader only for semantics/authority/scope/group-boundary changes; unique run-scoped IDs, isolated roots/DB, explicit readiness, generated receipts, parallel read-only checks, then one independent Verifier; packaged lifecycle only for G12/Phase 3; standards, assertions, acceptance meaning, and independence unchanged**
 diagnostic-pass-authority: **RETAINED EVIDENCE ONLY — the prior exact visible-HISTORY Mission click recorded the real projection refusal; the current authority is the Reader-approved product repair below, with no persistence/new truth/schema/Kernel/Canvas/timeout/assertion change**
 finite-rewrite-authority: **RETAINED/BINDING GATE CONTRACT — exactly one Task belongs to the Mission fixture; dynamic Task/Run IDs and exact object/link sets must survive CURRENT_MISSION, FULL_LINEAGE, close/reopen, and F04 parity; no multi-Task chooser**
@@ -1499,3 +1499,37 @@ Preserve every existing G10 assertion, including the mouse-first contract and
 the F09 guest-scroll repair; this tile-manager seam is not a change to the
 superseded F09 native/focus/RAF scroll bait. No other product, gate, timing,
 assertion, scope, or G11 change is authorized.
+
+## Final G10 closure — independent Verifier PASS
+
+G10 is closed on the exact accepted candidate
+`96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree
+`10ae35acc709b96da6c535dd88ff13f11297906d`. The candidate has exactly one
+changed path, `qa/gates/golden-g10-canvas-runtime.ts`, relative to parent
+`d25a2bba382407f34b359e0bdfed82aea39e39a5`; the product bundle was reused
+unchanged at SHA256
+`3006C94B2B7638B295F09CACF2BE5CD4F70831230BCE203DAABCE71B14BCD681`.
+
+Independent Verifier task `01a0508a-43f5-7101-9416-0683ba081449` reran the
+focused F14b cleanup falsifier and the complete registered gate with exact
+build reuse. The focused bait returned RED, the restored cleanup returned
+GREEN, and the registered command returned exit `0` with
+`PASS golden-g10-canvas-runtime`. The final owned-run receipt was
+`processes=0 roots_remaining=0 leaked=[]`. Four older pre-existing roots were
+left untouched and excluded by exact-run attribution; they are not evidence
+of a leak in this candidate.
+
+The complete retained G10 evidence is under
+`docs/orders/evidence/golden-baseline/g10/`, including the builder final
+checks, focused transcripts, fast-preflight receipts, and no-Canvas-domain-
+writes receipt. The builder final-check receipt is immutable historical
+evidence; its pre-repair gate-source hash discrepancy is clarified by the
+separate [receipt-hash clarification](evidence/golden-baseline/g10/RECEIPT-HASH-CLARIFICATION-20260829.md).
+The durable [independent acceptance](evidence/golden-baseline/g10/VERIFIER-ACCEPTANCE-20260829.md)
+records the authoritative candidate, commands, outputs, attribution, and
+boundary result without rewriting any prior receipt.
+
+G12's inherited package/process red remains open and is not silently cleared
+by this G10 pass. G11 may not repair or relabel that red; packaging,
+installation, shutdown/relaunch, PTY prebuild, and process-root work remain
+owned by G12 and are out of this order.
