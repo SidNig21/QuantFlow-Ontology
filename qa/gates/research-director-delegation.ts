@@ -455,13 +455,16 @@ function focusedReader(
   lineage: Record<string, DelegationLink[]> = {
     "director-1:spawned_from": [{ from_id: "director-1", to_id: "definition-director" }],
   },
+  workerStatus: string | null = "running",
 ): TaskDelegationProjectionReader {
   return {
     listTasks: () => [{ id: "task-1", title: "Fixture Task", description: "KERNEL_REASON_SENTINEL", status: "open" }],
     linksFrom: (id, kind) => (assignmentLinks[`${id}:${kind}`] ?? lineage[`${id}:${kind}`] ?? []),
-    getObject: (_type, id) => id === "definition-director"
-      ? { id, display_name: "Research Director" }
-      : null,
+    getObject: (type, id) => type === "agent_session"
+      ? id === "worker-1" && workerStatus !== null ? { id, status: workerStatus } : null
+      : id === "definition-director"
+        ? { id, display_name: "Research Director" }
+        : null,
   };
 }
 

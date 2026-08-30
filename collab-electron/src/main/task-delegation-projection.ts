@@ -51,7 +51,10 @@ export type TaskHistoryFact = {
 export type TaskDelegationProjectionReader = {
   listTasks: () => Array<Record<string, unknown>>;
   linksFrom: (id: string, kind: string) => DelegationLink[];
-  getObject: (type: "agent_definition", id: string) => Record<string, unknown> | null;
+  getObject: (
+    type: "agent_definition" | "agent_session",
+    id: string,
+  ) => Record<string, unknown> | null;
 };
 
 function validTask(
@@ -74,9 +77,10 @@ function validTask(
 
 /**
  * Project every task's exact assignment cardinality from Kernel rows. A task
- * with one delegated_by and one assigned_to is assigned; any partial or
- * duplicate identity is deliberately surfaced as unavailable so the UI can
- * clear a previously rendered title instead of guessing.
+ * with one delegated_by and one assigned_to retains those exact identities.
+ * An open assignment is operable only while its exact assignee session is
+ * running; settled Tasks retain their historical assignment regardless of
+ * later runtime availability.
  */
 export function projectTaskAssignments(
   reader: TaskDelegationProjectionReader,
@@ -107,6 +111,11 @@ export function projectTaskAssignments(
       ? delegatorDefinition.display_name
       : null;
     const exact = assignmentLinksExact && delegatorDisplayName !== null;
+    const assignedToSessionId = exact ? assignedIds[0]! : null;
+    const assigneeSession = assignedToSessionId
+      ? reader.getObject("agent_session", assignedToSessionId)
+      : null;
+    const openAssigneeAvailable = task.status !== "open" || assigneeSession?.status === "running";
     projections.push({
       taskId: task.taskId,
       title: task.title,
@@ -114,10 +123,10 @@ export function projectTaskAssignments(
       delegatorDisplayName: exact ? delegatorDisplayName : null,
       description: task.description,
       delegatedBySessionId: exact ? delegatedIds[0]! : null,
-      assignedToSessionId: exact ? assignedIds[0]! : null,
-      assignmentState: exact ? "assigned" : "unavailable",
+      assignedToSessionId,
+      assignmentState: exact && openAssigneeAvailable ? "assigned" : "unavailable",
       unavailableSessionIds: exact
-        ? []
+        ? openAssigneeAvailable ? [] : [assignedToSessionId!]
         : [...new Set([...delegatedIds, ...assignedIds])],
     });
   }

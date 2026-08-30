@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ c469f89e` on 2026-08-30 by
+> Generated from `wo-golden-g2 @ 1723d600` on 2026-08-30 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -495,7 +495,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 644
 - **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 1015
 - `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 761
-- `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 81
+- `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 85
 
 ### Research review / publication
 

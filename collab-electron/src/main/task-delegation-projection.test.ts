@@ -9,6 +9,7 @@ import {
 type Fixture = {
   tasks: Array<Record<string, unknown>>;
   links: Record<string, DelegationLink[]>;
+  sessions: Record<string, Record<string, unknown>>;
 };
 
 function readerFor(fixture: Fixture): TaskDelegationProjectionReader {
@@ -23,11 +24,13 @@ function readerFor(fixture: Fixture): TaskDelegationProjectionReader {
   return {
     listTasks: () => fixture.tasks.map((task) => ({ ...task })),
     linksFrom: (id, kind) => (fixture.links[`${id}:${kind}`] ?? []).map((link) => ({ ...link })),
-    getObject: (_type, id) => definitions[id] ?? null,
+    getObject: (type, id) => type === "agent_session"
+      ? fixture.sessions[id] ?? null
+      : definitions[id] ?? null,
   };
 }
 
-function completeFixture(status: "open" | "done" = "open"): Fixture {
+function completeFixture(status: "open" | "done" | "cancelled" = "open"): Fixture {
   return {
     tasks: [{
       id: "task-1",
@@ -44,6 +47,10 @@ function completeFixture(status: "open" | "done" = "open"): Fixture {
       "session-worker:spawned_from": [
         { from_id: "session-worker", to_id: "definition-worker" },
       ],
+    },
+    sessions: {
+      "session-orchestrator": { id: "session-orchestrator", status: "running" },
+      "session-worker": { id: "session-worker", status: "running" },
     },
   };
 }
@@ -97,6 +104,63 @@ describe("projectTaskAssignments", () => {
       assignmentState: "assigned",
       unavailableSessionIds: [],
     }]);
+  });
+
+  test("an open Task is unavailable unless its exact assignee session is running", () => {
+    for (const status of ["starting", "blocked", "cancelled", "failed", "closed"] as const) {
+      const fixture = completeFixture();
+      fixture.sessions["session-worker"]!.status = status;
+      expect(projectTaskAssignments(readerFor(fixture))[0]).toEqual({
+        taskId: "task-1",
+        title: "Read fixture market",
+        status: "open",
+        delegatorDisplayName: "Research Director",
+        description: "Read the exact fixture market.",
+        delegatedBySessionId: "session-orchestrator",
+        assignedToSessionId: "session-worker",
+        assignmentState: "unavailable",
+        unavailableSessionIds: ["session-worker"],
+      });
+    }
+
+    const missing = completeFixture();
+    delete missing.sessions["session-worker"];
+    expect(projectTaskAssignments(readerFor(missing))[0]).toMatchObject({
+      delegatedBySessionId: "session-orchestrator",
+      assignedToSessionId: "session-worker",
+      assignmentState: "unavailable",
+      unavailableSessionIds: ["session-worker"],
+    });
+
+    expect(projectTaskAssignments(readerFor(completeFixture()))[0]).toMatchObject({
+      assignmentState: "assigned",
+      unavailableSessionIds: [],
+    });
+  });
+
+  test("settled Tasks preserve exact historical assignment after the assignee stops or disappears", () => {
+    for (const status of ["done", "cancelled"] as const) {
+      const stopped = completeFixture(status);
+      stopped.sessions["session-worker"]!.status = "closed";
+      expect(projectTaskAssignments(readerFor(stopped))[0]).toMatchObject({
+        status,
+        delegatorDisplayName: "Research Director",
+        delegatedBySessionId: "session-orchestrator",
+        assignedToSessionId: "session-worker",
+        assignmentState: "assigned",
+        unavailableSessionIds: [],
+      });
+
+      const missing = completeFixture(status);
+      delete missing.sessions["session-worker"];
+      expect(projectTaskAssignments(readerFor(missing))[0]).toMatchObject({
+        status,
+        delegatedBySessionId: "session-orchestrator",
+        assignedToSessionId: "session-worker",
+        assignmentState: "assigned",
+        unavailableSessionIds: [],
+      });
+    }
   });
 
   test("fails closed for missing or malformed delegator lineage", () => {

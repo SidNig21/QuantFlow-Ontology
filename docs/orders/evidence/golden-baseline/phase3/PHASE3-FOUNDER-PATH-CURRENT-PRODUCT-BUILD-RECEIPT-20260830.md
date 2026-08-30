@@ -2,19 +2,22 @@
 
 The current QuantFlow product now keeps a durable founder Task operable after its runtime disappears, makes that Task inspectable, and removes the measured UI contradictions without changing research semantics.
 
-status: **BUILDER COMPLETE / INDEPENDENT VERIFICATION REQUIRED**
+status: **F01 PROJECTION REPAIR BUILDER COMPLETE / INDEPENDENT VERIFICATION REQUIRED / UNRELATED RESEARCH-DIRECTOR GATE RED RECORDED**
 
 ## Authority and source
 
 - accepted authority: `79456a01c8321ab4084b30dc97e50e5bd87046f2`
 - frozen Reader verdict: `YES / YES`
 - build parent: `c469f89e8d531ca588a1fbecd32f04093c67c6f9`
+- F01 amendment authority: `ec6b326a1d7832af17902fff2e291c214a25ea65`
+- F01 repair parent: `1723d60089e16992c62f216a7e748a597973e925`
 - branch: `wo-golden-g2`
 - provider prompts submitted: **zero**
 
 ## Delivered behavior
 
 - F01: cold reconciliation issues exactly one existing `fail_agent_session` with `reason=app_terminated` for an absent active runtime that owns an open Task. It does not close that session, Task, or assignment/delegation lineage.
+- F01 projection amendment: an exact open Task is `assigned` only while its exact assignee `agent_session` exists and is `running`. Missing or non-running assignees project `unavailable` with exactly that assignee ID while retaining the exact delegator, assignee, and display-name lineage. Done/cancelled Tasks retain exact historical assignment regardless of later session availability.
 - F02: a successful Task creation collapses back to one `Create Task` affordance. A refused creation retains the entered fields and visible error.
 - F03: only a same-session, zero-length handoff overlay is suppressed; real cross-session handoffs remain projected once.
 - F04: the rendered Task is a real button that forwards only its Task ID. Dock refreshes its latest Kernel-derived task surface, refuses stale/wrong IDs, and shows Task identity, status, description, delegator, assignee, and relationship meaning.
@@ -125,3 +128,79 @@ added 0 · newly-detected 0 · resolved 0 · regressed 0
 ## Judgment exercised
 
 Task selection refreshes Dock's existing `listTaskSurface()` projection before resolving the ID, rather than trusting the tile's rendered payload or adding UI memory. The same-seat handoff is filtered at the shared projection seam, leaving durable Kernel lineage untouched. These choices keep the correction inside the one-truth-store rule while making the measured founder path operable.
+
+## F01 projection-amendment evidence
+
+The accepted F01 test cases were first added while the prior projection decision remained intact:
+
+```text
+bun test collab-electron/src/main/task-delegation-projection.test.ts
+7 pass
+1 fail
+16 expect() calls
+
+RED: an open non-running assignee still projected assigned with no unavailable ID
+```
+
+After the bounded projection repair, the same suite proved every named runtime state and historical exception:
+
+```text
+8 pass
+0 fail
+22 expect() calls
+
+open starting/blocked/cancelled/failed/closed/missing -> unavailable
+open running -> assigned
+done/cancelled with closed or missing historical session -> assigned with exact lineage
+```
+
+The complete founder-path focused matrix remained green, including every frozen F02-F07 surface:
+
+```text
+43 pass
+0 fail
+202 expect() calls
+Ran 43 tests across 6 files.
+```
+
+`git diff --exit-code 295fa47d -- <all F02-F07 product/UI paths>` exited 0. Those product/UI blobs are byte-identical to the independently checked candidate.
+
+Exact affected gate results:
+
+```text
+bun qa/run.ts team-composition
+PASS
+
+bun -e "import { runResearchDirectorDelegationFocusedFalsifiers } ..."
+all assignment-cardinality, delegator-lineage, and renderer-local falsifiers/restorations PASS
+```
+
+Two complete `bun qa/run.ts research-director-delegation` runs each passed every projection-owned focused falsifier, then failed at the existing real-path assertion:
+
+```text
+research-director-delegation: FAIL wrong definition falsifier did not select hermes-worker-2
+owned_process_tree_remaining=0 electron_processes_remaining=0 hermes_processes_remaining=0 roots_remaining=0
+repository_tree_unchanged=true
+```
+
+This is not an F01 projection assertion, and repairing or weakening that pre-existing wrong-definition product/gate meaning is outside the accepted amendment. The Builder made no such change and does not call the complete gate green.
+
+The remaining bounded evidence is green:
+
+```text
+bun run build
+main 306 / preload 2 / renderer 7783 modules; exit 0
+
+bun qa/run.ts pre-r18-coherence
+C01-C14 PASS; objects=17; links=21; roots_remaining=0; leaked=[]
+
+seven static gates
+all PASS
+
+Atlas
+current 412 files / 113 channels / 4 strip candidates
+HARD RED 0 / unexplained 0 / undecided without blocker 0
+VERDICT UNCHANGED versus repair parent
+```
+
+The projection repair reads one more existing Kernel object (`agent_session`) and derives availability without writing or persisting UI state. Structural/link/delegator exactness is decided before runtime availability, so a stopped runtime cannot erase durable lineage and a malformed lineage cannot become an assignment merely because a session runs.

@@ -31,7 +31,7 @@ function projection(db: ReturnType<typeof openKernel>) {
       .all(id, kind) as Array<{ from_id: string; to_id: string }>,
     getObject: (type, id) => type === "agent_definition"
       ? db.query("SELECT * FROM agent_definition WHERE id = ?").get(id) as Record<string, unknown> | null
-      : null,
+      : db.query("SELECT * FROM agent_session WHERE id = ?").get(id) as Record<string, unknown> | null,
   });
 }
 

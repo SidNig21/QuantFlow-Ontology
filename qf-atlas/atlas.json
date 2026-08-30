@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "c469f89e",
+    "commit": "1723d600",
     "generatedAt": "2026-08-30",
     "filesScanned": 412,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "8872e8a409998505"
+    "fingerprint": "3cf304b5a25e2be9"
   },
   "stats": {
     "live": 109,
@@ -3236,7 +3236,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1202.8,
+      "kb": 1203,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3327,7 +3327,7 @@
         },
         {
           "path": "qa/gates/research-director-delegation.ts",
-          "kb": 29.7,
+          "kb": 29.8,
           "spawns": 2,
           "spawnsLive": 1,
           "writes": 0,
@@ -3474,7 +3474,7 @@
         },
         {
           "path": "qa/gates/team-composition.ts",
-          "kb": 10.3,
+          "kb": 10.4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5760,7 +5760,7 @@
       "id": "2:residue",
       "layer": 2,
       "name": "41 small modules*",
-      "kb": 108.1,
+      "kb": 108.5,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -5781,7 +5781,7 @@
         },
         {
           "path": "collab-electron/src/main/task-delegation-projection.ts",
-          "kb": 5.8,
+          "kb": 6.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -10936,7 +10936,7 @@
         {
           "file": "collab-electron/src/main/task-delegation-projection.ts",
           "weak": [
-            "exports projectTaskAssignments() at line 81"
+            "exports projectTaskAssignments() at line 85"
           ],
           "strong": [],
           "weight": "weak"
@@ -53192,12 +53192,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "8295828b",
+      "commit": "c469f89e",
       "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "c469f89e",
+      "commit": "1723d600",
       "generatedAt": "2026-08-30"
     },
     "verdict": "better",
