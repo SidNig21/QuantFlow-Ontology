@@ -15,6 +15,8 @@ const ROOT = join(import.meta.dir, "../..");
 const SEED = "746d29a0";
 const HISTORICAL_G11 = "1f81c469371fbb4db3e4e8bdac1248f0a0d3d51c";
 const PHASE3_GATE = "golden-phase3-requalification";
+const ELECTRON_SDK_ROW = "collab-electron/package.json\tdependencies\t@agentclientprotocol/sdk\t0.18.2";
+const CURRENT_DEPENDENCIES_SHA256 = "3AD64D1EE994131B963B5574C3B9529D26BC6D3FEFCD747241DA350F4B56F172";
 const CLASSIFICATION = "docs/orders/evidence/golden-baseline/phase3/PHASE3-GATE-CLASSIFICATION.tsv";
 const TRAVERSAL = "docs/orders/evidence/golden-baseline/phase3/PHASE3-WINDOWS-TRAVERSAL.tsv";
 const EXPECTED_SEEDS: Record<string, { count: number; sha256: string }> = {
@@ -35,6 +37,7 @@ type Bait =
   | "duplicate-disposition"
   | "remove-claim-mapping"
   | "fixture-only-claim"
+  | "missing-electron-sdk-owner"
   | "unregistered-gate"
   | "wrong-historical-authority";
 
@@ -151,6 +154,17 @@ function validate(seed: Ledgers, current: Ledgers, bait?: Bait): { issues: strin
     if (!rows || rows.length !== expected.count) issues.push(`seed-count ${name} expected=${expected.count} actual=${rows?.length ?? -1}`);
     else if (sha256(serialize(rows)) !== expected.sha256) issues.push(`seed-hash ${name} expected=${expected.sha256} actual=${sha256(serialize(rows))}`);
   }
+  const currentDependencies = bait === "missing-electron-sdk-owner"
+    ? current["direct-dependencies"].filter((row) => row !== ELECTRON_SDK_ROW)
+    : current["direct-dependencies"];
+  if (currentDependencies.length !== 104) issues.push(`current dependency total expected=104 actual=${currentDependencies.length}`);
+  if (!currentDependencies.includes(ELECTRON_SDK_ROW)) issues.push("Electron direct @agentclientprotocol/sdk owner absent");
+  if (bait !== "missing-electron-sdk-owner" && sha256(serialize(currentDependencies)) !== CURRENT_DEPENDENCIES_SHA256) {
+    issues.push(`current dependency hash expected=${CURRENT_DEPENDENCIES_SHA256} actual=${sha256(serialize(currentDependencies))}`);
+  }
+  if (!dependencies(tracked(), undefined).some((row) => row === "species/hermes/package.json\tdependencies\t@agentclientprotocol/sdk\t0.18.2")) {
+    issues.push("Hermes compatibility declaration absent");
+  }
   const all = Object.entries(current).flatMap(([ledger, rows]) => rows.map((row) => key(ledger, row)));
   if (bait === "delete-ledger-row") all.pop();
   const dispositions = all.map((entry) => {
@@ -209,7 +223,7 @@ function validate(seed: Ledgers, current: Ledgers, bait?: Bait): { issues: strin
 
 export async function runGoldenPhase3RequalificationGate(): Promise<{ ok: boolean }> {
   const rawBait = process.env.QF_PHASE3_FALSIFY?.trim() as Bait | undefined;
-  const allowed = new Set<Bait>(["delete-ledger-row", "duplicate-disposition", "remove-claim-mapping", "fixture-only-claim", "unregistered-gate", "wrong-historical-authority"]);
+  const allowed = new Set<Bait>(["delete-ledger-row", "duplicate-disposition", "remove-claim-mapping", "fixture-only-claim", "missing-electron-sdk-owner", "unregistered-gate", "wrong-historical-authority"]);
   if (rawBait && !allowed.has(rawBait)) {
     console.error(`golden-phase3-requalification: unknown QF_PHASE3_FALSIFY=${rawBait}`);
     return { ok: false };

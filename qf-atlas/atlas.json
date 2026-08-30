@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "59a88940",
+    "commit": "28dd91f8",
     "generatedAt": "2026-08-30",
-    "filesScanned": 410,
+    "filesScanned": 411,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "f03168ddc3cc9dbc"
+    "fingerprint": "bf21bd219525c086"
   },
   "stats": {
     "live": 109,
@@ -327,9 +327,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 532
+      "files": 533
     },
-    "coverageFiles": 532,
+    "coverageFiles": 533,
     "ownership": {
       "responsibilities": 10,
       "contested": 7,
@@ -3236,12 +3236,12 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1120,
+      "kb": 1135.6,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 91,
-      "writes": 50,
+      "spawns": 92,
+      "writes": 55,
       "dml": 19,
       "executes": 55,
       "files": [
@@ -3416,6 +3416,16 @@
           "path": "qa/gates/golden-g8-kernel-proof.ts",
           "kb": 17.8,
           "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 5,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/golden-phase3-requalification.ts",
+          "kb": 15.6,
+          "spawns": 1,
           "spawnsLive": 0,
           "writes": 5,
           "dml": 0,
@@ -4260,7 +4270,7 @@
       "id": "5:qa::run",
       "layer": 5,
       "name": "qa/run.ts",
-      "kb": 38.6,
+      "kb": 39,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -4271,7 +4281,7 @@
       "files": [
         {
           "path": "qa/run.ts",
-          "kb": 38.6,
+          "kb": 39,
           "spawns": 3,
           "spawnsLive": 2,
           "writes": 0,
@@ -10035,6 +10045,10 @@
     },
     {
       "path": "qa/gates/golden-g8-schema-lifecycle.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/golden-phase3-requalification.ts",
       "status": "out-of-scope"
     },
     {
@@ -20250,6 +20264,31 @@
       "unexplained": []
     },
     {
+      "path": "qa/gates/golden-phase3-requalification.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
       "path": "qa/gates/governed-review.test.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -24012,41 +24051,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 528,
+      "indexed": 529,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 260,
+      "not-applicable": 261,
       "indexed": 269,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 522,
+      "not-applicable": 523,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 481,
+      "not-applicable": 482,
       "partial": 29,
       "indexed": 22
     },
     "lifetime": {
-      "not-applicable": 469,
+      "not-applicable": 470,
       "partial": 58,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 209,
+      "not-applicable": 210,
       "unsupported": 102,
       "indexed": 221
     },
     "ownership": {
-      "not-applicable": 176,
+      "not-applicable": 177,
       "unsupported": 336,
       "indexed": 20
     },
     "reach": {
-      "unsupported": 309,
+      "unsupported": 310,
       "indexed": 220,
       "partial": 3
     }
@@ -53083,12 +53122,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "91386807",
+      "commit": "59a88940",
       "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "59a88940",
+      "commit": "28dd91f8",
       "generatedAt": "2026-08-30"
     },
     "verdict": "better",

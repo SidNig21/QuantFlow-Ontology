@@ -161,6 +161,7 @@
   "dependencies": {
 
 
+    "@agentclientprotocol/sdk": "0.18.2",
     "@lezer/common": "^1.5.1",
     "@lezer/python": "^1.1.18",
     "@parcel/watcher": "2.5.6",
