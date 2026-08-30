@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "ebd57d8d",
+    "commit": "ca088759",
     "generatedAt": "2026-08-30",
     "filesScanned": 411,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "3a743908537a556b"
+    "fingerprint": "284e1373273fce03"
   },
   "stats": {
     "live": 109,
@@ -994,7 +994,7 @@
       "id": "2:collab-electron/src/main::agent",
       "layer": 2,
       "name": "agent*",
-      "kb": 31.4,
+      "kb": 31.7,
       "x": -0.91,
       "z": 2.48,
       "status": "ok",
@@ -1005,7 +1005,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/agent-host.ts",
-          "kb": 26.9,
+          "kb": 27.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3236,7 +3236,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1135.6,
+      "kb": 1139.1,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3257,7 +3257,7 @@
         },
         {
           "path": "qa/gates/pre-r18-coherence.ts",
-          "kb": 148,
+          "kb": 149.3,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 1,
@@ -3297,7 +3297,7 @@
         },
         {
           "path": "qa/gates/technique-outcome-loop.ts",
-          "kb": 45.9,
+          "kb": 46.8,
           "spawns": 4,
           "spawnsLive": 2,
           "writes": 0,
@@ -3307,7 +3307,7 @@
         },
         {
           "path": "qa/gates/founder-steering.ts",
-          "kb": 31.9,
+          "kb": 33.2,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -53122,12 +53122,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "1c323085",
+      "commit": "ebd57d8d",
       "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "ebd57d8d",
+      "commit": "ca088759",
       "generatedAt": "2026-08-30"
     },
     "verdict": "better",

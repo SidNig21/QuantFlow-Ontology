@@ -847,7 +847,15 @@ export async function disposeAgentHost(): Promise<void> {
   for (const [id, entry] of live) {
     if (entry.kind === "native_tui") {
       try {
-        await nativeTuiTeardowns.begin(id, entry as NativeTuiLive);
+        await nativeTuiTeardowns.begin(id, entry as NativeTuiLive, () => {
+          const status = String(kernelGetObject("agent_session", id)?.status ?? "");
+          if (["closed", "cancelled", "failed"].includes(status)) return;
+          kernelExecute(
+            "close_agent_session",
+            { session_id: id },
+            newTrace(),
+          );
+        });
       } catch (error) {
         if (error instanceof Error && error.message === UNDELIVERED_RESULT_ERROR) continue;
       }

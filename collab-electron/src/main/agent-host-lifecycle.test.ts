@@ -255,6 +255,7 @@ describe("agent-host native-TUI lifecycle admission", () => {
     expect(teardownCalls).toBe(1);
     expect(hasLiveAgentSession(id)).toBe(false);
     expect(roles.get("orchestrator")).toBeUndefined();
+    expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("closed");
   });
 
   test("cancel blocks its own teardown and releases after acknowledgment", async () => {

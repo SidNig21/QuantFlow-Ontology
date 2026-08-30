@@ -312,7 +312,32 @@ export async function runFounderSteeringGate(): Promise<{ ok: boolean }> {
   try {
     launchOne = await launch(root, kernelDb, artifactRoot, appRoot, hermesRoot);
     for (const pid of launchOne.owned) ownedPids.add(pid);
-    await rpcCall(launchOne.endpoint, "app.ui.evaluate", { expression: `(() => { const input = document.querySelector('#dock-question-input'); const form = document.querySelector('#dock-question-form'); if (!(input instanceof HTMLTextAreaElement) || !(form instanceof HTMLFormElement)) throw new Error('Research Director form is missing'); input.value = ${JSON.stringify(QUESTION)}; input.dispatchEvent(new Event('input', { bubbles: true })); form.requestSubmit(); return true; })()` });
+    await rpcCall(launchOne.endpoint, "app.ui.evaluate", { expression: `(async () => {
+      const input = document.querySelector('#dock-question-input');
+      const form = document.querySelector('#dock-question-form');
+      const techniqueSelect = document.querySelector('.dock-technique-version');
+      if (!(input instanceof HTMLTextAreaElement) || !(form instanceof HTMLFormElement) || !(techniqueSelect instanceof HTMLSelectElement)) throw new Error('Research Director form is missing');
+      const sample = await window.shellApi.qf.loadSampleResearchDataset();
+      const datasetId = sample?.dataset?.object_id;
+      const strategyId = sample?.technique?.strategy_id;
+      if (!sample?.ok || typeof datasetId !== 'string' || datasetId.length === 0 || typeof strategyId !== 'string' || strategyId.length === 0) throw new Error('sample Research Dataset or Technique missing');
+      let option = [...techniqueSelect.options].find((candidate) => candidate.value === strategyId);
+      if (!option) {
+        option = document.createElement('option');
+        option.value = strategyId;
+        option.textContent = String(sample.technique.label ?? strategyId);
+        techniqueSelect.appendChild(option);
+      }
+      techniqueSelect.value = strategyId;
+      techniqueSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      form.dataset.r17DatasetId = datasetId;
+      input.value = ${JSON.stringify(QUESTION)};
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      const submit = form.querySelector('button[type=submit]');
+      if (!(submit instanceof HTMLButtonElement) || submit.disabled) throw new Error('real form submit remained disabled after Technique selection');
+      form.requestSubmit();
+      return true;
+    })()` });
     await waitFor("original Task", async () => {
       const rows = dbRows(kernelDb, "SELECT id, title, description, status FROM task WHERE description = ?", QUESTION);
       return rows.length === 1 && rows[0]!.status === "open" ? rows[0] : null;

@@ -126,6 +126,16 @@
     },
     {
       "type": "artifact",
+      "id": "${worker_evidence_artifact_id}",
+      "fields": {
+        "id": "${worker_evidence_artifact_id}",
+        "kind": "trajectory",
+        "content_hash": "${field:worker_evidence_artifact:content_hash}",
+        "receipt": "${field:worker_evidence_artifact:receipt}"
+      }
+    },
+    {
+      "type": "artifact",
       "id": "${grade_artifact_id}",
       "fields": {
         "id": "${grade_artifact_id}",
@@ -245,6 +255,11 @@
       "kind": "produces",
       "from_id": "run-r17-gate",
       "to_id": "${result_artifact_id}"
+    },
+    {
+      "kind": "produces",
+      "from_id": "r17-executor",
+      "to_id": "${worker_evidence_artifact_id}"
     },
     {
       "kind": "grades_ticket",

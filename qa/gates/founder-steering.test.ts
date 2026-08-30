@@ -1,5 +1,18 @@
 import { expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { normalizeHistoryFacts, normalizeVisibleTaskSessionLinkFacts } from "./founder-steering.ts";
+
+test("founder steering uses the ordinary form with exact preload Dataset and Technique", () => {
+  const gate = readFileSync(join(import.meta.dir, "founder-steering.ts"), "utf8");
+  const setup = gate.slice(gate.indexOf("const sample = await window.shellApi.qf.loadSampleResearchDataset()"), gate.indexOf("await waitFor(\"original Task\""));
+  expect(setup).toContain("const datasetId = sample?.dataset?.object_id");
+  expect(setup).toContain("const strategyId = sample?.technique?.strategy_id");
+  expect(gate).toContain("document.querySelector('.dock-technique-version')");
+  expect(setup).toContain("form.dataset.r17DatasetId = datasetId");
+  expect(setup.match(/form\.requestSubmit\(\)/g)).toHaveLength(1);
+  expect(setup).not.toContain("TRY GUIDED RESEARCH");
+});
 
 test("founder steering gate normalizes the eight Kernel/DOM history fields", () => {
   expect(normalizeHistoryFacts([{
