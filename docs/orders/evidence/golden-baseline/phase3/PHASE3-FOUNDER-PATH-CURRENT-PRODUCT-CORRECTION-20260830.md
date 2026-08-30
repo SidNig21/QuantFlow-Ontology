@@ -80,13 +80,16 @@ The Builder may change only the smallest subset of these existing surfaces neede
 - `collab-electron/src/windows/shell/src/shell.css`
 - `collab-electron/src/windows/shell/index.html`
 - `qa/gates/hermes-production-inference.ts` and `qa/gates/hermes-production-inference.test.ts` only for already-authorized credential-safe failure preservation and the later visible P14-B inference receipt; they may not implement or substitute the product corrections
-- `qa/gates/pre-r18-coherence.ts` only to rerun its unchanged C14/current-product acceptance after the product repair; its assertions, fixtures, timings, and meaning are immutable
-- `docs/orders/evidence/golden-baseline/phase3/PHASE3-FOUNDER-PATH-CURRENT-PRODUCT-READER-ACCEPTANCE-20260830.md`
 - `docs/orders/evidence/golden-baseline/phase3/PHASE3-FOUNDER-PATH-CURRENT-PRODUCT-BUILD-RECEIPT-20260830.md`
-- `docs/orders/evidence/golden-baseline/phase3/PHASE3-FOUNDER-PATH-COMPUTER-USE-RECEIPT-20260830.md`
 - generated Atlas outputs after product changes
 
 If a required implementation file is absent from this list, stop and return the exact reason before changing it.
+
+## Read-only prerequisites and Router-owned evidence
+
+- The independent Reader testimony is frozen by Router before Builder authority opens in `docs/orders/evidence/golden-baseline/phase3/PHASE3-FOUNDER-PATH-CURRENT-PRODUCT-READER-ACCEPTANCE-20260830.md`. The Builder may read but not edit it.
+- `qa/gates/pre-r18-coherence.ts` is execution-only and byte-immutable. Its existing C14/current-product acceptance is rerun after the repair; assertions, fixtures, timings, and meaning may not change.
+- Router alone writes `docs/orders/evidence/golden-baseline/phase3/PHASE3-FOUNDER-PATH-COMPUTER-USE-RECEIPT-20260830.md` after operating the corrected package. The Builder may not create or edit it.
 
 ## Hard invariants
 
