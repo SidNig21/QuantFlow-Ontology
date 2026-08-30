@@ -351,9 +351,9 @@ static scope/receipt bait and never exercises G12 lifecycle.
 The frozen 1,421-path denominator remains
 `b1720c086bb2d93942448a3fdd352b7d58af9483` / tree
 `97b2768e3bc79d45c321336e73ec30167c6c8959` and is revalidated separately.
-The exact rollback comparison baseline is the amended authority commit
-`3a4b45fca5c965b643f7d64a68f35abf2cb7c8d1` / tree
-`39d64367fb43c153418562e274a8b9cf097fab92`. The Builder records exactly one
+The exact rollback comparison baseline is the five-correction amended
+authority commit `81fd841828707c652eae91c98522adb9f287bc2c` / tree
+`e66af95375d80071ed8c1be8506626fdde2dbc01`. The Builder records exactly one
 candidate commit `<G11_CANDIDATE>` and tree `<G11_CANDIDATE_TREE>` in the
 receipt; neither placeholder may remain at verification.
 
@@ -366,7 +366,7 @@ source SHA256 is
 Then restore every modified A-path from the named start commit and remove only
 the candidate-created G11 receipt/static-verifier paths. The rollback is green
 only when `git diff --exit-code
-3a4b45fca5c965b643f7d64a68f35abf2cb7c8d1`, the separate 1,421-row/blob
+81fd841828707c652eae91c98522adb9f287bc2c`, the separate 1,421-row/blob
 reproduction against `b1720c086bb2d93942448a3fdd352b7d58af9483`, all
 380 tracked immutable-manifest SHA256 rows, the external Phase-1 content check,
 `doc-links`, `repo-shape`, and
