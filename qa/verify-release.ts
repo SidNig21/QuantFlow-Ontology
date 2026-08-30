@@ -29,7 +29,7 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
   {
     id: "install-hermes",
     cwd: "species/hermes",
-    command: ["bun", "install", "--frozen-lockfile"],
+    command: ["bun", "install", "--frozen-lockfile", "--linker=isolated"],
     installCache: "hermes",
   },
   {

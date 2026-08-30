@@ -33,11 +33,16 @@ describe("verify-release stages", () => {
       "observe-door",
     ]);
     expect(WINDOWS_RELEASE_STAGES).toHaveLength(18);
-    expect(
-      WINDOWS_RELEASE_STAGES.filter((stage) =>
-        stage.command.join(" ") === "bun install --frozen-lockfile"
-      ).map((stage) => stage.cwd),
-    ).toEqual(["collab-electron", "species/hermes"]);
+    expect(WINDOWS_RELEASE_STAGES[0]).toMatchObject({
+      id: "install-electron",
+      cwd: "collab-electron",
+      command: ["bun", "install", "--frozen-lockfile"],
+    });
+    expect(WINDOWS_RELEASE_STAGES[1]).toMatchObject({
+      id: "install-hermes",
+      cwd: "species/hermes",
+      command: ["bun", "install", "--frozen-lockfile", "--linker=isolated"],
+    });
   });
 
   test("omitting the Hermes frozen install before Windows unit is detectable", () => {
