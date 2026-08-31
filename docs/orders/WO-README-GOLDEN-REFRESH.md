@@ -1,6 +1,6 @@
 # WO-README-GOLDEN-REFRESH — current Golden README
 
-status: **ACTIVE / DOCS ONLY**
+status: **CLOSED / INDEPENDENT PASS**
 
 ## Outcome
 
@@ -23,3 +23,9 @@ No product, schema, Kernel, Canvas, Dock, adapter, package, dependency, Atlas ca
 - `bun qa/run.ts doc-links`, `bun qf-atlas/generate.mjs --check`, and `git diff --check` pass.
 - The focused founder-receipt test proves root-README drift is documentation-only while a real product-byte mutation remains RED, and the live founder-receipt gate returns PASS.
 - One independent read-only Verifier reviews the immutable README candidate.
+
+## Closure
+
+- Accepted candidate: `88070edd95ad5bfeb941a34f649f65ec2698e674`
+- Accepted tree: `f4d653df1ba71f14fe5e209436cea76b9d319a59`
+- Independent result: [VERIFIER-ACCEPTANCE-20260831.md](evidence/readme-golden-refresh/VERIFIER-ACCEPTANCE-20260831.md)

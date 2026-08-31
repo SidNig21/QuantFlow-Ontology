@@ -1,11 +1,11 @@
 # NEXT — R18 GOLDEN BASELINE / PHASE 2 CLOSED / PHASE 3 CURRENT FOUNDER PATH
 
-status: GOLDEN BASELINE ACCEPTED / README CURRENT-STATE REFRESH OPEN / R18 CLOSED
+status: GOLDEN BASELINE ACCEPTED / README CURRENT-STATE REFRESH CLOSED / R18 CLOSED
 rotated-at: 2026-08-30
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-README-GOLDEN-REFRESH](WO-README-GOLDEN-REFRESH.md)
-builder-authority: **OPEN ONLY TO `README.md` plus the exact founder-receipt gate/test classification named by `WO-README-GOLDEN-REFRESH`; no product, schema, Kernel, Canvas, Dock, adapter, package, dependency, Atlas capability, or R18 change**
-router-authority: **OPEN TO FREEZE ONE DOCS-ONLY README CANDIDATE, ROUTE ONE INDEPENDENT READ-ONLY VERIFIER, CLOSE THE ORDER AFTER PASS, AND NON-FORCE FAST-FORWARD MAIN/REMOTE; R18 remains closed**
+builder-authority: **CLOSED — README refresh independently accepted; no product or R18 work is open**
+router-authority: **OPEN ONLY TO RECORD README ACCEPTANCE AND NON-FORCE FAST-FORWARD MAIN/REMOTE; R18 remains closed**
 golden-fast-mode: **STANDING EXECUTION POLICY — freeze the starting matrix once; make fast preflight and focused checks green before one complete registered group gate; reuse exact product-bundle SHA builds; use the lowest falsifying proof tier; route PRODUCT RED versus HARNESS RED; require Reader only for semantics/authority/scope/group-boundary changes; use run-scoped IDs, isolated roots/DB, explicit readiness, generated receipts, parallel read-only checks, then one independent Verifier; packaged lifecycle is reserved for G12/Phase 3; standards, assertions, and independence are unchanged**
 g10-status: **CLOSED — accepted candidate `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`; independent Verifier task `01a0508a-43f5-7101-9416-0683ba081449`; final `processes=0 roots_remaining=0 leaked=[]`; its then-inherited G12 red is now cured by accepted G12**
 g10-closure: [independent G10 acceptance](evidence/golden-baseline/g10/VERIFIER-ACCEPTANCE-20260829.md) | [receipt-hash clarification](evidence/golden-baseline/g10/RECEIPT-HASH-CLARIFICATION-20260829.md)
