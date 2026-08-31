@@ -99,7 +99,7 @@ The packaged production Dock contains exactly these Hermes-backed profiles:
 
 The deterministic `qf-proof-agent` is QA-only. It is not production Dock inventory. Claude Code, Codex, local models, scrapers, and learning workers are not certified built-in production adapters in the Golden product.
 
-Hermes runs through an optional WSL2/Ubuntu adapter. QuantFlow owns Dock identity, admission, PTY lifecycle, launch-scoped MCP access, Kernel truth, and Canvas projection. Hermes owns its CLI/TUI process and private authentication. QuantFlow does not install, read, copy, or rewrite the founder's Hermes credentials.
+QuantFlow can boot without Hermes. Running a Hermes participant requires founder-owned WSL2, Ubuntu, Hermes, and authentication. QuantFlow owns Dock identity, admission, PTY lifecycle, launch-scoped MCP access, Kernel truth, and Canvas projection. Hermes owns its CLI/TUI process and private authentication. QuantFlow does not install, read, copy, or rewrite the founder's Hermes credentials.
 
 ### Generated tools and application bridges
 

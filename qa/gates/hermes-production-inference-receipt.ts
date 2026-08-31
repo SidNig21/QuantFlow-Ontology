@@ -72,6 +72,7 @@ const PRODUCT_TREE_PREFIX_EXCLUSIONS = [
 ] as const;
 
 const FINAL_PRODUCT_TREE_PREFIX_EXCLUSIONS = ["qa/", "docs/orders/", "qf-atlas/"] as const;
+const FINAL_PRODUCT_TREE_EXACT_EXCLUSIONS = new Set(["README.md"]);
 
 function object(value: unknown, label: string): Json {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`${label} is not an object`);
@@ -139,6 +140,7 @@ export function finalProductTreeRows(lsTree: string): string[] {
     const metadata = row.slice(0, separator).split(" ");
     requireValue(metadata.length === 3 && /^[0-7]{6}$/.test(metadata[0]!) && metadata[1] === "blob" && /^[0-9a-f]{40}$/.test(metadata[2]!), "final product git ls-tree row lacks exact mode/type/blob");
     const path = row.slice(separator + 1);
+    if (FINAL_PRODUCT_TREE_EXACT_EXCLUSIONS.has(path)) return false;
     return !FINAL_PRODUCT_TREE_PREFIX_EXCLUSIONS.some((prefix) => path.startsWith(prefix));
   }).sort();
 }

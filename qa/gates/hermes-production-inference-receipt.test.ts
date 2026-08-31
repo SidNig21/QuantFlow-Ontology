@@ -91,12 +91,15 @@ test("final founder product fingerprint excludes proof surfaces and preserves pr
     "100644 blob 1111111111111111111111111111111111111111\tqa/gate.ts",
     "100644 blob 2222222222222222222222222222222222222222\tdocs/orders/NEXT.md",
     "100644 blob 3333333333333333333333333333333333333333\tqf-atlas/atlas.json",
+    "100644 blob aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tREADME.md",
     "100644 blob 4444444444444444444444444444444444444444\tcollab-electron/src/main/kernel.ts",
   ].join("\n");
   expect(finalProductTreeRows(base)).toHaveLength(1);
   const fingerprint = finalProductTreeSha256(base);
+  expect(finalProductTreeSha256(base.replace("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))).toBe(fingerprint);
   expect(finalProductTreeSha256(base.replace("4444444444444444444444444444444444444444", "5555555555555555555555555555555555555555"))).not.toBe(fingerprint);
   expect(finalProductTreeSha256(`${base}\n100644 blob 6666666666666666666666666666666666666666\tqa/new-proof.ts`)).toBe(fingerprint);
+  expect(finalProductTreeSha256(`${base}\n100644 blob 7777777777777777777777777777777777777777\tREADME.md.backup`)).not.toBe(fingerprint);
 });
 
 test("product tree fingerprint preserves mode/type/blob/path and excludes only exact proof surfaces", () => {
