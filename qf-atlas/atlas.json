@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "b4d22948",
+    "commit": "b82fbab6",
     "generatedAt": "2026-08-31",
     "filesScanned": 413,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "0d559edb193847a7"
+    "fingerprint": "8ed3c9b21baaad20"
   },
   "stats": {
     "live": 109,
@@ -3236,11 +3236,11 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1256.3,
+      "kb": 1272,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 97,
+      "spawns": 98,
       "writes": 56,
       "dml": 19,
       "executes": 55,
@@ -3331,6 +3331,16 @@
           "spawns": 4,
           "spawnsLive": 3,
           "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/hermes-production-inference-receipt.ts",
+          "kb": 32.6,
+          "spawns": 3,
+          "spawnsLive": 0,
+          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -3438,16 +3448,6 @@
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 5,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/hermes-production-inference-receipt.ts",
-          "kb": 16.9,
-          "spawns": 2,
-          "spawnsLive": 0,
-          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -20452,7 +20452,7 @@
       },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
+      "persistence": "indexed",
       "lifetime": "not-applicable",
       "packaging": "not-applicable",
       "ownership": "not-applicable",
@@ -20460,7 +20460,6 @@
         "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
@@ -24194,9 +24193,9 @@
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 486,
+      "not-applicable": 485,
       "partial": 29,
-      "indexed": 22
+      "indexed": 23
     },
     "lifetime": {
       "not-applicable": 473,
@@ -53256,12 +53255,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "48921711",
+      "commit": "b4d22948",
       "generatedAt": "2026-08-31"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "b4d22948",
+      "commit": "b82fbab6",
       "generatedAt": "2026-08-31"
     },
     "verdict": "better",
