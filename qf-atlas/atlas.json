@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "3e31b994",
-    "generatedAt": "2026-08-30",
+    "commit": "a44c0f1a",
+    "generatedAt": "2026-08-31",
     "filesScanned": 412,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "8bfb5b6b36e5d192"
+    "fingerprint": "7125be8b3644a288"
   },
   "stats": {
     "live": 109,
@@ -3236,11 +3236,11 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1203,
+      "kb": 1220.3,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 95,
+      "spawns": 96,
       "writes": 56,
       "dml": 19,
       "executes": 55,
@@ -3316,18 +3316,8 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/windows-cold-boot.ts",
-          "kb": 31.3,
-          "spawns": 5,
-          "spawnsLive": 5,
-          "writes": 4,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "qa/gates/research-director-delegation.ts",
-          "kb": 29.8,
+          "kb": 37.8,
           "spawns": 2,
           "spawnsLive": 1,
           "writes": 0,
@@ -3337,10 +3327,20 @@
         },
         {
           "path": "qa/gates/hermes-production-inference.ts",
-          "kb": 27.1,
-          "spawns": 3,
-          "spawnsLive": 2,
+          "kb": 36.4,
+          "spawns": 4,
+          "spawnsLive": 3,
           "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/windows-cold-boot.ts",
+          "kb": 31.3,
+          "spawns": 5,
+          "spawnsLive": 5,
+          "writes": 4,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -4201,7 +4201,7 @@
       "id": "5:qa/gates/market-ingest::run",
       "layer": 5,
       "name": "market-ingest/run.ts",
-      "kb": 55.3,
+      "kb": 56.5,
       "x": 1.01,
       "z": 0.85,
       "status": "ice",
@@ -4212,18 +4212,18 @@
       "files": [
         {
           "path": "qa/gates/market-ingest/run.ts",
-          "kb": 55.3,
+          "kb": 56.5,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
           "dml": 17,
           "dmlLines": [
-            609,
-            631,
-            646,
-            655,
-            706,
-            706
+            625,
+            647,
+            662,
+            671,
+            722,
+            722
           ],
           "executes": 29
         }
@@ -4236,12 +4236,12 @@
           "what": "17 SQL statements outside execute()",
           "where": "qa/gates/market-ingest/run.ts",
           "lines": [
-            609,
-            631,
-            646,
-            655,
-            706,
-            706
+            625,
+            647,
+            662,
+            671,
+            722,
+            722
           ],
           "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
         }
@@ -6196,7 +6196,7 @@
       "id": "0:residue",
       "layer": 0,
       "name": "35 small modules*",
-      "kb": 81.4,
+      "kb": 81.5,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6279,7 +6279,7 @@
         },
         {
           "path": "tools/qf-bovada-football/src/gate.ts",
-          "kb": 4.3,
+          "kb": 4.4,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 1,
@@ -20448,7 +20448,7 @@
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "2 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
+        "lifetime": "3 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
@@ -53103,12 +53103,12 @@
       "what": "17 SQL statements outside execute()",
       "where": "qa/gates/market-ingest/run.ts",
       "lines": [
-        609,
-        631,
-        646,
-        655,
-        706,
-        706
+        625,
+        647,
+        662,
+        671,
+        722,
+        722
       ],
       "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
     },
@@ -53192,13 +53192,13 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "1723d600",
+      "commit": "3e31b994",
       "generatedAt": "2026-08-30"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "3e31b994",
-      "generatedAt": "2026-08-30"
+      "commit": "a44c0f1a",
+      "generatedAt": "2026-08-31"
     },
     "verdict": "better",
     "why": "27 improvement(s), nothing added or hidden",

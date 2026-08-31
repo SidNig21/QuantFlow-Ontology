@@ -203,7 +203,7 @@ function validate(seed: Ledgers, current: Ledgers, bait?: Bait): { issues: strin
   const expectedNames = new Set([...classified.keys(), PHASE3_GATE]);
   for (const name of currentNames) if (!expectedNames.has(name)) issues.push(`unclassified gate ${name}`);
   for (const name of expectedNames) if (!currentNames.has(name)) issues.push(`classified gate absent ${name}`);
-  if (currentNames.size !== 73) issues.push(`gate total expected=73 actual=${currentNames.size}`);
+  if (currentNames.size !== 74) issues.push(`gate total expected=74 actual=${currentNames.size}`);
   const historical = bait === "wrong-historical-authority" ? "d14ceb36659d86f157b4856b927581616dbaaa56" : HISTORICAL_G11;
   if (historical !== HISTORICAL_G11) issues.push("wrong-historical-authority");
   else {

@@ -1,0 +1,107 @@
+{
+  "app_exit_code": 0,
+  "cleanup": {
+    "leaked": [],
+    "processes": 0,
+    "rootsRemaining": 0
+  },
+  "conjuncts": {
+    "api_ordinal_one": true,
+    "api_provider_model": true,
+    "api_tokens_latency": true,
+    "app_exit_zero": true,
+    "app_readiness": true,
+    "cleanup_zero": true,
+    "dock_click": true,
+    "exact_api_row": true,
+    "exact_tile": true,
+    "exact_turn_row": true,
+    "exact_webview": true,
+    "fresh_log_present": true,
+    "input_and_enter": true,
+    "kernel_binding": true,
+    "no_runtime_error_codes": true,
+    "post_response_ready_visible": true,
+    "prompt_response_screenshots": true,
+    "rendered_surface_present": true,
+    "turn_bound_success": true
+  },
+  "error_code": "none",
+  "gate": "hermes-production-inference",
+  "identity": {
+    "build_sha256": "1611d0725f53ffcc83c85073f28a4348869b0406fa36cd7213abeac35e0df8e3",
+    "candidate": "a44c0f1ad20a8878ba74db321bbd9088a8c42f6d",
+    "prompt_sha256": "f9f9a7a454880b623ad5d337c9126c5b4e41538a8d78bc3f0141907c4da310e1",
+    "tree": "f4b8a5363077f249961a9ecc606c82c3d9e25efe"
+  },
+  "kernel": {
+    "definitionId": "hermes-research-director",
+    "runtimeProfile": "default",
+    "sessionId": "9ef5d018-a200-48d3-8669-149ecb5e7568",
+    "spawnedFrom": "hermes-research-director",
+    "status": "running"
+  },
+  "provider_contact": "proven",
+  "result": "PASS",
+  "route": {
+    "dock_clicked": true,
+    "enter_dispatched": true,
+    "input_completed_at": 1788134500733,
+    "input_dispatched": true,
+    "input_started_at": 1788134411861,
+    "kernel_session_id": "9ef5d018-a200-48d3-8669-149ecb5e7568",
+    "readiness": true,
+    "runtime_session_id": "20260830_170010_284a31",
+    "tile_count": 1,
+    "webview_count": 1
+  },
+  "schema": "qf.p14b.production-inference-diagnostic.v2",
+  "terminal_transport": {
+    "authority": "non-authoritative-raw-pty-telemetry",
+    "bytes": 9771,
+    "nonce_occurrences": 2,
+    "nonce_only_lines": 0,
+    "present": true,
+    "sha256": "059d7b738f7d470847f8bb88d669d479b5edd3223e169e6b3b8ce2956becabc6"
+  },
+  "trusted_log": {
+    "api_rows": [
+      {
+        "input_tokens": 1411,
+        "latency_seconds": 3.6,
+        "model": "kimi-k3",
+        "ordinal": 1,
+        "output_tokens": 56,
+        "provider": "opencode-go",
+        "session": "20260830_170010_284a31",
+        "timestamp": 1788134499000,
+        "total_tokens": 1467
+      }
+    ],
+    "bytes": 6450,
+    "configured_model": "kimi-k3",
+    "configured_provider": "opencode-go",
+    "present": true,
+    "runtime_error_codes": [],
+    "sha256": "555cb113ac9f686eaca244cad6065d18920cbe874c82d8fb59b2fef7d7572af0",
+    "turn_rows": [
+      {
+        "api_calls": 1,
+        "model": "kimi-k3",
+        "response_length": 31,
+        "session": "20260830_170010_284a31",
+        "successful": true,
+        "timestamp": 1788134499000
+      }
+    ]
+  },
+  "visual_evidence": {
+    "authority": "rendered-product-corroboration-with-Windows-OCR-fallback",
+    "post_response_ready_visible": true,
+    "prompt_png_sha256": "9525a0eea113d7ee36a8f6ad4311b133fecec29085e8851894136726526e6d80",
+    "rendered_text_bytes": 301,
+    "rendered_text_present": true,
+    "rendered_text_sha256": "74935f965066aab683e7f1e9488e8469fbc7df5a0a8e41e9a09da097f17d1f94",
+    "response_png_sha256": "eefdcc93fd6bd3452b399ea8d5c3770025c6e116161c74572bcf36d1f7fa0024"
+  }
+}

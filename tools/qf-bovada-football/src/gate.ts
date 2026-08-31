@@ -106,7 +106,11 @@ async function runBait(bait: Bait): Promise<void> {
   const mutantSource = join(mutantRoot, "src");
   try {
     cpSync(SOURCE_ROOT, mutantSource, { recursive: true });
-    symlinkSync(join(PACKAGE_ROOT, "node_modules"), join(mutantRoot, "node_modules"));
+    symlinkSync(
+      join(PACKAGE_ROOT, "node_modules"),
+      join(mutantRoot, "node_modules"),
+      process.platform === "win32" ? "junction" : "dir",
+    );
     mutateExactlyOnce(
       join(mutantSource, bait.sourceFile),
       bait.needle,

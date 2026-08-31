@@ -151,6 +151,24 @@ function readCounts(path: string): Counts {
   }
 }
 
+function readSessionBindings(path: string): Map<string, string[]> {
+  const db = new Database(path, { readonly: true });
+  try {
+    const rows = db.query(
+      "SELECT s.id, l.to_id FROM agent_session AS s LEFT JOIN links AS l ON l.from_id = s.id AND l.kind = 'spawned_from' ORDER BY s.id, l.to_id",
+    ).all() as Array<{ id: string; to_id: string | null }>;
+    const bindings = new Map<string, string[]>();
+    for (const row of rows) {
+      const targets = bindings.get(row.id) ?? [];
+      if (row.to_id !== null) targets.push(row.to_id);
+      bindings.set(row.id, targets);
+    }
+    return bindings;
+  } finally {
+    db.close();
+  }
+}
+
 function readOracle(
   path: string,
   missionId: string,
@@ -311,19 +329,95 @@ async function runRealCase(
     }, deadlineAt);
     const launchPids = collectOwnedPids(beforeProcesses, await processSnapshot(), child.pid);
     for (const pid of launchPids) ownedPids.add(pid);
-    await rpcCall(endpoint, "qf.research.seed_fixture_dataset", {});
+    const coverage = await rpcCall(endpoint, "app.ui.evaluate", {
+      expression: `(async () => {
+        const form = document.querySelector('#dock-question-form');
+        const techniqueSelect = document.querySelector('#dock-technique-version');
+        if (!(form instanceof HTMLFormElement) || !(techniqueSelect instanceof HTMLSelectElement)) throw new Error('Research Director Technique form is missing');
+        const sample = await window.shellApi.qf.loadSampleResearchDataset();
+        const datasetId = sample?.dataset?.object_id;
+        const technique = sample?.technique;
+        const strategyId = technique?.strategy_id;
+        const family = technique?.family;
+        const version = Number(technique?.version);
+        const contentHash = String(technique?.content_hash ?? '');
+        if (!sample?.ok || typeof datasetId !== 'string' || datasetId.length === 0 ||
+            typeof strategyId !== 'string' || strategyId.length === 0 || family !== 'guided-settled-results' ||
+            version !== 1 || !/^[0-9a-f]{64}$/.test(contentHash)) throw new Error('guided Research Dataset or Technique coverage is invalid');
+        let option = [...techniqueSelect.options].find((candidate) => candidate.value === strategyId);
+        if (!option) {
+          option = document.createElement('option');
+          option.value = strategyId;
+          option.textContent = String(technique.label ?? strategyId);
+          techniqueSelect.appendChild(option);
+        }
+        option.dataset.family = family;
+        option.dataset.version = String(version);
+        option.dataset.contentHash = contentHash;
+        techniqueSelect.value = strategyId;
+        techniqueSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        form.dataset.r17DatasetId = datasetId;
+        const submit = form.querySelector('button[type=submit]');
+        return {
+          ok: true,
+          datasetId,
+          strategyId,
+          family,
+          version,
+          contentHash,
+          selected: techniqueSelect.value,
+          selectedFamily: techniqueSelect.selectedOptions[0]?.dataset.family ?? '',
+          selectedVersion: techniqueSelect.selectedOptions[0]?.dataset.version ?? '',
+          selectedContentHash: techniqueSelect.selectedOptions[0]?.dataset.contentHash ?? '',
+          boundDatasetId: form.dataset.r17DatasetId ?? '',
+          submitEnabled: submit instanceof HTMLButtonElement && !submit.disabled,
+        };
+      })()`,
+    }) as {
+      ok: boolean;
+      datasetId: string;
+      strategyId: string;
+      family: string;
+      version: number;
+      contentHash: string;
+      selected: string;
+      selectedFamily: string;
+      selectedVersion: string;
+      selectedContentHash: string;
+      boundDatasetId: string;
+      submitEnabled: boolean;
+    };
+    assert(coverage.ok && coverage.datasetId.length > 0 && coverage.strategyId.length > 0, "guided Research Dataset or Technique identity is missing");
+    assert(coverage.family === "guided-settled-results" && coverage.version === 1 && /^[0-9a-f]{64}$/.test(coverage.contentHash), "guided Technique descriptor is not exact");
+    assert(coverage.selected === coverage.strategyId && coverage.selectedFamily === coverage.family && coverage.selectedVersion === "1" && coverage.selectedContentHash === coverage.contentHash, "rendered Technique option/change state is not exact");
+    assert(coverage.boundDatasetId === coverage.datasetId, "rendered guided Dataset binding is missing");
+    assert(coverage.submitEnabled, "real form submit remained disabled after guided coverage selection");
     const before = readCounts(kernelDb);
-    await rpcCall(endpoint, "app.ui.evaluate", {
+    const beforeSessionIds = new Set(readSessionBindings(kernelDb).keys());
+    const submitted = await rpcCall(endpoint, "app.ui.evaluate", {
       expression: `(() => {
         const input = document.querySelector('#dock-question-input');
         const form = document.querySelector('#dock-question-form');
         if (!(input instanceof HTMLTextAreaElement) || !(form instanceof HTMLFormElement)) throw new Error('Research Director form is missing');
+        if (form.dataset.r17DatasetId !== ${JSON.stringify(coverage.datasetId)}) throw new Error('guided Dataset binding changed before submit');
+        const techniqueSelect = document.querySelector('#dock-technique-version');
+        if (!(techniqueSelect instanceof HTMLSelectElement) || techniqueSelect.value !== ${JSON.stringify(coverage.strategyId)}) throw new Error('guided Technique selection changed before submit');
         input.value = ${JSON.stringify(QUESTION)};
         input.dispatchEvent(new Event('input', { bubbles: true }));
+        const submit = form.querySelector('button[type=submit]');
+        if (!(submit instanceof HTMLButtonElement) || submit.disabled) throw new Error('real form submit is disabled');
         form.requestSubmit();
         return { submitted: true, disabled: input.disabled };
       })()`,
-    });
+    }) as { submitted: boolean; disabled: boolean };
+    assert(submitted.submitted && submitted.disabled, "real form did not enter in-flight state after guided submission");
+    await waitFor("durable Mission or visible Technique refusal", async () => {
+      const status = await rpcCall(endpoint!, "app.ui.evaluate", {
+        expression: `(() => ({ text: document.querySelector('#dock-question-status')?.textContent ?? '', tone: document.querySelector('#dock-question-status')?.dataset.tone ?? '' }))()`,
+      }) as { text: string; tone: string };
+      assert(!status.text.includes("TECHNIQUE COVERAGE REFUSED"), "visible TECHNIQUE COVERAGE REFUSED after exact guided selection");
+      return readCounts(kernelDb).missions === before.missions + 1 ? true : null;
+    }, Math.min(deadlineAt, Date.now() + 15_000));
 
     const greenObservation = async (): Promise<UiReceipt | null> => {
       const state = await rpcCall(endpoint!, "app.ui.evaluate", {
@@ -388,22 +482,57 @@ async function runRealCase(
       return { oracle, greenUi: ui };
     }
 
-    let positivePathPassed = false;
-    try {
-      await waitFor("unexpected positive delegation", greenObservation, Math.min(deadlineAt, Date.now() + 8_000));
-      positivePathPassed = true;
-    } catch {
-      positivePathPassed = false;
-    }
-    const after = readCounts(kernelDb);
-    assert(!positivePathPassed, `${kind} falsifier unexpectedly created the positive delegation path`);
-    assert(after.tasks === before.tasks, `${kind} falsifier created a Task`);
     if (kind === "old-no-recruit-instruction") {
+      let positivePathPassed = false;
+      try {
+        await waitFor("unexpected positive delegation", greenObservation, Math.min(deadlineAt, Date.now() + 8_000));
+        positivePathPassed = true;
+      } catch {
+        positivePathPassed = false;
+      }
+      const after = readCounts(kernelDb);
+      assert(!positivePathPassed, `${kind} falsifier unexpectedly created the positive delegation path`);
+      assert(after.tasks === before.tasks, `${kind} falsifier created a Task`);
       assert(after.specialistSessions === before.specialistSessions, "old instruction created a specialist session");
       console.log("falsifier=old-no-recruit-instruction result=red");
     } else {
-      assert(after.specialistSessions === before.specialistSessions, "wrong definition falsifier created hermes-worker");
-      assert(after.wrongSpecialistSessions === before.wrongSpecialistSessions + 1, "wrong definition falsifier did not select hermes-worker-2");
+      const wrong = await waitFor("exact wrong-definition observation", async () => {
+        const after = readCounts(kernelDb);
+        const newBindings = [...readSessionBindings(kernelDb).entries()]
+          .filter(([sessionId]) => !beforeSessionIds.has(sessionId));
+        const ui = await rpcCall(endpoint!, "app.ui.evaluate", {
+          expression: `(() => ({
+            directorTiles: document.querySelectorAll('.canvas-tile[data-definition-id="${DIRECTOR_ID}"]').length,
+            specialistTiles: document.querySelectorAll('.canvas-tile[data-definition-id="${SPECIALIST_ID}"]').length,
+            wrongSpecialistTiles: document.querySelectorAll('.canvas-tile[data-definition-id="${WRONG_SPECIALIST_ID}"]').length,
+            participantTiles: document.querySelectorAll('.canvas-tile[data-definition-id][data-session-id]').length,
+            taskTiles: document.querySelectorAll('.canvas-tile[data-qf-world-type="task"]').length,
+            taskFooterFacts: document.querySelectorAll('.qf-task-title, .qf-task-status, .qf-task-delegator, .qf-task-reason').length,
+          }))()`,
+        }) as {
+          directorTiles: number;
+          specialistTiles: number;
+          wrongSpecialistTiles: number;
+          participantTiles: number;
+          taskTiles: number;
+          taskFooterFacts: number;
+        };
+        const exactBindings = newBindings.length === 2 &&
+          newBindings.every(([, targets]) => targets.length === 1) &&
+          newBindings.map(([, targets]) => targets[0]).sort().join("|") === [DIRECTOR_ID, WRONG_SPECIALIST_ID].sort().join("|");
+        const exactKernel = after.sessions === before.sessions + 2 &&
+          after.specialistSessions === before.specialistSessions &&
+          after.wrongSpecialistSessions === before.wrongSpecialistSessions + 1 &&
+          after.tasks === before.tasks &&
+          after.delegatesTo === before.delegatesTo + 1 &&
+          after.delegatedBy === before.delegatedBy &&
+          after.assignedTo === before.assignedTo;
+        const exactUi = ui.directorTiles === 1 && ui.wrongSpecialistTiles === 1 &&
+          ui.participantTiles === 2 && ui.specialistTiles === 0 && ui.taskTiles === 0 && ui.taskFooterFacts === 0;
+        return exactBindings && exactKernel && exactUi ? { after, newBindings, ui } : null;
+      }, Math.min(deadlineAt, Date.now() + 30_000));
+      assert(wrong.newBindings.filter(([, targets]) => targets[0] === WRONG_SPECIALIST_ID).length === 1, "wrong definition did not create exactly one hermes-worker-2 session with one spawned_from link");
+      assert(wrong.ui.specialistTiles === 0 && wrong.ui.taskTiles === 0 && wrong.ui.taskFooterFacts === 0, "wrong definition exposed positive worker/Task UI");
       console.log("falsifier=wrong-worker-definition result=red");
     }
     await recordOwnedProcesses();

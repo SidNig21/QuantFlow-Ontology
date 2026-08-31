@@ -24,6 +24,8 @@ import {
 } from "../../../qf-kernel-schema/src/commands.ts";
 import {
   actionToolForAction,
+  generateMcp,
+  isActionServedToAgents,
   readToolsForObject,
   servedToolsForSchema,
 } from "../../../qf-kernel-schema/src/generate/mcp.ts";
@@ -56,7 +58,7 @@ const PACKAGE_INSPECTOR = join(
 const INGEST_ACTION = "ingest_market_batch";
 const CONTEXT_ACTIONS = ["register_venue", "schedule_market_event"] as const;
 const SERVED_TOOLS_SHA256 =
-  "f42d36773e4b4d726769442f4196ca7ce18c03384b78b8d55446150ff4c72021";
+  "03c328e03c08e3b89969c7f05e7c12e3e45f3318c0c325d041bfc1e6be2badc0";
 const INGEST_EVENTS = ["instrument.ingested", "quote.ingested"] as const;
 const TRACE = { trace_id: "market-gate-trace", span_id: "market-gate-span" };
 
@@ -478,8 +480,8 @@ function commandInventoryProof(): void {
   const pipelineActions = pipelineCommands.map((entry) => entry.action);
   assertSetEqual(
     [...transitionActions, ...creationActions, ...pipelineActions],
-    schema.actions.map((action) => action.name),
-    "schema action ↔ dispatch catalog",
+    schema.actions.filter((action) => action.internalOnly !== true).map((action) => action.name),
+    "generated action ↔ dispatch catalog",
   );
   assert(pipelineCommands.length === 1, "pipeline catalog must contain exactly one command");
   assert(
@@ -507,17 +509,33 @@ function commandInventoryProof(): void {
 function generatedSurfaceProof(): void {
   console.log("\n=== D0/D1 generated authority, served hash, and hidden context actions ===");
   assert(schema.objects.length === 23, `expected 23 objects, got ${schema.objects.length}`);
-  assert(schema.actions.length === 28, `expected 28 actions, got ${schema.actions.length}`);
+  assert(schema.actions.length === 43, `expected 43 actions, got ${schema.actions.length}`);
   const action = schema.actions.find((candidate) => candidate.name === INGEST_ACTION);
   assert(action?.pipelineOnly === true, "ingest_market_batch is not pipelineOnly");
   assert(action.operatorOnly !== true, "pipeline action must not also be operatorOnly");
 
-  const completeCount = schema.objects.length * 3 + schema.actions.length;
+  const theoreticalCount = schema.objects.length * 3 + schema.actions.length;
+  const internalActions = schema.actions.filter((candidate) => candidate.internalOnly === true);
+  const generatedCount = (JSON.parse(generateMcp(schema)) as unknown[]).length;
+  const restrictedGeneratedActions = schema.actions.filter(
+    (candidate) => candidate.internalOnly !== true && !isActionServedToAgents(candidate),
+  );
   const served = servedToolsForSchema(schema);
   const servedHash = createHash("sha256")
     .update(JSON.stringify(served), "utf8")
     .digest("hex");
   assert(servedHash === SERVED_TOOLS_SHA256, `served tool serialization hash changed: ${servedHash}`);
+  assert(theoreticalCount === 112, `theoretical schema tool count expected 112, got ${theoreticalCount}`);
+  assert(internalActions.length === 8, `internal-only action count expected 8, got ${internalActions.length}`);
+  assert(
+    generatedCount === theoreticalCount - internalActions.length && generatedCount === 104,
+    `generated authority must omit exactly 8 internal-only actions: theoretical=${theoreticalCount} internal=${internalActions.length} generated=${generatedCount}`,
+  );
+  assert(
+    restrictedGeneratedActions.length === 5,
+    `generated operator/pipeline action count expected 5, got ${restrictedGeneratedActions.length}`,
+  );
+  assert(served.length === 99, `served tool count expected 99, got ${served.length}`);
   assert(
     actionToolForAction(action).name === "qf_ingest_market_batch",
     "complete action generator does not map ingest_market_batch",
@@ -538,15 +556,13 @@ function generatedSurfaceProof(): void {
       `${actionName} is served to agents`,
     );
   }
-  const hidden = schema.actions.filter(
-    (candidate) => candidate.operatorOnly === true || candidate.pipelineOnly === true,
-  );
+  const hidden = restrictedGeneratedActions;
   assert(
-    served.length === completeCount - hidden.length,
-    `served tool count does not exclude exact trusted-only set (${hidden.length})`,
+    served.length === generatedCount - hidden.length,
+    `served tool count does not exclude exact generated trusted-only set (${hidden.length})`,
   );
   console.log(
-    `objects=${schema.objects.length} actions=${schema.actions.length} complete_tools=${completeCount} served_tools=${served.length} hidden_actions=${JSON.stringify(hidden.map((item) => item.name).sort())}`,
+    `objects=${schema.objects.length} actions=${schema.actions.length} theoretical_tools=${theoreticalCount} internal_only_actions=${internalActions.length} generated_tools=${generatedCount} served_tools=${served.length} hidden_actions=${JSON.stringify(hidden.map((item) => item.name).sort())}`,
   );
 
   const base = {
@@ -693,7 +709,7 @@ function assertCurrentMeta(db: KernelDb, label: string): void {
     );
   }
   const actionCount = count(db, "schema_meta", " WHERE kind = ?", ["action"]);
-  assert(actionCount === 28, `${label} action meta count expected 28, got ${actionCount}`);
+  assert(actionCount === 43, `${label} action meta count expected 43, got ${actionCount}`);
   assert(kernel.classifyKernelShape(db) === "current", `${label} did not classify current`);
 }
 
