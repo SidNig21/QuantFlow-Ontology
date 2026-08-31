@@ -5,6 +5,9 @@ import {
   P14B_ACCEPTED_COMMIT,
   P14B_EVIDENCE_INVENTORY,
   P14B_REQUIRED_HASHES,
+  FINAL_FOUNDER_RECEIPT,
+  finalProductTreeRows,
+  finalProductTreeSha256,
   productTreeRows,
   productTreeSha256,
   validateP14BReceiptSnapshot,
@@ -38,6 +41,10 @@ function green(): P14BReceiptSnapshot {
       "collab-electron/dist/win-unpacked/QuantFlow.exe": { exists: true, bytes: 213_647_360 },
       "collab-electron/dist/QuantFlow Setup 0.8.4.exe": { exists: true, bytes: 127_171_912 },
     },
+    finalReceipt: JSON.parse(readFileSync(join(ROOT, FINAL_FOUNDER_RECEIPT), "utf8")),
+    finalProductTreeSha256: "b".repeat(64),
+    currentFinalProductTreeSha256: "b".repeat(64),
+    releaseProductTreeSha256: "b".repeat(64),
   };
 }
 
@@ -56,17 +63,17 @@ test("identity, ancestry, product tree, file, missing, and evidence-inventory dr
   red((value) => { value.descendant = false; });
   red((value) => { value.currentCommit = "short"; });
   red((value) => { value.currentProductTreeSha256 = "0".repeat(64); });
-  red((value) => { value.hashes["qa/gates/hermes-production-inference.ts"] = "0".repeat(64); });
+  red((value) => { value.hashes["docs/orders/evidence/golden-baseline/phase3/P14-B-PRODUCTION-INFERENCE-20260830.json"] = "0".repeat(64); });
   red((value) => { value.hashes["docs/orders/evidence/golden-baseline/phase3/P14-B-PROMPT-20260830.png"] = null; });
   red((value) => { value.evidenceInventory.push("P14-B-EXTRA.log"); });
   red((value) => { value.evidenceInventory.pop(); });
   expect(() => validateP14BReceiptSnapshot(green())).not.toThrow();
 });
 
-test("current release status and current artifacts fail closed without reusing the historical ASAR hash", () => {
+test("current release status, proof-only product equivalence, and artifacts fail closed", () => {
   red((value) => { value.releaseStatus = null; });
   red((value) => { (value.releaseStatus as Record<string, unknown>).contract = "wrong"; });
-  red((value) => { ((value.releaseStatus as Record<string, unknown>).build as Record<string, unknown>).commit_sha = "0".repeat(40); });
+  red((value) => { ((value.releaseStatus as Record<string, unknown>).build as Record<string, unknown>).commit_sha = "short"; });
   red((value) => { ((value.releaseStatus as Record<string, unknown>).build as Record<string, unknown>).packaged_at = "yesterday"; });
   red((value) => { ((value.releaseStatus as Record<string, unknown>).package as Record<string, unknown>).version = "0.8.3"; });
   red((value) => { ((value.releaseStatus as Record<string, unknown>).artifacts as Array<Record<string, unknown>>)[0]!.path = "C:/repo/wrong.exe"; });
@@ -74,7 +81,22 @@ test("current release status and current artifacts fail closed without reusing t
   red((value) => { value.currentArtifacts["collab-electron/dist/win-unpacked/resources/app.asar"]!.bytes = 0; });
   red((value) => { value.currentArtifacts["collab-electron/dist/win-unpacked/resources/app.asar"]!.sha256 = "not-a-hash"; });
   red((value) => { delete value.currentArtifacts["collab-electron/dist/win-unpacked/QuantFlow.exe"]; });
+  red((value) => { value.currentFinalProductTreeSha256 = "0".repeat(64); });
+  red((value) => { value.releaseProductTreeSha256 = null; });
   expect(() => validateP14BReceiptSnapshot(green())).not.toThrow();
+});
+
+test("final founder product fingerprint excludes proof surfaces and preserves product bytes", () => {
+  const base = [
+    "100644 blob 1111111111111111111111111111111111111111\tqa/gate.ts",
+    "100644 blob 2222222222222222222222222222222222222222\tdocs/orders/NEXT.md",
+    "100644 blob 3333333333333333333333333333333333333333\tqf-atlas/atlas.json",
+    "100644 blob 4444444444444444444444444444444444444444\tcollab-electron/src/main/kernel.ts",
+  ].join("\n");
+  expect(finalProductTreeRows(base)).toHaveLength(1);
+  const fingerprint = finalProductTreeSha256(base);
+  expect(finalProductTreeSha256(base.replace("4444444444444444444444444444444444444444", "5555555555555555555555555555555555555555"))).not.toBe(fingerprint);
+  expect(finalProductTreeSha256(`${base}\n100644 blob 6666666666666666666666666666666666666666\tqa/new-proof.ts`)).toBe(fingerprint);
 });
 
 test("product tree fingerprint preserves mode/type/blob/path and excludes only exact proof surfaces", () => {
@@ -144,6 +166,56 @@ test("prompt, provider, API, Turn, runtime, Kernel, screenshot, exit, and cleanu
   red((value) => { (value.receipt.visual_evidence as Record<string, unknown>).response_png_sha256 = "0".repeat(64); });
   red((value) => { value.receipt.app_exit_code = 1; });
   red((value) => { (value.receipt.cleanup as Record<string, unknown>).processes = 1; });
+  expect(() => validateP14BReceiptSnapshot(green())).not.toThrow();
+});
+
+test("final founder route, identity, prompt, provider, and one-turn cardinality mutations go red", () => {
+  red((value) => { (value.finalReceipt.identity as Record<string, unknown>).candidate = "0".repeat(40); });
+  red((value) => { (value.finalReceipt.route as Record<string, unknown>).authority = "internal RPC"; });
+  red((value) => { (value.finalReceipt.route as Record<string, unknown>).prohibited_substitutions_absent = false; });
+  red((value) => { (value.finalReceipt.prompt as Record<string, unknown>).sha256 = "0".repeat(64); });
+  red((value) => { (value.finalReceipt.execution as Record<string, unknown>).provider = "fallback"; });
+  red((value) => { (value.finalReceipt.execution as Record<string, unknown>).model = "wrong-model"; });
+  red((value) => { (value.finalReceipt.execution as Record<string, unknown>).user_turns = 2; });
+  red((value) => { (value.finalReceipt.execution as Record<string, unknown>).api_calls = 4; });
+  red((value) => { (value.finalReceipt.execution as Record<string, unknown>).tool_turns = 3; });
+  red((value) => { (value.finalReceipt.execution as Record<string, unknown>).fallback = true; });
+  red((value) => { (value.finalReceipt.execution as Record<string, unknown>).unrelated_retry = true; });
+  expect(() => validateP14BReceiptSnapshot(green())).not.toThrow();
+});
+
+test("final five API rows and four ordered governed tool calls are independently fail-capable", () => {
+  red((value) => { (((value.finalReceipt.execution as Record<string, unknown>).api_rows as Array<Record<string, unknown>>)[0]!).input_tokens = 0; });
+  red((value) => { (((value.finalReceipt.execution as Record<string, unknown>).api_rows as Array<Record<string, unknown>>)[1]!).latency_seconds = 0; });
+  red((value) => { (((value.finalReceipt.execution as Record<string, unknown>).api_rows as Array<Record<string, unknown>>)[2]!).provider = "other"; });
+  red((value) => { ((value.finalReceipt.execution as Record<string, unknown>).api_rows as unknown[]).pop(); });
+  red((value) => {
+    const chain = value.finalReceipt.tool_chain as Array<Record<string, unknown>>;
+    [chain[0], chain[1]] = [chain[1]!, chain[0]!];
+  });
+  red((value) => { (((value.finalReceipt.tool_chain as Array<Record<string, unknown>>)[1]!).arguments as Record<string, unknown>).id = "wrong-task"; });
+  red((value) => { (((value.finalReceipt.tool_chain as Array<Record<string, unknown>>)[2]!).arguments as Record<string, unknown>).id = "wrong-session"; });
+  red((value) => { (((value.finalReceipt.tool_chain as Array<Record<string, unknown>>)[3]!).artifact as Record<string, unknown>).sha256 = "0".repeat(64); });
+  red((value) => { (((value.finalReceipt.tool_chain as Array<Record<string, unknown>>)[0]!).artifact as Record<string, unknown>).role = "critic"; });
+  red((value) => {
+    const artifact = (value.finalReceipt.tool_chain as Array<Record<string, unknown>>)[0]!.artifact as Record<string, unknown>;
+    (artifact.result as Array<Record<string, unknown>>)[0]!.status = "closed";
+  });
+  expect(() => validateP14BReceiptSnapshot(green())).not.toThrow();
+});
+
+test("final Kernel lineage, answer, close-reopen truth, visual checkpoints, and updater honesty go red", () => {
+  red((value) => { ((value.finalReceipt.kernel as Record<string, unknown>).task as Record<string, unknown>).id = "wrong-task"; });
+  red((value) => { ((value.finalReceipt.kernel as Record<string, unknown>).session as Record<string, unknown>).id = "wrong-session"; });
+  red((value) => { ((value.finalReceipt.kernel as Record<string, unknown>).links as unknown[]).pop(); });
+  red((value) => { (value.finalReceipt.response as Record<string, unknown>).text = "QF_GOLDEN_ONTOLOGY_OK"; });
+  red((value) => { (value.finalReceipt.response as Record<string, unknown>).required_suffix = "wrong"; });
+  red((value) => { ((value.finalReceipt.lifecycle as Record<string, unknown>).first_shutdown as Record<string, unknown>).processes = 1; });
+  red((value) => { ((value.finalReceipt.lifecycle as Record<string, unknown>).reopen as Record<string, unknown>).task_visible = false; });
+  red((value) => { ((value.finalReceipt.lifecycle as Record<string, unknown>).second_shutdown as Record<string, unknown>).socket_absent = false; });
+  red((value) => { ((value.finalReceipt.visual as Record<string, unknown>).checkpoints as Record<string, unknown>).response_visible = false; });
+  red((value) => { delete ((value.finalReceipt.visual as Record<string, unknown>).update_observation as Record<string, unknown>).http_status; });
+  red((value) => { ((value.finalReceipt.visual as Record<string, unknown>).update_observation as Record<string, unknown>).classification = "hidden"; });
   expect(() => validateP14BReceiptSnapshot(green())).not.toThrow();
 });
 

@@ -1,0 +1,161 @@
+{
+  "schema": "qf.phase3.final-founder-ontology-walkthrough.v1",
+  "gate": "hermes-production-inference-receipt",
+  "result": "PASS",
+  "identity": {
+    "candidate": "a91b5deec9bb49538136c76a031648be2c08e05e",
+    "tree": "e7213a4420f109a8f71bd38970f570a7b4b6295e",
+    "packaged_at": "2026-08-31T03:39:01.739Z",
+    "package": {
+      "app_asar_bytes": 96709659,
+      "app_asar_sha256": "07590470516b065e759555ae23edcdf878032852576fa179100cc23f2ad6bce8",
+      "exe_bytes": 213647360,
+      "exe_sha256": "1101cc1b6084ee0e3cb91d94f32fd1020e8f1b517e67ad4174f4ec6b7f286edf",
+      "installer_bytes": 127171374,
+      "installer_sha256": "74cbfb8d8fca7cfe4d7cbe28986a451df8ee0a87f4365e5ca2b23d87abf2a1f"
+    }
+  },
+  "route": {
+    "authority": "Router-owned Computer Use rendered-product transcript",
+    "task_id": "019ffb57-4d45-70a1-8cb7-30e99f79d348",
+    "isolated_root": "C:\\tmp\\qf-golden-founder-a91b5dee-20260830",
+    "founder_state_untouched": true,
+    "user_actions": [
+      "launch packaged QuantFlow",
+      "click TIDY",
+      "open Dock CATALOG",
+      "pointer-click Research Director SPAWN",
+      "resize participant through the visible southeast handle",
+      "click Create Task and submit the governed Task form",
+      "select and inspect the rendered Task",
+      "focus the rendered Hermes prompt, type the frozen query, and press Enter",
+      "observe the governed response in the same participant tile",
+      "close normally, reopen the same isolated world, inspect truthful History, and close normally"
+    ],
+    "prohibited_substitutions_absent": true,
+    "qa_flags_absent": [
+      "QF_UI_PROOF",
+      "QF_HERMES_SYNTHETIC_TEST",
+      "QF_DOCK_QA_MODE"
+    ]
+  },
+  "prompt": {
+    "text": "Use the connected QuantFlow MCP/Ontology tools to inspect the Task named \"Golden Founder Ontology Walkthrough\". Do not answer from assumptions or terminal context. Read the governed QuantFlow state. Tell me the Task's title, current status, and the participant/role it is assigned to. End your response with QF_GOLDEN_ONTOLOGY_OK.",
+    "bytes": 330,
+    "sha256": "81ae3aa8a59a95237f5e8010802940efa1c3f50f752d31da14ca2edb0d8202bd"
+  },
+  "execution": {
+    "runtime_session": "20260830_204733_f93524",
+    "kernel_session": "cafcad5c-fe94-4055-ac6c-2375c33b004a",
+    "provider": "opencode-go",
+    "model": "kimi-k3",
+    "provider_request_id": "not_exposed",
+    "user_turns": 1,
+    "api_calls": 5,
+    "tool_turns": 4,
+    "finish_reason": "stop",
+    "response_length": 657,
+    "synthetic": false,
+    "fallback": false,
+    "unrelated_retry": false,
+    "runtime_error_codes": [],
+    "session_evidence": {
+      "bytes": 22637,
+      "sha256": "b5494a0417a60a01bd3131891b069126cc6fbbe460792e0c73c22d81ac94c4e6"
+    },
+    "log_evidence": {
+      "bytes": 9673,
+      "sha256": "8d006adac7ea21abcdecd31c23e7552c66a50d06153db2f57d5c1e331280431"
+    },
+    "api_rows": [
+      { "ordinal": 1, "provider": "opencode-go", "model": "kimi-k3", "input_tokens": 1963, "output_tokens": 158, "total_tokens": 2121, "latency_seconds": 5.1 },
+      { "ordinal": 2, "provider": "opencode-go", "model": "kimi-k3", "input_tokens": 2286, "output_tokens": 130, "total_tokens": 2416, "latency_seconds": 4.7 },
+      { "ordinal": 3, "provider": "opencode-go", "model": "kimi-k3", "input_tokens": 2714, "output_tokens": 153, "total_tokens": 2867, "latency_seconds": 8.8 },
+      { "ordinal": 4, "provider": "opencode-go", "model": "kimi-k3", "input_tokens": 3467, "output_tokens": 119, "total_tokens": 3586, "latency_seconds": 22.5 },
+      { "ordinal": 5, "provider": "opencode-go", "model": "kimi-k3", "input_tokens": 3769, "output_tokens": 286, "total_tokens": 4055, "latency_seconds": 9.8 }
+    ]
+  },
+  "tool_chain": [
+    {
+      "ordinal": 1,
+      "tool": "mcp_quantflow_ontology_qf_task_query",
+      "arguments": { "title": "Golden Founder Ontology Walkthrough" },
+      "artifact": { "id": "690b731ea749327193bd0fc67163306df0ffa644224bb79e57d29660966895d2", "bytes": 666, "sha256": "690b731ea749327193bd0fc67163306df0ffa644224bb79e57d29660966895d2", "contract": "qf.ontology.v1", "tool": "qf_task_query", "role": "orchestrator", "session_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "created_at": "2026-08-31T03:49:03.978Z", "nonce": "aa4714ab-329a-4d40-83fe-2e9fe53274b1", "result": [{ "id": "task-5d9e9b6a-26cc-4059-914c-d4f479a47731", "created_at": "2026-08-31T03:48:16.979Z", "title": "Golden Founder Ontology Walkthrough", "description": "Read this exact governed Task through QuantFlow Ontology and report its title, status, and assigned participant role.", "status": "open" }] }
+    },
+    {
+      "ordinal": 2,
+      "tool": "mcp_quantflow_ontology_qf_task_links",
+      "arguments": { "id": "task-5d9e9b6a-26cc-4059-914c-d4f479a47731" },
+      "artifact": { "id": "5edaad9fb84d8a9b7cc96c7773080357ab1f3b7288c46e32f7b7d27084feb024", "bytes": 849, "sha256": "5edaad9fb84d8a9b7cc96c7773080357ab1f3b7288c46e32f7b7d27084feb024", "contract": "qf.ontology.v1", "tool": "qf_task_links", "role": "orchestrator", "session_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "created_at": "2026-08-31T03:49:08.732Z", "nonce": "edf7c9d3-05c4-4a46-94a3-1b4c86063223", "result": [{ "id": "47c90752-b191-400a-8a51-4a7003dd3fe3", "kind": "delegated_by", "from_id": "task-5d9e9b6a-26cc-4059-914c-d4f479a47731", "to_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "created_at": "2026-08-31T03:48:16.979Z" }, { "id": "196c7ca5-37c0-4838-ab3b-3f994f5482a8", "kind": "assigned_to", "from_id": "task-5d9e9b6a-26cc-4059-914c-d4f479a47731", "to_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "created_at": "2026-08-31T03:48:16.980Z" }] }
+    },
+    {
+      "ordinal": 3,
+      "tool": "mcp_quantflow_ontology_qf_agent_session_links",
+      "arguments": { "id": "cafcad5c-fe94-4055-ac6c-2375c33b004a" },
+      "artifact": { "id": "00a1346575a67bb332b0255f1579c63d66a63c09a041f725a593cb8b624ac54d", "bytes": 1651, "sha256": "00a1346575a67bb332b0255f1579c63d66a63c09a041f725a593cb8b624ac54d", "contract": "qf.ontology.v1", "tool": "qf_agent_session_links", "role": "orchestrator", "session_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "created_at": "2026-08-31T03:49:17.536Z", "nonce": "d0b76fc5-659f-4084-a6c8-18d76d574afb", "result": [{ "id": "5146fac4-0852-4b18-b20a-142e31ce77ff", "kind": "spawned_from", "from_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "to_id": "hermes-research-director", "created_at": "2026-08-31T03:47:27.573Z" }, { "id": "47c90752-b191-400a-8a51-4a7003dd3fe3", "kind": "delegated_by", "from_id": "task-5d9e9b6a-26cc-4059-914c-d4f479a47731", "to_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "created_at": "2026-08-31T03:48:16.979Z" }, { "id": "196c7ca5-37c0-4838-ab3b-3f994f5482a8", "kind": "assigned_to", "from_id": "task-5d9e9b6a-26cc-4059-914c-d4f479a47731", "to_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "created_at": "2026-08-31T03:48:16.980Z" }, { "id": "d54792df-bed8-4a50-bcbd-b8495a2a7ec4", "kind": "produces", "from_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "to_id": "690b731ea749327193bd0fc67163306df0ffa644224bb79e57d29660966895d2", "created_at": "2026-08-31T03:49:03.990Z" }, { "id": "e2869511-97f9-4891-9546-2047d3d79007", "kind": "produces", "from_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "to_id": "5edaad9fb84d8a9b7cc96c7773080357ab1f3b7288c46e32f7b7d27084feb024", "created_at": "2026-08-31T03:49:08.742Z" }] }
+    },
+    {
+      "ordinal": 4,
+      "tool": "mcp_quantflow_ontology_qf_agent_definition_query",
+      "arguments": { "name": "hermes-research-director" },
+      "artifact": { "id": "6ca4ec32ed6430d2c440d957556db6f0ff1fc7a839ecca1af8dd8a1dbb1747c7", "bytes": 752, "sha256": "6ca4ec32ed6430d2c440d957556db6f0ff1fc7a839ecca1af8dd8a1dbb1747c7", "contract": "qf.ontology.v1", "tool": "qf_agent_definition_query", "role": "orchestrator", "session_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "created_at": "2026-08-31T03:49:40.053Z", "nonce": "7ee2556d-7c70-43b5-9fd8-d684b4ea463b", "result": [{ "id": "hermes-research-director", "created_at": "2026-08-31T03:44:26.333Z", "name": "hermes-research-director", "role": "orchestrator", "package_ref": "species/hermes/packed/hermes.aospkg", "system_prompt_ref": "prompts/research-director.md", "runtime_profile": "default", "capability_groups": "[\"desk.orchestrate\"]", "display_name": "Research Director" }] }
+    }
+  ],
+  "kernel": {
+    "bytes": 270336,
+    "sha256": "65d67b862c453950736125dcd7bad80e44ffe420eb39d3c3301f3bc9ff588b26",
+    "task": {
+      "id": "task-5d9e9b6a-26cc-4059-914c-d4f479a47731",
+      "created_at": "2026-08-31T03:48:16.979Z",
+      "title": "Golden Founder Ontology Walkthrough",
+      "description": "Read this exact governed Task through QuantFlow Ontology and report its title, status, and assigned participant role.",
+      "status": "open"
+    },
+    "session": { "id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "created_at": "2026-08-31T03:47:27.572Z", "status_after_reopen": "failed", "label": "hermes-research-director" },
+    "links": [
+      { "id": "5146fac4-0852-4b18-b20a-142e31ce77ff", "kind": "spawned_from", "from_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "to_id": "hermes-research-director" },
+      { "id": "47c90752-b191-400a-8a51-4a7003dd3fe3", "kind": "delegated_by", "from_id": "task-5d9e9b6a-26cc-4059-914c-d4f479a47731", "to_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a" },
+      { "id": "196c7ca5-37c0-4838-ab3b-3f994f5482a8", "kind": "assigned_to", "from_id": "task-5d9e9b6a-26cc-4059-914c-d4f479a47731", "to_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a" },
+      { "id": "d54792df-bed8-4a50-bcbd-b8495a2a7ec4", "kind": "produces", "from_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "to_id": "690b731ea749327193bd0fc67163306df0ffa644224bb79e57d29660966895d2" },
+      { "id": "e2869511-97f9-4891-9546-2047d3d79007", "kind": "produces", "from_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "to_id": "5edaad9fb84d8a9b7cc96c7773080357ab1f3b7288c46e32f7b7d27084feb024" },
+      { "id": "118a231d-7acd-4ba3-848a-296b924dc674", "kind": "produces", "from_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "to_id": "00a1346575a67bb332b0255f1579c63d66a63c09a041f725a593cb8b624ac54d" },
+      { "id": "63c34ba4-9b9a-4b44-acb3-ae92cbf9cfaa", "kind": "produces", "from_id": "cafcad5c-fe94-4055-ac6c-2375c33b004a", "to_id": "6ca4ec32ed6430d2c440d957556db6f0ff1fc7a839ecca1af8dd8a1dbb1747c7" }
+    ]
+  },
+  "response": {
+    "text": "I read the governed QuantFlow Ontology state directly. Here are the results:\n\n**Task Inspection — \"Golden Founder Ontology Walkthrough\"**\n\n- **Title:** Golden Founder Ontology Walkthrough\n- **Current status:** `open`\n- **Assigned participant/role:** The task carries an `assigned_to` link to agent session `cafcad5c-fe94-4055-ac6c-2375c33b004a`, which was `spawned_from` the agent definition `hermes-research-director` — display name **Research Director**, role **orchestrator**.\n\nEvidence trail (read from ontology, not assumptions): task query → task links (`assigned_to`) → session links (`spawned_from`) → agent definition lookup.\n\nQF_GOLDEN_ONTOLOGY_OK",
+    "bytes": 667,
+    "sha256": "bbbba3d8ad53491505abcb5662e050f6b11dc58950dd57592da5fad176e685da",
+    "required_suffix": "QF_GOLDEN_ONTOLOGY_OK"
+  },
+  "lifecycle": {
+    "first_shutdown": { "processes": 0, "socket_absent": true, "pty_pid_absent": true },
+    "reopen": { "live": 0, "closed": 1, "session": "closed", "runtime": "stopped", "work": "blocked", "recovery": "restartable", "task_visible": true, "history_same_participant": true, "inspect_same_task": true, "kernel_status": "failed" },
+    "second_shutdown": { "processes": 0, "socket_absent": true, "pty_pid_absent": true }
+  },
+  "visual": {
+    "authority": "Router-owned Computer Use rendered-product transcript",
+    "persisted_screenshot_files": false,
+    "checkpoints": {
+      "packaged_identity": true,
+      "dock_spawn": true,
+      "participant_tile": true,
+      "hermes_ready": true,
+      "task_inspect": true,
+      "prompt_visible": true,
+      "response_visible": true,
+      "reopened_history": true
+    },
+    "update_observation": {
+      "visible": "Update failed — retry",
+      "http_status": 406,
+      "endpoint": "/releases/latest",
+      "classification": "honest unavailable release channel for unsigned internal package",
+      "affected_product_path": false
+    }
+  },
+  "scope": {
+    "claim": "one founder-operated packaged QuantFlow turn in which real Hermes/Kimi read one real standalone Kernel Task through four governed Ontology tools",
+    "r18_claimed": false
+  }
+}
