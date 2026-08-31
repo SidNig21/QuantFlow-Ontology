@@ -1,11 +1,11 @@
 # NEXT — R18 GOLDEN BASELINE / PHASE 2 CLOSED / PHASE 3 CURRENT FOUNDER PATH
 
-status: G1–G12 CLOSED / PHASE 2 ACCEPTED / PHASE 3 ACCEPTED / GOLDEN BASELINE DESIGNATED / R18 CLOSED
+status: GOLDEN BASELINE ACCEPTED / README CURRENT-STATE REFRESH OPEN / R18 CLOSED
 rotated-at: 2026-08-30
 rotated-by: Router under founder standing mechanical authority
 active-order: [WO-GOLDEN-PHASE3](WO-GOLDEN-PHASE3.md)
-builder-authority: **CLOSED — Golden candidate accepted; no product, proof, cleanup, Atlas, package, dependency, or R18 work is authorized**
-router-authority: **CLOSED AFTER RECORDING THIS DESIGNATION AND RECONCILING THE ACCEPTED EVIDENCE HEAD TO THE PROTECTED MAIN/REMOTE BY NON-FORCE FAST-FORWARD; R18 remains closed and requires a separate founder-authorized rotation**
+builder-authority: **OPEN TO README.md ONLY under founder-authorized `WO-README-GOLDEN-REFRESH`; no product, schema, Kernel, Canvas, Dock, adapter, package, dependency, Atlas, gate, or R18 change**
+router-authority: **OPEN TO FREEZE ONE DOCS-ONLY README CANDIDATE, ROUTE ONE INDEPENDENT READ-ONLY VERIFIER, CLOSE THE ORDER AFTER PASS, AND NON-FORCE FAST-FORWARD MAIN/REMOTE; R18 remains closed**
 golden-fast-mode: **STANDING EXECUTION POLICY — freeze the starting matrix once; make fast preflight and focused checks green before one complete registered group gate; reuse exact product-bundle SHA builds; use the lowest falsifying proof tier; route PRODUCT RED versus HARNESS RED; require Reader only for semantics/authority/scope/group-boundary changes; use run-scoped IDs, isolated roots/DB, explicit readiness, generated receipts, parallel read-only checks, then one independent Verifier; packaged lifecycle is reserved for G12/Phase 3; standards, assertions, and independence are unchanged**
 g10-status: **CLOSED — accepted candidate `96ad59984a62dc8defe224c4404b34c7ca3b2157` / tree `10ae35acc709b96da6c535dd88ff13f11297906d`; independent Verifier task `01a0508a-43f5-7101-9416-0683ba081449`; final `processes=0 roots_remaining=0 leaked=[]`; its then-inherited G12 red is now cured by accepted G12**
 g10-closure: [independent G10 acceptance](evidence/golden-baseline/g10/VERIFIER-ACCEPTANCE-20260829.md) | [receipt-hash clarification](evidence/golden-baseline/g10/RECEIPT-HASH-CLARIFICATION-20260829.md)
@@ -41,6 +41,7 @@ phase3-final-founder-ontology-walkthrough: [founder-authorized exact current-byt
 phase3-final-founder-ontology-reader: [fresh Reader YES / YES](evidence/golden-baseline/phase3/PHASE3-FINAL-FOUNDER-ONTOLOGY-WALKTHROUGH-READER-ACCEPTANCE-20260830.md) — **five provider calls are one four-tool user turn; updater 406 is honest non-blocking internal-release-channel absence; proof-only surface is sufficient; no R18 expansion**
 phase3-final-verifier: [independent PASS](evidence/golden-baseline/phase3/PHASE3-FINAL-VERIFIER-ACCEPTANCE-20260831.md) — **candidate `7c26141f...` / tree `d13cca5a...`; founder receipt 11/11; Atlas current / HARD RED 0; product bytes equivalent; processes zero**
 golden-designation: [accepted Golden Baseline](evidence/golden-baseline/phase3/GOLDEN-DESIGNATION-20260831.md) — **Phase 2 and Phase 3 closed; R18 closed pending a separate founder-authorized rotation**
+readme-golden-refresh: [current-state docs-only order](WO-README-GOLDEN-REFRESH.md) — **remove stale G11/QA-inventory/design-reference claims and state only accepted Golden capability; no future-rung work**
 phase3-founder-link-semantics: [accepted one-file gateway authority](evidence/golden-baseline/phase3/PHASE3-FOUNDER-LINK-SEMANTICS-AMENDMENT-20260830.md) | [fresh Reader YES / YES](evidence/golden-baseline/phase3/PHASE3-FOUNDER-LINK-SEMANTICS-READER-ACCEPTANCE-20260830.md) — **generated default link reads and explicit `both` return every Kernel edge touching the id; explicit `from`/`to` retain directional behavior; no hidden argument may rescue packaged proof; no schema/Kernel/MCP bridge/UI/R18 change**
 phase3-source: `d14ceb36659d86f157b4856b927581616dbaaa56` / tree `b84d4641a5f37e76c3e62a7df54d8019e0869ffe`
 phase3-amendment: **the first fresh Reader's five finite defects are closed in the current authority packet: finite census/completeness, exact Windows traversal and Kernel oracle, isolated cold-source lifecycle, immutable candidate/Verifier/Golden chain, and explicit R18 freeze; a fresh YES / YES against this amended commit is still required**
