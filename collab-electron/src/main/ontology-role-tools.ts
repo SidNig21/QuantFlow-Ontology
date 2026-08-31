@@ -1,6 +1,9 @@
 const FOCUSED_ROLE_TOOLS: Record<string, ReadonlySet<string>> = {
   orchestrator: new Set([
     "qf_agent_definition_query",
+    "qf_agent_session_links",
+    "qf_task_query",
+    "qf_task_links",
     "qf_create_agent_session",
     "qf_start_agent_session",
   ]),

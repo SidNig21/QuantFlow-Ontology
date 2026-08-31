@@ -148,9 +148,12 @@ export function callOntologyReadTool(
       args.direction === "from" || args.direction === "to" || args.direction === "both"
         ? args.direction
         : undefined;
-    result = kernelGetLinks(id, kind ? { kind } : undefined).filter((link) =>
-      direction === "from" ? link.from_id === id : link.to_id === id
-    );
+    const links = kernelGetLinks(id, kind ? { kind } : undefined);
+    result = direction === "from"
+      ? links.filter((link) => link.from_id === id)
+      : direction === "to"
+        ? links.filter((link) => link.to_id === id)
+        : links;
   }
   const governed = kernelGovernedReviewContextForSession(identity.sessionId);
   if (

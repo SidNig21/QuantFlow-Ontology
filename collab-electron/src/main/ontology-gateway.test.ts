@@ -49,7 +49,7 @@ mock.module("electron", () => ({
   } = await import("./kernel");
 const { registerOntologyGatewayRpc } = await import("./ontology-gateway");
 
-const { existsSync, mkdtempSync, rmSync } = await import("node:fs");
+const { existsSync, mkdirSync, mkdtempSync, rmSync } = await import("node:fs");
 const { tmpdir } = await import("node:os");
 const { join } = await import("node:path");
 const gatewaySuiteRoot = mkdtempSync(join(tmpdir(), "qf-ontology-gateway-suite-"));
@@ -107,9 +107,11 @@ test("generic ontology actions expose deterministic execution but not task bypas
 test("native research roles receive a focused generated ontology surface", () => {
   const tools = [
     { name: "qf_agent_definition_query" },
+    { name: "qf_agent_session_links" },
     { name: "qf_create_agent_session" },
     { name: "qf_start_agent_session" },
     { name: "qf_task_query" },
+    { name: "qf_task_links" },
     { name: "qf_hypothesis_get" },
     { name: "qf_run_get" },
     { name: "qf_artifact_get" },
@@ -118,8 +120,11 @@ test("native research roles receive a focused generated ontology surface", () =>
   ];
   expect(ontologyToolsForRole("orchestrator", tools).map((tool) => tool.name)).toEqual([
     "qf_agent_definition_query",
+    "qf_agent_session_links",
     "qf_create_agent_session",
     "qf_start_agent_session",
+    "qf_task_query",
+    "qf_task_links",
   ]);
   expect(ontologyToolsForRole("critic", tools).map((tool) => tool.name)).toEqual([
     "qf_hypothesis_get",
@@ -128,6 +133,97 @@ test("native research roles receive a focused generated ontology surface", () =>
     "qf_record_evaluation",
   ]);
   expect(ontologyToolsForRole("worker", tools)).toEqual(tools);
+});
+
+test("the Director reads one governed Task and its exact assignment lineage", async () => {
+  const { callOntologyReadTool } = await import("./ontology-gateway");
+  const artifactRoot = join(gatewaySuiteRoot, "founder-task-read-artifacts");
+  const previousArtifactRoot = process.env.QF_ARTIFACT_ROOT;
+  process.env.QF_ARTIFACT_ROOT = artifactRoot;
+  mkdirSync(artifactRoot, { recursive: true });
+  const trace = () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  const definitionId = "founder-task-read-director";
+  const sessionId = "founder-task-read-session";
+  const taskId = "founder-task-read-task";
+  const taskTitle = "Golden Founder Ontology Walkthrough";
+
+  try {
+    openAppKernel();
+    kernelExecute("register_agent_definition", {
+      name: definitionId,
+      role: "orchestrator",
+      package_ref: "test:founder-task-read-director",
+      capability_groups: ["desk.orchestrate"],
+      display_name: "Research Director",
+    }, trace());
+    kernelExecute("create_agent_session", {
+      session_id: sessionId,
+      agent_definition_id: definitionId,
+      label: "Research Director",
+    }, trace());
+    kernelExecute("start_agent_session", { session_id: sessionId }, trace());
+    kernelExecute("create_task", {
+      task_id: taskId,
+      title: taskTitle,
+      description: "Read this exact governed Task through QuantFlow Ontology.",
+      assignee_session_id: sessionId,
+    }, { ...trace(), actor_session_id: sessionId });
+
+    const identity = { sessionId, role: "orchestrator" };
+    const artifactIds = new Set<string>();
+    const read = (tool: string, args: Record<string, unknown>) => {
+      const response = callOntologyReadTool(identity, tool, args);
+      expect(artifactIds.has(response.artifactId)).toBe(false);
+      artifactIds.add(response.artifactId);
+      const artifact = kernelGetObject("artifact", response.artifactId);
+      expect(artifact?.kind).toBe("trajectory");
+      const payload = JSON.parse(readFileSync(String(artifact?.storage_ref), "utf8")) as Record<string, unknown>;
+      expect(payload).toMatchObject({
+        tool,
+        arguments: args,
+        result: response.result,
+        session_id: sessionId,
+        role: "orchestrator",
+      });
+      expect(kernelGetLinks(response.artifactId, { kind: "produces" })).toContainEqual(
+        expect.objectContaining({ kind: "produces", from_id: sessionId, to_id: response.artifactId }),
+      );
+      return response.result;
+    };
+
+    const tasks = read("qf_task_query", { title: taskTitle }) as Array<Record<string, unknown>>;
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0]).toMatchObject({ id: taskId, title: taskTitle, status: "open" });
+
+    const taskLinks = read("qf_task_links", { id: taskId }) as Array<Record<string, unknown>>;
+    expect(taskLinks.filter((link) => link.kind === "assigned_to")).toEqual([
+      expect.objectContaining({ from_id: taskId, to_id: sessionId }),
+    ]);
+    expect(read("qf_task_links", { id: taskId, direction: "both" })).toEqual(taskLinks);
+    expect(read("qf_task_links", { id: taskId, direction: "from" })).toEqual(
+      taskLinks.filter((link) => link.from_id === taskId),
+    );
+    expect(read("qf_task_links", { id: taskId, direction: "to" })).toEqual(
+      taskLinks.filter((link) => link.to_id === taskId),
+    );
+
+    const sessionLinks = read("qf_agent_session_links", { id: sessionId }) as Array<Record<string, unknown>>;
+    expect(sessionLinks.filter((link) => link.kind === "spawned_from")).toEqual([
+      expect.objectContaining({ from_id: sessionId, to_id: definitionId }),
+    ]);
+    expect(sessionLinks.filter((link) => link.kind === "assigned_to")).toEqual([
+      expect.objectContaining({ from_id: taskId, to_id: sessionId }),
+    ]);
+
+    const definitions = read("qf_agent_definition_query", { name: definitionId }) as Array<Record<string, unknown>>;
+    expect(definitions).toEqual([
+      expect.objectContaining({ id: definitionId, role: "orchestrator", display_name: "Research Director" }),
+    ]);
+    expect(artifactIds.size).toBe(7);
+  } finally {
+    if (previousArtifactRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
+    else process.env.QF_ARTIFACT_ROOT = previousArtifactRoot;
+  }
 });
 
 test("production list_tools serves action and read schemas for admitted seats", () => {
@@ -225,6 +321,14 @@ test("production list_tools serves action and read schemas for admitted seats", 
     }, rpcContext) as { tools: Array<{ name: string; description: string; inputSchema: Record<string, unknown> }> };
 
     const orchestratorTools = serve(orchestratorSessionId, "orchestrator").tools;
+    expect(orchestratorTools.map((tool) => tool.name).sort()).toEqual([
+      "qf_agent_definition_query",
+      "qf_agent_session_links",
+      "qf_create_agent_session",
+      "qf_start_agent_session",
+      "qf_task_links",
+      "qf_task_query",
+    ]);
     const createAgentSession = orchestratorTools.find((tool) => tool.name === "qf_create_agent_session");
     expect(createAgentSession).toBeDefined();
     const createAgentSessionAction = schema.actions.find((action) => action.name === "create_agent_session");
@@ -241,6 +345,7 @@ test("production list_tools serves action and read schemas for admitted seats", 
     ]);
 
     const marketTools = serve(marketSessionId, "worker").tools;
+    expect(marketTools.some((tool) => ["qf_task_query", "qf_task_links", "qf_agent_session_links"].includes(tool.name))).toBe(false);
     const venueGet = marketTools.find((tool) => tool.name === "qf_venue_get");
     expect(venueGet).toBeDefined();
     const venue = schema.objects.find((object) => object.name === "venue");
@@ -250,6 +355,7 @@ test("production list_tools serves action and read schemas for admitted seats", 
     expect(venueGet).toEqual(expectedVenueGet);
 
     const criticTools = serve(criticSessionId, "critic").tools;
+    expect(criticTools.some((tool) => ["qf_task_query", "qf_task_links", "qf_agent_session_links"].includes(tool.name))).toBe(false);
     const recordEvaluation = criticTools.find((tool) => tool.name === "qf_record_evaluation");
     expect(recordEvaluation).toBeDefined();
     const rubric = (recordEvaluation!.inputSchema.properties as Record<string, unknown>).rubric;

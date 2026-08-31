@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "48921711",
+    "commit": "b4d22948",
     "generatedAt": "2026-08-31",
     "filesScanned": 413,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "c16d3b03a784978e"
+    "fingerprint": "0d559edb193847a7"
   },
   "stats": {
     "live": 109,
@@ -1753,7 +1753,7 @@
       "id": "2:collab-electron/src/main::ontology",
       "layer": 2,
       "name": "ontology*",
-      "kb": 12,
+      "kb": 12.2,
       "x": -2,
       "z": 3.42,
       "status": "ok",
@@ -1764,7 +1764,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/ontology-gateway.ts",
-          "kb": 10.7,
+          "kb": 10.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
@@ -1774,7 +1774,7 @@
         },
         {
           "path": "collab-electron/src/main/ontology-role-tools.ts",
-          "kb": 0.5,
+          "kb": 0.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3236,7 +3236,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1241.9,
+      "kb": 1256.3,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3350,6 +3350,16 @@
           "kb": 24.1,
           "spawns": 5,
           "spawnsLive": 5,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/windows-dock-ontology.ts",
+          "kb": 23.5,
+          "spawns": 1,
+          "spawnsLive": 1,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
@@ -3507,16 +3517,6 @@
         {
           "path": "qa/gates/windows-dock-hire.ts",
           "kb": 9.8,
-          "spawns": 1,
-          "spawnsLive": 1,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/windows-dock-ontology.ts",
-          "kb": 9.1,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -53256,12 +53256,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "6c7f76ce",
+      "commit": "48921711",
       "generatedAt": "2026-08-31"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "48921711",
+      "commit": "b4d22948",
       "generatedAt": "2026-08-31"
     },
     "verdict": "better",
