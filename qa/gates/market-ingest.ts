@@ -6,6 +6,7 @@
  * happened to materialize their dependencies.
  */
 import { join } from "node:path";
+import { runFrozenPackageInstall } from "../package-install.ts";
 
 const REPO = join(import.meta.dir, "../..");
 const INSTALL_PLAN = [
@@ -17,16 +18,7 @@ const INSTALL_PLAN = [
 
 async function run(): Promise<number> {
   for (const entry of INSTALL_PLAN) {
-    const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-      cwd: entry.cwd,
-      stdout: "inherit",
-      stderr: "inherit",
-    });
-    const code = await install.exited;
-    if (code !== 0) {
-      console.error(`market-ingest: ${entry.name} bun install exited ${code}`);
-      return code;
-    }
+    if (!(await runFrozenPackageInstall("market-ingest", entry.cwd))) return 1;
   }
 
   const gate = Bun.spawn(["bun", "./run.ts"], {

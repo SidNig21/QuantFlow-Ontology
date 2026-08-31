@@ -153,6 +153,9 @@ const SERVING_ALLOWLIST = new Set([
   // G2: pure QA comparisons; neither registers nor advertises tools.
   "qa/gates/doc-action-surface.ts",
   "qa/gates/governed-review.ts",
+  // Phase 3: compares the complete generated catalogue with the filtered
+  // served catalogue; it does not register or advertise tools.
+  "qa/gates/market-ingest/run.ts",
   "qa/gates/observe-door.ts",
 ]);
 
