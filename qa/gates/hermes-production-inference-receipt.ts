@@ -2,10 +2,11 @@
 /** Reuse the one accepted P14-B live inference receipt without another provider call. */
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 export const P14B_ACCEPTED_COMMIT = "bb837464d889ea196c4c00aeb003bf949296d91f";
+export const P14B_ACCEPTED_PRODUCT_BASE = "a44c0f1ad20a8878ba74db321bbd9088a8c42f6d";
 export const P14B_PACKAGE_SHA256 = "1611d0725f53ffcc83c85073f28a4348869b0406fa36cd7213abeac35e0df8e3";
 export const P14B_PROMPT_SHA256 = "f9f9a7a454880b623ad5d337c9126c5b4e41538a8d78bc3f0141907c4da310e1";
 export const P14B_REQUIRED_HASHES = {
@@ -14,7 +15,6 @@ export const P14B_REQUIRED_HASHES = {
   "docs/orders/evidence/golden-baseline/phase3/P14-B-PRODUCTION-INFERENCE-20260830.json": "206d43652004020263181c89c2817ded76693a7617fe9148b498ca2ccdc24583",
   "docs/orders/evidence/golden-baseline/phase3/P14-B-PROMPT-20260830.png": "9525a0eea113d7ee36a8f6ad4311b133fecec29085e8851894136726526e6d80",
   "docs/orders/evidence/golden-baseline/phase3/P14-B-RESPONSE-20260830.png": "eefdcc93fd6bd3452b399ea8d5c3770025c6e116161c74572bcf36d1f7fa0024",
-  "collab-electron/dist/win-unpacked/resources/app.asar": P14B_PACKAGE_SHA256,
 } as const;
 
 export const P14B_EVIDENCE_INVENTORY = [
@@ -46,7 +46,21 @@ export type P14BReceiptSnapshot = {
   hashes: Record<string, string | null>;
   evidenceInventory: string[];
   receipt: Json;
+  acceptedProductTreeSha256: string;
+  currentProductTreeSha256: string;
+  releaseStatus: Json | null;
+  currentArtifacts: Record<string, { exists: boolean; bytes: number; sha256?: string }>;
 };
+
+const CURRENT_ASAR = "collab-electron/dist/win-unpacked/resources/app.asar";
+const CURRENT_EXE = "collab-electron/dist/win-unpacked/QuantFlow.exe";
+const CURRENT_INSTALLER = "collab-electron/dist/QuantFlow Setup 0.8.4.exe";
+const PRODUCT_TREE_EXACT_EXCLUSION = "tools/qf-bovada-football/src/gate.ts";
+const PRODUCT_TREE_PREFIX_EXCLUSIONS = [
+  "qa/",
+  "docs/orders/evidence/golden-baseline/phase3/",
+  "qf-atlas/",
+] as const;
 
 function object(value: unknown, label: string): Json {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`${label} is not an object`);
@@ -90,6 +104,27 @@ function rejectLeakage(value: unknown, path = "receipt"): void {
   }
 }
 
+export function productTreeRows(lsTree: string): string[] {
+  return lsTree.replaceAll("\r\n", "\n").split("\n").filter(Boolean).filter((row) => {
+    const separator = row.indexOf("\t");
+    requireValue(separator > 0, "malformed git ls-tree row");
+    const metadata = row.slice(0, separator).split(" ");
+    requireValue(metadata.length === 3 && /^[0-7]{6}$/.test(metadata[0]!) && metadata[1] === "blob" && /^[0-9a-f]{40}$/.test(metadata[2]!), "git ls-tree row lacks exact mode/type/blob");
+    const path = row.slice(separator + 1);
+    if (path === PRODUCT_TREE_EXACT_EXCLUSION) return false;
+    return !PRODUCT_TREE_PREFIX_EXCLUSIONS.some((prefix) => path.startsWith(prefix));
+  }).sort();
+}
+
+export function productTreeSha256(lsTree: string): string {
+  const rows = productTreeRows(lsTree);
+  return createHash("sha256").update(rows.length ? `${rows.join("\n")}\n` : "", "utf8").digest("hex");
+}
+
+function normalizedArtifactPath(value: unknown): string {
+  return typeof value === "string" ? value.replaceAll("\\", "/") : "";
+}
+
 export function validateP14BReceiptSnapshot(snapshot: P14BReceiptSnapshot): void {
   requireValue(snapshot.clean, "repository is dirty");
   requireValue(/^[0-9a-f]{40}$/.test(snapshot.currentCommit) && snapshot.descendant, "current commit is not a clean descendant of accepted P14-B authority");
@@ -102,6 +137,27 @@ export function validateP14BReceiptSnapshot(snapshot: P14BReceiptSnapshot): void
     JSON.stringify([...snapshot.evidenceInventory].sort()) === JSON.stringify([...P14B_EVIDENCE_INVENTORY].sort()),
     "P14-B evidence inventory drift",
   );
+  requireValue(/^[0-9a-f]{64}$/.test(snapshot.acceptedProductTreeSha256) && snapshot.acceptedProductTreeSha256 === snapshot.currentProductTreeSha256, "current product tree differs from accepted P14-B product base");
+
+  const release = exactKeys(snapshot.releaseStatus, ["artifacts", "build", "contract", "installer", "package"], "release_status");
+  const releasePackage = exactKeys(release.package, ["name", "productName", "version"], "release_status.package");
+  const releaseBuild = exactKeys(release.build, ["commit_sha", "packaged_at"], "release_status.build");
+  const releaseInstaller = exactKeys(release.installer, ["authenticode", "name", "path"], "release_status.installer");
+  const releaseArtifacts = exactArray(release.artifacts, 2, "release_status.artifacts").map((row, index) => exactKeys(row, ["authenticode", "path"], `release_status.artifacts[${index}]`));
+  requireValue(release.contract === "qf.windows.release-status.v1", "release status contract drift");
+  requireValue(releasePackage.name === "@quantflow/electron" && releasePackage.productName === "QuantFlow" && releasePackage.version === "0.8.4", "release package identity drift");
+  requireValue(releaseBuild.commit_sha === snapshot.currentCommit, "release status is not bound to current HEAD");
+  const packagedAt = typeof releaseBuild.packaged_at === "string" ? releaseBuild.packaged_at : "";
+  requireValue(packagedAt.length > 0 && Number.isFinite(Date.parse(packagedAt)) && new Date(packagedAt).toISOString() === packagedAt, "release packaged_at is not canonical");
+  requireValue(releaseInstaller.name === "QuantFlow Setup 0.8.4.exe" && normalizedArtifactPath(releaseInstaller.path).endsWith(`/${CURRENT_INSTALLER}`), "release installer reference drift");
+  const referencedArtifacts = releaseArtifacts.map((row) => normalizedArtifactPath(row.path)).sort();
+  requireValue([CURRENT_INSTALLER, CURRENT_EXE].every((expected) => referencedArtifacts.some((path) => path.endsWith(`/${expected}`))), "release artifact references drift");
+  requireValue(JSON.stringify(Object.keys(snapshot.currentArtifacts).sort()) === JSON.stringify([CURRENT_ASAR, CURRENT_EXE, CURRENT_INSTALLER].sort()), "current artifact inventory drift");
+  for (const path of [CURRENT_ASAR, CURRENT_EXE, CURRENT_INSTALLER]) {
+    const artifact = snapshot.currentArtifacts[path];
+    requireValue(artifact?.exists === true && artifact.bytes > 0, `current release artifact missing or empty: ${path}`);
+  }
+  requireValue(/^[0-9a-f]{64}$/.test(snapshot.currentArtifacts[CURRENT_ASAR]!.sha256 ?? ""), "current app.asar hash fact missing");
 
   rejectLeakage(snapshot.receipt);
   const receipt = exactKeys(snapshot.receipt, TOP_KEYS, "receipt");
@@ -136,8 +192,8 @@ function sha256(path: string): string {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
-function git(args: string[]): string {
-  return execFileSync("git", args, { cwd: join(import.meta.dir, "../.."), encoding: "utf8" }).trim();
+function git(root: string, args: string[]): string {
+  return execFileSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 128 * 1024 * 1024 }).replaceAll("\r\n", "\n").trim();
 }
 
 export function collectP14BReceiptSnapshot(root = join(import.meta.dir, "../..")): P14BReceiptSnapshot {
@@ -148,14 +204,31 @@ export function collectP14BReceiptSnapshot(root = join(import.meta.dir, "../..")
     const absolute = join(root, path);
     hashes[path] = existsSync(absolute) ? sha256(absolute) : null;
   }
+  const currentCommit = git(root, ["rev-parse", "HEAD"]);
+  const currentArtifacts: P14BReceiptSnapshot["currentArtifacts"] = {};
+  for (const path of [CURRENT_ASAR, CURRENT_EXE, CURRENT_INSTALLER]) {
+    const absolute = join(root, path);
+    const exists = existsSync(absolute);
+    currentArtifacts[path] = {
+      exists,
+      bytes: exists ? statSync(absolute).size : 0,
+      ...(path === CURRENT_ASAR && exists ? { sha256: sha256(absolute) } : {}),
+    };
+  }
   const ancestry = spawnSync("git", ["merge-base", "--is-ancestor", P14B_ACCEPTED_COMMIT, "HEAD"], { cwd: root, windowsHide: true });
   return {
-    currentCommit: git(["rev-parse", "HEAD"]),
-    clean: git(["status", "--porcelain=v1", "--untracked-files=all"]) === "",
+    currentCommit,
+    clean: git(root, ["status", "--porcelain=v1", "--untracked-files=all"]) === "",
     descendant: ancestry.status === 0,
     hashes,
     evidenceInventory: readdirSync(evidenceRoot).filter((name) => name.startsWith("P14-B-")).sort(),
     receipt: JSON.parse(readFileSync(receiptPath, "utf8")) as Json,
+    acceptedProductTreeSha256: productTreeSha256(git(root, ["ls-tree", "-r", "--full-tree", P14B_ACCEPTED_PRODUCT_BASE])),
+    currentProductTreeSha256: productTreeSha256(git(root, ["ls-tree", "-r", "--full-tree", currentCommit])),
+    releaseStatus: existsSync(join(root, "collab-electron/dist/RELEASE-STATUS.json"))
+      ? JSON.parse(readFileSync(join(root, "collab-electron/dist/RELEASE-STATUS.json"), "utf8")) as Json
+      : null,
+    currentArtifacts,
   };
 }
 
@@ -163,7 +236,7 @@ export function runP14BReceiptGate(): { ok: boolean } {
   try {
     const snapshot = collectP14BReceiptSnapshot();
     validateP14BReceiptSnapshot(snapshot);
-    console.log(`p14-b-receipt: PASS accepted=${P14B_ACCEPTED_COMMIT.slice(0, 8)} current=${snapshot.currentCommit.slice(0, 8)} package=${P14B_PACKAGE_SHA256}`);
+    console.log(`p14-b-receipt: PASS accepted=${P14B_ACCEPTED_COMMIT.slice(0, 8)} current=${snapshot.currentCommit.slice(0, 8)} live_bundle=${P14B_PACKAGE_SHA256} current_asar=${snapshot.currentArtifacts[CURRENT_ASAR]!.sha256}`);
     return { ok: true };
   } catch (error) {
     console.error(`p14-b-receipt: RED ${error instanceof Error ? error.message : String(error)}`);
