@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "a44c0f1a",
+    "commit": "bde84a70",
     "generatedAt": "2026-08-31",
-    "filesScanned": 412,
+    "filesScanned": 413,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "7125be8b3644a288"
+    "fingerprint": "88a96e7ede9c107b"
   },
   "stats": {
     "live": 109,
@@ -327,9 +327,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 535
+      "files": 537
     },
-    "coverageFiles": 535,
+    "coverageFiles": 537,
     "ownership": {
       "responsibilities": 10,
       "contested": 7,
@@ -3236,11 +3236,11 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1220.3,
+      "kb": 1231.9,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 96,
+      "spawns": 98,
       "writes": 56,
       "dml": 19,
       "executes": 55,
@@ -3457,6 +3457,16 @@
           "kb": 13.6,
           "spawns": 4,
           "spawnsLive": 2,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/hermes-production-inference-receipt.ts",
+          "kb": 11.6,
+          "spawns": 2,
+          "spawnsLive": 0,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
@@ -4308,7 +4318,7 @@
       "id": "5:qa::verify",
       "layer": 5,
       "name": "verify*",
-      "kb": 7.5,
+      "kb": 7.7,
       "x": 2.6,
       "z": -0.45,
       "status": "ok",
@@ -4319,7 +4329,7 @@
       "files": [
         {
           "path": "qa/verify-release.ts",
-          "kb": 7.1,
+          "kb": 7.3,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -10071,6 +10081,10 @@
     },
     {
       "path": "qa/gates/hermes-launch-policy.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/hermes-production-inference-receipt.ts",
       "status": "out-of-scope"
     },
     {
@@ -20404,6 +20418,56 @@
       "unexplained": []
     },
     {
+      "path": "qa/gates/hermes-production-inference-receipt.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "qa/gates/hermes-production-inference-receipt.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
       "path": "qa/gates/hermes-production-inference.test.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -24116,41 +24180,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 531,
+      "indexed": 533,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 263,
+      "not-applicable": 265,
       "indexed": 269,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 525,
+      "not-applicable": 527,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 484,
+      "not-applicable": 486,
       "partial": 29,
       "indexed": 22
     },
     "lifetime": {
-      "not-applicable": 471,
+      "not-applicable": 473,
       "partial": 59,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 212,
+      "not-applicable": 214,
       "unsupported": 102,
       "indexed": 221
     },
     "ownership": {
-      "not-applicable": 179,
+      "not-applicable": 181,
       "unsupported": 336,
       "indexed": 20
     },
     "reach": {
-      "unsupported": 312,
+      "unsupported": 314,
       "indexed": 220,
       "partial": 3
     }
@@ -53192,12 +53256,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "3e31b994",
-      "generatedAt": "2026-08-30"
+      "commit": "a44c0f1a",
+      "generatedAt": "2026-08-31"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "a44c0f1a",
+      "commit": "bde84a70",
       "generatedAt": "2026-08-31"
     },
     "verdict": "better",
