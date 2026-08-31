@@ -50,6 +50,11 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
     cwd: ".",
     command: ["bun", "qa/run.ts", "golden-g12-package-operations"],
   },
+  {
+    id: "p14-b-receipt",
+    cwd: ".",
+    command: ["bun", "qa/gates/hermes-production-inference-receipt.ts"],
+  },
   // hermes-founder-state is deliberately NOT a release stage. It needs a real
   // WSL distro and fails closed without one, which is the correct posture for a
   // gate but wrong for this door: CI runs on windows-latest, which ships no WSL

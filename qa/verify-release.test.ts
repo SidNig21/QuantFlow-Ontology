@@ -38,6 +38,7 @@ describe("verify-release stages", () => {
       "install-bovada",
       "unit",
       "golden-g12-package-operations",
+      "p14-b-receipt",
       "repo-shape",
       "lockfile-committed",
       "kernel-sole-writer",
@@ -53,7 +54,7 @@ describe("verify-release stages", () => {
       "kernel-market-lineage",
       "observe-door",
     ]);
-    expect(WINDOWS_RELEASE_STAGES).toHaveLength(19);
+    expect(WINDOWS_RELEASE_STAGES).toHaveLength(20);
     expect(WINDOWS_RELEASE_STAGES[0]).toMatchObject({
       id: "install-electron",
       cwd: "collab-electron",
@@ -132,9 +133,34 @@ describe("verify-release stages", () => {
     ).toBe(true);
   });
 
+  test("P14-B receipt reuse occurs exactly once immediately after G12", () => {
+    const expected = WINDOWS_RELEASE_STAGES.map((stage) => stage.id);
+    const g12 = expected.indexOf("golden-g12-package-operations");
+    const p14b = expected.indexOf("p14-b-receipt");
+    expect(expected.filter((id) => id === "p14-b-receipt")).toHaveLength(1);
+    expect(p14b).toBe(g12 + 1);
+    expect(WINDOWS_RELEASE_STAGES[p14b]).toMatchObject({
+      id: "p14-b-receipt",
+      cwd: ".",
+      command: ["bun", "qa/gates/hermes-production-inference-receipt.ts"],
+    });
+    expect(WINDOWS_RELEASE_STAGES.filter((stage) => stage.id !== "p14-b-receipt").map((stage) => stage.id)).not.toEqual(expected);
+    expect([...WINDOWS_RELEASE_STAGES, WINDOWS_RELEASE_STAGES[p14b]!].map((stage) => stage.id)).not.toEqual(expected);
+    const moved = [...WINDOWS_RELEASE_STAGES];
+    const [stage] = moved.splice(p14b, 1);
+    moved.splice(p14b + 1, 0, stage!);
+    expect(moved.map((entry) => entry.id)).not.toEqual(expected);
+  });
+
   test("keeps Linux as an explicit compatibility route", () => {
     expect(releaseStagesForPlatform("win32")).toBe(WINDOWS_RELEASE_STAGES);
     expect(releaseStagesForPlatform("linux")).toBe(LINUX_RELEASE_STAGES);
+    expect(LINUX_RELEASE_STAGES.some((stage) => stage.id === "p14-b-receipt")).toBe(false);
+    expect(LINUX_RELEASE_STAGES.at(-1)).toMatchObject({
+      id: "qa",
+      cwd: ".",
+      command: ["bun", "qa/run.ts", "--all"],
+    });
   });
 
   test("fails the canonical door closed off Windows", () => {
