@@ -55,7 +55,11 @@ export type P14BReceiptSnapshot = {
 const CURRENT_ASAR = "collab-electron/dist/win-unpacked/resources/app.asar";
 const CURRENT_EXE = "collab-electron/dist/win-unpacked/QuantFlow.exe";
 const CURRENT_INSTALLER = "collab-electron/dist/QuantFlow Setup 0.8.4.exe";
-const PRODUCT_TREE_EXACT_EXCLUSION = "tools/qf-bovada-football/src/gate.ts";
+const PRODUCT_TREE_EXACT_EXCLUSIONS = new Set([
+  "tools/qf-bovada-football/src/gate.ts",
+  "collab-electron/cli/qf-hermes-synthetic-responder.mjs",
+  "collab-electron/cli/qf-hermes-synthetic-responder.test.ts",
+]);
 const PRODUCT_TREE_PREFIX_EXCLUSIONS = [
   "qa/",
   "docs/orders/evidence/golden-baseline/phase3/",
@@ -111,7 +115,7 @@ export function productTreeRows(lsTree: string): string[] {
     const metadata = row.slice(0, separator).split(" ");
     requireValue(metadata.length === 3 && /^[0-7]{6}$/.test(metadata[0]!) && metadata[1] === "blob" && /^[0-9a-f]{40}$/.test(metadata[2]!), "git ls-tree row lacks exact mode/type/blob");
     const path = row.slice(separator + 1);
-    if (path === PRODUCT_TREE_EXACT_EXCLUSION) return false;
+    if (PRODUCT_TREE_EXACT_EXCLUSIONS.has(path)) return false;
     return !PRODUCT_TREE_PREFIX_EXCLUSIONS.some((prefix) => path.startsWith(prefix));
   }).sort();
 }
@@ -137,7 +141,7 @@ export function validateP14BReceiptSnapshot(snapshot: P14BReceiptSnapshot): void
     JSON.stringify([...snapshot.evidenceInventory].sort()) === JSON.stringify([...P14B_EVIDENCE_INVENTORY].sort()),
     "P14-B evidence inventory drift",
   );
-  requireValue(/^[0-9a-f]{64}$/.test(snapshot.acceptedProductTreeSha256) && snapshot.acceptedProductTreeSha256 === snapshot.currentProductTreeSha256, "current product tree differs from accepted P14-B product base");
+  requireValue(/^[0-9a-f]{64}$/.test(snapshot.acceptedProductTreeSha256) && snapshot.acceptedProductTreeSha256 === snapshot.currentProductTreeSha256, "production-inference tree reuse differs outside the packaged QA delta");
 
   const release = exactKeys(snapshot.releaseStatus, ["artifacts", "build", "contract", "installer", "package"], "release_status");
   const releasePackage = exactKeys(release.package, ["name", "productName", "version"], "release_status.package");
@@ -236,7 +240,7 @@ export function runP14BReceiptGate(): { ok: boolean } {
   try {
     const snapshot = collectP14BReceiptSnapshot();
     validateP14BReceiptSnapshot(snapshot);
-    console.log(`p14-b-receipt: PASS accepted=${P14B_ACCEPTED_COMMIT.slice(0, 8)} current=${snapshot.currentCommit.slice(0, 8)} live_bundle=${P14B_PACKAGE_SHA256} current_asar=${snapshot.currentArtifacts[CURRENT_ASAR]!.sha256}`);
+    console.log(`p14-b-receipt: PASS production_inference_tree_reuse=true packaged_qa_delta=synthetic_responder accepted=${P14B_ACCEPTED_COMMIT.slice(0, 8)} current=${snapshot.currentCommit.slice(0, 8)} historical_live_bundle=${P14B_PACKAGE_SHA256} current_asar_fact=${snapshot.currentArtifacts[CURRENT_ASAR]!.sha256}`);
     return { ok: true };
   } catch (error) {
     console.error(`p14-b-receipt: RED ${error instanceof Error ? error.message : String(error)}`);

@@ -83,24 +83,44 @@ test("product tree fingerprint preserves mode/type/blob/path and excludes only e
     "100644 blob 2222222222222222222222222222222222222222\tdocs/orders/evidence/golden-baseline/phase3/proof.json",
     "100644 blob 3333333333333333333333333333333333333333\tqf-atlas/atlas.json",
     "100644 blob 4444444444444444444444444444444444444444\ttools/qf-bovada-football/src/gate.ts",
-    "100644 blob 5555555555555555555555555555555555555555\tcollab-electron/src/main/index.ts",
-    "100644 blob 6666666666666666666666666666666666666666\tqa-shadow/product.ts",
-    "100644 blob 7777777777777777777777777777777777777777\tdocs/orders/evidence/golden-baseline/phase30/product.ts",
-    "100644 blob 8888888888888888888888888888888888888888\tqf-atlas-shadow/product.ts",
-    "100644 blob 9999999999999999999999999999999999999999\ttools/qf-bovada-football/src/gate.ts.extra",
+    "100644 blob 5555555555555555555555555555555555555555\tcollab-electron/cli/qf-hermes-synthetic-responder.mjs",
+    "100644 blob 6666666666666666666666666666666666666666\tcollab-electron/cli/qf-hermes-synthetic-responder.test.ts",
+    "100644 blob 7777777777777777777777777777777777777777\tcollab-electron/package.json",
+    "100644 blob 8888888888888888888888888888888888888888\tcollab-electron/cli/qf-hermes-launch.sh",
+    "100644 blob 9999999999999999999999999999999999999999\tcollab-electron/src/main/host-native-tui.ts",
+    "100644 blob aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tqa-shadow/product.ts",
+    "100644 blob bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\tdocs/orders/evidence/golden-baseline/phase30/product.ts",
+    "100644 blob cccccccccccccccccccccccccccccccccccccccc\tqf-atlas-shadow/product.ts",
+    "100644 blob dddddddddddddddddddddddddddddddddddddddd\ttools/qf-bovada-football/src/gate.ts.extra",
+    "100644 blob eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\tcollab-electron/cli/qf-hermes-synthetic-responder.mjs.extra",
+    "100644 blob ffffffffffffffffffffffffffffffffffffffff\tcollab-electron/cli/qf-hermes-synthetic-responder.test.ts.extra",
   ].join("\n");
   const rows = productTreeRows(base);
-  expect(rows).toHaveLength(5);
-  for (const path of ["collab-electron/src/main/index.ts", "qa-shadow/product.ts", "docs/orders/evidence/golden-baseline/phase30/product.ts", "qf-atlas-shadow/product.ts", "tools/qf-bovada-football/src/gate.ts.extra"]) {
+  expect(rows).toHaveLength(9);
+  for (const path of [
+    "collab-electron/package.json",
+    "collab-electron/cli/qf-hermes-launch.sh",
+    "collab-electron/src/main/host-native-tui.ts",
+    "qa-shadow/product.ts",
+    "docs/orders/evidence/golden-baseline/phase30/product.ts",
+    "qf-atlas-shadow/product.ts",
+    "tools/qf-bovada-football/src/gate.ts.extra",
+    "collab-electron/cli/qf-hermes-synthetic-responder.mjs.extra",
+    "collab-electron/cli/qf-hermes-synthetic-responder.test.ts.extra",
+  ]) {
     expect(rows.some((row) => row.endsWith(`\t${path}`))).toBe(true);
   }
+  for (const path of [
+    "collab-electron/cli/qf-hermes-synthetic-responder.mjs",
+    "collab-electron/cli/qf-hermes-synthetic-responder.test.ts",
+  ]) expect(rows.some((row) => row.endsWith(`\t${path}`))).toBe(false);
   const fingerprint = productTreeSha256(base);
   for (const mutant of [
-    `${base}\n100644 blob aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tproduct-added.ts`,
-    base.replace(/\n100644 blob 5555[^\n]+/, ""),
-    base.replace("100644 blob 5555", "100755 blob 5555"),
-    base.replace("collab-electron/src/main/index.ts", "collab-electron/src/main/renamed.ts"),
-    base.replace("5555555555555555555555555555555555555555", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+    `${base}\n100644 blob 1010101010101010101010101010101010101010\tproduct-added.ts`,
+    base.replace(/\n100644 blob 7777[^\n]+/, ""),
+    base.replace("100644 blob 8888", "100755 blob 8888"),
+    base.replace("collab-electron/src/main/host-native-tui.ts", "collab-electron/src/main/host-native-tui-renamed.ts"),
+    base.replace("9999999999999999999999999999999999999999", "0101010101010101010101010101010101010101"),
   ]) expect(productTreeSha256(mutant)).not.toBe(fingerprint);
 });
 
