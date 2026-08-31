@@ -281,9 +281,46 @@ export type SteeringDeliveryFact = {
   outcome?: unknown;
 };
 
+export type SecondOpinionRequestedFact = {
+  event_id?: unknown;
+  object_id?: unknown;
+  source_task_id?: unknown;
+  review_task_id?: unknown;
+  task_id?: unknown;
+  critic_session_id?: unknown;
+  title?: unknown;
+  instruction?: unknown;
+};
+
+export type SecondOpinionDeliveryFact = {
+  accepted_event_id?: unknown;
+  object_id?: unknown;
+  task_id?: unknown;
+  target_session_id?: unknown;
+  outcome?: unknown;
+};
+
 export function expectedSteeringDeliveryDigest(taskId: string, mode: "clarify" | "redirect", instruction: string): string {
   return createHash("sha256")
     .update(JSON.stringify(["qf.task.steering.v1", taskId, mode, instruction]), "utf8")
+    .digest("hex")
+    .slice(0, 32);
+}
+
+export function expectedSecondOpinionDeliveryDigest(
+  sourceTaskId: string,
+  reviewTaskId: string,
+  title: string,
+  instruction: string,
+): string {
+  return createHash("sha256")
+    .update(JSON.stringify([
+      "qf.task.second_opinion.v1",
+      sourceTaskId,
+      reviewTaskId,
+      title,
+      instruction,
+    ]), "utf8")
     .digest("hex")
     .slice(0, 32);
 }
@@ -303,9 +340,61 @@ export function steeringDeliveryObserved(
   return compactPtyCapture(output).split(marker).length - 1 > markerCountBefore;
 }
 
+export function secondOpinionDeliveryObserved(
+  requestedFacts: SecondOpinionRequestedFact[],
+  deliveryFacts: SecondOpinionDeliveryFact[],
+  binding: {
+    acceptedEventId: string;
+    sourceTaskId: string;
+    reviewTaskId: string;
+    criticSessionId: string;
+    title: string;
+    instruction: string;
+    expectedRole: string;
+  },
+  output: string,
+  markerCountBefore: number,
+): boolean {
+  const requested = requestedFacts.filter((fact) => fact.event_id === binding.acceptedEventId);
+  if (requested.length !== 1) return false;
+  const request = requested[0]!;
+  if (request.object_id !== binding.sourceTaskId ||
+      request.source_task_id !== binding.sourceTaskId ||
+      request.task_id !== binding.sourceTaskId ||
+      request.review_task_id !== binding.reviewTaskId ||
+      request.critic_session_id !== binding.criticSessionId ||
+      request.title !== binding.title ||
+      request.instruction !== binding.instruction) return false;
+  const deliveries = deliveryFacts.filter((fact) => fact.accepted_event_id === binding.acceptedEventId);
+  if (deliveries.length !== 1) return false;
+  const delivery = deliveries[0]!;
+  if (delivery.object_id !== binding.sourceTaskId ||
+      delivery.task_id !== binding.sourceTaskId ||
+      delivery.target_session_id !== binding.criticSessionId ||
+      delivery.outcome !== "delivered") return false;
+  const digest = expectedSecondOpinionDeliveryDigest(
+    binding.sourceTaskId,
+    binding.reviewTaskId,
+    binding.title,
+    binding.instruction,
+  );
+  const marker = `QF_SYNTHETIC delivery_proof role=${binding.expectedRole} digest=${digest}`;
+  return compactPtyCapture(output).split(marker).length - 1 === markerCountBefore + 1;
+}
+
 function steeringDeliveryFacts(kernelDb: string, taskId: string): SteeringDeliveryFact[] {
   return dbRows(kernelDb, "SELECT payload FROM events WHERE type='task.steering_delivery' AND object_id=? ORDER BY rowid", taskId)
     .map((row) => jsonPayload(String(row.payload)));
+}
+
+function secondOpinionRequestedFacts(kernelDb: string, sourceTaskId: string): SecondOpinionRequestedFact[] {
+  return dbRows(kernelDb, "SELECT id AS event_id, object_id, payload FROM events WHERE type='task.second_opinion_requested' AND object_id=? ORDER BY rowid", sourceTaskId)
+    .map((row) => ({ event_id: row.event_id, object_id: row.object_id, ...jsonPayload(String(row.payload)) }));
+}
+
+function secondOpinionDeliveryFacts(kernelDb: string, sourceTaskId: string): SecondOpinionDeliveryFact[] {
+  return dbRows(kernelDb, "SELECT object_id, payload FROM events WHERE type='task.second_opinion_delivery' AND object_id=? ORDER BY rowid", sourceTaskId)
+    .map((row) => ({ object_id: row.object_id, ...jsonPayload(String(row.payload)) }));
 }
 
 async function waitForDeliveryAck(endpoint: string, sessionId: string, expected: string, deadlineAt: number, count = 1, diagnostics?: { kernelDb: string; taskId: string }): Promise<void> {
@@ -349,6 +438,43 @@ async function waitForSteeringDelivery(
     const finalFacts = steeringDeliveryFacts(kernelDb, binding.taskId);
     if (steeringDeliveryObserved(finalFacts, binding, finalOutput, markerCountBefore)) return;
     console.error(`founder-steering: steering-delivery-timeout binding=${JSON.stringify(binding)} facts=${JSON.stringify(finalFacts)} tail=${JSON.stringify(compactPtyCapture(finalOutput).slice(-2_000))}`);
+    throw error;
+  }
+}
+
+async function waitForSecondOpinionDelivery(
+  endpoint: string,
+  sessionId: string,
+  kernelDb: string,
+  binding: {
+    acceptedEventId: string;
+    sourceTaskId: string;
+    reviewTaskId: string;
+    criticSessionId: string;
+    title: string;
+    instruction: string;
+    expectedRole: string;
+  },
+  markerCountBefore: number,
+  deadlineAt: number,
+): Promise<void> {
+  const observed = async () => secondOpinionDeliveryObserved(
+    secondOpinionRequestedFacts(kernelDb, binding.sourceTaskId),
+    secondOpinionDeliveryFacts(kernelDb, binding.sourceTaskId),
+    binding,
+    await captureSession(endpoint, sessionId),
+    markerCountBefore,
+  );
+  try {
+    await waitFor(`causal second-opinion delivery ${binding.acceptedEventId}`, async () => {
+      try { return await observed() ? true : null; } catch { return null; }
+    }, deadlineAt);
+  } catch (error) {
+    const finalOutput = await captureSession(endpoint, sessionId).catch(() => "");
+    const requested = secondOpinionRequestedFacts(kernelDb, binding.sourceTaskId);
+    const deliveries = secondOpinionDeliveryFacts(kernelDb, binding.sourceTaskId);
+    if (secondOpinionDeliveryObserved(requested, deliveries, binding, finalOutput, markerCountBefore)) return;
+    console.error(`founder-steering: second-opinion-delivery-timeout binding=${JSON.stringify(binding)} requested=${JSON.stringify(requested)} deliveries=${JSON.stringify(deliveries)} tail=${JSON.stringify(compactPtyCapture(finalOutput).slice(-2_000))}`);
     throw error;
   }
 }
@@ -467,15 +593,22 @@ export async function runFounderSteeringGate(): Promise<{ ok: boolean }> {
     const oldWorkerOutput = await captureSession(launchOne.endpoint, workerOneId).catch(() => "");
     assert(!oldWorkerOutput.includes(`contract=qf.task.assignment.v1 task_id=${taskId}`), "reassignment delivery reached the old runtime");
     await clickTaskButton(launchOne.endpoint, "Second opinion", String((dbRows(kernelDb, "SELECT title FROM task WHERE id = ?", taskId)[0] as { title: string }).title));
-    await waitFor("second opinion", async () => {
-      const event = dbRows(kernelDb, "SELECT payload FROM events WHERE type='task.second_opinion_requested' AND object_id=?", taskId)[0];
+    const secondOpinionBinding = await waitFor("second opinion", async () => {
+      const events = dbRows(kernelDb, "SELECT id, payload FROM events WHERE type='task.second_opinion_requested' AND object_id=? ORDER BY rowid", taskId);
+      if (events.length !== 1) return null;
+      const event = events[0]!;
       if (!event) return null;
-      const payload = jsonPayload(String(event.payload)); reviewTaskId = String(payload.review_task_id ?? ""); criticId = String(payload.critic_session_id ?? ""); return reviewTaskId && criticId ? true : null;
+      const payload = jsonPayload(String(event.payload));
+      reviewTaskId = String(payload.review_task_id ?? "");
+      criticId = String(payload.critic_session_id ?? "");
+      const title = String(payload.title ?? "");
+      const instruction = String(payload.instruction ?? "");
+      return reviewTaskId && criticId && title && instruction ? {
+        acceptedEventId: String(event.id), sourceTaskId: taskId, reviewTaskId,
+        criticSessionId: criticId, title, instruction, expectedRole: "critic",
+      } : null;
     }, Date.now() + 35_000);
-    await waitForDeliveryAck(launchOne.endpoint, criticId, `QF_SYNTHETIC delivery_ack role=critic task_id=${reviewTaskId}`, Date.now() + 15_000);
-    const criticOutput = await captureSession(launchOne.endpoint, criticId);
-    const compactCriticOutput = compactPtyCapture(criticOutput);
-    assert(compactCriticOutput.includes(`QF_SYNTHETIC delivery_binding source_task_id=${taskId}`) && compactCriticOutput.includes(`QF_SYNTHETIC delivery_binding review_task_id=${reviewTaskId}`), "critic acknowledgement is not source/review bound");
+    await waitForSecondOpinionDelivery(launchOne.endpoint, criticId, kernelDb, secondOpinionBinding, 0, Date.now() + 15_000);
     assert(dbRows(kernelDb, "SELECT s.id FROM agent_session s JOIN links l ON l.from_id=s.id AND l.kind='spawned_from' WHERE s.id=? AND l.to_id='hermes-critic' AND s.status='running'", criticId).length === 1, "second opinion critic definition/session cardinality mismatch");
     const preCancelSessionId = workerTwoId;
     const preCancelOutput = await captureSession(launchOne.endpoint, preCancelSessionId);

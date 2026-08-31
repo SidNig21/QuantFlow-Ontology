@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "77629cdd",
+    "commit": "6c7f76ce",
     "generatedAt": "2026-08-31",
     "filesScanned": 413,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "8c4ecb1780206fb4"
+    "fingerprint": "8f8fe0632f3063a9"
   },
   "stats": {
     "live": 109,
@@ -458,7 +458,7 @@
       "id": "2:collab-electron/cli::qf",
       "layer": 2,
       "name": "qf*",
-      "kb": 42.2,
+      "kb": 42.8,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -469,7 +469,7 @@
       "files": [
         {
           "path": "collab-electron/cli/qf-hermes-synthetic-responder.mjs",
-          "kb": 30.2,
+          "kb": 30.8,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -3236,7 +3236,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1237,
+      "kb": 1241.7,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3307,7 +3307,7 @@
         },
         {
           "path": "qa/gates/founder-steering.ts",
-          "kb": 38.3,
+          "kb": 43,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -53256,12 +53256,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "2c5b4b2f",
+      "commit": "77629cdd",
       "generatedAt": "2026-08-31"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "77629cdd",
+      "commit": "6c7f76ce",
       "generatedAt": "2026-08-31"
     },
     "verdict": "better",

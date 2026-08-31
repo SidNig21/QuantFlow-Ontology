@@ -145,6 +145,32 @@ test("steering delivery proof is exact, domain-fixed, and rejects malformed inpu
   expect(responder.steeringDeliveryDigest({ ...exact, instruction: 7 })).toBeNull();
 });
 
+test("second-opinion delivery proof is exact, domain-fixed, and binds every tuple field", () => {
+  const exact = {
+    contract: "qf.task.second_opinion.v1",
+    source_task_id: "source-task-a",
+    review_task_id: "review-task-a",
+    title: "Independent review",
+    instruction: "Review the exact source independently.",
+  };
+  const digest = responder.secondOpinionDeliveryDigest(exact);
+  expect(digest).toMatch(/^[0-9a-f]{32}$/);
+  expect(digest).toBe(createHash("sha256").update(JSON.stringify([
+    exact.contract, exact.source_task_id, exact.review_task_id, exact.title, exact.instruction,
+  ]), "utf8").digest("hex").slice(0, 32));
+  for (const mutant of [
+    { ...exact, contract: "qf.task.second_opinion.v2" },
+    { ...exact, source_task_id: "source-task-b" },
+    { ...exact, review_task_id: "review-task-b" },
+    { ...exact, title: "Changed title" },
+    { ...exact, instruction: "Changed instruction" },
+  ]) expect(responder.secondOpinionDeliveryDigest(mutant)).not.toBe(digest);
+  expect(responder.secondOpinionDeliveryDigest({ ...exact, source_task_id: 7 })).toBeNull();
+  expect(responder.secondOpinionDeliveryDigest({ ...exact, review_task_id: 7 })).toBeNull();
+  expect(responder.secondOpinionDeliveryDigest({ ...exact, title: 7 })).toBeNull();
+  expect(responder.secondOpinionDeliveryDigest({ ...exact, instruction: 7 })).toBeNull();
+});
+
 test("production worker accepts the real assignment envelope as worker2 activation", async () => {
   process.env[HOLD_FLAG] = "1";
   const reader = new ControlledReader(JSON.stringify({
@@ -272,7 +298,15 @@ test("nextReview acknowledges one exact structured second opinion with exact bin
 		process.stdout.write = originalWrite;
 	}
 	const text = output.join("");
+	const digest = createHash("sha256").update(JSON.stringify([
+		SECOND_OPINION.contract,
+		SECOND_OPINION.source_task_id,
+		SECOND_OPINION.review_task_id,
+		SECOND_OPINION.title,
+		SECOND_OPINION.instruction,
+	]), "utf8").digest("hex").slice(0, 32);
 	expect(text.match(/delivery_ack role=[^ ]+ task_id=review-task-second-opinion/g)).toHaveLength(1);
+	expect(text.match(new RegExp(`delivery_proof role=[^ ]+ digest=${digest}`, "g"))).toHaveLength(1);
 	expect(text).toContain("delivery_binding source_task_id=source-task-second-opinion");
 	expect(text).toContain("delivery_binding review_task_id=review-task-second-opinion");
 });

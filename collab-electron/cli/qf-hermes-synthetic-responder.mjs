@@ -50,6 +50,24 @@ export function steeringDeliveryDigest(delivery) {
     .slice(0, 32);
 }
 
+export function secondOpinionDeliveryDigest(delivery) {
+  if (delivery?.contract !== "qf.task.second_opinion.v1" ||
+      typeof delivery.source_task_id !== "string" ||
+      typeof delivery.review_task_id !== "string" ||
+      typeof delivery.title !== "string" ||
+      typeof delivery.instruction !== "string") return null;
+  return createHash("sha256")
+    .update(JSON.stringify([
+      delivery.contract,
+      delivery.source_task_id,
+      delivery.review_task_id,
+      delivery.title,
+      delivery.instruction,
+    ]), "utf8")
+    .digest("hex")
+    .slice(0, 32);
+}
+
 function emitBoundary(boundary, fields = {}) {
   if (SUPPRESS_BOUNDARY === boundary) return;
   emit({ boundary, ...fields });
@@ -425,7 +443,7 @@ function emitDeliveryReceipt(delivery) {
     : "";
   process.stdout.write(`QF_SYNTHETIC delivery_received role=${ROLE} contract=${delivery.contract} task_id=${taskId}${suffix}\n`);
   emitTerminalReceipt(`QF_SYNTHETIC delivery_ack role=${ROLE} task_id=${taskId}`);
-  const proofDigest = steeringDeliveryDigest(delivery);
+  const proofDigest = steeringDeliveryDigest(delivery) ?? secondOpinionDeliveryDigest(delivery);
   if (proofDigest) emitTerminalReceipt(`QF_SYNTHETIC delivery_proof role=${ROLE} digest=${proofDigest}`);
   if (delivery.contract === "qf.task.second_opinion.v1") {
     emitTerminalReceipt(`QF_SYNTHETIC delivery_binding source_task_id=${delivery.source_task_id}`);

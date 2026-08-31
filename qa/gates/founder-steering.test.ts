@@ -1,7 +1,15 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { deliveryAckObserved, expectedSteeringDeliveryDigest, normalizeHistoryFacts, normalizeVisibleTaskSessionLinkFacts, steeringDeliveryObserved } from "./founder-steering.ts";
+import {
+  deliveryAckObserved,
+  expectedSecondOpinionDeliveryDigest,
+  expectedSteeringDeliveryDigest,
+  normalizeHistoryFacts,
+  normalizeVisibleTaskSessionLinkFacts,
+  secondOpinionDeliveryObserved,
+  steeringDeliveryObserved,
+} from "./founder-steering.ts";
 
 test("founder steering accepts an exact acknowledgement first observed at the timeout boundary", () => {
 	const expected = "QF_SYNTHETIC delivery_ack role=worker task_id=task-1100ccac-66c4-429f-9265-b2da46a68ef9";
@@ -42,6 +50,69 @@ test("founder steering requires one exact causal Kernel receipt and a fresh exac
 
   const gate = readFileSync(join(import.meta.dir, "founder-steering.ts"), "utf8");
   expect(gate).toContain("if (steeringDeliveryObserved(finalFacts, binding, finalOutput, markerCountBefore)) return;");
+});
+
+test("founder steering binds second-opinion request, delivery, and one exact fresh critic proof", () => {
+  const binding = {
+    acceptedEventId: "accepted-second-opinion",
+    sourceTaskId: "source-task-1",
+    reviewTaskId: "review-task-1",
+    criticSessionId: "critic-1",
+    title: "Original title",
+    instruction: "Original instruction",
+    expectedRole: "critic",
+  };
+  const requested = {
+    event_id: binding.acceptedEventId,
+    object_id: binding.sourceTaskId,
+    source_task_id: binding.sourceTaskId,
+    task_id: binding.sourceTaskId,
+    review_task_id: binding.reviewTaskId,
+    critic_session_id: binding.criticSessionId,
+    title: binding.title,
+    instruction: binding.instruction,
+  };
+  const delivery = {
+    accepted_event_id: binding.acceptedEventId,
+    object_id: binding.sourceTaskId,
+    task_id: binding.sourceTaskId,
+    target_session_id: binding.criticSessionId,
+    outcome: "delivered",
+  };
+  const digest = expectedSecondOpinionDeliveryDigest(
+    binding.sourceTaskId, binding.reviewTaskId, binding.title, binding.instruction,
+  );
+  const marker = `QF_SYNTHETIC delivery_proof role=critic digest=${digest}`;
+  expect(secondOpinionDeliveryObserved([requested], [delivery], binding, marker, 0)).toBe(true);
+
+  for (const [field, value] of [
+    ["event_id", "wrong-event"], ["object_id", "wrong-source"], ["source_task_id", "wrong-source"],
+    ["task_id", "wrong-source"], ["review_task_id", "wrong-review"], ["critic_session_id", "wrong-critic"],
+    ["title", "wrong-title"], ["instruction", "wrong-instruction"],
+  ] as const) {
+    expect(secondOpinionDeliveryObserved([{ ...requested, [field]: value }], [delivery], binding, marker, 0)).toBe(false);
+  }
+  expect(secondOpinionDeliveryObserved([requested, requested], [delivery], binding, marker, 0)).toBe(false);
+  for (const [field, value] of [
+    ["accepted_event_id", "wrong-event"], ["object_id", "wrong-source"], ["task_id", "wrong-source"],
+    ["target_session_id", "wrong-critic"], ["outcome", "delivery_failed"],
+  ] as const) {
+    expect(secondOpinionDeliveryObserved([requested], [{ ...delivery, [field]: value }], binding, marker, 0)).toBe(false);
+  }
+  expect(secondOpinionDeliveryObserved([requested], [delivery, delivery], binding, marker, 0)).toBe(false);
+
+  expect(secondOpinionDeliveryObserved([requested], [delivery], binding, "", 0)).toBe(false);
+  expect(secondOpinionDeliveryObserved([requested], [delivery], binding, `${marker}\r\n${marker}`, 0)).toBe(false);
+  expect(secondOpinionDeliveryObserved([requested], [delivery], binding, marker.replace("role=critic", "role=worker"), 0)).toBe(false);
+  expect(secondOpinionDeliveryObserved([requested], [delivery], binding, marker.toUpperCase(), 0)).toBe(false);
+  expect(secondOpinionDeliveryObserved([requested], [delivery], binding, marker.slice(0, -16), 0)).toBe(false);
+  for (const changed of [
+    { sourceTaskId: "source-task-2" }, { reviewTaskId: "review-task-2" },
+    { title: "Changed title" }, { instruction: "Changed instruction" },
+  ]) {
+    const changedBinding = { ...binding, ...changed };
+    expect(secondOpinionDeliveryObserved([requested], [delivery], changedBinding, marker, 0)).toBe(false);
+  }
 });
 
 test("founder steering uses the ordinary form with exact preload Dataset and Technique", () => {
