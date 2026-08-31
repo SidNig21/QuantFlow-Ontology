@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "6c7f76ce",
+    "commit": "48921711",
     "generatedAt": "2026-08-31",
     "filesScanned": 413,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "8f8fe0632f3063a9"
+    "fingerprint": "c16d3b03a784978e"
   },
   "stats": {
     "live": 109,
@@ -3236,7 +3236,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1241.7,
+      "kb": 1241.9,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3434,7 +3434,7 @@
         },
         {
           "path": "qa/gates/hermes-production-inference-receipt.ts",
-          "kb": 16.7,
+          "kb": 16.9,
           "spawns": 2,
           "spawnsLive": 0,
           "writes": 0,
@@ -53256,12 +53256,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "77629cdd",
+      "commit": "6c7f76ce",
       "generatedAt": "2026-08-31"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "6c7f76ce",
+      "commit": "48921711",
       "generatedAt": "2026-08-31"
     },
     "verdict": "better",
