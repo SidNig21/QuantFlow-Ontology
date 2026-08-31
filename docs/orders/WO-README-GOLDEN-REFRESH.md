@@ -10,8 +10,9 @@ The public README describes the accepted Golden product and repository as they e
 
 - `README.md`
 - this order and the directly caused `NEXT.md` pointer/closure receipt
+- `qa/gates/hermes-production-inference-receipt.ts` and its focused test, solely to classify the exact root `README.md` as a documentation-only surface in the final founder product-tree fingerprint
 
-No product, schema, Kernel, Canvas, Dock, adapter, package, dependency, Atlas, gate, future-rung, bet, or trade change is authorized.
+No product, schema, Kernel, Canvas, Dock, adapter, package, dependency, Atlas capability, future-rung, bet, or trade change is authorized. The receipt correction may exclude only the exact root `README.md`; it must retain every existing exclusion and prove that changing a real product path still changes the fingerprint.
 
 ## Acceptance
 
@@ -20,4 +21,5 @@ No product, schema, Kernel, Canvas, Dock, adapter, package, dependency, Atlas, g
 - `qf-proof-agent` is identified as QA-only.
 - R18 remains closed and no future roadmap is drafted.
 - `bun qa/run.ts doc-links`, `bun qf-atlas/generate.mjs --check`, and `git diff --check` pass.
+- The focused founder-receipt test proves root-README drift is documentation-only while a real product-byte mutation remains RED, and the live founder-receipt gate returns PASS.
 - One independent read-only Verifier reviews the immutable README candidate.
