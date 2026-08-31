@@ -1,183 +1,233 @@
 # QuantFlow Ontology
 
-**A Windows-first, ontology-centered quantitative research and learning environment led by a custom Hermes Research Director.**
+**A Windows-first, single-user, ontology-centered environment for governed quantitative research.**
 
-QuantFlow doesn't compete with agent frameworks — it's the surface they land on. External CLIs such as Claude Code, Codex, a scraper, or an RL worker can be user-owned integrations or future adapter candidates; the current built-in Dock runtime is Hermes, while deterministic qf-proof participation is QA-only. Profiles keep their own identity while sharing reusable runtime code, collaborate over an MCP bus, and act on a shared, governed world model (the Kernel). New agent tools shipping across the ecosystem aren't competition here — they're inventory.
+QuantFlow is a persistent spatial desk where a founder works with AI participants over one shared world model. The default participant is a custom Hermes **Research Director**. The Canvas shows participants, work, evidence, judgment, and lineage; the Dock admits governed participants; the Kernel owns durable truth.
 
-> **It plugs into your world; it doesn't become your world.**
+QuantFlow is research and advisor software only. It never places a bet or executes a trade.
 
-Built solo, in the open, for native Windows first. Early-stage and honest about it — see [Status](#status).
+## Current status
 
----
+**Golden Baseline accepted on 2026-08-31.** Phase 2 repository purification and Phase 3 whole-product requalification are closed. The accepted Golden product candidate is `7c26141f3ab365630b01e8570b395f8856603453`; the designation and independent verification are recorded in the [Golden evidence packet](docs/orders/evidence/golden-baseline/phase3/GOLDEN-DESIGNATION-20260831.md).
 
-## Screenshots
+The Golden designation means the repository and current Windows product have a clean, reproducible, independently verified floor. It does **not** mean the complete real-market research product is finished.
 
-<p align="center">
-  <img src="docs/readme-assets/windows-shell.png" alt="QuantFlow Ontology on Windows — canvas, file rail, and Dock species rail" width="900" />
-</p>
-
-<p align="center"><em>Live Windows shell (WO-WIN1 evidence): infinite canvas, file rail, and Dock — Act I product floor. Glacier (g1–g5) re-skins this surface in source; rebuild the install to see it on the desktop shortcut.</em></p>
-
-<p align="center">
-  <img src="docs/readme-assets/dock-session.png" alt="Dock session tile with qf-proof-agent running on the canvas" width="720" />
-</p>
-
-<p align="center"><em>A Dock-spawned <code>qf-proof-agent</code> session on the canvas with live session ledger (running / closed) — collaboration transport proven on Windows.</em></p>
-
-<p align="center">
-  <img src="docs/readme-assets/glacier-showcase.png" alt="Glacier design showcase — spine tiles, dock, and a declared cable" width="900" />
-</p>
-
-<p align="center"><em>Glacier design reference (<code>design/glacier/showcase.html</code>) — the look WO-g1–g5 land in source: spine tiles, typographic dock, void canvas, and declared (dashed) cables.</em></p>
-
-<p align="center">
-  <img src="docs/readme-assets/glacier-tile-spec.png" alt="Glacier tile anatomy — spine head, id, grip, and arm-confirm close" width="720" />
-</p>
-
-<p align="center"><em>Tile anatomy from the Glacier tile spec — 44px spine, arm-then-confirm close, vertical session id. WO-g2 landed this structure in source.</em></p>
-
----
-
-## What works today (verified, not aspirational)
-
-Every claim below is backed by a falsified `qa/` gate, a Kernel proof, or a recorded work-order evidence folder. If it's not on this list, it doesn't exist yet.
-
-- **The Kernel** — a sole-writer SQLite system of record. Append-only event log, content-addressed artifacts, schema-generated code (`qf-kernel-schema`). All mutation goes through Kernel `execute()`; gates fail the build if any other path writes domain truth.
-- **The canvas + dock** — an infinite pan/zoom Electron surface. Every agent card launches by exact Kernel definition id. Sessions link back to the definition the founder clicked. Dock **Clear** hides closed sessions from the ledger without deleting Kernel history.
-- **Agent seats** — packaged Dock includes `qf-proof-agent`, Hermes profiles, and labeled deterministic proof profiles. Deterministic collaboration is proven end-to-end on Windows; model-backed seats are present with distinct Kernel identities but are not certified as everyday research workflows.
-- **The app-owned peer notification transport** (`collab-electron/src/main/peer-delivery.ts`) — live Agent Host/native-TUI delivery for Kernel notifications. Transport SQLite stays separate from the Kernel.
-- **Desk + governed research loop (R0–R15)** - Kernel, Dock seats, durable Tasks, Research Director recruitment and steering, strict independent critic review, and evaluation-gated Report publication are independently verified in this checkout.
-- **Native Hermes development runtime** - the custom Research Director and exact least-privilege critic run through the production Hermes transport with durable Kernel identity and receipts.
-- **Connection write path (WO-g5a)** — experimental `create_connection` / `delete_connection` through `execute()` only; upgrade `0006` brings existing Kernels forward.
-- **Glacier visual program (WO-g1 → g5)** — tokens + ANSI (g1), tile spine (g2), dock masthead/ask/launcher/ledger (g3), shell chrome / file-rail / canvas / z-scale (g4), Kernel-backed **view** cables with dashed honesty + orphan cascade (g5). ADR-0003 allows UI on experimental `connection` without promotion. Reversible checkpoint: tag `glacier-checkpoint-a` (after g5a+g1). Installed asar needs rebuild/package-click to match source.
-- **Verification culture** — work orders, cold worktrees, bait-tested gates. Artifact hashes are recomputed, not trusted.
-
-## The end goal: a governed research and learning world
-
-**QuantFlow is a Windows-first, single-user, ontology-centered quantitative research and learning environment.** Its default front door is **Research Director**, a custom Hermes Agent Profile. Ryan states a research mission naturally; the Director uses governed Kernel actions to plan, recruit exact specialists, assign work, and route evidence. The canvas automatically reveals that active work and lets Ryan steer it. The Dock is optional manual inventory and control. Quantitative research is the invariant domain, sports betting is the first application, and QuantFlow never places a bet or trade.
-
-1. **One governed system of record.** The Kernel is the sole writer. Retrieval, scraping, and agent chatter never become truth without passing through a Kernel command.
-2. **Tools follow the ontology.** Model the object/link/action graph correctly and CRUD + action tools fall out of codegen for free — that's what lets agents one-shot cross-object work instead of being hand-held verb by verb.
-3. **Names and descriptions are load-bearing.** Agents reason over the schema. Every object type and property carries a mandatory description, enforced by lint, or it doesn't merge.
-
-The ontology has three planes:
-
-- **Research plane** (invariant, market-agnostic): `Hypothesis → Dataset → Run → Artifact → Evaluation → Report`. Identical whether the instrument is a game line, a perp contract, or an equity.
-- **Market plane** (pluggable, pipeline-fed): `Venue / Instrument / Quote / MarketEvent`. A new market adds *rows*, never new object types.
-- **Agent plane** (largely live already): `AgentDefinition` (Dock profile) → `AgentSession` through `spawned_from`, plus trajectory artifacts. Several definitions may share one runtime package without collapsing identity.
-
-**The proof standard** — the day this repo gets to call itself an ontology: an orchestrator seat answers *"What did the last Run on Hypothesis X show, which Evaluation gated it, and should we re-run against the newer Dataset?"* in one pass, using only tools generated from the schema, with every step recorded to the Kernel.
-
-## Status
-
-**As of 2026-08-24 (this checkout). If this table disagrees with `NEXT.md`, `NEXT.md` wins.**
-
-| Layer | State |
+| Surface | Verified state |
 | --- | --- |
-| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) names the bounded G11 authority/history compression; its replacement Reader returned `YES/YES` at `dc16169f1494d270388eda1c0b369bc0a0aaf73a` |
-| Product plan | [`docs/plans/INSTITUTIONAL-BUILD-PLAN.md`](docs/plans/INSTITUTIONAL-BUILD-PLAN.md) — canonical R18-R25 outcome contracts; route authority remains [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) and build authority remains [`docs/orders/NEXT.md`](docs/orders/NEXT.md) |
-| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R0-R17 and Pre-R18 are accepted; G11 compresses authority/history without opening R18 product work |
-| Product floor | Windows app, Hermes Research Director, durable governed work and steering, independent review, evaluation-gated publication, visible/reopenable research world, named Technique selection, and operator-supplied outcome grading |
-| Honest boundary | No normal Mission yet acquires real QB-interception market evidence. R18 owns that first-use journey. R19-R25 remain route-level only. |
+| Repository | Golden baseline on `main`; clean Phase 2/Phase 3 evidence and independent verification |
+| Windows app | Builds, packages, installs, cold-boots, reopens the same isolated state, and shuts down cleanly |
+| Kernel | Sole-writer SQLite truth with schema-generated objects, links, actions, tools, and conformance tests |
+| Canvas + Dock | Running Electron surfaces for participant tiles, governed work, Inspect, Mission/history/lineage views, cables, pan/zoom, and `TIDY` |
+| Production Dock | Four Hermes profiles: Research Director, two Market Researchers, and Critic |
+| Real model path | One founder-operated Hermes → OpenCode Go → Kimi K3 turn proven through the rendered packaged app |
+| Real Ontology use | The Director used four governed Ontology tools to read one founder-created Task and its exact participant lineage |
+| Persistence | The same Task and participant history survived normal close/reopen; terminated runtime state was projected honestly |
+| Packaging | Unsigned Windows x64 NSIS installer; Authenticode reports `NotSigned` |
+| Update channel | Not available for the internal build; the app honestly renders `Update failed — retry` after HTTP 406 |
+| Current boundary | No normal Mission yet composes real point-in-time sports evidence into a complete useful research result |
 
-```bash
-bun qa/run.ts rung-ladder    # must say active=R18; NEXT remains the sole build-authority pointer
-bun qa/run.ts --list         # every registered gate
+`docs/orders/NEXT.md` is the sole build-authority pointer. It currently keeps product work closed; a document describing future work is not permission to start it.
+
+## What works today
+
+### Founder-operated Windows workflow
+
+The accepted real-product walkthrough proved this exact path without internal RPC substitution or a synthetic responder:
+
+```text
+launch packaged QuantFlow
+  → open the real Dock catalog
+  → pointer-spawn Research Director
+  → see the participant tile on the Canvas
+  → create and inspect a durable Task
+  → type into the real Hermes terminal and press Enter
+  → Hermes calls governed Ontology tools through QuantFlow
+  → OpenCode Go / Kimi K3 answers in the same tile
+  → close and reopen the same world
+  → see truthful Task and participant history
+  → shut down with zero owned processes
 ```
 
-Do not treat `bun qa/verify-release.ts` as everyday proof. It is a release door, not the next feature.
+The credential-safe [founder walkthrough receipt](docs/orders/evidence/golden-baseline/phase3/FINAL-FOUNDER-ONTOLOGY-WALKTHROUGH-20260830.md) binds the rendered interaction to the exact Kernel rows, Artifact hashes, Hermes session, provider/model rows, response, reopen state, and cleanup results.
 
-The ontology is generated, not hand-written: object types, links, actions, the migration, the agent tool surface, and the conformance suite all fall out of one schema. The live surface is [`qf-kernel-schema/golden/ONTOLOGY.md`](qf-kernel-schema/golden/ONTOLOGY.md), regenerated by `bun run generate` and compared byte-for-byte on every schema test run.
+### Kernel and Ontology
 
-Research-only: QuantFlow **never places bets or executes trades**. It proposes, backtests, criticizes, evaluates, and reports — the operator acts in the world.
+The Kernel is the only shared source of durable product truth. Domain mutation passes through `execute()`; gates reject domain SQL and Canvas-domain persistence outside the sanctioned Kernel path.
+
+The generated Ontology currently contains:
+
+- 23 object types;
+- 23 link types;
+- 43 actions;
+- 104 generated MCP tools.
+
+The canonical generated surface is [`qf-kernel-schema/golden/ONTOLOGY.md`](qf-kernel-schema/golden/ONTOLOGY.md). SQL, generated tools, Ontology documentation, and conformance tests are derived from the schema and compared byte-for-byte. Generated files are never hand-edited.
+
+The principal planes are:
+
+- **Research:** `Hypothesis → Dataset → Run → Artifact → Evaluation → governed Report publication`.
+- **Market:** `Venue / MarketEvent / Instrument / Quote / Result`.
+- **Agent:** `AgentDefinition → AgentSession`, plus durable Task ownership, delegation, steering, and produced Artifacts.
+
+Artifact bytes are content-addressed. Dataset time fences, deterministic execution, independent Evaluation, current-versus-historical Report authority, Task steering, session lifecycle, and lineage refusal paths have executable gates.
+
+### Canvas and Dock
+
+The Electron application provides:
+
+- an infinite pan/zoom Canvas;
+- a file rail;
+- a Research Dock with `START`, `CATALOG`, `ACTIVE`, `INSPECT`, and `HISTORY` modes;
+- participant/terminal tiles with resize and focus behavior;
+- Kernel-projected Tasks, Runs, Artifacts, Evaluations, Reports, sessions, and relationships;
+- Workspace, Current Mission, History, and Full Lineage views;
+- semantic cables, selection emphasis, a minimap, and deterministic `TIDY` layout;
+- mouse-first controls with normal keyboard text and terminal input.
+
+These surfaces are functional and gated, but the interface remains early-stage. Golden proves truthful operation, not that every workflow is self-explanatory to a first-time user.
+
+### Production participant inventory
+
+The packaged production Dock contains exactly these Hermes-backed profiles:
+
+| Definition | Display role | Kernel role | Capability group |
+| --- | --- | --- | --- |
+| `hermes-research-director` | Research Director | `orchestrator` | `desk.orchestrate` |
+| `hermes-worker` | Market Researcher | `worker` | `market.read` |
+| `hermes-worker-2` | Market Researcher | `worker2` | `market.read` |
+| `hermes-critic` | Critic | `critic` | `research.evaluate` |
+
+The deterministic `qf-proof-agent` is QA-only. It is not production Dock inventory. Claude Code, Codex, local models, scrapers, and learning workers are not certified built-in production adapters in the Golden product.
+
+Hermes runs through an optional WSL2/Ubuntu adapter. QuantFlow owns Dock identity, admission, PTY lifecycle, launch-scoped MCP access, Kernel truth, and Canvas projection. Hermes owns its CLI/TUI process and private authentication. QuantFlow does not install, read, copy, or rewrite the founder's Hermes credentials.
+
+### Generated tools and application bridges
+
+The packaged app includes:
+
+- the schema-generated Ontology MCP surface;
+- an app-owned collaboration MCP surface;
+- role/capability filtering;
+- foreign-Kernel refusal;
+- tool-call trajectory Artifacts;
+- `qf-canvas`, the CLI control surface for inspecting and arranging Canvas tiles;
+- the fixed Bovada NFL capture CLI/RPC component.
+
+The Bovada component has strict origin, response-size, schema, selection, cancellation, replay, Artifact, and Kernel-ingest tests. It is not yet composed into the normal founder Mission workflow.
+
+## Honest product boundary
+
+The Golden product proves a real desktop, real governed state, a real Hermes runtime, and one real model/Ontology Task interaction. It does not yet prove:
+
+- a complete NFL or UFC research Mission using live point-in-time evidence;
+- a validated betting Technique or predictive edge;
+- automatic research composition from acquisition through independent Evaluation to a useful Decision Set;
+- a heterogeneous multi-model Dock;
+- evaluated recall or learning;
+- PufferLib training or Policy promotion;
+- a signed public release, working update channel, backup/restore, or rollback;
+- stranger-ready onboarding or a polished consumer interface;
+- multi-user, SaaS, marketplace, or commercial launch readiness.
+
+Fixtures and synthetic responders are used to prove isolated mechanics. They are never reported as real research judgment. The real founder inference receipt is separately bound to trusted Hermes logs, exact Kernel state, immutable Ontology-call Artifacts, and rendered application behavior.
+
+## Verification
+
+The canonical native-Windows release door is:
+
+```powershell
+bun qa/verify-release.ts
+```
+
+It performs frozen installs, focused Windows units, package/resource verification, an unsigned installer build, installed and unpacked readiness/shutdown, packaged Hermes lifecycle proof, the real-founder inference receipt check, and the static Kernel/Canvas/schema laws.
+
+Useful inspection commands:
+
+```powershell
+bun qa/run.ts --list
+bun qa/run.ts schema
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+```
+
+Atlas is a generated developer wiring map, not the running product or Kernel truth. At Golden designation it was current with HARD RED 0, while still retaining visible amber and undecided findings. Atlas can expose wiring and write-path risk; it cannot prove research usefulness or UI clarity.
 
 ## Architecture
 
-Non-authoritative [Product brief](docs/PRODUCT.md); `START_HERE.md` remains the authority.
-
-```
-┌───────────────────────────────────────────────────────┐
-│  CANVAS + DOCK (Electron)          the surface        │
-│  seat spawn rail · terminal tiles · live PTY sessions │
-├───────────────────────────────────────────────────────┤
-│  COLLABORATION PLANE               agent ↔ agent      │
-│  app-owned notification transport · host push into live TUIs │
-├───────────────────────────────────────────────────────┤
-│  WORLD MODEL                       agent ↔ world      │
-│  SQLite Kernel · sole writer · append-only event log  │
-│  content-addressed artifacts · schema-generated code  │
-└───────────────────────────────────────────────────────┘
+```text
+CANVAS + DOCK (Electron)
+  rendered participants, work, evidence, judgment, lineage
+        ↓ projections / governed actions
+APPLICATION PLANE
+  participant admission, PTY lifecycle, MCP bridges, peer delivery
+        ↓ one sanctioned mutation door
+KERNEL (SQLite)
+  objects, links, actions, events, durable identity and lineage
+        ↕
+CONTENT-ADDRESSED ARTIFACTS
+  raw evidence, trajectories, results, evaluations, reports
 ```
 
-Runtime split worth knowing: the Electron main process is Node (`node:sqlite`); Bun code (tools, tests, gates) uses `bun:sqlite`. The Kernel is opened through a single driver seam — only one file in the app may import it, and a gate enforces that.
+The Electron main process uses Node and `node:sqlite`; tools, tests, and gates use Bun and `bun:sqlite`. The Kernel is opened through one driver seam. Gates enforce both that app boundary and the sole-writer rule.
 
-## Repo layout
+## Repository layout
 
-| Path | What it is |
-|---|---|
-| `collab-electron/` | The desktop app — canvas, dock, seat spawning, peer delivery watcher |
-| `qf-kernel-schema/` | Schema → generated Kernel SQL, tools, ontology docs, upgrades |
-| `collab-electron/src/main/peer-delivery.ts` | App-owned peer notification transport and live TUI delivery watcher |
-| `species/` | Runtime/adapter packages and agent fixtures; durable Dock profile identity lives in the Kernel |
-| `design/glacier/` | Glacier visual language — tokens, tile/showcase specs, cable plumbing |
-| `qa/` | Gates. Falsifiable by construction — if a gate can't go red, it isn't a gate |
-| `docs/orders/` | Work orders + verification records (the build's audit trail) |
-| `docs/readme-assets/` | Screenshots linked from this README |
+| Path | Purpose |
+| --- | --- |
+| `collab-electron/` | Windows desktop application, Canvas, Dock, tiles, PTY/runtime hosting, MCP bridges, packaging |
+| `packages/qf-kernel/` | Kernel execution, lifecycle, governed review, deterministic execution, SQLite drivers |
+| `qf-kernel-schema/` | Canonical schema and generated SQL, tools, Ontology documentation, upgrades, conformance tests |
+| `species/hermes/` | Hermes adapter package, production Dock profiles, prompts, launch/runtime controls |
+| `tools/qf-bovada-football/` | Fixed public Bovada NFL capture and governed Kernel ingestion component |
+| `qa/` | Registered falsifiable gates and canonical Windows release verifier |
+| `qf-atlas/` | Generated developer wiring/coverage map and ratchet |
+| `docs/orders/` | Current build authority, scoped orders, and immutable verification evidence |
+| `docs/history/` | Superseded planning and decision history; never current authority |
 
 ## Development
 
-Prerequisites: **Windows 11**, **Node.js 24+**, and **Bun**. Native Windows packaging and runtime are the release floor; WSL/Linux are secondary compatibility targets.
+Primary platform: **Windows 11**. Required development tools: **Node.js 24+** and **Bun**. Hermes-backed participant runs additionally require founder-owned WSL2, Ubuntu, Hermes, and authentication.
 
-```sh
-git clone <this repo>
-cd QuantFlow-Ontology/collab-electron
-bun install
-bun run dev     # Electron app with hot reload
-bun test        # tests
-bun run build   # production build
+```powershell
+git clone <this-repository>
+cd QuantFlow-Ontology\collab-electron
+bun install --frozen-lockfile
+bun run dev
 ```
 
-On Windows, `bun run package:unsigned` creates the unsigned package under `collab-electron/dist/`.
-The canonical readiness check is run from the repository root with `bun qa/verify-release.ts`.
-While the app is running, `qf-canvas` is the command-line control surface for arranging and
-inspecting canvas tiles.
+Build the unsigned Windows package:
 
-Cold-start for agents: read [`START_HERE.md`](START_HERE.md), then [`AGENTS.md`](AGENTS.md), then the order named by `docs/orders/NEXT.md`.
+```powershell
+bun run package:unsigned
+```
 
-### Local data layout
-
-QuantFlow keeps domain truth, durable artifact bytes, and app-local projection state in three
-deliberately separate locations:
+Local state is deliberately separated:
 
 ```text
-~/.quantflow/kernel.db
-~/.quantflow/artifacts/
-~/.quantflow/app/
+~/.quantflow/kernel.db   canonical domain truth
+~/.quantflow/artifacts/ content-addressed durable bytes
+~/.quantflow/app/       application-local projection/config/log/socket state
 ```
 
-The Kernel is the sole source of domain truth. Artifact bytes live beside it under the canonical
-artifact root, while canvas, browser, configuration, logs, sockets, and other app-local state live
-under `app/` (development launches are isolated below `app/dev/worktree-<id>/`). On first launch,
-QuantFlow copies eligible state from the legacy Collaborator locations without deleting the source;
-if both roots exist, the QuantFlow root wins unchanged.
+Application-local state may support rendering and runtime operation, but it may not become a second domain truth store.
 
-Gates run from `qa/` and are wired into CI. The Dock definitions bootstrap automatically from packaged manifests, but real Hermes turns still require the founder's local [Hermes](https://github.com/NousResearch/hermes-agent) install and matching `qf-orchestrator`, `qf-worker`, and `qf-worker-2` runtime profiles. App-owned notifications remain the delivery seam for live collaboration.
+Agents entering this repository must read [`START_HERE.md`](START_HERE.md), [`AGENTS.md`](AGENTS.md), and the order named by [`docs/orders/NEXT.md`](docs/orders/NEXT.md) before editing.
 
-**Current collaboration limit:** Windows proofs cover catalogue selection, session lineage, safe native-TUI cleanup, and metadata-authorized PTY delivery for deterministic seats. They do not create Hermes profiles, handle credentials, or prove an unscripted real-model research collaboration; those remain later rungs.
+## Non-negotiable rules
 
-## Doctrine (the rules this repo is built under)
+- The Kernel owns truth; everything else is a projection or cache.
+- Durable domain writes go through `execute()`.
+- QuantFlow never places bets or executes trades.
+- Raw evidence remains inspectable after Evaluation and publication.
+- Independent Evaluation gates authoritative Report publication.
+- Runtime identity never replaces durable Task or Artifact identity.
+- Credentials remain operator-owned and absent from repository evidence.
+- Windows is the primary release and acceptance platform.
+- A mock, fixture, synthetic responder, or markdown file is never presented as live capability.
+- The agent that builds a change is not its verifier.
 
-- **Stop building engines.** The substrate is done. New effort goes into the world model and the loop that runs over it.
-- **Kernel is the sole writer.** Everything else asks.
-- **One canonical type per real-world entity.** `Run` with a `kind` property — never `BacktestRun`/`ScreenerRun` clones. Extension via new linked types, not mutation of shipped ones.
-- **Pipeline-shaped data has no per-type or manual agent write verbs.** Trusted bulk-ingest commands still pass through the Kernel's single `execute()` door, carrying provenance and atomic retry rules, while Dock agents receive read access rather than a second write surface.
-- **Descriptions are enforced, not encouraged.** The schema is agent context.
-- **Measurements beat prose.** Nothing is "done" by narrative — gates go red or the claim doesn't exist.
+## Lineage and license
 
-## Lineage
+QuantFlow is a fork of [Collaborator](https://github.com/collaborator-ai/collab-public) (`collab-electron`), whose Canvas, tile system, and terminal architecture form the inherited surface layer. The Kernel, Ontology, governed participant plane, research workflows, and verification system are QuantFlow work.
 
-QuantFlow is a fork of [Collaborator](https://github.com/collaborator-ai/collab-public) (`collab-electron`), whose canvas, tile system, and terminal architecture form the surface layer — see `LICENSE.md` and `NOTICE.md`. The Kernel, app-owned peer transport, seats, gates, and the ontology direction are QuantFlow's own.
-
-## License
-
-See [LICENSE.md](LICENSE.md).
+License: [FSL-1.1-ALv2](LICENSE.md).
