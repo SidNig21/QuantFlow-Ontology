@@ -6,10 +6,10 @@ builder-authority: CLOSED
 router-authority: CLOSED
 g11-status: CLOSED
 r18-status: FROZEN / SUPERSEDED
-foundation-status: UNACCEPTED qualification checkpoint; release and independent verification pending
+foundation-status: ACCEPTED — candidate 58b444d858443debeac8b13e041b2bb65e4e370e; independent YES / YES
 
-Golden remains accepted. FM-0 and Proof A remain CLOSED. No product implementation,
-merge, or push is authorized. Explicitly authorized qualification and read-only review may proceed.
+Golden and the Post-Golden Foundation closure are accepted. FM-0 and Proof A remain CLOSED.
+No product implementation is authorized until a later order opens through this pointer.
 
 - [Official Roadmap](../plans/OFFICIAL-ROADMAP.md)
 - [Institution Contracts](../plans/INSTITUTION-CONTRACTS.md)
@@ -17,6 +17,7 @@ merge, or push is authorized. Explicitly authorized qualification and read-only 
 - [Demo Spec](../plans/DEMO-SPEC.md)
 - [Archived Foundation qualification order](../history/orders/WO-POST-GOLDEN-FOUNDATION.md)
 - [Foundation evidence](evidence/post-golden-foundation/QUALIFICATION.md)
+- [Foundation acceptance](evidence/post-golden-foundation/ACCEPTANCE.md)
 - [Accepted Golden designation](evidence/golden-baseline/phase3/GOLDEN-DESIGNATION-20260831.md)
 - [Archived NEXT ledger](../history/orders/NEXT-post-golden-ab40524d.md)
 
