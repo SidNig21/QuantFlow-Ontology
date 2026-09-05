@@ -7,7 +7,8 @@
  *
  * G1 Every rung named in GOLDEN-RUN.md's route tables appears exactly once in
  *    the rung status table, and vice versa.
- * G2 Exactly one rung is `active`.
+ * Explicit closed NEXT pointers are checked without treating historical rungs as active.
+ * G2 For an open legacy pointer, exactly one rung is `active`.
  * G3 NEXT.md's title names that same rung.
  * G4 Every `complete` rung has a non-empty evidence directory at the path the
  *    status table declares.
@@ -65,10 +66,31 @@ function rungOrder(id: string): number {
   return Number(m[1]) * 10 + (m[2] === "b" ? 1 : 0);
 }
 
+/** A closed pointer authorizes no work, regardless of historical rung tables. */
+export function closedPointerReasons(markdown: string): string[] | null {
+  const fields = (name: string) => [...markdown.matchAll(new RegExp("^" + name + ": *(.+)$", "gm"))].map((match) => match[1]!.trim());
+  const status = fields("status");
+  const order = fields("active-order");
+  if (!status.includes("CLOSED") && !order.includes("none")) return null;
+  const reasons: string[] = [];
+  for (const [name, expected] of [["status", "CLOSED"], ["active-order", "none"], ["builder-authority", "CLOSED"], ["router-authority", "CLOSED"]]) {
+    const values = fields(name!);
+    if (values.length !== 1 || values[0] !== expected) reasons.push("closed NEXT requires exactly one " + name + ": " + expected);
+  }
+  if (!markdown.startsWith("# NEXT — CLOSED\n")) reasons.push("closed NEXT title must be '# NEXT — CLOSED'");
+  return reasons;
+}
+
 export function checkRungLadder(): { ok: boolean; reasons: string[] } {
   const reasons: string[] = [];
-  const route = readFileSync(join(REPO_ROOT, ROUTE), "utf8");
   const next = readFileSync(join(REPO_ROOT, NEXT), "utf8");
+  const closed = closedPointerReasons(next);
+  if (closed !== null) {
+    for (const reason of closed) console.error(`rung-ladder: ${reason}`);
+    if (closed.length === 0) console.log("rung-ladder: PASS (authority closed; no active order; historical ladder not activated)");
+    return { ok: closed.length === 0, reasons: closed };
+  }
+  const route = readFileSync(join(REPO_ROOT, ROUTE), "utf8");
 
   const routeIds = routeRungIds(route);
   const rows = statusRows(route);

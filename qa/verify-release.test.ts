@@ -133,7 +133,7 @@ describe("verify-release stages", () => {
     ).toBe(true);
   });
 
-  test("P14-B receipt reuse occurs exactly once immediately after G12", () => {
+  test("historical P14-B validation occurs exactly once immediately after G12", () => {
     const expected = WINDOWS_RELEASE_STAGES.map((stage) => stage.id);
     const g12 = expected.indexOf("golden-g12-package-operations");
     const p14b = expected.indexOf("p14-b-receipt");
@@ -142,7 +142,7 @@ describe("verify-release stages", () => {
     expect(WINDOWS_RELEASE_STAGES[p14b]).toMatchObject({
       id: "p14-b-receipt",
       cwd: ".",
-      command: ["bun", "qa/gates/hermes-production-inference-receipt.ts"],
+      command: ["bun", "qa/gates/hermes-production-inference-receipt.ts", "--historical"],
     });
     expect(WINDOWS_RELEASE_STAGES.filter((stage) => stage.id !== "p14-b-receipt").map((stage) => stage.id)).not.toEqual(expected);
     expect([...WINDOWS_RELEASE_STAGES, WINDOWS_RELEASE_STAGES[p14b]!].map((stage) => stage.id)).not.toEqual(expected);

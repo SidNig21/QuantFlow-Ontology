@@ -9,6 +9,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Historical receipt validation resolves accepted Git commits.
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest

@@ -11,6 +11,7 @@ import {
   productTreeRows,
   productTreeSha256,
   validateP14BReceiptSnapshot,
+  validateHistoricalReceiptSnapshot,
   type P14BReceiptSnapshot,
 } from "./hermes-production-inference-receipt.ts";
 
@@ -226,4 +227,28 @@ test("direct live observer remains explicitly Computer-Use-only and rejects no-f
   const source = readFileSync(join(ROOT, "qa/gates/hermes-production-inference.ts"), "utf8");
   expect(source).toContain('process.argv.includes("--computer-use")');
   expect(source).toContain('assert(computerUseInput, "P14-B production inference requires Router-owned Computer Use")');
+});
+
+test("historical evidence remains valid when current product or package differs", () => {
+  const changed = green();
+  changed.currentFinalProductTreeSha256 = "0".repeat(64);
+  changed.releaseProductTreeSha256 = null;
+  changed.releaseStatus = null;
+  changed.currentArtifacts = {};
+  expect(() => validateHistoricalReceiptSnapshot(changed)).not.toThrow();
+  expect(() => validateP14BReceiptSnapshot(changed)).toThrow();
+});
+
+test("historical mode still rejects altered receipts, hashes, and accepted-tree mismatch", () => {
+  for (const mutate of [
+    (value: P14BReceiptSnapshot) => { value.hashes[FINAL_FOUNDER_RECEIPT] = "0".repeat(64); },
+    (value: P14BReceiptSnapshot) => { value.currentProductTreeSha256 = "0".repeat(64); },
+    (value: P14BReceiptSnapshot) => { value.receipt.result = "FAIL"; },
+    (value: P14BReceiptSnapshot) => { value.finalReceipt.result = "FAIL"; },
+  ]) {
+    const value = green();
+    mutate(value);
+    expect(() => validateHistoricalReceiptSnapshot(value)).toThrow();
+    expect(() => validateP14BReceiptSnapshot(value)).toThrow();
+  }
 });

@@ -2,33 +2,6 @@
 *.swp
 *.swo
 *~
-# docs/ is an ALLOWLIST: everything is ignored, then named paths are restored.
-# A new directory under docs/ is therefore invisible to git until it is listed
-# here — `git add` reports nothing and the work is silently lost. That has cost
-# us three times (ADR-0001, readme-assets, V2-SCOPE). Adding a docs/ directory?
-# Add its two lines below in the same commit.
-docs/*
-!docs/adr/
-!docs/adr/**
-!docs/history/
-!docs/history/**
-!docs/LAWS.md
-!docs/DEBT.md
-!docs/orders/
-!docs/orders/**
-!docs/demos/
-!docs/demos/**
-!docs/DOCTRINE.md
-!docs/RESEARCH.md
-!docs/BLUEPRINT.md
-!docs/ONTOLOGY_SCHEMA.md
-!docs/ROADMAP.md
-!docs/readme-assets/
-!docs/readme-assets/**
-!docs/proposals/
-!docs/proposals/**
-!docs/plans/
-!docs/plans/**
 .collaborator
 .superpowers
 .claude/

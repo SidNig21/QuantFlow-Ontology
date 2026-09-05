@@ -639,26 +639,8 @@ async function launch(
     const afterReady = await processSnapshot();
     const ownedPids = collectOwnedPids(beforeProcesses as never, afterReady as never, child.pid);
     ownedPids.add(child.pid);
-    try {
-      await rpcCall(ready.endpoint, "qf.research.seed_fixture_dataset", { include_future_row: true });
-      throw new Error("future Dataset falsifier unexpectedly succeeded");
-    } catch (error) {
-      assert(String(error).includes("after as_of"), `future Dataset failed for the wrong reason: ${String(error)}`);
-      const db = new Database(kernelDb, { readonly: true });
-      try {
-        const downstream = db.query(`
-          SELECT 'hypothesis' AS kind, COUNT(*) AS count FROM hypothesis
-          UNION ALL SELECT 'run', COUNT(*) FROM run
-          UNION ALL SELECT 'evaluation', COUNT(*) FROM evaluation
-          UNION ALL SELECT 'artifact', COUNT(*) FROM artifact
-          UNION ALL SELECT 'links', COUNT(*) FROM links
-        `).all() as Array<{ kind: string; count: number }>;
-        assert(downstream.every((row) => Number(row.count) === 0), "future Dataset refusal left downstream research objects");
-      } finally {
-        db.close();
-      }
-      console.log("windows-hermes-research: FALSIFY RED future Dataset after as_of refused; FALSIFY GREEN no downstream objects");
-    }
+    // Future-row rejection is exercised through execute() by r10-dataset-integrity.test.ts
+    // in windows-unit. The fixture RPC invents that error and is not Kernel proof.
     const fixture = await rpcCall(ready.endpoint, "qf.research.seed_fixture_dataset", { include_future_row: false, r17_technique: true }) as Record<string, unknown>;
     const dataset = fixture.dataset as Record<string, unknown>;
     const strategies = fixture.strategies as Array<Record<string, unknown>>;

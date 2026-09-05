@@ -51,7 +51,7 @@ Nothing else. The read is deliberately narrow so it stays cheap enough to actual
 
 **Reviews are testimony, not verdicts.** A review is a claim like any other and gets verified before it is acted on — the same standard applied to a builder's report. This is not ceremony: the review that produced this role was itself partly wrong (it proposed binding a real session ID into `ToolLoopAgent`, which has no session concept — the `sessionId` it found belongs to React hooks). Two blockers were confirmed by measurement; one proposed remedy was not achievable. **Precedence, always: measurements beat prose — the reviewer's, the builder's, the verifier's, and the architect's alike.**
 
-**Entry points.** Builders and verifiers both start at [`NEXT.md`](NEXT.md) — it is the build authority (DOCTRINE A9) and it names the one active rung plus its acceptance. Cold start, no chat history required, by design. The separate `VERIFYING.md` door was archived on 2026-08-03: it was a second reading-order doc that drifted from this one, which is the exact rot the paragraph below describes.
+**Entry points.** Builders and verifiers both start at [`NEXT.md`](NEXT.md) — it is the build authority (DOCTRINE A9) and it names the active order and its acceptance, or explicitly closes work. Cold start, no chat history required, by design. The separate `VERIFYING.md` door was archived on 2026-08-03: it was a second reading-order doc that drifted from this one, which is the exact rot the paragraph below describes.
 
 ## The loop
 
@@ -61,7 +61,7 @@ Architect writes WO-NNN (self-contained file, no chat context needed)
   → Founder points a builder at the WO file
   → Builder works a branch: build → run gates → commit with evidence → report
   → Founder brings the report back (or architect reads the branch)
-  → Architect verifies: re-run gates + inspect seams → PASS (merge) or REWORK (numbered defects appended to WO)
+  → Architect verifies: re-run gates + inspect seams → PASS (await founder acceptance before merge/push) or REWORK (numbered defects appended to WO)
   → [every 2–3 merges] Reviewer reads shipped work adversarially — findings only, verified before acted on
 ```
 
@@ -82,30 +82,18 @@ Corollary — **the founder's four checks, which need no technical knowledge.** 
 3. **Did a command print PASS?** That is what the gate board is *for* — it converts "trust me" into something readable without knowing any of this.
 4. **Told, or shown?** "Done" versus pasted output. "The gate works" versus the transcript of it going red on purpose and green again.
 
-**Static-gates rule (added 2026-07-19, WO-007 round 1):** gates that need no installs (`repo-shape`, `lockfile-committed`, `kernel-sole-writer`, `no-canvas-domain-writes`, `kernel-sole-writer-app`, `doc-action-surface`, `one-skin`) are **builder-run on every order, always** — they cost seconds and depend on nothing. The cold-run-is-verifier-only rule covers the installing gates, not these; a builder who cannot run the static gates green does not report done.
+**Focused verification:** run existing checks relevant to the changed surface. Add a test only for a meaningful failure mode not already covered. Full release/package verification runs when explicitly authorized; neither every static gate nor every historical falsifier is required for every change.
 
 **Atlas change-control rule:** before any IPC, SQL, or product edit, the Builder reads [`qf-atlas/ATLAS.md`](../../qf-atlas/ATLAS.md), runs `bun qf-atlas/generate.mjs --check`, then `bun qf-atlas/ratchet.mjs`, and uses that snapshot to understand the affected files and blast radius. After the focused product gates, the Builder regenerates with `bun qf-atlas/generate.mjs`, runs `--check` and the ratchet again, inspects and reports `bun qf-atlas/generate.mjs --diff <build-base-ref>`, and commits the generated projections with the product change. The fresh Verifier reads the same map and reruns `--check`, the ratchet, and the build-base diff against the immutable candidate; it does not regenerate or edit the candidate. Both retain the unedited outputs. Baseline edits require explicit founder authority; Atlas never authorizes semantic changes or deletion. This normal-loop sequence stays under 60 seconds; `bun qf-atlas/falsify.mjs` is independent Atlas-acceptance evidence, not a per-rung gate.
 
 **Cold-state rule (learned the hard way, WO-003):** a gate may not depend on ambient machine state — it installs whatever it needs. Verify gates **cold**, not after a convenience install: the machine that already has dependencies present will pass a gate that a fresh CI checkout fails. If an order's acceptance steps install something before running the gates, the gates are being masked and the order is written wrong.
 
-**Cold-run-is-verifier-only rule (learned the hard way, WO-004a — an order-authoring defect, three occurrences):** the cold run belongs to the **verifier**, in a throwaway worktree. **No order may instruct a builder to delete `node_modules`.**
-
-**Current founder override.** While `AUTONOMY.md`'s 2026-08-14 standing override
-remains active, its one-checkout rule replaces the throwaway-worktree procedure
-for routed V2/R14+ orders, and its named ban on release/package gates applies
-unless the active order names one. Separation remains separate chat sessions;
-the verifier records an immutable SHA before and after and nobody edits the
-checkout during its matrix. The founder reaffirmed this precedence on
-2026-08-15.
-
-The reason is that builders share the founder's single working tree. WO-005 and WO-004a both carried `rm -rf tools/*/node_modules qf-kernel-schema/node_modules packages/*/node_modules` as a builder step — correct for a builder with a private clone, destructive where the builders actually stand (~1.9 GB of installed dependencies, `tools/runtime-proof` alone 1.8 GB). Two builders independently noticed and routed around it: WO-005's deferred the cold run to the verifier, WO-004a's invented a clean-room worktree. Both were right *in spite of* the order. The third would have run it.
-
-So the split is now fixed:
-
-- **Builder** runs package-level gates only (`bun install && bun test`, `bunx tsc --noEmit`) plus the gate-falsification proof, then reports. A builder that cannot run the cold gate says so; that is compliance, not a gap.
-- **Verifier** runs `bun qa/verify-release.ts` in a fresh worktree — that is the canonical door, the one CI runs. (`bun qa/run.ts --all` is the gate-level runner; use `--list` to inspect what exists.) Use `git worktree add --detach <path> origin/wo-NNN` so the builder's branch can stay checked out in the founder's tree. **A fresh worktree has no `node_modules` by construction — there is nothing to delete, and the `rm` was always a no-op there anyway.**
-
-The general lesson, and the reason this is a rule rather than a fix: an instruction that is safe in the environment the author imagined can be destructive in the environment the builder occupies. Orders state *what* must be true, not *where* someone must stand to check it.
+**Checkout and independent verification:** the founder's standing one-checkout
+override in [AUTONOMY.md](AUTONOMY.md) governs. Work on a short-lived branch in
+that checkout; do not create a worktree or delete shared dependencies. The
+independent verifier uses a separate session, records the immutable candidate,
+and checks it while other edits are paused. Release/package commands require
+explicit authorization. Merge and push require the founder's acceptance.
 
 ## Work order format (template)
 
@@ -121,8 +109,8 @@ depends: WO-MMM
 ## Deliverables — concrete files/behaviors.
 ## Contract — constraints that may not be violated (types, naming, laws).
 ## Acceptance gates — exact runnable commands + expected results.
-##   Builder-run: package-level only (install, test, typecheck) + the gate-falsification proof.
-##   Verifier-run: the cold `bun qa/verify-release.ts`. Never ask a builder to delete node_modules.
+##   Builder-run: relevant existing checks and falsifiers for new or changed critical guards.
+##   Verifier-run: independently rerun the named checks; full release qualification only when explicitly authorized. Never delete shared node_modules.
 ## Out of scope — explicit, to stop helpful drift.
 ## Report back — the exact format the builder must return.
 ```
@@ -135,13 +123,13 @@ depends: WO-MMM
 
 Hand out **one order at a time**, and only one whose `depends` are all `done` in the log. Fresh builder chat per order — the WO file is the entire context by design. Paste this, changing only the order number:
 
-> Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute `docs/orders/WO-NNN.md` exactly. Work on a new branch named `wo-NNN`. Stay strictly inside the order's scope — anything not listed in Deliverables is out. Run every acceptance gate and paste the full, unedited output in your report, using the order's Report-back format. Commit to your branch and push it. Do not merge. If anything in the order is ambiguous, stop and say so instead of improvising.
+> Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute `docs/orders/WO-NNN.md` exactly. Work on a new branch named `wo-NNN`. Stay strictly inside the order's scope — anything not listed in Deliverables is out. Run the named acceptance checks and report their outcomes and relevant unedited evidence. Resolve routine implementation details within scope. Ask when ambiguity changes the outcome, authority, or irreversible effects. Present the candidate for independent verification; merge and push only after founder acceptance.
 
-Rules of the loop: builders work on branches and never merge; status in the order log flips only when the verifier re-runs the gates and passes the work; a builder question is an order defect — the answer lands as an edit to the WO file, never as chat-only guidance; two failed rework cycles stop the order for a rewrite, never a third lap.
+Rules of the loop: builders work on branches and never merge; status in the order log flips only when the verifier re-runs the gates and passes the work; material scope or acceptance changes must be recorded in the order before implementation; routine clarifications do not require an order amendment; two failed rework cycles stop the order for a rewrite, never a third lap.
 
 ## Rework records go to the builder's branch (added 2026-07-19)
 
-When a verification round ends in REWORK, the verifier appends the record to the WO file **and pushes that docs-only commit to the builder's branch**, not only to `QuantFlow`. Reason, measured on WO-006b: the record went to `QuantFlow` while the builder's checkout of `wo-006b` kept a stale `NEXT.md` that still said "build" — the builder had to detect the contradiction and choose. The rotation rule's "log wins" clause resolved it correctly, but the ambiguity was avoidable. Builder's first step on any rework remains `git pull`.
+When a verification round ends in REWORK, the verifier appends the record to the WO file on the builder's branch; pushing that docs-only commit requires founder acceptance, not only to `QuantFlow`. Reason, measured on WO-006b: the record went to `QuantFlow` while the builder's checkout of `wo-006b` kept a stale `NEXT.md` that still said "build" — the builder had to detect the contradiction and choose. The rotation rule's "log wins" clause resolved it correctly, but the ambiguity was avoidable. Builder's first step on any rework remains `git pull`.
 
 ## The NEXT.md rotation (verifier duty)
 

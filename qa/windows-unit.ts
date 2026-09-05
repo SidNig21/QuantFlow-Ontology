@@ -23,6 +23,9 @@ export const WINDOWS_FOCUSED_TESTS = [
   "collab-electron/scripts/package-lib/shared-paths.test.ts",
   "collab-electron/scripts/package-lib/unit-wiring.test.ts",
   "qa/verify-release.test.ts",
+  "qa/gates/rung-ladder.test.ts",
+  "qa/gates/hermes-production-inference-receipt.test.ts",
+  "packages/qf-kernel/src/r10-dataset-integrity.test.ts",
 ] as const;
 
 export const WINDOWS_NODE_TESTS = [

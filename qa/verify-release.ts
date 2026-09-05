@@ -53,7 +53,7 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
   {
     id: "p14-b-receipt",
     cwd: ".",
-    command: ["bun", "qa/gates/hermes-production-inference-receipt.ts"],
+    command: ["bun", "qa/gates/hermes-production-inference-receipt.ts", "--historical"],
   },
   // hermes-founder-state is deliberately NOT a release stage. It needs a real
   // WSL distro and fails closed without one, which is the correct posture for a

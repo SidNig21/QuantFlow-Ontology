@@ -9,10 +9,10 @@ QuantFlow is a Windows-first, single-user spatial console for AI-assisted quanti
 It is **research and advisor only** — it never places a bet or executes a trade. It proposes,
 backtests, criticizes, evaluates, and reports; the operator acts in the world.
 
-## Read in this order, in full, before your first edit
+## Read the current instructions before your first edit
 
 1. **`START_HERE.md`** — mission and the hard rules. If anything below contradicts it, it wins.
-2. **`docs/orders/NEXT.md`** — points at the one unblocked order, or tells you to stop when none is authorized. Never choose work around it.
+2. **`docs/orders/NEXT.md`** — read the current pointer; do not load archived routing. If no order is open, do not begin product implementation. Explicit founder-authorized read-only investigations may proceed.
 3. **Your order in `docs/orders/`** — deliverables, gates, and out-of-scope. End to end.
 4. **`docs/orders/PROTOCOL.md`** — rules of engagement, roles, evidence standards.
 
@@ -26,7 +26,7 @@ write paths, or proposing deletes. It cannot authorize work. The app does not la
 
 **`NEXT.md` is the build authority** (DOCTRINE A9). There is no ladder file to consult and no
 roadmap to select from. The old ones are in `docs/history/` and are not authority — if one names a
-rung, that is history, not permission. If `NEXT.md` closes the door, stop and say so.
+rung, that is history, not permission. A closed `NEXT.md` prohibits product implementation; it does not cancel an explicit founder-authorized read-only investigation.
 
 ## The one rule
 
@@ -64,9 +64,9 @@ This binds every main agent, sub-agent, verifier, and automated swarm working in
    does not exist.
 3. **You are never your own verifier.** Do not mark your own work passed. Report evidence and
    stop. Someone who did not build it decides whether it landed.
-4. **A gate you did not falsify is not a gate.** Every gate ships with a bait transcript:
-   break the thing on purpose → watch it go red → restore → watch it go green. Paste both
-   outputs. A gate that has only ever been green is decoration.
+4. **New or changed critical guards need a falsifier.** Exercise the actual boundary
+   with a failing case and a valid control. Report both. Reuse accepted regression
+   checks; do not manufacture new gates or repeat every historical bait for each edit.
 5. **Never handle credentials.** Do not write, read, log, print, commit, or template any API
    key, token, or secret — not in code, not in tests, not in a `.env`, not in your report. If
    an order needs one, it says "read from `$VAR_NAME`" and the operator exports it before
@@ -75,8 +75,10 @@ This binds every main agent, sub-agent, verifier, and automated swarm working in
 ## Working shape
 
 - Work on a short-lived branch off `main`, named for your order (`wo-101`).
-- **Commit from a git worktree, never the shared tree.** Another agent is probably working in
-  it. `cursor-agent -w` does this for you.
+- Use a short-lived branch in the founder's existing checkout, as required by the
+  standing checkout override in `docs/orders/AUTONOMY.md`. Do not create another
+  checkout or modify `main` without explicit founder authorization. Pause other
+  edits while an independent verifier checks the immutable candidate.
 - Lockfiles are committed. LF line endings (`.gitattributes` enforces).
 - TypeScript strict. Bun is the runtime. Every schema entity carries a non-empty description —
   this is lint-enforced at define time and it is not a style preference (see below).
@@ -93,7 +95,8 @@ step." That is the bar.
 
 ## Commands (as CI runs them — `.github/workflows/ci.yml`)
 
-From a clean native-Windows worktree, run the one canonical release verifier from repo root:
+For an explicitly authorized release qualification, run the canonical verifier
+from the clean native-Windows checkout. For other changes, use relevant focused checks:
 
 ```bash
 bun qa/verify-release.ts
@@ -113,8 +116,8 @@ bun test                           # the suite reports its own count; do not cac
 bun run generate                   # regenerates golden/ — see below
 ```
 
-The `schema` QA gate runs that suite with a frozen install, so the canonical release verifier
-covers schema work through its final all-gates stage.
+The `schema` QA gate runs that suite with a frozen install. Run it for schema
+changes; do not assume the native-Windows release stage list runs every gate.
 
 **`golden/` is generated output, never hand-edited.** `bun run generate` writes
 `golden/migration.sql`, `golden/tools.json`, `golden/ONTOLOGY.md`, and
@@ -137,7 +140,8 @@ Never hand-edit `golden/` to make a test pass. That is a second truth store — 
 - Adding a dependency, a package, or a service the order did not name.
 - Changing `START_HERE.md`, `docs/DOCTRINE.md`, or `PROTOCOL.md`. These change by deliberate
   decision, not as a side effect of a build.
-- Deleting or rewriting a test to make a gate pass. If a gate is wrong, say so and stop.
+- Weakening a test to hide a product failure. If a gate is wrong, present the exact
+  defect and proposed correction; apply it only under explicit test-repair authority.
 - Force-pushing, rebasing shared history, or touching `main` directly.
 
 ## When you finish
@@ -148,7 +152,7 @@ proposals, not deletes. Do this at the end of every rung so the next agent is no
 reading a map of the previous tree.
 
 Report **evidence, not conclusions**. For each deliverable: what you did, the command that
-proves it, and the output. For each gate: the bait transcript. Then one paragraph on any
+proves it, and the output. For new or changed critical guards: the failing case and valid control. Then one paragraph on any
 place you exercised judgment — where the order was silent and you chose. That paragraph is
 the most valuable thing in your report, because it is where the next defect is hiding.
 

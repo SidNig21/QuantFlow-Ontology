@@ -1,4 +1,4 @@
-> **Active track:** [`docs/orders/NEXT.md`](docs/orders/NEXT.md) names the one active rung, and
+> **Active track:** [`docs/orders/NEXT.md`](docs/orders/NEXT.md) names the active order or explicitly closes work, and
 > [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) holds the route and the rung status table.
 > **This line deliberately states no status.** It used to, and it went stale: on 2026-08-03 it still
 > announced the builder door was closed while `NEXT.md` named an active rung. A status copied into a
@@ -74,9 +74,9 @@ Bun + TypeScript strict (orchestration) · Electron shell inherited from Collabo
 
 ## 5. Hard rules for all agents (builders and residents alike)
 
-1. Read this file, then the order you're executing. No order, no work.
+1. Read this file, then the order you're executing. No product implementation without an active order; explicit founder-authorized read-only investigations may proceed.
 2. No new truth stores. Ever.
-3. Every change ships with a runnable `qa/` gate; the founder verifies outcomes, not diffs.
+3. Every change carries relevant runnable verification; reuse existing checks. Add a gate only for a meaningful failure mode not already covered. The founder verifies outcomes, not diffs.
 4. **No self-approval** — the agent that built a change is never its verifier.
 5. Lockfiles are committed. Descriptions on every schema entity. LF line endings (.gitattributes enforces).
 6. Windows is the primary product target. Platform-dependent code still takes an injectable `platform` parameter, but every release floor must pass natively on Windows before secondary-platform work counts.
