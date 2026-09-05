@@ -2,7 +2,7 @@
 
 status: **NON-AUTHORITATIVE** — inventory only, authorizes nothing
 swept: 2026-08-12
-companion to: `V2-SCOPE.md`
+companion to: archived `docs/history/proposals/V2-SCOPE.md`
 
 > **Relevant to QuantFlow never means Dock item.** This file exists so useful
 > research is preserved without every release becoming architecture. An entry

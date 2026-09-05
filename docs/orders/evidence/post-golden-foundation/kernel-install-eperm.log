@@ -1,0 +1,33 @@
+isolated-root: C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-ZaEOP3
+command: bun test packages/qf-kernel/src/r10-dataset-integrity.test.ts
+cwd: C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-ZaEOP3
+exit: 1
+bun test v1.3.12 (700fc117)
+
+packages\qf-kernel\src\r10-dataset-integrity.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find module 'qf-kernel-schema/commands' from 'C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-ZaEOP3\packages\qf-kernel\src\pipeline.ts'
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [55.00ms]
+
+command: bun install --frozen-lockfile
+cwd: C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-ZaEOP3\packages\qf-kernel
+exit: 1
+bun install v1.3.12 (700fc117)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ zod@4.4.3
+
+6 packages installed [2.00s]
+Failed to install 1 package
+EPERM: failed copying files from cache to destination for package qf-kernel-schema
+
+cleanup: owned roots remaining=0; synchronous children completed

@@ -1,0 +1,3 @@
+warning: unable to access 'C:\Users\rybow/.config/git/ignore': Permission denied
+warning: unable to access 'C:\Users\rybow/.config/git/ignore': Permission denied
+current-product-fingerprint: PASS HEAD=80883799d5c845339a08f6430360b471c3d0eb09 Golden=a91b5deec9bb49538136c76a031648be2c08e05e files=564 sha256=3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6 exact_exclusion=species/hermes/README.md CI=qualification-only-pinned historical_receipt_is_not_current_product_proof=true

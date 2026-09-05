@@ -1,0 +1,44 @@
+bun test v1.3.12 (700fc117)
+
+qa\verify-release.test.ts:
+(pass) verify-release stages > requires the native Windows install, unit, package, and static-gate order
+(pass) verify-release stages > classifies all 15 lock roots and rejects install-closure drift [47.00ms]
+(pass) verify-release stages > Kernel frozen install resolves its own dependency root before Windows unit
+(pass) verify-release stages > current product identity cannot be satisfied by historical P14 receipts
+(pass) verify-release stages > omitting the Hermes frozen install before Windows unit is detectable
+(pass) verify-release stages > Electron and Hermes frozen installs cannot reuse one cache
+(pass) verify-release stages > deleting Windows cold boot is detectable
+(pass) verify-release stages > omitting the G12 package and operations stage is detectable
+(pass) verify-release stages > historical P14-B validation occurs exactly once immediately after G12
+(pass) verify-release stages > keeps Linux as an explicit compatibility route
+(pass) verify-release stages > fails the canonical door closed off Windows
+(pass) verify-release stages > package signing inspection binds to the built-in PowerShell module
+
+qa\gates\hermes-production-inference-receipt.test.ts:
+fingerprint bait RED: collab-electron/src/main/index.ts; restored GREEN: 3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6
+fingerprint bait RED: collab-electron/package.json; restored GREEN: 3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6
+fingerprint bait RED: collab-electron/resources/tmux.conf; restored GREEN: 3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6
+fingerprint bait RED: collab-electron/packages/collab-canvas-skill/skills/collab-canvas/SKILL.md; restored GREEN: 3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6
+fingerprint bait RED: species/hermes/agent-package/src/acp-shim.ts; restored GREEN: 3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6
+(pass) current Golden fingerprint guards all five product classes and pins CI separately [156.00ms]
+(pass) accepted P14-B receipt snapshot restores green without a provider call [16.00ms]
+(pass) identity, ancestry, product tree, file, missing, and evidence-inventory drift go red
+(pass) current release status, proof-only product equivalence, and artifacts fail closed
+(pass) final founder product fingerprint excludes proof surfaces and preserves product bytes [15.00ms]
+(pass) product tree fingerprint preserves mode/type/blob/path and excludes only exact proof surfaces
+(pass) false conjuncts, keyset drift, leakage, and extra raw evidence go red
+(pass) prompt, provider, API, Turn, runtime, Kernel, screenshot, exit, and cleanup drift go red
+(pass) final founder route, identity, prompt, provider, and one-turn cardinality mutations go red [16.00ms]
+(pass) final five API rows and four ordered governed tool calls are independently fail-capable
+(pass) final Kernel lineage, answer, close-reopen truth, visual checkpoints, and updater honesty go red
+(pass) direct live observer remains explicitly Computer-Use-only and rejects no-flag execution
+(pass) historical evidence remains valid when current product or package differs
+(pass) historical mode still rejects altered receipts, hashes, and accepted-tree mismatch [16.00ms]
+
+qa\gates\rung-ladder.test.ts:
+(pass) closed pointer admits no order and rejects conflicting authority
+
+ 27 pass
+ 0 fail
+ 188 expect() calls
+Ran 27 tests across 3 files. [341.00ms]

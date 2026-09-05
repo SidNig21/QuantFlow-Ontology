@@ -231,3 +231,8 @@ Agents entering this repository must read [`START_HERE.md`](START_HERE.md), [`AG
 QuantFlow is a fork of [Collaborator](https://github.com/collaborator-ai/collab-public) (`collab-electron`), whose Canvas, tile system, and terminal architecture form the inherited surface layer. The Kernel, Ontology, governed participant plane, research workflows, and verification system are QuantFlow work.
 
 License: [FSL-1.1-ALv2](LICENSE.md).
+
+Approved planning: [Official Roadmap](docs/plans/OFFICIAL-ROADMAP.md) ·
+[Institution Contracts](docs/plans/INSTITUTION-CONTRACTS.md) ·
+[Product Surface](docs/plans/PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md) ·
+[Demo Spec](docs/plans/DEMO-SPEC.md). Build authority remains NEXT.

@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ 9d3a5680` on 2026-08-31 by
+> Generated from `codex/wo-post-golden-foundation-final @ 80883799` on 2026-09-05 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -366,9 +366,9 @@ asked before the change, when nothing is red yet.
 
 **222 of 223 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**537 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**538 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 314 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 315 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -415,7 +415,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (537 files)
+## Per-analyzer coverage (538 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -423,17 +423,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 533 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 269 | 0 | 3 | 0 | 265 |
-| `ipcPush` | 7 | 0 | 3 | 0 | 527 |
-| `persistence` | 23 | 29 | 0 | 0 | 485 |
-| `lifetime` | 5 | 59 | 0 | 0 | 473 |
-| `packaging` | 221 | 0 | 0 | 102 | 214 |
-| `ownership` | 20 | 0 | 0 | 336 | 181 |
-| `reach` | 220 | 3 | 0 | 314 | 0 |
+| `imports` | 534 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 269 | 0 | 3 | 0 | 266 |
+| `ipcPush` | 7 | 0 | 3 | 0 | 528 |
+| `persistence` | 23 | 29 | 0 | 0 | 486 |
+| `lifetime` | 5 | 59 | 0 | 0 | 474 |
+| `packaging` | 221 | 0 | 0 | 102 | 215 |
+| `ownership` | 20 | 0 | 0 | 336 | 182 |
+| `reach` | 220 | 3 | 0 | 315 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 314 files means those trees are
+failure — `reach: unsupported` on 315 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 102 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.

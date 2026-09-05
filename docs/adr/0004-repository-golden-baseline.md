@@ -187,3 +187,10 @@ obsolete subsystem.
 **Rewrite QuantFlow.** Rejected because the audit proved the Kernel/Ontology,
 Electron shell, Canvas, Dock, Hermes path, and research lineage are real retained
 architecture.
+
+## Realized consequences — 2026-09-05
+
+Golden is accepted; Phase 2 and Phase 3 are closed. R18 remains frozen, with its
+former route superseded by the approved post-Golden roadmap. `.mcp.json` remains
+an explicitly invoked developer workflow as required by G11 F06; it is not product
+or Kernel truth. NEXT alone may open a later order.

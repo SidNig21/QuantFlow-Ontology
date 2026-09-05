@@ -1,0 +1,53 @@
+isolated-root: C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-rx1JBN
+command: bun test packages/qf-kernel/src/r10-dataset-integrity.test.ts
+cwd: C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-rx1JBN
+exit: 1
+bun test v1.3.12 (700fc117)
+
+packages\qf-kernel\src\r10-dataset-integrity.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find package 'qf-kernel-schema' from 'C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-rx1JBN\packages\qf-kernel\src\ontology-read-receipt.ts'
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [55.00ms]
+
+command: bun install --frozen-lockfile --linker isolated
+cwd: C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-rx1JBN\packages\qf-kernel
+exit: 0
+bun install v1.3.12 (700fc117)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ qf-kernel-schema@../../qf-kernel-schema
++ zod@4.4.3
+
+14 packages installed [1391.00ms]
+
+command: bun test packages/qf-kernel/src/r10-dataset-integrity.test.ts
+cwd: C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-rx1JBN
+exit: 0
+bun test v1.3.12 (700fc117)
+
+packages\qf-kernel\src\r10-dataset-integrity.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > registers immutable bytes and computes the time fence [31.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > rejects a declared hash that is not the Artifact identity
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > rejects observations after the declared as_of fence
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > rejects durable bytes changed after Artifact publication [16.00ms]
+
+ 4 pass
+ 0 fail
+ 11 expect() calls
+Ran 4 tests across 1 file. [219.00ms]
+
+missing install-kernel: RED (real dependency failure); restored frozen stage: GREEN; no schema install
+cleanup: owned roots remaining=0; synchronous children completed

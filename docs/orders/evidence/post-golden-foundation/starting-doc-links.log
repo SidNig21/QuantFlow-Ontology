@@ -1,0 +1,5 @@
+command: bun qa/run.ts doc-links
+context: authority just rotated; product still starting floor
+exit: 0
+doc-links: PASS (85 live documents, every pointer resolves)
+PASS  doc-links

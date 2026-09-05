@@ -1,6 +1,6 @@
 # QuantFlow Institutional Build Plan
 
-status: canonical program route
+status: HISTORICAL — pre-Golden R18–R25 route; superseded by docs/plans/OFFICIAL-ROADMAP.md on 2026-09-03; R18 frozen by ADR-0004
 decided: 2026-08-24
 product floor: R0-R17 and Pre-R18 accepted
 route authority: [`../orders/GOLDEN-RUN.md`](../orders/GOLDEN-RUN.md)

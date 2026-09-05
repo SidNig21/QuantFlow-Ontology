@@ -1,0 +1,5 @@
+command: bun qa/run.ts golden-g11-authority
+context: authority just rotated; product still starting floor
+exit: 1
+FAIL  golden-g11-authority
+F01 terminal_order_authority_mismatch

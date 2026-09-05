@@ -447,11 +447,71 @@ export function runHistoricalReceiptGate(): { ok: boolean } {
   }
 }
 
+/** Current product identity is separate from historical receipt validity. */
+export const CURRENT_PRODUCT_EXCLUSION = "species/hermes/README.md";
+const QUALIFICATION_CI_BLOB = "2cde342448d37235ed555fa77e0e926594d1162a";
+export function currentProductPath(path: string): boolean {
+  return path !== CURRENT_PRODUCT_EXCLUSION && (
+    /^(?:collab-electron|packages|qf-kernel-schema|species|tools)\//.test(path) ||
+    /(?:^|\/)(?:bun\.lockb?|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$/.test(path) ||
+    path === "install.sh"
+  );
+}
+
+function exactTreeRows(tree: string): string[] {
+  const rows = tree.replaceAll("\r\n", "\n").split("\n").filter(Boolean);
+  const paths = new Set<string>();
+  for (const row of rows) {
+    requireValue(/^[0-7]{6} (?:blob|commit) [0-9a-f]{40}\t.+$/.test(row), "malformed current Git tree row");
+    const path = row.slice(row.indexOf("\t") + 1);
+    requireValue(!paths.has(path), `duplicate current Git tree path: ${path}`);
+    paths.add(path);
+  }
+  return rows.sort();
+}
+
+export function currentProductRows(tree: string): string[] {
+  return exactTreeRows(tree).filter(row => currentProductPath(row.slice(row.indexOf("\t") + 1)));
+}
+
+export function validateCurrentProductTrees(goldenTree: string, currentTree: string): { files: number; sha256: string } {
+  const golden = currentProductRows(goldenTree);
+  const current = currentProductRows(currentTree);
+  requireValue(golden.length > 0 && JSON.stringify(golden) === JSON.stringify(current), "current HEAD product fingerprint differs from Golden");
+  const workflows = (tree: string) => exactTreeRows(tree).filter(row => row.split("\t")[1]!.startsWith(".github/workflows/"));
+  const expectedWorkflows = workflows(goldenTree).map(row => row.endsWith("\t.github/workflows/ci.yml")
+    ? `100644 blob ${QUALIFICATION_CI_BLOB}\t.github/workflows/ci.yml` : row);
+  requireValue(expectedWorkflows.some(row => row.endsWith("\t.github/workflows/ci.yml")), "Golden CI entry missing");
+  requireValue(JSON.stringify(expectedWorkflows) === JSON.stringify(workflows(currentTree)), "qualification-only CI pin or other workflow differs");
+  return { files: current.length, sha256: createHash("sha256").update(current.join("\n") + "\n").digest("hex") };
+}
+
+export function runCurrentProductGate(): { ok: boolean } {
+  try {
+    const root = join(import.meta.dir, "../..");
+    const current = git(root, ["rev-parse", "HEAD"]);
+    const result = validateCurrentProductTrees(
+      git(root, ["ls-tree", "-r", "--full-tree", FINAL_FOUNDER_PRODUCT_COMMIT]),
+      git(root, ["ls-tree", "-r", "--full-tree", current]),
+    );
+    const changed = [
+      ...git(root, ["diff", "--name-only", "HEAD"]).split("\n"),
+      ...git(root, ["ls-files", "--others", "--exclude-standard"]).split("\n"),
+    ].filter(path => currentProductPath(path) || path.startsWith(".github/workflows/"));
+    requireValue(changed.length === 0, `uncommitted product/workflow changes: ${changed.join(", ")}`);
+    console.log(`current-product-fingerprint: PASS HEAD=${current} Golden=${FINAL_FOUNDER_PRODUCT_COMMIT} files=${result.files} sha256=${result.sha256} exact_exclusion=${CURRENT_PRODUCT_EXCLUSION} CI=qualification-only-pinned historical_receipt_is_not_current_product_proof=true`);
+    return { ok: true };
+  } catch (error) {
+    console.error(`current-product-fingerprint: RED ${error instanceof Error ? error.message : String(error)}`);
+    return { ok: false };
+  }
+}
+
 if (import.meta.main) {
   const args = process.argv.slice(2);
-  if (args.length > 1 || (args.length === 1 && args[0] !== "--historical")) {
-    console.error("usage: hermes-production-inference-receipt.ts [--historical]");
+  if (args.length > 1 || (args.length === 1 && !["--historical", "--current-product"].includes(args[0]!))) {
+    console.error("usage: hermes-production-inference-receipt.ts [--historical | --current-product]");
     process.exit(1);
   }
-  process.exit((args[0] === "--historical" ? runHistoricalReceiptGate() : runP14BReceiptGate()).ok ? 0 : 1);
+  process.exit((args[0] === "--historical" ? runHistoricalReceiptGate() : args[0] === "--current-product" ? runCurrentProductGate() : runP14BReceiptGate()).ok ? 0 : 1);
 }

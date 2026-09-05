@@ -24,9 +24,12 @@ If this branch has `qf-atlas/`, that is a **generated wiring map** — not Kerne
 not the running app, not an order. Read `qf-atlas/ATLAS.md` before changing IPC, SQL
 write paths, or proposing deletes. It cannot authorize work. The app does not launch it.
 
-**`NEXT.md` is the build authority** (DOCTRINE A9). There is no ladder file to consult and no
-roadmap to select from. The old ones are in `docs/history/` and are not authority — if one names a
-rung, that is history, not permission. A closed `NEXT.md` prohibits product implementation; it does not cancel an explicit founder-authorized read-only investigation.
+**`NEXT.md` alone authorizes builds** (DOCTRINE A9).
+`docs/plans/OFFICIAL-ROADMAP.md` is the approved route;
+`docs/history/orders/GOLDEN-RUN.md` is completed history. Neither is permission.
+A closed `NEXT.md` prohibits product implementation; it does not cancel an explicit
+founder-authorized read-only investigation. Read `docs/plans/INSTITUTION-CONTRACTS.md`
+before admission, Dock, tool/capability, or Evaluation seam changes.
 
 ## The one rule
 
@@ -76,7 +79,7 @@ This binds every main agent, sub-agent, verifier, and automated swarm working in
 
 - Work on a short-lived branch off `main`, named for your order (`wo-101`).
 - Use a short-lived branch in the founder's existing checkout, as required by the
-  standing checkout override in `docs/orders/AUTONOMY.md`. Do not create another
+  standing checkout override in `docs/history/orders/AUTONOMY.md`. Do not create another
   checkout or modify `main` without explicit founder authorization. Pause other
   edits while an independent verifier checks the immutable candidate.
 - Lockfiles are committed. LF line endings (`.gitattributes` enforces).

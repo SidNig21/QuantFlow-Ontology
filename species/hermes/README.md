@@ -1,7 +1,7 @@
 # species/hermes — native TUI (default) + host ACP (substrate)
 
-**Default desk UX (WO-D2):** the normal Dock exposes `hermes-orchestrator`, `hermes-worker`, and
-`hermes-worker-2`. Clicking one opens a term tile running the shared Hermes package as
+**Default desk UX (WO-D2):** the normal Dock exposes `hermes-research-director`, `hermes-worker`, and
+`hermes-worker-2`, and `hermes-critic`. Clicking one opens a term tile running the shared Hermes package as
 `hermes -p <runtime-profile> --tui`. There is no separate Peer Seats catalogue or renderer-authored
 argv.
 

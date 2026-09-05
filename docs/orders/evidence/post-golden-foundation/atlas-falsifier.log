@@ -1,0 +1,8 @@
+Current Atlas metadata mutation: bun qf-atlas/generate.mjs --check; exit=0
+qf-atlas: current — 413 files, 113 channels, 4 strip candidates
+Current Atlas fingerprint mutation: bun qf-atlas/generate.mjs --check; exit=1
+qf-atlas: STALE — atlas.json fingerprint 0000000000000000 != 9e32fe41df007381
+The map is a projection. Run: bun qf-atlas/generate.mjs
+Restored current Atlas: bun qf-atlas/generate.mjs --check; exit=0
+qf-atlas: current — 413 files, 113 channels, 4 strip candidates
+Observed existing limitation: --check compares the recorded fingerprint with the source model; it does not rehash edited atlas.json fields. No Atlas guard was changed by this order. Current artifacts were generated and restored byte-exactly.

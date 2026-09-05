@@ -3,7 +3,7 @@
 > **Binding.** Cut out of `docs/ROADMAP.md` on 2026-08-03 under DOCTRINE A9, verbatim. The ladder
 > around it was archived to `docs/history/ladders/`; this table was the only part still load-bearing.
 >
-> **Rules.** Tracked so it is not rediscovered. None of this blocks the active rung. Each entry lands
+> **Rules.** Tracked so it is not rediscovered. None of this blocks work unless NEXT.md names it. Each entry lands
 > by order when it starts costing more than it saves. Struck rows (`~~text~~`) are closed and kept
 > for their reasoning. Append new debt at the end; never renumber — other documents cite these
 > numbers.

@@ -1,0 +1,9 @@
+Atlas diff  9d3a5680 -> 80883799
+VERDICT: UNCHANGED — no architectural change
+
+  added 0 · newly-detected 0 · resolved 0 · regressed 0
+  confidence changed 0 · owners changed 0
+  coverage worse 0 · better 0
+  undecided 27 -> 27
+
+wrote qf-atlas/atlas-diff.json

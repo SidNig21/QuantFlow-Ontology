@@ -1,0 +1,184 @@
+bun test v1.3.12 (700fc117)
+
+qa\verify-release.test.ts:
+(pass) verify-release stages > requires the native Windows install, unit, package, and static-gate order
+(pass) verify-release stages > classifies all 15 lock roots and rejects install-closure drift [62.00ms]
+(pass) verify-release stages > Kernel frozen install resolves its own dependency root before Windows unit
+(pass) verify-release stages > current product identity cannot be satisfied by historical P14 receipts
+(pass) verify-release stages > omitting the Hermes frozen install before Windows unit is detectable
+(pass) verify-release stages > Electron and Hermes frozen installs cannot reuse one cache
+(pass) verify-release stages > deleting Windows cold boot is detectable
+(pass) verify-release stages > omitting the G12 package and operations stage is detectable
+(pass) verify-release stages > historical P14-B validation occurs exactly once immediately after G12
+(pass) verify-release stages > keeps Linux as an explicit compatibility route
+(pass) verify-release stages > fails the canonical door closed off Windows
+(pass) verify-release stages > package signing inspection binds to the built-in PowerShell module
+
+qa\gates\hermes-production-inference-receipt.test.ts:
+fingerprint bait RED: collab-electron/src/main/index.ts; restored GREEN: 3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6
+fingerprint bait RED: collab-electron/package.json; restored GREEN: 3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6
+fingerprint bait RED: collab-electron/resources/tmux.conf; restored GREEN: 3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6
+fingerprint bait RED: collab-electron/packages/collab-canvas-skill/skills/collab-canvas/SKILL.md; restored GREEN: 3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6
+fingerprint bait RED: species/hermes/agent-package/src/acp-shim.ts; restored GREEN: 3cd8754ff3163f6b0b33cb000823fff176992b661a5548d859dc471034163bb6
+(pass) current Golden fingerprint guards all five product classes and pins CI separately [188.00ms]
+(pass) accepted P14-B receipt snapshot restores green without a provider call [15.00ms]
+(pass) identity, ancestry, product tree, file, missing, and evidence-inventory drift go red
+(pass) current release status, proof-only product equivalence, and artifacts fail closed
+(pass) final founder product fingerprint excludes proof surfaces and preserves product bytes
+(pass) product tree fingerprint preserves mode/type/blob/path and excludes only exact proof surfaces
+(pass) false conjuncts, keyset drift, leakage, and extra raw evidence go red [16.00ms]
+(pass) prompt, provider, API, Turn, runtime, Kernel, screenshot, exit, and cleanup drift go red
+(pass) final founder route, identity, prompt, provider, and one-turn cardinality mutations go red
+(pass) final five API rows and four ordered governed tool calls are independently fail-capable [15.00ms]
+(pass) final Kernel lineage, answer, close-reopen truth, visual checkpoints, and updater honesty go red
+(pass) direct live observer remains explicitly Computer-Use-only and rejects no-flag execution
+(pass) historical evidence remains valid when current product or package differs
+(pass) historical mode still rejects altered receipts, hashes, and accepted-tree mismatch
+
+qa\gates\rung-ladder.test.ts:
+(pass) closed pointer admits no order and rejects conflicting authority
+
+collab-electron\scripts\package-lib\extra-resources.test.ts:
+(pass) extra-resources parsing > rejects non-array extraResources
+(pass) extra-resources parsing > rejects linux extraResources non-array
+(pass) extra-resources parsing > rejects empty from/to and extra keys
+(pass) extra-resources parsing > rejects macros in from and to
+(pass) extra-resources parsing > merges top-level and linux file sets
+(pass) extra-resources parsing > Windows packaging declares collaboration and ontology bridge resources
+
+collab-electron\scripts\package-lib\package-cleanup.test.ts:
+(pass) package verification cleanup > preserves sibling distribution artifacts
+
+collab-electron\scripts\package-lib\package-receipt.test.ts:
+(pass) package receipt log path binding > accepts the canonical package verification log [15.00ms]
+(pass) package receipt log path binding > rejects a prefix-sibling root
+(pass) package receipt log path binding > rejects an alternative log inside the collab root
+
+collab-electron\scripts\package-lib\shared-paths.test.ts:
+(pass) shared production path rules > changing shared input moves both production and inspection consumers [16.00ms]
+(pass) static shared-module dependency > gate and production import and call package-resource-paths
+
+collab-electron\scripts\package-lib\unit-wiring.test.ts:
+(pass) package-closure unit wiring > test-unit.sh executes root qa package-closure tests [16.00ms]
+(pass) package-closure unit wiring > rejects restored cold-import.test.ts path
+(pass) package-closure unit wiring > falsify removing root qa invocation from in-memory script copy
+
+collab-electron\src\main\app-root.test.ts:
+(pass) selectAppRoot > development uses repository root
+(pass) selectAppRoot > packaged uses resourcesPath
+(pass) selectAppRoot > packaged without resourcesPath fails closed
+
+collab-electron\src\main\cwd-fallback.test.ts:
+(pass) nearestExistingDir > returns the directory itself when it exists
+(pass) nearestExistingDir > returns the nearest existing ancestor when the leaf is missing
+(pass) nearestExistingDir > walks up multiple missing levels
+(pass) nearestExistingDir > returns the parent directory when the path is a file
+(pass) nearestExistingDir > prefers an existing ancestor over the provided fallback
+(pass) nearestExistingDir > defaults the fallback to the home directory
+
+collab-electron\src\main\dock-profiles.test.ts:
+(pass) Dock profile manifests > actual repository QA discovery accepts the proof fixture display names
+(pass) Dock profile manifests > production discovery succeeds without proof packages [16.00ms]
+(pass) Dock profile manifests > production discovery requires the exact Research Director contract [15.00ms]
+(pass) Dock profile manifests > invalid display names enumerate the exact four allowed values [16.00ms]
+(pass) Dock profile manifests > QA discovery explicitly includes proof fixtures [15.00ms]
+(pass) Dock profile manifests > QA discovery still fails when a required fixture package is missing [16.00ms]
+(pass) Dock profile manifests > projects only exact missing Hermes Dock state as an adapter diagnostic
+(pass) Dock profile manifests > registers once, skips identical rows, and preserves conflicts [31.00ms]
+(pass) Dock profile manifests > validates every manifest before making a Kernel call [16.00ms]
+(pass) Dock profile manifests > propagates Kernel registration failures
+(pass) Dock profile manifests > rejects traversal and duplicate ids [16.00ms]
+
+collab-electron\src\main\logger-policy.test.ts:
+(pass) packaged logger transport policy > disables only console logging for packaged Windows
+(pass) packaged logger transport policy > does not swallow non-EPIPE stream failures
+(pass) packaged logger transport policy > keeps console logging for development and non-Windows
+
+collab-electron\src\main\native-tui-orchestration.test.ts:
+(pass) orchestrateNativeTuiAdmission > shutdown awaits a detached native-TUI teardown [312.00ms]
+(pass) orchestrateNativeTuiAdmission > create failure leaves no process-local or Kernel compensation residue
+(pass) orchestrateNativeTuiAdmission > start failure records fail and close, cleans maps, then permits same role
+(pass) orchestrateNativeTuiAdmission > late peer failure unregisters only its PTY and same-role relaunch succeeds
+(pass) orchestrateNativeTuiAdmission > duplicate role preflight rejects before process start
+(pass) orchestrateNativeTuiAdmission > duplicate-role preflight revokes a minted capability without starting a process
+(pass) orchestrateNativeTuiAdmission > precreated admission preserves the exact id and registers delivery before running
+(pass) orchestrateNativeTuiAdmission > failed admission revokes its in-memory seat capability during owned cleanup
+(pass) orchestrateNativeTuiAdmission > readiness rejection writes no start and cleans every owned runtime seam
+
+collab-electron\src\main\peer-role-registry.test.ts:
+(pass) PeerRoleRegistry > rejects duplicate live roles without rerouting
+(pass) PeerRoleRegistry > unregister is owner-specific
+
+collab-electron\src\main\runtime-adapter.test.ts:
+(pass) runtime adapter metadata > expands one complete runtime-profile token and keeps null on base argv
+(pass) runtime adapter metadata > rejects missing, repeated, partial, and unknown placeholders
+(pass) runtime adapter metadata > rejects unknown keys and duplicate peer selectors
+(pass) runtime adapter metadata > uses base argv for a real default-only profile
+(pass) runtime adapter metadata > resolves sibling metadata and binds it to the package filename [16.00ms]
+
+packages\qf-kernel\src\r10-dataset-integrity.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > registers immutable bytes and computes the time fence [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > rejects a declared hash that is not the Artifact identity
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > rejects observations after the declared as_of fence [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > rejects durable bytes changed after Artifact publication
+
+ 85 pass
+ 0 fail
+ 344 expect() calls
+Ran 85 tests across 16 files. [1208.00ms]
+▶ SidecarClient
+  ✔ connects and pings (11.2768ms)
+  ✔ creates session and receives data (1544.6046ms)
+  ✔ lists sessions (1705.7956ms)
+  ✔ kills session (194.2622ms)
+  ✔ RPC timeout when server goes away (6.2052ms)
+  ✔ socket close rejects pending RPCs (5.9231ms)
+  ✔ malformed JSON from server does not crash (18.0094ms)
+  ✔ reconnects session and receives scrollback (1677.0666ms)
+  ✔ notification handler receives session.exited (2.9606ms)
+✔ SidecarClient (5167.9524ms)
+▶ SidecarServer
+  ✔ starts and responds to ping (10.0758ms)
+✔ SidecarServer (10.9247ms)
+▶ SidecarServer session lifecycle
+  ✔ session.create spawns a shell and returns socketPath (259.7394ms)
+  ✔ data socket sends PTY output (404.4015ms)
+  ✔ replays early PTY output to the first attached data client (536.9317ms)
+  ✔ session.list returns created sessions (236.6573ms)
+  ✔ session.kill removes session from list (166.8964ms)
+  ✔ session.reconnect returns scrollback over data socket (582.6144ms)
+✔ SidecarServer session lifecycle (2187.9759ms)
+▶ Shell exit sends session.exited notification
+  ﹣ emits session.exited with sessionId and exitCode (0.2982ms) # Windows native PTY exit is covered by the client notification test
+✔ Shell exit sends session.exited notification (0.5009ms)
+▶ Last-attach-wins eviction
+  ✔ closes socket A when socket B connects (733.9043ms)
+✔ Last-attach-wins eviction (734.0872ms)
+▶ session.resize works
+  ✔ returns { ok: true } when resizing (237.7579ms)
+✔ session.resize works (237.918ms)
+▶ session.foreground returns a command name
+  ✔ returns a non-empty command string (783.8786ms)
+✔ session.foreground returns a command name (784.0593ms)
+▶ Reconnect queues output produced during gap
+  ✔ scrollback includes output from both commands (832.7141ms)
+✔ Reconnect queues output produced during gap (832.8541ms)
+▶ Unknown RPC method returns error
+  ✔ returns error code -32601 for unknown method (2.9791ms)
+✔ Unknown RPC method returns error (3.0969ms)
+▶ Windows WSL smoke
+  ﹣ can spawn a WSL session when a distro is installed (0.2556ms) # Set RUN_WSL_SMOKE=1 to run the WSL integration smoke test
+✔ Windows WSL smoke (0.3168ms)
+ℹ tests 23
+ℹ suites 10
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 8252.3427
+windows-unit: PASS

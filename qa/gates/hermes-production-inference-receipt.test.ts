@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import {
   P14B_ACCEPTED_COMMIT,
@@ -13,9 +14,39 @@ import {
   validateP14BReceiptSnapshot,
   validateHistoricalReceiptSnapshot,
   type P14BReceiptSnapshot,
+  validateCurrentProductTrees,
+  currentProductPath,
+  FINAL_FOUNDER_PRODUCT_COMMIT,
 } from "./hermes-production-inference-receipt.ts";
 
 const ROOT = join(import.meta.dir, "../..");
+
+test("current Golden fingerprint guards all five product classes and pins CI separately", () => {
+  const tree = (ref: string) => execFileSync("git", ["ls-tree", "-r", "--full-tree", ref], {cwd: ROOT, encoding: "utf8", maxBuffer: 16 * 1024 * 1024});
+  const golden = tree(FINAL_FOUNDER_PRODUCT_COMMIT);
+  const current = tree("HEAD");
+  const control = validateCurrentProductTrees(golden, current);
+  const mutate = (path: string) => current.split("\n").map(row => row.endsWith("\t" + path) ? row.replace(/blob [0-9a-f]{40}/, "blob " + "0".repeat(40)) : row).join("\n");
+  for (const path of [
+    "collab-electron/src/main/index.ts",
+    "collab-electron/package.json",
+    "collab-electron/resources/tmux.conf",
+    "collab-electron/packages/collab-canvas-skill/skills/collab-canvas/SKILL.md",
+    "species/hermes/agent-package/src/acp-shim.ts",
+  ]) {
+    expect(currentProductPath(path)).toBe(true);
+    expect(mutate(path)).not.toBe(current);
+    expect(() => validateCurrentProductTrees(golden, mutate(path))).toThrow("fingerprint differs");
+    console.log(`fingerprint bait RED: ${path}; restored GREEN: ${control.sha256}`);
+  }
+  expect(() => validateCurrentProductTrees(golden, mutate(".github/workflows/ci.yml"))).toThrow("CI pin");
+  for (const path of ["START_HERE.md", "species/hermes/README.md"]) {
+    expect(mutate(path)).not.toBe(current);
+    expect(validateCurrentProductTrees(golden, mutate(path))).toEqual(control);
+  }
+  for (const path of ["bun.lock", "other/bun.lockb", "other/package-lock.json", "other/pnpm-lock.yaml", "other/yarn.lock", "install.sh", "species/hermes/README.md.backup"]) expect(currentProductPath(path)).toBe(true);
+  expect(() => validateCurrentProductTrees(golden, current + "\n100644 blob " + "0".repeat(40) + "\ttools/added.ts")).toThrow("fingerprint differs");
+});
 
 function green(): P14BReceiptSnapshot {
   return {

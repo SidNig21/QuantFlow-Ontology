@@ -14,9 +14,9 @@ const REPO_ROOT = join(import.meta.dir, "..");
 
 export type ReleaseStage = {
   id: string;
-  cwd: "." | "collab-electron" | "species/hermes" | "tools/qf-bovada-football";
+  cwd: "." | "collab-electron" | "species/hermes" | "tools/qf-bovada-football" | "packages/qf-kernel";
   command: readonly [string, ...string[]];
-  installCache?: "electron" | "hermes" | "bovada";
+  installCache?: "electron" | "hermes" | "bovada" | "kernel";
 };
 
 export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
@@ -41,6 +41,12 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
     installCache: "bovada",
   },
   {
+    id: "install-kernel",
+    cwd: "packages/qf-kernel",
+    command: ["bun", "install", "--frozen-lockfile", "--linker", "isolated"],
+    installCache: "kernel",
+  },
+  {
     id: "unit",
     cwd: ".",
     command: ["bun", "qa/windows-unit.ts"],
@@ -54,6 +60,11 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
     id: "p14-b-receipt",
     cwd: ".",
     command: ["bun", "qa/gates/hermes-production-inference-receipt.ts", "--historical"],
+  },
+  {
+    id: "current-product-fingerprint",
+    cwd: ".",
+    command: ["bun", "qa/gates/hermes-production-inference-receipt.ts", "--current-product"],
   },
   // hermes-founder-state is deliberately NOT a release stage. It needs a real
   // WSL distro and fails closed without one, which is the correct posture for a

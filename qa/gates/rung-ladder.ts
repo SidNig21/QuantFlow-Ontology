@@ -24,10 +24,10 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const REPO_ROOT = join(import.meta.dir, "../..");
-const ROUTE = "docs/orders/GOLDEN-RUN.md";
+const ROUTE = "docs/history/orders/GOLDEN-RUN.md";
 const NEXT = "docs/orders/NEXT.md";
 
-type RungState = "complete" | "active" | "pending";
+type RungState = "complete" | "active" | "pending" | "frozen";
 type StatusRow = { rung: string; state: RungState; evidence: string | null };
 
 /** Rung ids as they appear in the Act tables: | **R0** | ... */
@@ -43,7 +43,7 @@ export function statusRows(markdown: string): StatusRow[] {
   const section = markdown.slice(start, markdown.indexOf("\n### Closing a rung", start));
   const rows: StatusRow[] = [];
   for (const m of section.matchAll(
-    /^\|\s*(R\d+[ab]?)\s*\|\s*(complete|active|pending)\s*\|\s*(.+?)\s*\|/gm,
+    /^\|\s*(R\d+[ab]?)\s*\|\s*(complete|active|pending|frozen)\s*\|\s*(.+?)\s*\|/gm,
   )) {
     const raw = m[3]!.trim();
     rows.push({
@@ -86,6 +86,11 @@ export function checkRungLadder(): { ok: boolean; reasons: string[] } {
   const next = readFileSync(join(REPO_ROOT, NEXT), "utf8");
   const closed = closedPointerReasons(next);
   if (closed !== null) {
+    const route = readFileSync(join(REPO_ROOT, ROUTE), "utf8");
+    const rows = statusRows(route);
+    if (rows.some(row => row.state === "active")) closed.push("closed NEXT cannot coexist with an active historical rung");
+    if (rows.filter(row => row.rung === "R18" && row.state === "frozen").length !== 1) closed.push("historical R18 must be frozen exactly once");
+    if (!/^status: HISTORICAL /m.test(route)) closed.push("Golden route must be marked historical");
     for (const reason of closed) console.error(`rung-ladder: ${reason}`);
     if (closed.length === 0) console.log("rung-ladder: PASS (authority closed; no active order; historical ladder not activated)");
     return { ok: closed.length === 0, reasons: closed };

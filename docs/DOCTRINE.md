@@ -191,6 +191,9 @@ That last comment is Palantir's SuperRepo demo (local embedded ontology, live-re
 
 ## Part V — The roadmap (six phases, each with a falsifiable gate)
 
+> Status — superseded by the completed Golden route and then the approved
+> [post-Golden roadmap](plans/OFFICIAL-ROADMAP.md). Reasoning retained; do not select work from these phases.
+
 No phase is "done" by prose. Each has an exit gate that can go red.
 
 ### Phase 0 — The substrate · **BANKED**
@@ -271,8 +274,9 @@ The v1 text above is preserved untouched. These amendments record decisions made
 > **The case that matters today:** A4 (and passing mentions in A2, A3, and A6) name `docs/ROADMAP.md`
 > and `docs/orders/SCOPES.md` as the build ladder and build authority. **A9 overturned that.** Both
 > files are archived under `docs/history/`, the build authority is
-> [`docs/orders/NEXT.md`](orders/NEXT.md), and the route is
-> [`docs/orders/GOLDEN-RUN.md`](orders/GOLDEN-RUN.md), which carries the only rung status table.
+> [`docs/orders/NEXT.md`](orders/NEXT.md), and the approved current route is
+> [`Official Roadmap`](plans/OFFICIAL-ROADMAP.md). The archived
+> [`GOLDEN-RUN.md`](history/orders/GOLDEN-RUN.md) retains the completed R-ladder for history.
 > Anything in this section naming a build authority is superseded by A9 — check A9 before acting on
 > it.
 

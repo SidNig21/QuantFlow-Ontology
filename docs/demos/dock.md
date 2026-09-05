@@ -18,7 +18,7 @@ the renderer, and there is no second Peer Seats catalogue.
    - `agent-host: Dock bootstrap registered=… skipped=… conflicts=…`
    - dock invalidate / host ready
 3. With a fresh Kernel, confirm the **Agent dock** shows exactly `qf-proof-agent`,
-   `hermes-research-director`, `hermes-worker`, and `hermes-worker-2`. On an existing founder Kernel,
+   `hermes-research-director`, `hermes-worker`, `hermes-worker-2`, and `hermes-critic`. On an existing founder Kernel,
    additional historical definitions remain visible and a differing same-id row is preserved and
    reported as a bootstrap conflict.
 4. Spawn `hermes-research-director`, then `hermes-worker`. Confirm each opens a term tile and the host

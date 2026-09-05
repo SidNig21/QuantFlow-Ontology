@@ -100,7 +100,7 @@ function resources(ref?: string): string[] {
 function claims(ref?: string): string[] {
   return grep(ref, "description[[:space:]]*:|textContent[[:space:]]*=|innerText[[:space:]]*=|aria-label|title[[:space:]]*:|assert\\(|status:|mission:|decision:|name:[[:space:]]*\"", [
     "qf-kernel-schema/src/**", "collab-electron/src/windows/**", "collab-electron/scripts/package-lib/**", "qa/run.ts", "qa/gates/**",
-    "START_HERE.md", "docs/orders/NEXT.md", "docs/orders/GOLDEN-RUN.md", "docs/adr/0004-repository-golden-baseline.md",
+    "START_HERE.md", "docs/orders/NEXT.md", ref ? "docs/orders/GOLDEN-RUN.md" : "docs/history/orders/GOLDEN-RUN.md", "docs/adr/0004-repository-golden-baseline.md",
   ]);
 }
 
@@ -212,8 +212,14 @@ function validate(seed: Ledgers, current: Ledgers, bait?: Bait): { issues: strin
     const currentGate = current.gates.find((row) => row.startsWith("golden-g11-authority\t"));
     if (historicalGate !== currentGate) issues.push("historical/current golden-g11-authority registration mismatch");
     const implementationPath = "qa/gates/golden-g11-authority.ts";
-    if (blob(implementationPath, HISTORICAL_G11) !== blob(implementationPath)) {
-      issues.push("historical/current golden-g11-authority implementation mismatch");
+    // Pin the exact approved implementation while retaining the accepted historical
+    // gate, registration, receipt and census. The only semantic adjustment is the
+    // Architect-authorized exact ADR appendix and historical Atlas receipt anchor; other boundaries remain.
+    if (sha256(blob(implementationPath, HISTORICAL_G11)) !== "6360F1695F7D4324A1E29A9EAE4E0BBD70408E53C52D827E6F790C771A883E6C") {
+      issues.push("historical golden-g11-authority implementation pin mismatch");
+    }
+    if (sha256(blob(implementationPath)) !== "C00920B07DC13F848E6D1FDBCA625B5B565CD795AAFBD4C2064B7CF4D6E33C9D") {
+      issues.push("current golden-g11-authority approved re-anchor pin mismatch");
     }
     const acceptance = blob("docs/orders/evidence/golden-baseline/g11/VERIFIER-ACCEPTANCE-20260829.md");
     if (!acceptance.includes(HISTORICAL_G11)) issues.push("historical G11 acceptance identity absent");

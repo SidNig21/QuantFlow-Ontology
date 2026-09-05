@@ -408,6 +408,11 @@ const gates: Gate[] = [
         "docs/DEBT.md",
         "docs/orders/NEXT.md",
         "docs/orders/PROTOCOL.md",
+        "docs/plans/OFFICIAL-ROADMAP.md",
+        "docs/plans/INSTITUTION-CONTRACTS.md",
+        "docs/plans/PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md",
+        "docs/plans/DEMO-SPEC.md",
+        "docs/history/orders/GOLDEN-RUN.md",
         "docs/adr/0001-windows-first-product.md",
         "qf-kernel-schema/golden/ONTOLOGY.md",
         ".gitattributes",
@@ -425,6 +430,12 @@ const gates: Gate[] = [
         "docs/ROADMAP.md",
       ];
       let ok = true;
+      const orderFiles = readdirSync(join(REPO_ROOT, "docs/orders"), { withFileTypes: true })
+        .filter(entry => !entry.isDirectory()).map(entry => entry.name).sort();
+      if (JSON.stringify(orderFiles) !== JSON.stringify(["NEXT.md", "PROTOCOL.md"])) {
+        console.error(`repo-shape: top-level docs/orders must be exactly NEXT.md and PROTOCOL.md; found ${orderFiles.join(", ")}`);
+        ok = false;
+      }
       for (const f of mustExist) {
         if (!existsSync(join(REPO_ROOT, f))) {
           console.error(`repo-shape: missing required file ${f}`);

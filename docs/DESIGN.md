@@ -1,5 +1,7 @@
 # Current visual contract
 
+status: reference — visual/product register; not build or route authority
+
 The existing Glacier Canvas remains the product surface. Research-world tiles
 use compact, semantic rectangles: a human label, object type, current state or
 authority marker, and a shortened id are visible without hiding the canonical

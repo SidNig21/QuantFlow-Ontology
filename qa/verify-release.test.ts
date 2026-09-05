@@ -29,16 +29,18 @@ describe("verify-release stages", () => {
     "tools/qf-read-tools/bun.lock",
     "tools/qf-vault-projection/bun.lock",
   ];
-  const PREINSTALL_IDS = ["install-electron", "install-hermes", "install-bovada"];
+  const PREINSTALL_IDS = ["install-electron", "install-hermes", "install-bovada", "install-kernel"];
 
   test("requires the native Windows install, unit, package, and static-gate order", () => {
     expect(WINDOWS_RELEASE_STAGES.map((stage) => stage.id)).toEqual([
       "install-electron",
       "install-hermes",
       "install-bovada",
+      "install-kernel",
       "unit",
       "golden-g12-package-operations",
       "p14-b-receipt",
+      "current-product-fingerprint",
       "repo-shape",
       "lockfile-committed",
       "kernel-sole-writer",
@@ -54,7 +56,7 @@ describe("verify-release stages", () => {
       "kernel-market-lineage",
       "observe-door",
     ]);
-    expect(WINDOWS_RELEASE_STAGES).toHaveLength(20);
+    expect(WINDOWS_RELEASE_STAGES).toHaveLength(22);
     expect(WINDOWS_RELEASE_STAGES[0]).toMatchObject({
       id: "install-electron",
       cwd: "collab-electron",
@@ -76,14 +78,26 @@ describe("verify-release stages", () => {
     const actualLocks = execFileSync("git", ["ls-files"], { cwd: join(import.meta.dir, ".."), encoding: "utf8" })
       .split(/\r?\n/).filter((path) => path.endsWith("bun.lock")).sort();
     expect(actualLocks).toEqual(LOCK_ROOTS);
-    const ids = WINDOWS_RELEASE_STAGES.slice(0, 3).map((stage) => stage.id);
+    const ids = WINDOWS_RELEASE_STAGES.slice(0, 4).map((stage) => stage.id);
     expect(ids).toEqual(PREINSTALL_IDS);
     expect(ids.slice(1)).not.toEqual(PREINSTALL_IDS);
     expect([ids[1], ids[0], ids[2]]).not.toEqual(PREINSTALL_IDS);
     expect([...ids, "install-extra"]).not.toEqual(PREINSTALL_IDS);
-    const wrongOption = WINDOWS_RELEASE_STAGES.slice(0, 3).map((stage) => stage.command.join(" "));
+    const wrongOption = WINDOWS_RELEASE_STAGES.slice(0, 4).map((stage) => stage.command.join(" "));
     wrongOption[2] = wrongOption[2].replace("--backend copyfile", "--backend hardlink");
-    expect(wrongOption).not.toEqual(WINDOWS_RELEASE_STAGES.slice(0, 3).map((stage) => stage.command.join(" ")));
+    expect(wrongOption).not.toEqual(WINDOWS_RELEASE_STAGES.slice(0, 4).map((stage) => stage.command.join(" ")));
+  });
+
+  test("Kernel frozen install resolves its own dependency root before Windows unit", () => {
+    const kernel = WINDOWS_RELEASE_STAGES.find(stage => stage.id === "install-kernel");
+    expect(kernel).toEqual({id: "install-kernel", cwd: "packages/qf-kernel", command: ["bun", "install", "--frozen-lockfile", "--linker", "isolated"], installCache: "kernel"});
+    expect(WINDOWS_RELEASE_STAGES.indexOf(kernel!)).toBeLessThan(WINDOWS_RELEASE_STAGES.findIndex(stage => stage.id === "unit"));
+    expect(WINDOWS_RELEASE_STAGES.some(stage => String(stage.cwd) === "qf-kernel-schema")).toBe(false);
+  });
+
+  test("current product identity cannot be satisfied by historical P14 receipts", () => {
+    const p14 = WINDOWS_RELEASE_STAGES.findIndex(stage => stage.id === "p14-b-receipt");
+    expect(WINDOWS_RELEASE_STAGES[p14 + 1]).toEqual({id: "current-product-fingerprint", cwd: ".", command: ["bun", "qa/gates/hermes-production-inference-receipt.ts", "--current-product"]});
   });
 
   test("omitting the Hermes frozen install before Windows unit is detectable", () => {
@@ -104,11 +118,14 @@ describe("verify-release stages", () => {
     const electronCache = releaseInstallCacheDir(electron, "fixture-run", "C:\\fixture-cache");
     const hermesCache = releaseInstallCacheDir(hermes, "fixture-run", "C:\\fixture-cache");
     const bovadaCache = releaseInstallCacheDir(bovada, "fixture-run", "C:\\fixture-cache");
+    const kernel = WINDOWS_RELEASE_STAGES.find(stage => stage.id === "install-kernel")!;
+    const kernelCache = releaseInstallCacheDir(kernel, "fixture-run", "C:\\fixture-cache");
+    expect(kernelCache).toBe("C:\\fixture-cache\\qf-release-fixture-run\\kernel");
     expect(electronCache).toBe("C:\\fixture-cache\\qf-release-fixture-run\\electron");
     expect(hermesCache).toBe("C:\\fixture-cache\\qf-release-fixture-run\\hermes");
     expect(bovadaCache).toBe("C:\\fixture-cache\\qf-release-fixture-run\\bovada");
     expect(electronCache).not.toBe(hermesCache);
-    expect(new Set([electronCache, hermesCache, bovadaCache])).toHaveLength(3);
+    expect(new Set([electronCache, hermesCache, bovadaCache, kernelCache])).toHaveLength(4);
   });
 
   test("deleting Windows cold boot is detectable", () => {

@@ -1,0 +1,9 @@
+{
+  "base": "80883799d5c845339a08f6430360b471c3d0eb09",
+  "branch": "codex/wo-post-golden-foundation-final",
+  "reference": "13cf85ee762982ea57fe98b466d6c36b5d79f7a7",
+  "golden": "a91b5deec9bb49538136c76a031648be2c08e05e",
+  "startingWorktree": "clean before authority rotation",
+  "processCheck": "CIM: no inspected bun/node/electron/git/claude/codex process explicitly targeted checkout; sole Builder assignment; Router is coordinating, audit task idle",
+  "ciBlob": "2cde342448d37235ed555fa77e0e926594d1162a"
+}

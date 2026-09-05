@@ -1,0 +1,532 @@
+{
+  "base": "80883799d5c845339a08f6430360b471c3d0eb09",
+  "moves": [
+    {
+      "source": "docs/orders/AUTONOMY.md",
+      "destination": "docs/history/orders/AUTONOMY.md",
+      "blob": "cb444518f4d8ba7696f161eb3170d9d4968ae125",
+      "before": "377b79d04c055832cf8a30897576dd2a51ed7a737dd4955d7e4a7355565987d3",
+      "after": "377b79d04c055832cf8a30897576dd2a51ed7a737dd4955d7e4a7355565987d3",
+      "checkoutBefore": "377b79d04c055832cf8a30897576dd2a51ed7a737dd4955d7e4a7355565987d3",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/GOLDEN-RUN.md",
+      "destination": "docs/history/orders/GOLDEN-RUN.md",
+      "blob": "7d5160f699433329fb1302695d43ecc091cd07d2",
+      "before": "20b186878986c0268022f42b363cff1d1362ded55627fdb5fbc6e51923539305",
+      "after": "b59eacf9f646a1db837d9ca80cd51891705b78634e1cfb0d074ead164b7099f5",
+      "checkoutBefore": "20b186878986c0268022f42b363cff1d1362ded55627fdb5fbc6e51923539305",
+      "checkoutLineEndings": "same as Git",
+      "delta": "historical status marker; R18 active -> frozen"
+    },
+    {
+      "source": "docs/orders/SPRINT.md",
+      "destination": "docs/history/orders/SPRINT.md",
+      "blob": "20b8d0137274bebdb17043ae48778338e9ba0c3c",
+      "before": "dbd11d6035918b9b62b6512245fa583992d9c0ef304331efc127d1f86745efca",
+      "after": "dbd11d6035918b9b62b6512245fa583992d9c0ef304331efc127d1f86745efca",
+      "checkoutBefore": "dbd11d6035918b9b62b6512245fa583992d9c0ef304331efc127d1f86745efca",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-ACT1-GOLDEN-PATH.md",
+      "destination": "docs/history/orders/WO-ACT1-GOLDEN-PATH.md",
+      "blob": "5cc46092ec7644d1108cafdbb59247b1927bfc57",
+      "before": "8594ae6d8e2d82a459b6af8185722111eff6327e3973bc8513ccd3c4353cfd9e",
+      "after": "8594ae6d8e2d82a459b6af8185722111eff6327e3973bc8513ccd3c4353cfd9e",
+      "checkoutBefore": "8594ae6d8e2d82a459b6af8185722111eff6327e3973bc8513ccd3c4353cfd9e",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G1-R1.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G1-R1.md",
+      "blob": "13f11e852bfad4e92da4f35d3106e9d648230f6f",
+      "before": "37c634c53a0804423a7bc528c7eaf26d20519979de65e5b9d9394e5c5632c4c7",
+      "after": "37c634c53a0804423a7bc528c7eaf26d20519979de65e5b9d9394e5c5632c4c7",
+      "checkoutBefore": "37c634c53a0804423a7bc528c7eaf26d20519979de65e5b9d9394e5c5632c4c7",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G1-R2.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G1-R2.md",
+      "blob": "5564af4f0d556ff875bd02a726a5b40e8ec0af04",
+      "before": "0a50a17e75869667b653188f4d9028689c15e068b4cef906fed40266f9e2c4b1",
+      "after": "0a50a17e75869667b653188f4d9028689c15e068b4cef906fed40266f9e2c4b1",
+      "checkoutBefore": "0a50a17e75869667b653188f4d9028689c15e068b4cef906fed40266f9e2c4b1",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G1.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G1.md",
+      "blob": "099c37cea2ce470e6f850e0324e5bbde6f63f56b",
+      "before": "a81730b2163cbd296f8ded8b500e55733f46028e68e5bbd7948541a02f0fcbd9",
+      "after": "a81730b2163cbd296f8ded8b500e55733f46028e68e5bbd7948541a02f0fcbd9",
+      "checkoutBefore": "a81730b2163cbd296f8ded8b500e55733f46028e68e5bbd7948541a02f0fcbd9",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G10.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G10.md",
+      "blob": "89dc010a2409bbef7baa294def97cb366bb014d4",
+      "before": "01f7a2f60edf7da4589e7af8f8fe6a866a1c83b158fda261292d69cf14865676",
+      "after": "01f7a2f60edf7da4589e7af8f8fe6a866a1c83b158fda261292d69cf14865676",
+      "checkoutBefore": "01f7a2f60edf7da4589e7af8f8fe6a866a1c83b158fda261292d69cf14865676",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G11.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G11.md",
+      "blob": "fb9cfc8c94894bfccb559720470e7cb46a41862a",
+      "before": "c2fb84763133fcd64d945a7433f81f1213efd2f681fab431ed2711cdf44ea0ee",
+      "after": "c2fb84763133fcd64d945a7433f81f1213efd2f681fab431ed2711cdf44ea0ee",
+      "checkoutBefore": "c2fb84763133fcd64d945a7433f81f1213efd2f681fab431ed2711cdf44ea0ee",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G12.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G12.md",
+      "blob": "86e4eaa74a8b98202c1ba26e0c8a7677fab2680b",
+      "before": "fa41125cc1513c38b8797bce51a3d0a7c724812cd144bdfc6fb0da0f358e1465",
+      "after": "fa41125cc1513c38b8797bce51a3d0a7c724812cd144bdfc6fb0da0f358e1465",
+      "checkoutBefore": "fa41125cc1513c38b8797bce51a3d0a7c724812cd144bdfc6fb0da0f358e1465",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G2-INTEGRATION.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G2-INTEGRATION.md",
+      "blob": "6d664dfd38debfc700560f6c64d208d9051c4504",
+      "before": "05617602d0b2cb40602124cadfbdd0688f0f7bcd60633aa16d1e3963ae6d57a6",
+      "after": "05617602d0b2cb40602124cadfbdd0688f0f7bcd60633aa16d1e3963ae6d57a6",
+      "checkoutBefore": "05617602d0b2cb40602124cadfbdd0688f0f7bcd60633aa16d1e3963ae6d57a6",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G2.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G2.md",
+      "blob": "2684b6afb1683d7747b6c0e788f741e0f984c4bf",
+      "before": "bd69149fbe636495580dd8dd2ec2a3e1922a658482a24f3cc943a6df1e796cfa",
+      "after": "bd69149fbe636495580dd8dd2ec2a3e1922a658482a24f3cc943a6df1e796cfa",
+      "checkoutBefore": "bd69149fbe636495580dd8dd2ec2a3e1922a658482a24f3cc943a6df1e796cfa",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G3.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G3.md",
+      "blob": "f29b8bd4744631b360b00ee9570d2479927b5c8e",
+      "before": "d5fe6463bb639afbe108cdd9ceb7cecd4a9dc5f943e314a146a1abb02fb0051b",
+      "after": "d5fe6463bb639afbe108cdd9ceb7cecd4a9dc5f943e314a146a1abb02fb0051b",
+      "checkoutBefore": "d5fe6463bb639afbe108cdd9ceb7cecd4a9dc5f943e314a146a1abb02fb0051b",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G4.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G4.md",
+      "blob": "66830cb65cefaa9869a832098fa3b19957809a80",
+      "before": "b0004e59daf911989c59fac9fcfa74e7b407f2383a685e1d6e33b5c1227d3395",
+      "after": "b0004e59daf911989c59fac9fcfa74e7b407f2383a685e1d6e33b5c1227d3395",
+      "checkoutBefore": "0976dd83a68ff15e9390b0eaffff0f74f9e4b0d4c55fabf95aacd01f9ab6cd34",
+      "checkoutLineEndings": "CRLF checkout normalized to original LF Git blob",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G5.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G5.md",
+      "blob": "d262416063403e9994608943bf70987e2fd36507",
+      "before": "e0627b8bbaf9f60148290bd226d66d87ca83a7fd5706b2df91f1d6a026a3c183",
+      "after": "e0627b8bbaf9f60148290bd226d66d87ca83a7fd5706b2df91f1d6a026a3c183",
+      "checkoutBefore": "e0627b8bbaf9f60148290bd226d66d87ca83a7fd5706b2df91f1d6a026a3c183",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G6.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G6.md",
+      "blob": "0fd4031bd4660144621bbe957a632b71ebb63784",
+      "before": "c27aa3b2f55d7d4c455c1c38b5e87e0245a64e59d16e7f77e0fbd235a2c5723c",
+      "after": "c27aa3b2f55d7d4c455c1c38b5e87e0245a64e59d16e7f77e0fbd235a2c5723c",
+      "checkoutBefore": "c27aa3b2f55d7d4c455c1c38b5e87e0245a64e59d16e7f77e0fbd235a2c5723c",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G7.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G7.md",
+      "blob": "759ae0afcad440272b39e5ac1fefe72173e1640b",
+      "before": "388832b5dc577b138b4fe7d26cbba6dbca7af65fa85dd24016cd728b57a2952a",
+      "after": "388832b5dc577b138b4fe7d26cbba6dbca7af65fa85dd24016cd728b57a2952a",
+      "checkoutBefore": "388832b5dc577b138b4fe7d26cbba6dbca7af65fa85dd24016cd728b57a2952a",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G8.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G8.md",
+      "blob": "95796e07e160926b0ca814526eaa569d8b2b7163",
+      "before": "c6e1af9cf300d189564d02ab25ef83c0ef858d0812c3f97809b4bcac985af64b",
+      "after": "c6e1af9cf300d189564d02ab25ef83c0ef858d0812c3f97809b4bcac985af64b",
+      "checkoutBefore": "c6e1af9cf300d189564d02ab25ef83c0ef858d0812c3f97809b4bcac985af64b",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G9-PREREQ.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G9-PREREQ.md",
+      "blob": "f279cb55f0b852388cc79d68953cbbf014376561",
+      "before": "2a44000cef047067c7dcfd7c465cac0a646473cf820bbd90aea58354ed79a146",
+      "after": "2a44000cef047067c7dcfd7c465cac0a646473cf820bbd90aea58354ed79a146",
+      "checkoutBefore": "2a44000cef047067c7dcfd7c465cac0a646473cf820bbd90aea58354ed79a146",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-G9.md",
+      "destination": "docs/history/orders/WO-GOLDEN-G9.md",
+      "blob": "f119d0ec148123820a30c6c4ebee08fa15792a6a",
+      "before": "094eaf2a21a172daf97c575d254940dd94aa38d13987e279d0521c572c175405",
+      "after": "094eaf2a21a172daf97c575d254940dd94aa38d13987e279d0521c572c175405",
+      "checkoutBefore": "094eaf2a21a172daf97c575d254940dd94aa38d13987e279d0521c572c175405",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-GOLDEN-PHASE3.md",
+      "destination": "docs/history/orders/WO-GOLDEN-PHASE3.md",
+      "blob": "fabbf357b7666a8d2ecd8395b836b40cc0abd035",
+      "before": "59d781f3682c889002d2e7cc1675e4838dd30dcb763e41bf927b718e9a437402",
+      "after": "59d781f3682c889002d2e7cc1675e4838dd30dcb763e41bf927b718e9a437402",
+      "checkoutBefore": "59d781f3682c889002d2e7cc1675e4838dd30dcb763e41bf927b718e9a437402",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-NORTHSTAR-1.md",
+      "destination": "docs/history/orders/WO-NORTHSTAR-1.md",
+      "blob": "124b99c8b2c60fe3c5a83d8db8246cee82f1712b",
+      "before": "3f38fec45cf766a57307d44bd18f83c4fb6be83840f69d5cdd14e3aeae732856",
+      "after": "3f38fec45cf766a57307d44bd18f83c4fb6be83840f69d5cdd14e3aeae732856",
+      "checkoutBefore": "3f38fec45cf766a57307d44bd18f83c4fb6be83840f69d5cdd14e3aeae732856",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-PRE-R18-COHERENCE.md",
+      "destination": "docs/history/orders/WO-PRE-R18-COHERENCE.md",
+      "blob": "48cb2f727c81fed0b4560be90211061a0cc2669e",
+      "before": "d18b7f1075d22d83f0253e09c56de5f8657ba8f0a3dd04d9ab43576f37be198f",
+      "after": "d18b7f1075d22d83f0253e09c56de5f8657ba8f0a3dd04d9ab43576f37be198f",
+      "checkoutBefore": "d18b7f1075d22d83f0253e09c56de5f8657ba8f0a3dd04d9ab43576f37be198f",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-R15.md",
+      "destination": "docs/history/orders/WO-R15.md",
+      "blob": "e63a50b7443bbb33af4b6ba03322f5d140663c53",
+      "before": "9c72f9a08e4980d638aa10a14218921541139db7d656c8136262aa9d67e7b351",
+      "after": "9c72f9a08e4980d638aa10a14218921541139db7d656c8136262aa9d67e7b351",
+      "checkoutBefore": "9c72f9a08e4980d638aa10a14218921541139db7d656c8136262aa9d67e7b351",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-R16.md",
+      "destination": "docs/history/orders/WO-R16.md",
+      "blob": "0b6d1b37bc8abd07320c43d502642c9d0ae3be80",
+      "before": "a0929a68edd8d097db08c167bfb231ffcf91a5f5e4bc79d26d057a9590548412",
+      "after": "a0929a68edd8d097db08c167bfb231ffcf91a5f5e4bc79d26d057a9590548412",
+      "checkoutBefore": "a0929a68edd8d097db08c167bfb231ffcf91a5f5e4bc79d26d057a9590548412",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-R17.md",
+      "destination": "docs/history/orders/WO-R17.md",
+      "blob": "f44d43d0055cd6200b7de6ef51503bb1d2a92e90",
+      "before": "6eff36ea6bc6363d846518b312e021dcbbf8d271c22fff4fdfed1f704cb5e128",
+      "after": "6eff36ea6bc6363d846518b312e021dcbbf8d271c22fff4fdfed1f704cb5e128",
+      "checkoutBefore": "6eff36ea6bc6363d846518b312e021dcbbf8d271c22fff4fdfed1f704cb5e128",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-R18-GROUND.md",
+      "destination": "docs/history/orders/WO-R18-GROUND.md",
+      "blob": "d694d8f5276158574b40e9577ef5f48b6612eb58",
+      "before": "d4062c886fee96674482b2527af371530a1da4d5876fcff99a24eb5aaf4cea54",
+      "after": "d4062c886fee96674482b2527af371530a1da4d5876fcff99a24eb5aaf4cea54",
+      "checkoutBefore": "d4062c886fee96674482b2527af371530a1da4d5876fcff99a24eb5aaf4cea54",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-RD-1.md",
+      "destination": "docs/history/orders/WO-RD-1.md",
+      "blob": "ab41545bfc21496ef7003067cd866b2c2f716c41",
+      "before": "f3a83d403761b74f83d0f8c8b671d9c28323d9f5f46e6ab6b5a81ff45a239a2d",
+      "after": "f3a83d403761b74f83d0f8c8b671d9c28323d9f5f46e6ab6b5a81ff45a239a2d",
+      "checkoutBefore": "f3a83d403761b74f83d0f8c8b671d9c28323d9f5f46e6ab6b5a81ff45a239a2d",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-RD-2.md",
+      "destination": "docs/history/orders/WO-RD-2.md",
+      "blob": "eab774d13162a15845a5cf9cfc77ac2d6f8abbb0",
+      "before": "982c1e3a24d57bbd2f58382500c23541afae9be50790c2458d46bb40ecbd7fba",
+      "after": "982c1e3a24d57bbd2f58382500c23541afae9be50790c2458d46bb40ecbd7fba",
+      "checkoutBefore": "982c1e3a24d57bbd2f58382500c23541afae9be50790c2458d46bb40ecbd7fba",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-RD-3.md",
+      "destination": "docs/history/orders/WO-RD-3.md",
+      "blob": "96834f02ef429f0548f536cc9b03b6a41f869e04",
+      "before": "399bc77ca76eb9a37a3c7cf1e8db3394b0efb1114d92b3d824e638ea2783777f",
+      "after": "399bc77ca76eb9a37a3c7cf1e8db3394b0efb1114d92b3d824e638ea2783777f",
+      "checkoutBefore": "399bc77ca76eb9a37a3c7cf1e8db3394b0efb1114d92b3d824e638ea2783777f",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-README-GOLDEN-REFRESH.md",
+      "destination": "docs/history/orders/WO-README-GOLDEN-REFRESH.md",
+      "blob": "815b36cca886e54aaaeb025476240a22cf0670b3",
+      "before": "4a335ff1b3266b5c1bb07aca0b72cc1a102141daaa459eac863085285dc99087",
+      "after": "4a335ff1b3266b5c1bb07aca0b72cc1a102141daaa459eac863085285dc99087",
+      "checkoutBefore": "4a335ff1b3266b5c1bb07aca0b72cc1a102141daaa459eac863085285dc99087",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-V2-1.md",
+      "destination": "docs/history/orders/WO-V2-1.md",
+      "blob": "de66e7d8ac4269845a2906bf7f0950797ee94444",
+      "before": "e2a82c6a5f0477cbc2ff313f923a561939ac1c1a64cfde66d116a3707821686c",
+      "after": "e2a82c6a5f0477cbc2ff313f923a561939ac1c1a64cfde66d116a3707821686c",
+      "checkoutBefore": "e2a82c6a5f0477cbc2ff313f923a561939ac1c1a64cfde66d116a3707821686c",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-V2-2.md",
+      "destination": "docs/history/orders/WO-V2-2.md",
+      "blob": "003ea0d9af39e06b5cb658125157e679b53fdd8b",
+      "before": "1f4eb9d69488cf02af82f16501a54cded5b2d1af23d03312ebac65f0fc270e87",
+      "after": "1f4eb9d69488cf02af82f16501a54cded5b2d1af23d03312ebac65f0fc270e87",
+      "checkoutBefore": "1f4eb9d69488cf02af82f16501a54cded5b2d1af23d03312ebac65f0fc270e87",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-V2-3.md",
+      "destination": "docs/history/orders/WO-V2-3.md",
+      "blob": "4d34929a83d9e3f276109f027785477be64d532a",
+      "before": "885c4877203c0e5a65ba35babd65e8b0f2bde065cd86457b18183c272cc853a5",
+      "after": "885c4877203c0e5a65ba35babd65e8b0f2bde065cd86457b18183c272cc853a5",
+      "checkoutBefore": "885c4877203c0e5a65ba35babd65e8b0f2bde065cd86457b18183c272cc853a5",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-V2-3R.md",
+      "destination": "docs/history/orders/WO-V2-3R.md",
+      "blob": "6c1fb818fc0a966a015de774f24a7317e630a730",
+      "before": "c67840705e1532be92eb008945ab76010fafa2c7c457ebe0c7d6534e2b77946d",
+      "after": "c67840705e1532be92eb008945ab76010fafa2c7c457ebe0c7d6534e2b77946d",
+      "checkoutBefore": "c67840705e1532be92eb008945ab76010fafa2c7c457ebe0c7d6534e2b77946d",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-g1-glacier.md",
+      "destination": "docs/history/orders/WO-g1-glacier.md",
+      "blob": "000aec65b42fcd1db8872ea2b57d233cc493d3b1",
+      "before": "7c3c5ed1690ddbe87e824d474ec3ef7c435f61e75f8b9951e8b8643e59467036",
+      "after": "7c3c5ed1690ddbe87e824d474ec3ef7c435f61e75f8b9951e8b8643e59467036",
+      "checkoutBefore": "7c3c5ed1690ddbe87e824d474ec3ef7c435f61e75f8b9951e8b8643e59467036",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-g2-glacier-tile.md",
+      "destination": "docs/history/orders/WO-g2-glacier-tile.md",
+      "blob": "510d3da9f678331067ff9f4b69761309653280ff",
+      "before": "c13da413ad3c7746d7dd4e31fbcd94762706abae03087cf56fd71f8ffab41e6a",
+      "after": "c13da413ad3c7746d7dd4e31fbcd94762706abae03087cf56fd71f8ffab41e6a",
+      "checkoutBefore": "c13da413ad3c7746d7dd4e31fbcd94762706abae03087cf56fd71f8ffab41e6a",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-g3-glacier-dock.md",
+      "destination": "docs/history/orders/WO-g3-glacier-dock.md",
+      "blob": "0152b50bbafc7ca259feda3d78acc4f69d9ba7da",
+      "before": "c4db6ae751f618daaecbd4e9e8f15674ba272b962e968594d8851888436ef4e7",
+      "after": "c4db6ae751f618daaecbd4e9e8f15674ba272b962e968594d8851888436ef4e7",
+      "checkoutBefore": "c4db6ae751f618daaecbd4e9e8f15674ba272b962e968594d8851888436ef4e7",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-g4-glacier-shell.md",
+      "destination": "docs/history/orders/WO-g4-glacier-shell.md",
+      "blob": "88213ba37583cfcb7f7a6d5b46b2d586b7b86d82",
+      "before": "84c0fbd34777874a0ace4bde8d1f6c4d6c8e851193bf38c2dd9af13d528f62e3",
+      "after": "84c0fbd34777874a0ace4bde8d1f6c4d6c8e851193bf38c2dd9af13d528f62e3",
+      "checkoutBefore": "84c0fbd34777874a0ace4bde8d1f6c4d6c8e851193bf38c2dd9af13d528f62e3",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-g5-glacier-cables.md",
+      "destination": "docs/history/orders/WO-g5-glacier-cables.md",
+      "blob": "8b2e8a7ce56c1579e168f9c9b97df97388fa0be3",
+      "before": "3ee79d89649c8db7ffe91f5d0e2c78b2c9b8615c9ae940833030914aefea7e8f",
+      "after": "3ee79d89649c8db7ffe91f5d0e2c78b2c9b8615c9ae940833030914aefea7e8f",
+      "checkoutBefore": "3ee79d89649c8db7ffe91f5d0e2c78b2c9b8615c9ae940833030914aefea7e8f",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-g5a-connection-actions.md",
+      "destination": "docs/history/orders/WO-g5a-connection-actions.md",
+      "blob": "9dedf911d5ad75443563223e1a1cb15961c3453d",
+      "before": "c971296596e6a346400446a1a4c350c74ddcbe0c359e3ae3e781cec9f4fea8ce",
+      "after": "c971296596e6a346400446a1a4c350c74ddcbe0c359e3ae3e781cec9f4fea8ce",
+      "checkoutBefore": "c971296596e6a346400446a1a4c350c74ddcbe0c359e3ae3e781cec9f4fea8ce",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-g6-glacier-feel.md",
+      "destination": "docs/history/orders/WO-g6-glacier-feel.md",
+      "blob": "60a483d8288b5c5c57cba20942da3a058b306d8b",
+      "before": "4869828d57426b0a2ce92ac12e69edd03b1a823d42453e5e9586eba5eca1be93",
+      "after": "4869828d57426b0a2ce92ac12e69edd03b1a823d42453e5e9586eba5eca1be93",
+      "checkoutBefore": "4869828d57426b0a2ce92ac12e69edd03b1a823d42453e5e9586eba5eca1be93",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/orders/WO-g7-gate-integrity.md",
+      "destination": "docs/history/orders/WO-g7-gate-integrity.md",
+      "blob": "22c5c354db8de6f316c0c6ce44df46d3219588b9",
+      "before": "7e18133fc2f526c4c688a8044c0f0a136198ccdabf3d9b016a1c2b39b69a306f",
+      "after": "7e18133fc2f526c4c688a8044c0f0a136198ccdabf3d9b016a1c2b39b69a306f",
+      "checkoutBefore": "7e18133fc2f526c4c688a8044c0f0a136198ccdabf3d9b016a1c2b39b69a306f",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "docs/plans/INSTITUTIONAL-BUILD-PLAN.md",
+      "destination": "docs/history/plans/INSTITUTIONAL-BUILD-PLAN.md",
+      "blob": "dd77514a7efa09769d9b4a554f99173c1f579b91",
+      "before": "6ed4341e38ced68117a648e37def05f71442fb6316b847a49ea9ca51c64293c5",
+      "after": "9f0569f560112254e07419ee0a4f9ac0d38df4a6c3d1fa5736697f3a713c4369",
+      "checkoutBefore": "6ed4341e38ced68117a648e37def05f71442fb6316b847a49ea9ca51c64293c5",
+      "checkoutLineEndings": "same as Git",
+      "delta": "status line only"
+    },
+    {
+      "source": "docs/proposals/V2-SCOPE.md",
+      "destination": "docs/history/proposals/V2-SCOPE.md",
+      "blob": "4736a1106837fa7c814b4a7239a4c3f300325aa0",
+      "before": "6606e4e399b5c7bcab0601864c33627ec45be21c259bcd23588c3427f0feffce",
+      "after": "c07e965f8795f4b2f326b44cc023233085b2f5dd0dbea328523377a59700994c",
+      "checkoutBefore": "6606e4e399b5c7bcab0601864c33627ec45be21c259bcd23588c3427f0feffce",
+      "checkoutLineEndings": "same as Git",
+      "delta": "status line only"
+    },
+    {
+      "source": "design/glacier/CABLE-PLUMBING.md",
+      "destination": "docs/history/design/glacier/CABLE-PLUMBING.md",
+      "blob": "9200b89fb9a4da4cbf1c8ad9e1758b221ec2fbb3",
+      "before": "2f4b559170b8e591ed041a14489f4af982c30d0832b21c4d46bdbac2fcbff833",
+      "after": "2f4b559170b8e591ed041a14489f4af982c30d0832b21c4d46bdbac2fcbff833",
+      "checkoutBefore": "2f4b559170b8e591ed041a14489f4af982c30d0832b21c4d46bdbac2fcbff833",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "design/glacier/README.md",
+      "destination": "docs/history/design/glacier/README.md",
+      "blob": "a0f2e8cd481e45252429535df21fa61f9a46fa5d",
+      "before": "5e20087c6412c29abdb3b84c56a9c725df2564d4d58ae278ebe881dc36dc1a18",
+      "after": "5e20087c6412c29abdb3b84c56a9c725df2564d4d58ae278ebe881dc36dc1a18",
+      "checkoutBefore": "5e20087c6412c29abdb3b84c56a9c725df2564d4d58ae278ebe881dc36dc1a18",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "design/glacier/glacier.reference.css",
+      "destination": "docs/history/design/glacier/glacier.reference.css",
+      "blob": "d70e71ad7ee6929da0a5e45fc24a3bc5aa1c6040",
+      "before": "ef96d7c63ad181ba2fb4695dbe33add830a821e4c5d9f0117ea3531e08aec91d",
+      "after": "ef96d7c63ad181ba2fb4695dbe33add830a821e4c5d9f0117ea3531e08aec91d",
+      "checkoutBefore": "ef96d7c63ad181ba2fb4695dbe33add830a821e4c5d9f0117ea3531e08aec91d",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "design/glacier/qf-ansi.reference.ts",
+      "destination": "docs/history/design/glacier/qf-ansi.reference.ts",
+      "blob": "415246bc261cac7b4aef8518bd6b585940965bbb",
+      "before": "f780ed2765c448b3007f22d59247cb715a348d5e046818628f394b206f905161",
+      "after": "f780ed2765c448b3007f22d59247cb715a348d5e046818628f394b206f905161",
+      "checkoutBefore": "f780ed2765c448b3007f22d59247cb715a348d5e046818628f394b206f905161",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "design/glacier/qf-tokens.additions.css",
+      "destination": "docs/history/design/glacier/qf-tokens.additions.css",
+      "blob": "eab315a5d953141230482da2941c9430c3fd02e5",
+      "before": "5f75e46aa8cb859c280a666fa1481212b715965245c4a80e9f9ef474fc4f0ab2",
+      "after": "5f75e46aa8cb859c280a666fa1481212b715965245c4a80e9f9ef474fc4f0ab2",
+      "checkoutBefore": "5f75e46aa8cb859c280a666fa1481212b715965245c4a80e9f9ef474fc4f0ab2",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "design/glacier/showcase.html",
+      "destination": "docs/history/design/glacier/showcase.html",
+      "blob": "65eb261767d6be1f39f94f1653bfdda2813db084",
+      "before": "4d0a27ee750fd72e30dc739e14e65ed79a0044513b3e1cbf88ccffdd6b4202b3",
+      "after": "4d0a27ee750fd72e30dc739e14e65ed79a0044513b3e1cbf88ccffdd6b4202b3",
+      "checkoutBefore": "4d0a27ee750fd72e30dc739e14e65ed79a0044513b3e1cbf88ccffdd6b4202b3",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    },
+    {
+      "source": "design/glacier/tile-spec.html",
+      "destination": "docs/history/design/glacier/tile-spec.html",
+      "blob": "a4ac16e4eafbe1206dd4dd8972481d5701c3c0b0",
+      "before": "feaf7cfa35b75681b7d49968306207a6b75a62489923d12ed0db168c1458ac81",
+      "after": "feaf7cfa35b75681b7d49968306207a6b75a62489923d12ed0db168c1458ac81",
+      "checkoutBefore": "feaf7cfa35b75681b7d49968306207a6b75a62489923d12ed0db168c1458ac81",
+      "checkoutLineEndings": "same as Git",
+      "delta": "byte-exact"
+    }
+  ],
+  "qualificationOrder": {
+    "source": "docs/orders/WO-POST-GOLDEN-FOUNDATION.md",
+    "destination": "docs/history/orders/WO-POST-GOLDEN-FOUNDATION.md",
+    "sha256": "3DA49E2C3AA95ECD4B92595085A6FBCFB4117334BE9C54817180C207A3F335D1",
+    "originalGitBlob": null,
+    "provenance": "New amended order; final move byte-exact; unaccepted qualification checkpoint"
+  }
+}

@@ -1,5 +1,7 @@
 # GOLDEN-RUN.md — the definition of done, and the route to it
 
+status: HISTORICAL — completed Golden route; post-R17 sequence superseded by docs/plans/OFFICIAL-ROADMAP.md on 2026-09-03; not build authority
+
 > **This is the route, not the authority.** `NEXT.md` names the one active rung and is the only
 > thing that authorizes work (DOCTRINE A9). A rung described here is a contract waiting to be
 > selected, never permission to start. If this file and `NEXT.md` disagree about what is active,
@@ -238,7 +240,7 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R15 | complete | `docs/orders/evidence/r15` |
 | R16 | complete | `docs/orders/evidence/r16` |
 | R17 | complete | `docs/orders/evidence/r17` |
-| R18 | active | `WO-R18-GROUND.md` Reader YES/YES at `10bad8c`; `NEXT.md` withholds Builder authority pending exact founder activation |
+| R18 | frozen | `WO-R18-GROUND.md` Reader YES/YES at `10bad8c`; `NEXT.md` withholds Builder authority pending exact founder activation |
 | R19 | pending | — |
 | R20 | pending | — |
 | R21 | pending | — |

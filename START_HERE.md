@@ -1,8 +1,6 @@
-> **Active track:** [`docs/orders/NEXT.md`](docs/orders/NEXT.md) names the active order or explicitly closes work, and
-> [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) holds the route and the rung status table.
-> **This line deliberately states no status.** It used to, and it went stale: on 2026-08-03 it still
-> announced the builder door was closed while `NEXT.md` named an active rung. A status copied into a
-> second file has no mechanism to stay true, so this one points instead of asserting.
+> **Active work:** [`docs/orders/NEXT.md`](docs/orders/NEXT.md) names the one open order or closes the Builder door.
+> [`Official Roadmap`](docs/plans/OFFICIAL-ROADMAP.md) is the approved post-Golden route;
+> [`GOLDEN-RUN.md`](docs/history/orders/GOLDEN-RUN.md) is the archived, completed R-ladder. Neither authorizes work.
 
 # START_HERE.md
 
@@ -45,20 +43,18 @@ The domain loop serves the product loop; neither the research chain alone nor ma
 There are seven, and nothing else binds. If a document is not on this list, it cannot authorize work.
 
 1. **This file** — mission and rules.
-2. **`docs/orders/NEXT.md`** — the build authority (DOCTRINE A9). It names exactly one active rung, or closes the builder door. No agent selects work it does not name.
+2. **`docs/orders/NEXT.md`** — the build authority (DOCTRINE A9). It names exactly one open order, or closes the builder door. No agent selects work it does not name.
 3. **`docs/DOCTRINE.md`** — the plan of record: why the ontology, the phases, the founder amendments. Where it and an older doc disagree on *direction*, it wins.
 4. **`docs/LAWS.md`** — the Canvas-seam Laws A–F. Same weight as §1 of this file.
 5. **`docs/orders/PROTOCOL.md`** — rules of engagement, roles, evidence standard.
 6. **`docs/DEBT.md`** — the debt register. Binding, but blocks nothing.
-7. **`docs/adr/`** — accepted decisions with their reasons. A later ADR explicitly supersedes an earlier one.
+7. **`docs/adr/`** — only accepted decisions bind; a `DRAFT` does not. A later ADR explicitly supersedes an earlier one.
 
-The route to the golden run is [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md), and it holds
-the **only** rung status table — the `rung-ladder` gate fails the build if any other authority
-document grows a competing one. [`docs/orders/SPRINT.md`](docs/orders/SPRINT.md) tells a builder how
-to walk that ladder continuously and where it must stop. Neither authorizes work; `NEXT.md` does.
-The current R18-R25 outcome contracts are condensed in
-[`docs/plans/INSTITUTIONAL-BUILD-PLAN.md`](docs/plans/INSTITUTIONAL-BUILD-PLAN.md).
-That plan explains the destination but cannot open the Builder door.
+The approved post-Golden route is [`Official Roadmap`](docs/plans/OFFICIAL-ROADMAP.md),
+with seam rules in [`Institution Contracts`](docs/plans/INSTITUTION-CONTRACTS.md),
+surface grammar in [`Product Surface and Workflow Architecture`](docs/plans/PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md),
+and proof demonstrations in [`Demo Spec`](docs/plans/DEMO-SPEC.md). None authorizes work.
+The completed [`Golden R-ladder`](docs/history/orders/GOLDEN-RUN.md) is history.
 
 Two surfaces are **generated and cannot go stale** — prefer them over any prose: `qf-kernel-schema/golden/ONTOLOGY.md` for the live schema (byte-checked against the generator), and `bun qa/run.ts --list` for the live gates.
 

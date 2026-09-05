@@ -89,7 +89,7 @@ Corollary — **the founder's four checks, which need no technical knowledge.** 
 **Cold-state rule (learned the hard way, WO-003):** a gate may not depend on ambient machine state — it installs whatever it needs. Verify gates **cold**, not after a convenience install: the machine that already has dependencies present will pass a gate that a fresh CI checkout fails. If an order's acceptance steps install something before running the gates, the gates are being masked and the order is written wrong.
 
 **Checkout and independent verification:** the founder's standing one-checkout
-override in [AUTONOMY.md](AUTONOMY.md) governs. Work on a short-lived branch in
+override, recorded in archived [AUTONOMY.md](../history/orders/AUTONOMY.md), governs. Work on a short-lived branch in
 that checkout; do not create a worktree or delete shared dependencies. The
 independent verifier uses a separate session, records the immutable candidate,
 and checks it while other edits are paused. Release/package commands require

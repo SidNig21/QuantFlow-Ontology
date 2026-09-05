@@ -1,0 +1,24 @@
+QF_PHASE3_FALSIFY=delete-ledger-row bun qa/run.ts golden-phase3-requalification; exit=1
+golden-phase3-requalification: expected RED bait=delete-ledger-row issues=1
+FAIL  golden-phase3-requalification
+QF_PHASE3_FALSIFY=duplicate-disposition bun qa/run.ts golden-phase3-requalification; exit=1
+golden-phase3-requalification: expected RED bait=duplicate-disposition issues=1
+FAIL  golden-phase3-requalification
+QF_PHASE3_FALSIFY=remove-claim-mapping bun qa/run.ts golden-phase3-requalification; exit=1
+golden-phase3-requalification: expected RED bait=remove-claim-mapping issues=1
+FAIL  golden-phase3-requalification
+QF_PHASE3_FALSIFY=fixture-only-claim bun qa/run.ts golden-phase3-requalification; exit=1
+golden-phase3-requalification: expected RED bait=fixture-only-claim issues=1
+FAIL  golden-phase3-requalification
+QF_PHASE3_FALSIFY=missing-electron-sdk-owner bun qa/run.ts golden-phase3-requalification; exit=1
+golden-phase3-requalification: expected RED bait=missing-electron-sdk-owner issues=2
+FAIL  golden-phase3-requalification
+QF_PHASE3_FALSIFY=unregistered-gate bun qa/run.ts golden-phase3-requalification; exit=1
+golden-phase3-requalification: expected RED bait=unregistered-gate issues=2
+FAIL  golden-phase3-requalification
+QF_PHASE3_FALSIFY=wrong-historical-authority bun qa/run.ts golden-phase3-requalification; exit=1
+golden-phase3-requalification: expected RED bait=wrong-historical-authority issues=1
+FAIL  golden-phase3-requalification
+Restored: bun qa/run.ts golden-phase3-requalification; exit=0
+golden-phase3-requalification: PASS tracked=1515 deps=104 hooks=6 locks=15 tests=125 gates=74 claims=2300 consumers=13
+PASS  golden-phase3-requalification

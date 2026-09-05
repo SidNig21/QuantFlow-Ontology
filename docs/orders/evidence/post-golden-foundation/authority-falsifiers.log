@@ -1,0 +1,227 @@
+command: bun qa/run.ts rung-ladder
+exit: 0
+rung-ladder: PASS (authority closed; no active order; historical ladder not activated)
+PASS  rung-ladder
+
+command: bun qa/run.ts rung-ladder
+exit: 1
+FAIL  rung-ladder
+rung-ladder: closed NEXT cannot coexist with an active historical rung
+rung-ladder: historical R18 must be frozen exactly once
+
+command: bun qa/run.ts rung-ladder
+exit: 1
+FAIL  rung-ladder
+rung-ladder: closed NEXT requires exactly one builder-authority: CLOSED
+
+command: bun qa/run.ts rung-ladder
+exit: 0
+rung-ladder: PASS (authority closed; no active order; historical ladder not activated)
+PASS  rung-ladder
+
+command: bun qa/run.ts repo-shape
+exit: 0
+PASS  repo-shape
+
+command: bun qa/run.ts repo-shape
+exit: 1
+FAIL  repo-shape
+repo-shape: top-level docs/orders must be exactly NEXT.md and PROTOCOL.md; found NEXT.md, PROTOCOL.md, WO-POST-GOLDEN-FOUNDATION.md
+
+command: bun qa/run.ts repo-shape
+exit: 0
+PASS  repo-shape
+
+command: bun docs/orders/evidence/post-golden-foundation/verify-foundation.ts
+exit: 0
+foundation-preservation: PASS moves=52 byte-exact=49 authorized-annotations=3 existing-evidence=568 canonical-documents=4 byte-exact-from=13cf85ee preserved-NEXT-hash=C355555AEDBBF15E143E21AC6166BAF6386329043DA741D237A010899A2D68AC
+warning: unable to access 'C:\Users\rybow/.config/git/ignore': Permission denied
+
+command: bun docs/orders/evidence/post-golden-foundation/verify-foundation.ts --falsify-archive
+exit: 1
+foundation-preservation: RED Error: archive hash/authorized delta mismatch docs/history/orders/AUTONOMY.md
+
+command: bun docs/orders/evidence/post-golden-foundation/verify-foundation.ts
+exit: 0
+foundation-preservation: PASS moves=52 byte-exact=49 authorized-annotations=3 existing-evidence=568 canonical-documents=4 byte-exact-from=13cf85ee preserved-NEXT-hash=C355555AEDBBF15E143E21AC6166BAF6386329043DA741D237A010899A2D68AC
+warning: unable to access 'C:\Users\rybow/.config/git/ignore': Permission denied
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority
+
+ADR bait: original mutation
+command: bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F04 immutable_hash_mismatch
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority
+
+ADR bait: original deletion
+command: bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F04 immutable_hash_mismatch
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority
+
+ADR bait: original duplication
+command: bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F04 immutable_hash_mismatch
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority
+
+ADR bait: original reordering
+command: bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F04 immutable_hash_mismatch
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority
+
+ADR bait: appendix mutation
+command: bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F04 immutable_hash_mismatch
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority
+
+ADR bait: appendix deletion
+command: bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F04 immutable_hash_mismatch
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority
+
+ADR bait: appendix duplication
+command: bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F04 immutable_hash_mismatch
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority
+
+ADR bait: appendix reordering
+command: bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F04 immutable_hash_mismatch
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority
+
+command: bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F01 terminal_order_authority_mismatch
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority
+
+command: QF_G11_FALSIFY=F01 bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F01 multiple_current_routes
+
+command: QF_G11_FALSIFY=F02 bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F02 false_current_claim
+
+command: QF_G11_FALSIFY=F03 bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F03 historical_active_noise
+
+command: QF_G11_FALSIFY=F04 bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F04 immutable_hash_mismatch
+
+command: QF_G11_FALSIFY=F05 bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F05 archive_byte_mismatch
+
+command: QF_G11_FALSIFY=F06 bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F06 retained_workflow_removed
+
+command: QF_G11_FALSIFY=F07 bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F07 atlas_receipt_or_scope
+
+command: QF_G11_FALSIFY=F08 bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F08 instrument_claims_authority
+
+command: QF_G11_FALSIFY=F09 bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F09 protected_path_changed
+
+command: QF_G11_FALSIFY=F10 bun qa/run.ts golden-g11-authority
+exit: 1
+FAIL  golden-g11-authority
+F10 g12_scope_or_receipt
+
+command: bun qa/run.ts golden-g11-authority
+exit: 0
+G12 package/process status: RED — inherited; not exercised or repaired by G11
+G10 owned-run final: processes=0 roots_remaining=0 leaked=[]
+golden-g11-authority: PASS
+PASS  golden-g11-authority

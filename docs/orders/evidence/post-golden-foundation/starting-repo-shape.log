@@ -1,0 +1,4 @@
+command: bun qa/run.ts repo-shape
+context: authority just rotated; product still starting floor
+exit: 0
+PASS  repo-shape

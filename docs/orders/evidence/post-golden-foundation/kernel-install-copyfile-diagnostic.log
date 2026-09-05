@@ -1,0 +1,33 @@
+isolated-root: C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-cZKOS5
+command: bun test packages/qf-kernel/src/r10-dataset-integrity.test.ts
+cwd: C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-cZKOS5
+exit: 1
+bun test v1.3.12 (700fc117)
+
+packages\qf-kernel\src\r10-dataset-integrity.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find package 'qf-kernel-schema' from 'C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-cZKOS5\packages\qf-kernel\src\ontology-read-receipt.ts'
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [53.00ms]
+
+command: bun install --frozen-lockfile --backend copyfile
+cwd: C:\Users\rybow\AppData\Local\Temp\qf-foundation-kernel-cZKOS5\packages\qf-kernel
+exit: 1
+bun install v1.3.12 (700fc117)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ zod@4.4.3
+
+6 packages installed [1.88s]
+Failed to install 1 package
+EPERM: failed copying files from cache to destination for package qf-kernel-schema
+
+cleanup: owned roots remaining=0; synchronous children completed

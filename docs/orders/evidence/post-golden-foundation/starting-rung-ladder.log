@@ -1,0 +1,5 @@
+command: bun qa/run.ts rung-ladder
+context: authority just rotated; product still starting floor
+exit: 1
+FAIL  rung-ladder
+rung-ladder: NEXT.md title does not name a rung (expected '# NEXT — R<n> …')
