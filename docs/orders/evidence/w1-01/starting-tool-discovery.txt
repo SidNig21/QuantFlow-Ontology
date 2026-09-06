@@ -1,0 +1,104 @@
+bun install v1.3.12 (700fc117)
+EPERM: failed copying files from cache to destination for package qf-kernel
+EPERM: failed copying files from cache to destination for package qf-kernel-schema
+EPERM: failed opening cache/package/version dir for package bun-types
+EPERM: failed opening cache/package/version dir for package @hono/node-server
+EPERM: failed opening cache/package/version dir for package ajv
+EPERM: failed opening cache/package/version dir for package ajv-formats
+EPERM: failed opening cache/package/version dir for package content-type
+EPERM: failed opening cache/package/version dir for package cors
+EPERM: failed opening cache/package/version dir for package cross-spawn
+EPERM: failed opening cache/package/version dir for package eventsource
+EPERM: failed opening cache/package/version dir for package eventsource-parser
+EPERM: failed opening cache/package/version dir for package express
+EPERM: failed opening cache/package/version dir for package express-rate-limit
+EPERM: failed opening cache/package/version dir for package hono
+EPERM: failed opening cache/package/version dir for package jose
+EPERM: failed opening cache/package/version dir for package json-schema-typed
+EPERM: failed opening cache/package/version dir for package pkce-challenge
+EPERM: failed opening cache/package/version dir for package raw-body
+EPERM: failed opening cache/package/version dir for package zod-to-json-schema
+EPERM: failed opening cache/package/version dir for package @types/node
+EPERM: failed opening cache/package/version dir for package fast-deep-equal
+EPERM: failed opening cache/package/version dir for package fast-uri
+EPERM: failed opening cache/package/version dir for package json-schema-traverse
+EPERM: failed opening cache/package/version dir for package require-from-string
+EPERM: failed opening cache/package/version dir for package object-assign
+EPERM: failed opening cache/package/version dir for package vary
+EPERM: failed opening cache/package/version dir for package path-key
+EPERM: failed opening cache/package/version dir for package shebang-command
+EPERM: failed opening cache/package/version dir for package which
+EPERM: failed opening cache/package/version dir for package accepts
+EPERM: failed opening cache/package/version dir for package body-parser
+EPERM: failed opening cache/package/version dir for package content-disposition
+EPERM: failed opening cache/package/version dir for package cookie
+EPERM: failed opening cache/package/version dir for package cookie-signature
+EPERM: failed opening cache/package/version dir for package debug
+EPERM: failed opening cache/package/version dir for package depd
+EPERM: failed opening cache/package/version dir for package encodeurl
+EPERM: failed opening cache/package/version dir for package escape-html
+EPERM: failed opening cache/package/version dir for package etag
+EPERM: failed opening cache/package/version dir for package finalhandler
+EPERM: failed opening cache/package/version dir for package fresh
+EPERM: failed opening cache/package/version dir for package http-errors
+EPERM: failed opening cache/package/version dir for package merge-descriptors
+EPERM: failed opening cache/package/version dir for package mime-types
+EPERM: failed opening cache/package/version dir for package on-finished
+EPERM: failed opening cache/package/version dir for package once
+EPERM: failed opening cache/package/version dir for package parseurl
+EPERM: failed opening cache/package/version dir for package proxy-addr
+EPERM: failed opening cache/package/version dir for package qs
+EPERM: failed opening cache/package/version dir for package range-parser
+EPERM: failed opening cache/package/version dir for package router
+EPERM: failed opening cache/package/version dir for package send
+EPERM: failed opening cache/package/version dir for package serve-static
+EPERM: failed opening cache/package/version dir for package statuses
+EPERM: failed opening cache/package/version dir for package type-is
+EPERM: failed opening cache/package/version dir for package ip-address
+EPERM: failed opening cache/package/version dir for package bytes
+EPERM: failed opening cache/package/version dir for package iconv-lite
+EPERM: failed opening cache/package/version dir for package unpipe
+EPERM: failed opening cache/package/version dir for package undici-types
+EPERM: failed opening cache/package/version dir for package shebang-regex
+EPERM: failed opening cache/package/version dir for package isexe
+EPERM: failed opening cache/package/version dir for package negotiator
+EPERM: failed opening cache/package/version dir for package ms
+EPERM: failed opening cache/package/version dir for package inherits
+EPERM: failed opening cache/package/version dir for package setprototypeof
+EPERM: failed opening cache/package/version dir for package toidentifier
+EPERM: failed opening cache/package/version dir for package mime-db
+EPERM: failed opening cache/package/version dir for package ee-first
+EPERM: failed opening cache/package/version dir for package wrappy
+EPERM: failed opening cache/package/version dir for package forwarded
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [161.00ms]
+Failed to install 96 packages
+EPERM: failed opening cache/package/version dir for package ipaddr.js
+EPERM: failed opening cache/package/version dir for package es-define-property
+EPERM: failed opening cache/package/version dir for package side-channel
+EPERM: failed opening cache/package/version dir for package is-promise
+EPERM: failed opening cache/package/version dir for package path-to-regexp
+EPERM: failed opening cache/package/version dir for package media-typer
+EPERM: failed opening cache/package/version dir for package safer-buffer
+EPERM: failed opening cache/package/version dir for package es-errors
+EPERM: failed opening cache/package/version dir for package object-inspect
+EPERM: failed opening cache/package/version dir for package side-channel-list
+EPERM: failed opening cache/package/version dir for package side-channel-map
+EPERM: failed opening cache/package/version dir for package side-channel-weakmap
+EPERM: failed opening cache/package/version dir for package call-bound
+EPERM: failed opening cache/package/version dir for package get-intrinsic
+EPERM: failed opening cache/package/version dir for package call-bind-apply-helpers
+EPERM: failed opening cache/package/version dir for package es-object-atoms
+EPERM: failed opening cache/package/version dir for package function-bind
+EPERM: failed opening cache/package/version dir for package get-proto
+EPERM: failed opening cache/package/version dir for package gopd
+EPERM: failed opening cache/package/version dir for package has-symbols
+EPERM: failed opening cache/package/version dir for package hasown
+EPERM: failed opening cache/package/version dir for package math-intrinsics
+EPERM: failed opening cache/package/version dir for package dunder-proto
+ENOENT: Failed to open node_modules folder for content-type in C:\Users\rybow\QuantFlow-Ontology\tools\qf-read-tools\node_modules\body-parser\node_modules
+ENOENT: Failed to open node_modules folder for content-type in C:\Users\rybow\QuantFlow-Ontology\tools\qf-read-tools\node_modules\type-is\node_modules
+tool-discovery: bun install exited 1
+FAIL  tool-discovery

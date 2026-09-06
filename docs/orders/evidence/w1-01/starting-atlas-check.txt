@@ -1,0 +1,2 @@
+qf-atlas: STALE — atlas.json fingerprint 9e32fe41df007381 != 392930855138033e
+The map is a projection. Run: bun qf-atlas/generate.mjs

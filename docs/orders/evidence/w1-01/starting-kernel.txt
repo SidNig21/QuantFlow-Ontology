@@ -1,0 +1,324 @@
+kernel: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\node_modules\qf-kernel-schema
+bun install v1.3.12 (700fc117)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [209.00ms]
+bun test v1.3.12 (700fc117)
+
+src\attach-kernel-drift.test.ts:
+(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta writable → KernelIncompleteInitializationError [16.00ms]
+(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta readonly → warn + getKernelDrift, no artifact table [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+(pass) attachKernel WO-K3 drift / incomplete init > clean :memory: writable publish succeeds [15.00ms]
+(pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture writable → KernelRegistryDriftError [16.00ms]
+(pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture readonly → warn + getKernelDrift [16.00ms]
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k3-attach-fiEcBf\governed-review-reopen.db provenance=explicit journal=wal sync=2 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k3-attach-fiEcBf\governed-review-reopen.db provenance=explicit journal=wal sync=2 schema_meta=89
+(pass) attachKernel WO-K3 drift / incomplete init > reopens governed-review schema with support rows intact [187.00ms]
+
+src\busy-timeout.test.ts:
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ok-NM8jOA\kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+(pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [672.00ms]
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ctrl-4RYxSC\kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+G2 control: codes [ 0, 2 ] stderr locked evt-b: database is locked
+
+(pass) WO-K1 G2 busy_timeout turn-taking > control: busy_timeout=0 makes concurrent BEGIN IMMEDIATE fail [609.00ms]
+
+src\connection-actions.test.ts:
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g5a-conn-EK07zp\conn.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g5a-conn-EK07zp\conn.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+(pass) WO-g5a connection write path > create + delete persist through reopen; rejects self-loop and duplicate [32.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+(pass) WO-g5a connection write path > delete unknown id refuses
+
+src\connection-readback.test.ts:
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-conn-readback-mYp7EE\k.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+(pass) connection create read-back > queryObjects({ id }) throws; getObject returns the row [31.00ms]
+
+src\g9-report-authority.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > publishes one current row with explicit superseded history for one full key [172.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > keeps same-version different-strategy and other key fields independent [94.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > refuses missing completed worker evidence before any Report publication [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > refuses rejects, inconclusive reviews, and self-review without publishing [62.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > binds completion evidence to the exact Run and rejects zero, multiple, non-trajectory, and mismatched candidates [31.00ms]
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g9-restart-bK5WU3\restart.db provenance=explicit journal=wal sync=2 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g9-restart-bK5WU3\restart.db provenance=explicit journal=wal sync=2 schema_meta=89
+(pass) G9 Report authority > durable completion and publication survive closing and reopening the Kernel [532.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) G9 Report authority > legacy migration partitions before deterministic fold and aborts atomically [78.00ms]
+
+src\kernel.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > applies generated migration (run + agent_session + events exist)
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > execute start_run; illegal retry writes nothing
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+illegal_transitions_rejected=7
+(pass) qf-kernel > counts illegal transition rejections under test [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > command without trace context is rejected
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > create_agent_session requires agent_definition_id and links spawned_from
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+replay_assertion=equal live.status=failed rebuilt.status=failed
+(pass) qf-kernel > replay rebuilds run status from events and equals live table
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > events carry trace_id from ctx [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > publish_artifact creates content-addressed row via event log
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > publish_artifact rejects hash mismatch and writes nothing
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+artifact_row_count_after_double_publish=1
+artifact_event_count_after_double_publish=1
+(pass) qf-kernel > publish_artifact identical bytes twice is idempotent (one row, no second event)
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+artifact_replay_assertion=equal id=229eb2b779d77cfcd8460c1c04c8641f6c43ae35f14a121be52fafadff29de0e kind=result_set
+(pass) qf-kernel > replay rebuilds artifact from events and equals live table
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > publish_artifact requires trace context [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > D1 · republish same bytes with different metadata rejects
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > D2 · replay fails when event content_hash disagrees with identity
+(pass) qf-kernel > D3 · every creationCommands entry has a handler
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > register_agent_definition inserts row with id=name
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > register_agent_definition accepts Research Director and rejects unknown display names [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > register_agent_definition rejects duplicate name
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > market_event start_event transition end to end (WO-103 D0)
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+G2_objects=[{"t":"artifact","id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689"},{"t":"artifact","id":"62b1010871f4d5a47271d8a5356339edba6c6b2a8e946bfb8337d356505269eb"},{"t":"dataset","id":"dataset:62b1010871f4d5a47271d8a5356339edba6c6b2a8e946bfb8337d356505269eb"},{"t":"hypothesis","id":"05a00ad1-619e-47f8-bb45-ad5127dfadb4"},{"t":"run","id":"run-chain-1"}]
+G2_links=[{"kind":"derived_from","from_id":"dataset:62b1010871f4d5a47271d8a5356339edba6c6b2a8e946bfb8337d356505269eb","to_id":"62b1010871f4d5a47271d8a5356339edba6c6b2a8e946bfb8337d356505269eb"},{"kind":"produces","from_id":"run-chain-1","to_id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689"},{"kind":"tests","from_id":"run-chain-1","to_id":"05a00ad1-619e-47f8-bb45-ad5127dfadb4"},{"kind":"uses","from_id":"run-chain-1","to_id":"dataset:62b1010871f4d5a47271d8a5356339edba6c6b2a8e946bfb8337d356505269eb"}]
+(pass) qf-kernel > G2 · hypothesis, Dataset, Run, and result link through execute() only [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > G3 · illegal link kind rejected by endpoint validator before commit
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > G3 · wrong endpoint type rejected by validator not sqlite
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+G4_events=[{"type":"ticket.observed","payload":"{\"command\":\"observe_ticket\",\"origin\":\"operator_supplied\",\"kind\":\"single\",\"external_ref\":\"slip-real\",\"placed_at\":\"2026-07-25T12:00:00.000Z\",\"legs\":[{\"selection\":\"A\",\"price\":1.9}],\"combined_price\":1.9,\"stake\":100,\"payout\":190,\"correlation_note\":\"\",\"grade\":\"win\",\"observation\":true,\"span_id\":\"span-slip\"}"}]
+(pass) qf-kernel > G4 · create_ticket rejects grade; observe_ticket records observation
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) qf-kernel > G4b · creation-policy rejects supplied run status; mechanism is reusable [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) read layer > getObject returns row by id
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) read layer > queryObjects filters by declared property equality
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) read layer > queryObjects limit null returns all rows without cap [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) read layer > queryObjects order asc reverses created_at sort
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) read layer > getLinks returns edges in either direction
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) read layer > unknown type name errors before SQL
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) read layer > unknown filter key errors before SQL
+
+src\market-context.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) WO-107c trusted market context > creates scheduled context with one provenance event and replays by trace identity
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) WO-107c trusted market context > rejects blank context row created_at on replay without writes
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) WO-107c trusted market context > conflicts are typed and context envelopes reject before any write [15.00ms]
+
+src\market-ingest.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) WO-107b market batch runtime > commits one event per row and one derived edge, then exact retry is a no-op [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) WO-107b market batch runtime > conflicting row state or provenance rejects the entire batch
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) WO-107b market batch runtime > missing source, duplicate IDs, and missing quote foreign key reject before writing
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) WO-107b market batch runtime > a commit-time failure on the final row rolls back prior rows and events [16.00ms]
+kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) WO-107b upgrade chain > pre_d1 reaches current in place and preserves rows, links, and events [15.00ms]
+kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) WO-107b upgrade chain > d1 reaches current in place and preserves rows, links, and events [32.00ms]
+
+src\open-kernel-create.test.ts:
+(pass) WO-K2 openKernel create / readonly > G3: missing file without create throws and creates nothing
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-0iA5hI\created.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+(pass) WO-K2 openKernel create / readonly > G3: { create: true } creates the file [31.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) WO-K2 openKernel create / readonly > G3: :memory: opens without create
+(pass) WO-K2 openKernel create / readonly > G3: create + readonly together throws
+(pass) WO-K2 openKernel create / readonly > G3: missing file with readonly throws (cannot create)
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-ksCpw2\ro-write.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-ksCpw2\ro-write.db provenance=explicit journal=wal sync=2 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-ksCpw2\ro-write.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+(pass) WO-K2 openKernel create / readonly > G4: readonly handle cannot write; writable control succeeds [62.00ms]
+
+src\r10-dataset-integrity.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > registers immutable bytes and computes the time fence [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > rejects a declared hash that is not the Artifact identity
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > rejects observations after the declared as_of fence [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R10 point-in-time Dataset integrity > rejects durable bytes changed after Artifact publication
+
+src\r11a-deterministic-execution.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R11a deterministic local execution > repeats exact inputs byte-for-byte with complete Kernel provenance [31.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R11a deterministic local execution > rejects false repeat claims and changed durable result bytes [15.00ms]
+kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R11a deterministic local execution > upgrades an existing R10 database in place [16.00ms]
+kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R11a deterministic local execution > upgrades the pinned post-composition predecessor and preserves receipts [31.00ms]
+(pass) R11a deterministic local execution > rejects one extra or missing governed predecessor shape without mutation [1266.00ms]
+(pass) R11a deterministic local execution > classifies a fixture retaining only the 0010 display_name shape as partial [16.00ms]
+(pass) R11a deterministic local execution > classifies a fixture retaining only the 0010 cancelled status as partial
+
+src\r11b-metric-correctness.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R11b hand-calculated metric correctness > matches exact ROI, hit rate, and closing-line value definitions [31.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R11b hand-calculated metric correctness > refuses ambiguous numeric money before creating a Run [15.00ms]
+
+src\r12-independent-critic.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+471 | function validateStoredSourceWork(db: KernelDb, work: SourceWork): void {
+472 |   const task = db.query("SELECT id FROM task WHERE id = ?").get(work.source_task_id);
+473 |   const hypothesis = db.query("SELECT id FROM hypothesis WHERE id = ?").get(work.hypothesis_id);
+474 |   const run = db.query("SELECT status, params FROM run WHERE id = ?").get(work.run_id) as { status: string; params: string } | null;
+475 |   const artifact = db.query("SELECT id, kind FROM artifact WHERE id = ?").get(work.result_artifact_id) as { id: string; kind: string } | null;
+476 |   if (!task || !hypothesis || !run || run.status !== "succeeded" || !artifact || artifact.kind !== "trajectory") throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+                                                                                                                                                                        ^
+KernelError: Review requires one succeeded Run with one exact Hypothesis, result Artifact, executor, and R14 source-Task lineage.
+      at validateStoredSourceWork (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\governed-review.ts:476:163)
+      at bindSourceWorkInAction (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\governed-review.ts:513:3)
+      at fixture (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\r12-independent-critic.test.ts:159:16)
+      at <anonymous> (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\r12-independent-critic.test.ts:265:15)
+(fail) R12 independent critic and report gate > binds a separate critic, findings, target result, metrics, and report [32.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+471 | function validateStoredSourceWork(db: KernelDb, work: SourceWork): void {
+472 |   const task = db.query("SELECT id FROM task WHERE id = ?").get(work.source_task_id);
+473 |   const hypothesis = db.query("SELECT id FROM hypothesis WHERE id = ?").get(work.hypothesis_id);
+474 |   const run = db.query("SELECT status, params FROM run WHERE id = ?").get(work.run_id) as { status: string; params: string } | null;
+475 |   const artifact = db.query("SELECT id, kind FROM artifact WHERE id = ?").get(work.result_artifact_id) as { id: string; kind: string } | null;
+476 |   if (!task || !hypothesis || !run || run.status !== "succeeded" || !artifact || artifact.kind !== "trajectory") throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+                                                                                                                                                                        ^
+KernelError: Review requires one succeeded Run with one exact Hypothesis, result Artifact, executor, and R14 source-Task lineage.
+      at validateStoredSourceWork (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\governed-review.ts:476:163)
+      at bindSourceWorkInAction (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\governed-review.ts:513:3)
+      at fixture (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\r12-independent-critic.test.ts:159:16)
+      at <anonymous> (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\r12-independent-critic.test.ts:297:15)
+(fail) R12 independent critic and report gate > refuses a non-critic before any governed write [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+471 | function validateStoredSourceWork(db: KernelDb, work: SourceWork): void {
+472 |   const task = db.query("SELECT id FROM task WHERE id = ?").get(work.source_task_id);
+473 |   const hypothesis = db.query("SELECT id FROM hypothesis WHERE id = ?").get(work.hypothesis_id);
+474 |   const run = db.query("SELECT status, params FROM run WHERE id = ?").get(work.run_id) as { status: string; params: string } | null;
+475 |   const artifact = db.query("SELECT id, kind FROM artifact WHERE id = ?").get(work.result_artifact_id) as { id: string; kind: string } | null;
+476 |   if (!task || !hypothesis || !run || run.status !== "succeeded" || !artifact || artifact.kind !== "trajectory") throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+                                                                                                                                                                        ^
+KernelError: Review requires one succeeded Run with one exact Hypothesis, result Artifact, executor, and R14 source-Task lineage.
+      at validateStoredSourceWork (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\governed-review.ts:476:163)
+      at bindSourceWorkInAction (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\governed-review.ts:513:3)
+      at fixture (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\r12-independent-critic.test.ts:159:16)
+      at <anonymous> (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\r12-independent-critic.test.ts:304:15)
+(fail) R12 independent critic and report gate > refuses rejecting publication without changing state [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+471 | function validateStoredSourceWork(db: KernelDb, work: SourceWork): void {
+472 |   const task = db.query("SELECT id FROM task WHERE id = ?").get(work.source_task_id);
+473 |   const hypothesis = db.query("SELECT id FROM hypothesis WHERE id = ?").get(work.hypothesis_id);
+474 |   const run = db.query("SELECT status, params FROM run WHERE id = ?").get(work.run_id) as { status: string; params: string } | null;
+475 |   const artifact = db.query("SELECT id, kind FROM artifact WHERE id = ?").get(work.result_artifact_id) as { id: string; kind: string } | null;
+476 |   if (!task || !hypothesis || !run || run.status !== "succeeded" || !artifact || artifact.kind !== "trajectory") throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+                                                                                                                                                                        ^
+KernelError: Review requires one succeeded Run with one exact Hypothesis, result Artifact, executor, and R14 source-Task lineage.
+      at validateStoredSourceWork (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\governed-review.ts:476:163)
+      at bindSourceWorkInAction (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\governed-review.ts:513:3)
+      at fixture (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\r12-independent-critic.test.ts:159:16)
+      at <anonymous> (C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\src\r12-independent-critic.test.ts:317:15)
+(fail) R12 independent critic and report gate > refuses self-review before any governed write [16.00ms]
+
+src\r15-governed-review.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > same-millisecond receipt ordering is a fail-capable ambiguity reproduction
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > freezes the tuple, requires exact reads, canonicalizes findings, and publishes supports [46.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > all three governed modes preserve exact Task, identity-link, support, attempt, and event cardinality [32.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > successful delivery keeps the ontology Task open and stopped-critic failure cancels only its matching Task [47.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > a critic that returns twice without an Evaluation fails only the review Task with a durable reason [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > admission boundary failure rolls back Task, links, review row, attempt, receipt, and event residue [31.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > invalid source work refuses before critic admission and duplicate attempts replay
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > malformed source delegated_by refuses with only one replayable refusal receipt, attempt, and event [32.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > strict rubric thresholds and findings references reject atomically [15.00ms]
+
+src\r16-visible-world.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R16 visible research world Kernel seams > trusted Mission context writes one belongs_to edge and hypothesis-bound runs write tests [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R16 visible research world Kernel seams > caller-supplied mission_id is rejected as an action field [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R16 visible research world Kernel seams > omitted hypothesis preserves legacy execution and the projection can report missing tests [15.00ms]
+
+src\r17-technique-outcome.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R17 technique outcome loop > binds immutable versioned Strategy and records an idempotent grade [15.00ms]
+
+src\r9-research-integrity.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R9 research integrity > resolution without named evidence writes nothing
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R9 research integrity > a report without an independent supporting Evaluation writes nothing
+
+src\registry-drift.test.ts:
+(pass) detectObjectTypeRegistryDrift > clean: declared, meta, and tables agree → ok
+(pass) detectObjectTypeRegistryDrift > missing: declared absent from meta
+(pass) detectObjectTypeRegistryDrift > retired: meta object no longer declared
+(pass) detectObjectTypeRegistryDrift > inconsistent: meta claims type with no table
+(pass) detectObjectTypeRegistryDrift > inconsistent: orphan non-infra table with no meta claim
+(pass) detectObjectTypeRegistryDrift > infra tables alone never mark inconsistent
+(pass) detectObjectTypeRegistryDrift > ignores exactly six governed-review support tables but rejects a seventh orphan
+
+src\resolve-artifact-root.test.ts:
+(pass) resolveArtifactRoot > default creates ~/.quantflow/artifacts and returns provenance=default [16.00ms]
+(pass) resolveArtifactRoot > env absolute path resolves with provenance=env
+(pass) resolveArtifactRoot > relative env path becomes absolute
+(pass) resolveArtifactRoot > env path that is a regular file throws and leaves the file unchanged
+(pass) resolveArtifactRoot > env path missing throws and creates nothing
+(pass) resolveArtifactRoot > default creates parent ~/.quantflow when missing
+
+src\resolve-path.test.ts:
+(pass) resolveKernelPath > default creates ~/.quantflow and returns absolute path with provenance=default
+(pass) resolveKernelPath > env absolute path resolves real path with provenance=env
+(pass) resolveKernelPath > relative env path becomes absolute (no cwd fork)
+(pass) resolveKernelPath > :memory: stays verbatim
+(pass) resolveKernelPath > G3: env parent missing throws and creates nothing
+(pass) resolveKernelPath > G3 control: default creates parent when missing
+
+4 tests failed:
+(fail) R12 independent critic and report gate > binds a separate critic, findings, target result, metrics, and report [32.00ms]
+(fail) R12 independent critic and report gate > refuses a non-critic before any governed write [15.00ms]
+(fail) R12 independent critic and report gate > refuses rejecting publication without changing state [16.00ms]
+(fail) R12 independent critic and report gate > refuses self-review before any governed write [16.00ms]
+
+ 111 pass
+ 4 fail
+ 438 expect() calls
+Ran 115 tests across 20 files. [4.96s]
+kernel: bun test exited 1
+FAIL  kernel

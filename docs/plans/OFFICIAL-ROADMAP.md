@@ -128,9 +128,9 @@ Exit: accepted and closed. Do not reopen it as Wave-1 work.
 
 ### 6.2 Wave-1 live-input decision door (formerly FM-0)
 
-A bounded first deliverable inside the opening product order, not a separate audit, rung, or founder decision ceremony. It proves one real current Bovada event/market with reliable participant identities, both sides and prices, event time, provider identity, local observation time, and an honest freshness statement; then proves one trustworthy historical path whose inputs can be reconstructed before the event cutoff. Attempt UFC first because it is live and useful to Ryan; use NFL as the reserved fallback under the same evidence bar. The order sets a hard timebox and switches promptly rather than protecting a favorite sport.
+A bounded first deliverable inside the opening product order, not a separate audit, rung, or founder decision ceremony. It proves one real current Bovada UFC event/market with reliable fighter identities, both sides and prices, event time, provider identity, local observation time, and an honest freshness statement; then proves one trustworthy historical UFC path whose inputs can be reconstructed before the event cutoff. UFC is the locked first proving ground because it is active and Ryan has substantial resolved betting history to contribute. That personal history may become governed evidence only when its event, market, price, cutoff, and official outcome identities can be reconstructed; it is not accepted as truth merely because Ryan supplied it. NFL remains the next expansion market and an existing regression seam, not a fallback for Proof A.
 
-This door also identifies the smallest transparent calculation that the available evidence can honestly support. It does **not** require Ryan to invent or select a named Technique. Exploration begins without one; before any conclusion can influence CANDIDATE/WATCH/PASS, the exact formula, inputs, version, cutoff, missing-data behavior, and limitations become an immutable Run envelope. If both real-data paths fail inside the timebox, stop with the exact missing dependency. Never substitute fixtures on the live claim.
+This door also identifies the smallest transparent calculation that the available UFC evidence can honestly support. It does **not** require Ryan to invent or select a named Technique. Exploration begins without one; before any conclusion can influence CANDIDATE/WATCH/PASS, the exact formula, inputs, version, cutoff, missing-data behavior, and limitations become an immutable Run envelope. If the UFC live or historical path fails inside the timebox, stop with the exact missing dependency. Never switch sports to rescue the first-product claim and never substitute fixtures on the live claim.
 
 ### 6.3 Minimum IC-0
 
@@ -210,12 +210,12 @@ Proof A + Proof B produce a **first-class show-ready technical/product demonstra
 
 ## 7. Stop conditions
 
-Stop and return to the founder only if: the bounded input door proves neither UFC nor NFL can supply the required real evidence without a credential or external access decision; any unit requires a second truth store; any unit passes only with a fixture on the live path; a real safety/authority conflict appears; the same semantic assertion fails twice after repair; or working software exposes a genuinely founder-only product choice. Do not stop for naming, ceremony, optional Technique selection, or implementation choices the architect can make from evidence.
+Stop and return to the founder only if: the bounded input door proves UFC cannot supply the required real evidence without a credential, founder-supplied source record, or external access decision; any unit requires a second truth store; any unit passes only with a fixture on the live path; a real safety/authority conflict appears; the same semantic assertion fails twice after repair; or working software exposes a genuinely founder-only product choice. Do not stop for naming, ceremony, optional Technique selection, or implementation choices the architect can make from evidence.
 
 ## 8. Open decisions by timing
 
 **Already settled by the founder:** this corrected product model and continuous execution through the three delivery waves; Golden remains closed.
-**The Wave-1 input door decides from evidence:** §6.2 list, including UFC versus NFL fallback and the smallest honest calculation.
+**The Wave-1 input door decides from evidence:** the exact UFC market subset, trustworthy historical path, and smallest honest calculation described in §6.2. The first sport is no longer an open decision.
 **After Proof A:** second runtime; exact PB-0/PB-1 implementation plan informed by the real role; adapter shape; untrusted-CLI security; Operator Season threshold.
 **After real history:** §6.11–6.13.
 Architect-settled (not founder questions): document ownership, contract wording, PB-0 placement, surface operating model, participant/capability distinction, compute/model placement, normalization shape, cadence. The Vault founder decision pack is non-authoritative research input; decisions that open or close work land in Git under the normal `NEXT.md`/order protocol.

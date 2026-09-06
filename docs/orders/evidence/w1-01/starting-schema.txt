@@ -1,0 +1,195 @@
+bun install v1.3.12 (700fc117)
+
+Done! Checked 7 packages (no changes) [15.00ms]
+bun test v1.3.12 (700fc117)
+
+src\define.test.ts:
+(pass) schema lint > trusted market context actions are operator-only and reject creation envelopes [16.00ms]
+(pass) schema lint > object missing description fails naming the offender
+(pass) schema lint > object missing lifecycle fails naming the offender
+(pass) schema lint > property missing description fails naming the offender
+(pass) schema lint > link missing description fails naming the offender
+(pass) schema lint > action missing description fails naming the offender
+(pass) schema lint > multi-endpoint link preserves declaration order
+(pass) schema lint > lintSchema rejects duplicate names
+(pass) schema lint > lintSchema rejects unknown link endpoints
+(pass) schema lint > lintSchema rejects status enum missing from transition table
+(pass) schema lint > lintCommands rejects a command that is not a schema action
+(pass) schema lint > lintCommands rejects a legal transition with no command
+(pass) schema lint > lintCommands rejects a creation command that is not a schema action
+(pass) schema lint > lintCommands rejects transition command edges for pipeline-fed types
+(pass) schema lint > lintCommands rejects creation command coverage for pipeline-fed types
+(pass) schema lint > lintCommands rejects observation-coupled action without operatorOnly (generic rule)
+(pass) schema lint > lintCommands rejects operatorOnly action with a non-observation command event
+(pass) schema lint > lintCommands accepts non-observation operatorOnly action
+(pass) schema lint > pipeline commands require pipeline-only actions and pipeline-fed object types
+(pass) schema lint > pipeline command lint rejects dual trust modes, duplicate entries, and mixed families
+(pass) schema lint > lintActionSurface rejects a schema action with no command wiring
+(pass) schema lint > lintSchema rejects silo clone object names that embed another kind enum value
+(pass) schema lint > lintSchema active-freeze rejects removed baseline property
+(pass) schema lint > lintSchema active-freeze rejects retyped baseline property
+(pass) schema lint > real-slip representability fixture builds a single and a five-leg parlay with a void leg [16.00ms]
+(pass) schema lint > market-plane pipeline-fed flags are set only on instrument and quote
+(pass) schema lint > market ingest batch is strict at the envelope and row boundaries
+
+src\generate.test.ts:
+(pass) golden outputs > SQL migration matches golden byte-for-byte
+(pass) golden outputs > MCP tools match golden byte-for-byte [32.00ms]
+(pass) golden outputs > ONTOLOGY.md matches golden byte-for-byte
+(pass) golden outputs > conformance.test.ts matches golden byte-for-byte
+(pass) golden outputs > agent-profile-identity upgrade matches golden byte-for-byte
+(pass) golden outputs > market-ingest upgrade matches golden byte-for-byte
+(pass) golden outputs > market-context upgrade matches golden byte-for-byte
+(pass) golden outputs > capability-grants upgrade matches golden byte-for-byte
+(pass) golden outputs > task-status upgrade matches golden byte-for-byte
+(pass) golden outputs > connection-actions upgrade matches golden byte-for-byte
+(pass) golden outputs > task-delegation upgrade matches golden byte-for-byte
+(pass) golden outputs > deterministic-execution upgrade matches golden byte-for-byte
+(pass) golden outputs > independent-critic upgrade matches golden byte-for-byte
+(pass) golden outputs > historical task upgrades stay byte-stable
+(pass) golden outputs > task-steering upgrade matches golden byte-for-byte
+(pass) determinism > two consecutive SQL generations are identical
+(pass) determinism > two consecutive MCP generations are identical [15.00ms]
+(pass) determinism > two consecutive docs generations are identical
+(pass) determinism > two consecutive conformance generations are identical
+(pass) mcp tool descriptions > get, query, and links descriptions are distinct per object [16.00ms]
+(pass) mcp tool descriptions > read tool count is three per object plus one action per action [15.00ms]
+(pass) mcp tool descriptions > pipeline-only action is complete generated authority but is not served to agents [16.00ms]
+(pass) conformance counts > generated file meta matches counted accept/reject totals
+(pass) record_evaluation publishes an exact numeric rubric object [16.00ms]
+(pass) record_evaluation publishes an exact ordered findings array
+
+golden\conformance.test.ts:
+(pass) run transitions > accepts queued → running
+(pass) run transitions > rejects queued → queued
+(pass) run transitions > rejects queued → succeeded
+(pass) run transitions > rejects queued → failed
+(pass) run transitions > rejects queued → cancelled
+(pass) run transitions > accepts running → succeeded
+(pass) run transitions > accepts running → failed
+(pass) run transitions > accepts running → cancelled
+(pass) run transitions > rejects running → queued
+(pass) run transitions > rejects running → running
+(pass) run transitions > rejects succeeded → queued
+(pass) run transitions > rejects succeeded → running
+(pass) run transitions > rejects succeeded → succeeded
+(pass) run transitions > rejects succeeded → failed
+(pass) run transitions > rejects succeeded → cancelled
+(pass) run transitions > rejects failed → queued
+(pass) run transitions > rejects failed → running
+(pass) run transitions > rejects failed → succeeded
+(pass) run transitions > rejects failed → failed
+(pass) run transitions > rejects failed → cancelled
+(pass) run transitions > rejects cancelled → queued
+(pass) run transitions > rejects cancelled → running
+(pass) run transitions > rejects cancelled → succeeded
+(pass) run transitions > rejects cancelled → failed
+(pass) run transitions > rejects cancelled → cancelled
+(pass) hypothesis transitions > accepts open → supported
+(pass) hypothesis transitions > accepts open → rejected
+(pass) hypothesis transitions > accepts open → inconclusive
+(pass) hypothesis transitions > rejects open → open
+(pass) hypothesis transitions > rejects supported → open
+(pass) hypothesis transitions > rejects supported → supported
+(pass) hypothesis transitions > rejects supported → rejected
+(pass) hypothesis transitions > rejects supported → inconclusive
+(pass) hypothesis transitions > rejects rejected → open
+(pass) hypothesis transitions > rejects rejected → supported
+(pass) hypothesis transitions > rejects rejected → rejected
+(pass) hypothesis transitions > rejects rejected → inconclusive
+(pass) hypothesis transitions > rejects inconclusive → open
+(pass) hypothesis transitions > rejects inconclusive → supported
+(pass) hypothesis transitions > rejects inconclusive → rejected
+(pass) hypothesis transitions > rejects inconclusive → inconclusive
+(pass) ticket transitions > accepts pending → win
+(pass) ticket transitions > accepts pending → loss
+(pass) ticket transitions > accepts pending → push
+(pass) ticket transitions > accepts pending → void
+(pass) ticket transitions > rejects pending → pending
+(pass) ticket transitions > rejects win → pending
+(pass) ticket transitions > rejects win → win
+(pass) ticket transitions > rejects win → loss
+(pass) ticket transitions > rejects win → push
+(pass) ticket transitions > rejects win → void
+(pass) ticket transitions > rejects loss → pending
+(pass) ticket transitions > rejects loss → win
+(pass) ticket transitions > rejects loss → loss
+(pass) ticket transitions > rejects loss → push
+(pass) ticket transitions > rejects loss → void
+(pass) ticket transitions > rejects push → pending
+(pass) ticket transitions > rejects push → win
+(pass) ticket transitions > rejects push → loss
+(pass) ticket transitions > rejects push → push
+(pass) ticket transitions > rejects push → void
+(pass) ticket transitions > rejects void → pending
+(pass) ticket transitions > rejects void → win
+(pass) ticket transitions > rejects void → loss
+(pass) ticket transitions > rejects void → push
+(pass) ticket transitions > rejects void → void
+(pass) market_event transitions > accepts scheduled → live
+(pass) market_event transitions > accepts scheduled → void
+(pass) market_event transitions > rejects scheduled → scheduled
+(pass) market_event transitions > rejects scheduled → settled
+(pass) market_event transitions > accepts live → settled
+(pass) market_event transitions > rejects live → scheduled
+(pass) market_event transitions > rejects live → live
+(pass) market_event transitions > rejects live → void
+(pass) market_event transitions > rejects settled → scheduled
+(pass) market_event transitions > rejects settled → live
+(pass) market_event transitions > rejects settled → settled
+(pass) market_event transitions > rejects settled → void
+(pass) market_event transitions > rejects void → scheduled
+(pass) market_event transitions > rejects void → live
+(pass) market_event transitions > rejects void → settled
+(pass) market_event transitions > rejects void → void
+(pass) agent_session transitions > accepts starting → running
+(pass) agent_session transitions > accepts starting → failed
+(pass) agent_session transitions > rejects starting → starting
+(pass) agent_session transitions > rejects starting → blocked
+(pass) agent_session transitions > rejects starting → cancelled
+(pass) agent_session transitions > rejects starting → closed
+(pass) agent_session transitions > accepts running → blocked
+(pass) agent_session transitions > accepts running → cancelled
+(pass) agent_session transitions > accepts running → failed
+(pass) agent_session transitions > accepts running → closed
+(pass) agent_session transitions > rejects running → starting
+(pass) agent_session transitions > rejects running → running
+(pass) agent_session transitions > accepts blocked → running
+(pass) agent_session transitions > accepts blocked → cancelled
+(pass) agent_session transitions > accepts blocked → failed
+(pass) agent_session transitions > rejects blocked → starting
+(pass) agent_session transitions > rejects blocked → blocked
+(pass) agent_session transitions > rejects blocked → closed
+(pass) agent_session transitions > accepts cancelled → closed
+(pass) agent_session transitions > rejects cancelled → starting
+(pass) agent_session transitions > rejects cancelled → running
+(pass) agent_session transitions > rejects cancelled → blocked
+(pass) agent_session transitions > rejects cancelled → cancelled
+(pass) agent_session transitions > rejects cancelled → failed
+(pass) agent_session transitions > accepts failed → closed
+(pass) agent_session transitions > rejects failed → starting
+(pass) agent_session transitions > rejects failed → running
+(pass) agent_session transitions > rejects failed → blocked
+(pass) agent_session transitions > rejects failed → cancelled
+(pass) agent_session transitions > rejects failed → failed
+(pass) agent_session transitions > rejects closed → starting
+(pass) agent_session transitions > rejects closed → running
+(pass) agent_session transitions > rejects closed → blocked
+(pass) agent_session transitions > rejects closed → cancelled
+(pass) agent_session transitions > rejects closed → failed
+(pass) agent_session transitions > rejects closed → closed
+(pass) task transitions > accepts open → open
+(pass) task transitions > accepts open → done
+(pass) task transitions > accepts open → cancelled
+(pass) task transitions > rejects done → open
+(pass) task transitions > rejects done → done
+(pass) task transitions > rejects done → cancelled
+(pass) task transitions > rejects cancelled → open
+(pass) task transitions > rejects cancelled → done
+(pass) task transitions > rejects cancelled → cancelled
+
+ 179 pass
+ 0 fail
+ 615 expect() calls
+Ran 179 tests across 3 files. [265.00ms]
+PASS  schema

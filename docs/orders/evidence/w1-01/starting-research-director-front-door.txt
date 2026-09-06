@@ -1,0 +1,48 @@
+warning: unable to access 'C:\Users\rybow/.config/git/ignore': Permission denied
+warning: unable to access 'C:\Users\rybow/.config/git/ignore': Permission denied
+falsifier=old-orchestrator-id result=red
+falsifier=generic-orchestrator-prompt result=red
+falsifier=ui-boundary-or-auto-tile-shortcut result=red
+research-director-front-door: FAIL Windows process snapshot unavailable: Command failed: powershell.exe -NoProfile -NonInteractive -Command $ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEach-Object { [pscustomobject]@{ pid=[int]$_.ProcessId; parentPid=[int]$_.ParentProcessId; name=[string]$_.Name; executablePath=if ($_.ExecutablePath) {[string]$_.ExecutablePath} else {''}; commandLine=if ($_.CommandLine) {[string]$_.CommandLine} else {''} } }) | ConvertTo-Json -Compress
+Get-CimInstance : Access denied 
+At line:1 char:34
++ ... ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEa ...
++                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : PermissionDenied: (root\cimv2:Win32_Process:String) [Get-CimInstance], CimException
+    + FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand
+ 
+ (Get-CimInstance : Access denied 
+At line:1 char:34
++ ... ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEa ...
++                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : PermissionDenied: (root\cimv2:Win32_Process:String) [Get-CimInstance], CimException
+    + FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand)
+convergence_remaining=[]
+231 |       ["-NoProfile", "-NonInteractive", "-Command", command],
+232 |       { windowsHide: true, maxBuffer: 16 * 1024 * 1024 },
+233 |       (error, stdout, stderr) => {
+234 |         if (error) {
+235 |           reject(
+236 |             new Error(
+                      ^
+error: Windows process snapshot unavailable: Command failed: powershell.exe -NoProfile -NonInteractive -Command $ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEach-Object { [pscustomobject]@{ pid=[int]$_.ProcessId; parentPid=[int]$_.ParentProcessId; name=[string]$_.Name; executablePath=if ($_.ExecutablePath) {[string]$_.ExecutablePath} else {''}; commandLine=if ($_.CommandLine) {[string]$_.CommandLine} else {''} } }) | ConvertTo-Json -Compress
+Get-CimInstance : Access denied 
+At line:1 char:34
++ ... ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEa ...
++                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : PermissionDenied: (root\cimv2:Win32_Process:String) [Get-CimInstance], CimException
+    + FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand
+ 
+ (Get-CimInstance : Access denied 
+At line:1 char:34
++ ... ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEa ...
++                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : PermissionDenied: (root\cimv2:Win32_Process:String) [Get-CimInstance], CimException
+    + FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand)
+      at <anonymous> (C:\Users\rybow\QuantFlow-Ontology\qa\gates\windows-cold-boot.ts:236:17)
+      at exitHandler (node:child_process:109:27)
+      at emit (node:events:98:22)
+      at #maybeClose (node:child_process:778:16)
+      at #handleOnExit (node:child_process:532:72)
+
+Bun v1.3.12 (Windows x64)

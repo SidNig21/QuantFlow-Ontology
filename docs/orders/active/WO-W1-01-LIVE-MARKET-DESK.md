@@ -1,12 +1,13 @@
 # WO-W1-01 — real Bovada market desk
 
-status: OPEN — Reader YES/YES on amended candidate `177de004`; authorized only through `NEXT.md`
+status: OPEN — UFC-first founder amendment pending fresh Reader; implementation paused
 base: accepted local `main` `6340d78f109eeed0fccea26a04f42557263db0a8`
 route: Wave 1 — First Useful Market Desk
 depends: Golden and Post-Golden Foundation accepted; product-model correction in this candidate
 builder: one fresh visible Codex task using `gpt-6-astra`, low reasoning, after `NEXT.md` opens
 reader: visible task `01a074fa-2603-7f21-b73d-be5c44fca106`; final `YES/YES`
 verifier: one different fresh visible Codex task; immutable candidate only
+amendment-review: PENDING — no Builder resumes until fresh Reader YES/YES
 
 ## Objective
 
@@ -38,20 +39,25 @@ obvious `Research this market` action—rather than another feasibility document
 Do this before product mutation and preserve a credential-safe receipt. It is part of this order, not a
 separate project.
 
-1. Use one disposable, uncommitted native-Windows probe outside the product tree to call the candidate UFC
-   endpoint under the existing transport's exact 20-second and 5-MB bounds. The production transport is
-   currently fixed to the NFL URL and is not mutated until this door chooses a path. Inspect one real
-   current Bovada UFC event and one pre-event moneyline market. Prove event/competition identity, start time, both selections and
-   prices, provider identifiers, local observation time, source timestamp when available, source hash,
-   and whether the same identities can resolve into trustworthy historical records available before the
-   event cutoff.
-2. UFC receives at most two focused hours. If it cannot meet that bar, spend the remaining bounded window
-   on the existing NFL path under the same evidence requirements. Total door: four focused hours maximum.
+1. Begin from the preserved bounded probe evidence for Bovada's public `ufc-mma/ufc` route, which returned
+   HTTP 200 and a scheduled Fight Winner market under the existing transport's exact 20-second and 5-MB
+   bounds. Independently reproduce it with one disposable, uncommitted native-Windows probe outside the
+   product tree before mutation. The production transport is currently fixed to the NFL URL and is not
+   mutated until the UFC response shape is understood. Prove event/competition identity, start time, both
+   selections and prices, provider identifiers, local observation time, source timestamp when available,
+   source hash, exclusion of unconfirmed Potential Fights, and whether the same identities can resolve into
+   trustworthy historical records available before the event cutoff.
+2. UFC is the mandatory first product path. Give its historical-identity proof the remaining bounded door,
+   with four focused hours total across the already-completed and resumed probe. Ryan's resolved UFC bet
+   history may be admitted when supplied, but only after exact event, market, price, cutoff, and official
+   outcome identity are proved. If no trustworthy UFC historical path can meet the bar, stop with the exact
+   missing dependency. Do not pivot the implementation to NFL.
 3. A rendered public listing is a cross-check, not durable truth. Capture bytes and parsed values are the
    evidence. Fetch time is not provider update time; say `provider time unavailable` when necessary.
-4. Choose the first path that passes. Cross-sport in this slice means neutral venue/event/instrument/quote
-   contracts plus one boundary example for the unselected sport—not two finished sports.
-5. If neither path passes, stop with the exact missing external dependency. Do not use a fixture, synthetic
+4. Cross-sport design in this slice means neutral venue/event/instrument/quote contracts while UFC alone
+   supplies the live positive path. The existing NFL package and gates remain non-regression evidence, not
+   an alternate acceptance path or a second finished sport.
+5. If the UFC path fails, stop with the exact missing external dependency. Do not use a fixture, synthetic
    market, guessed identity, or agent-written probability as the live positive path.
 
 The probe is deleted after the decision. The receipt is required release evidence for this feature and
@@ -140,7 +146,7 @@ The Builder must make these claims fail before trusting the new guard, then rest
 | Freshness | UI distinguishes provider time, local observation time, current/superseded evidence | reuse old bytes as if newly updated |
 | Technique-free start | normal UI creates an exact quote-linked investigation with no Strategy; a Task appears only after a running Director assigns it | inject renderer-only link/Task, fake Strategy, or untrusted principal |
 | Governed Dock identity | registered `tool` object and DATA row agree on id/class/version | render an unregistered constant or substitute `venue` identity |
-| Historical viability door | selected sport identities resolve to a pre-event historical sample and one statistic recomputes from source rows | post-event field leakage or unresolved competitor identity |
+| Historical viability door | UFC identities resolve to a pre-event historical sample and one statistic recomputes from source rows | post-event field leakage or unresolved fighter identity |
 | Continuous desk | open two investigations while a bench tile remains; focus/lineage/return preserves all identities | old replacement `reveal()` removes one |
 | Sole truth | rendered rows/links equal Kernel readback after reopen | forge a renderer-only market row |
 | Failure honesty | timeout, empty, malformed and ambiguous results stay distinct and actionable | stale success returned on failure |
@@ -194,9 +200,9 @@ does not replace the deterministic gates.
 
 ## Out of scope
 
-Historical importer and probability model; deterministic decision calculation; Critic orchestration;
+General historical importer and probability model; deterministic decision calculation; Critic orchestration;
 CANDIDATE/WATCH/PASS publication; recommendation/outcome tracking; second runtime; Technique catalog;
-continuous background scanning; props/parlays; broad multi-sport completion; new Canvas engine; new UI
+continuous background scanning; props/parlays; NFL consumer completion or broad multi-sport completion; new Canvas engine; new UI
 framework; automated bet placement; Golden reopening; rejected FM-0 merge.
 
 Those Wave-1 outcomes remain required, but they belong to the next vertical slice after this market desk is

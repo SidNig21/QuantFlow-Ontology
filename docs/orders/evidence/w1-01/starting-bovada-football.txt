@@ -1,0 +1,8 @@
+core tests: PASS
+core five-bait gate: PASS
+qf-canvas/RPC tests: PASS
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+request/header canary exclusion: PASS
+generated agent surface: PASS served_tools=99
+bovada-football gate FAILED: Bovada packaged proof requires the canonical QF_RELEASE_RUN_ID
+FAIL  bovada-football

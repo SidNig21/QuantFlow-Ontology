@@ -7,10 +7,10 @@ router-authority: OPEN
 g11-status: CLOSED
 r18-status: FROZEN / SUPERSEDED
 foundation-status: ACCEPTED — candidate 58b444d858443debeac8b13e041b2bb65e4e370e; independent YES / YES
-reader-status: YES / YES — task 01a074fa-2603-7f21-b73d-be5c44fca106; candidate 177de00469716cff90998a7e3b5cabbb0dda6938
+reader-status: PRIOR YES / YES superseded by founder UFC-first amendment; fresh review pending; Builder operationally paused
 
 Golden and the Post-Golden Foundation remain accepted and closed. The rejected FM-0 candidate remains
-unmerged. Only WO-W1-01 is open: ship the real Bovada market desk and Technique-free investigation entry.
+unmerged. Only WO-W1-01 is open: ship the real UFC-first Bovada market desk and Technique-free investigation entry.
 No historical calculation, recommendation, second runtime, betting action, or other Wave-1 work is
 authorized by this pointer.
 

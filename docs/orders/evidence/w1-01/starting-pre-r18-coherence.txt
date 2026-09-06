@@ -1,0 +1,16 @@
+80 | type Falsifier = Exclude<CaseId, "C14"> | C14Falsifier;
+81 | const captureReceipts: CaptureReceipt[] = [];
+82 | 
+83 | const JSON_FIELDS = new Set(["sources", "coverage", "params", "metrics", "rubric", "run_metrics", "source_work", "block_reason"]);
+84 | 
+85 | function assert(condition: unknown, message: string): asserts condition { if (!condition) throw new Error(message); }
+                                                                                                         ^
+error: candidate build exited 1
+      at assert (C:\Users\rybow\QuantFlow-Ontology\qa\gates\pre-r18-coherence.ts:85:101)
+      at buildOnce (C:\Users\rybow\QuantFlow-Ontology\qa\gates\pre-r18-coherence.ts:492:233)
+      at async runLiveR17C14Proof (C:\Users\rybow\QuantFlow-Ontology\qa\gates\pre-r18-coherence.ts:792:38)
+      at async runPreR18CoherenceGate (C:\Users\rybow\QuantFlow-Ontology\qa\gates\pre-r18-coherence.ts:936:157)
+      at async <anonymous> (C:\Users\rybow\QuantFlow-Ontology\qa\run.ts:320:28)
+      at async main (C:\Users\rybow\QuantFlow-Ontology\qa\run.ts:1177:24)
+
+Bun v1.3.12 (Windows x64)

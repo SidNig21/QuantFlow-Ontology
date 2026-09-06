@@ -1,0 +1,79 @@
+bun install v1.3.12 (700fc117)
+
+Done! Checked 7 packages (no changes) [22.00ms]
+market-ingest: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\node_modules\qf-kernel-schema
+bun install v1.3.12 (700fc117)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [148.00ms]
+market-ingest: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\tools\qf-read-tools\node_modules\qf-kernel
+market-ingest: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\tools\qf-read-tools\node_modules\qf-kernel-schema
+bun install v1.3.12 (700fc117)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+4 packages installed [197.00ms]
+market-ingest: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\qa\gates\market-ingest\node_modules\qf-kernel
+bun install v1.3.12 (700fc117)
+
++ qf-kernel@../../../packages/qf-kernel
+
+4 packages installed [169.00ms]
+
+=== D0/D1 public write and dispatch inventory ===
+public_exports_root=["AgentDefinitionExistsError","AgentSessionIdentityLinkRejectedError","ArtifactMetadataConflictError","AssignedToLinkRejectedError","ContentHashMismatchError","DETERMINISTIC_EXECUTION_UPGRADE","DelegatedByLinkRejectedError","DelegatesToLinkRejectedError","FabricatedStateError","GOVERNED_CRITIC_TOOLS","INDEPENDENT_CRITIC_UPGRADE","INTERNAL_APP_ACTIONS","INTERNAL_TASK_ACTIONS","INVALID_SOURCE_WORK_MESSAGE","IllegalLinkError","IllegalTransitionError","KernelError","KernelIncompleteInitializationError","KernelMissingFileError","KernelRegistryDriftError","KernelUpgradeShapeError","MARKET_CONTEXT_UPGRADE","MARKET_INGEST_UPGRADE","MarketContextConflictError","MarketIngestConflictError","MarketIngestValidationError","MissingTraceError","OpenKernelOptionsError","PROFILE_IDENTITY_UPGRADE","PackageRefUnresolvedError","REVISION_EXECUTOR_NOT_RUNNING_MESSAGE","SpawnedFromLinkRejectedError","TASK_COMPOSITION_UPGRADE","TASK_DELEGATION_UPGRADE","TaskCreationEnvelopeRejectedError","UnknownAgentDefinitionError","UnknownAssigneeSessionError","UnknownSpeciesError","assertCreationHandlersComplete","assertDurableOntologyReadReceipt","assertPipelineHandlersComplete","attachKernel","bindSourceWork","classifyKernelShape","closeKernel","contentHash","detectObjectTypeRegistryDrift","enforceObjectTypeRegistryDrift","ensureGovernedReviewSchema","eventCount","execute","executeInternalTaskAction","freezeSourceWork","getKernelDrift","getLinks","getObject","governedReviewProjection","internalAppActionHandlers","internalCommandHandlers","internalTaskActionHandlers","logKernelBoot","markGovernedCompletionFailed","markGovernedDelivery","migrationSqlPath","openKernel","queryObjects","readGovernedPublicationForEvaluation","recordGovernedEvaluation","recordGovernedToolReceipt","replayArtifactAndAssert","replayRunAndAssert","requestGovernedReview","requestRevision","requestSecondCritic","resolveArtifactRoot","resolveGovernedWorkerEvidence","resolveKernelPath","resolvePackageRef","resolveSpeciesPackage","seedExperimentalFixtureTable","upgradeSqlPath"]
+public_exports_portable=["AgentDefinitionExistsError","AgentSessionIdentityLinkRejectedError","ArtifactMetadataConflictError","ContentHashMismatchError","DETERMINISTIC_EXECUTION_UPGRADE","DelegatedByLinkRejectedError","DelegatesToLinkRejectedError","GOVERNED_CRITIC_TOOLS","INDEPENDENT_CRITIC_UPGRADE","INTERNAL_APP_ACTIONS","INTERNAL_TASK_ACTIONS","INVALID_SOURCE_WORK_MESSAGE","IllegalTransitionError","KernelError","KernelIncompleteInitializationError","KernelRegistryDriftError","KernelUpgradeShapeError","MARKET_CONTEXT_UPGRADE","MARKET_INGEST_UPGRADE","MarketContextConflictError","MarketIngestConflictError","MarketIngestValidationError","MissingTraceError","MissionContextConflictError","MissionContextRequiredError","PROFILE_IDENTITY_UPGRADE","PackageRefUnresolvedError","REVISION_EXECUTOR_NOT_RUNNING_MESSAGE","SpawnedFromLinkRejectedError","TASK_DELEGATION_UPGRADE","TASK_REFUSAL_MESSAGES","TaskCreationEnvelopeRejectedError","TaskRefusalError","UnknownAgentDefinitionError","UnknownSpeciesError","assertCreationHandlersComplete","assertDurableOntologyReadReceipt","assertPipelineHandlersComplete","attachKernel","bindSourceWork","classifyKernelShape","contentHash","detectObjectTypeRegistryDrift","enforceObjectTypeRegistryDrift","ensureGovernedReviewSchema","eventCount","execute","executeInternalTaskAction","freezeSourceWork","getKernelDrift","getLinks","getObject","governedReviewProjection","internalAppActionHandlers","internalCommandHandlers","internalTaskActionHandlers","logKernelBoot","markGovernedCompletionFailed","markGovernedDelivery","migrationSqlPath","queryObjects","readGovernedPublicationForEvaluation","recordGovernedEvaluation","recordGovernedToolReceipt","replayArtifactAndAssert","replayRunAndAssert","requestGovernedReview","requestRevision","requestSecondCritic","requireTrace","resolveArtifactRoot","resolveGovernedWorkerEvidence","resolveKernelPath","resolvePackageRef","resolveSpeciesPackage","upgradeSqlPath"]
+dispatch_actions=35 pipeline_rows=2
+
+=== D0/D1 generated authority, served hash, and hidden context actions ===
+objects=23 actions=43 theoretical_tools=112 internal_only_actions=8 generated_tools=104 served_tools=99 hidden_actions=["ingest_market_batch","observe_ticket","register_agent_definition","register_venue","schedule_market_event"]
+
+=== D1 trusted context creation, replay, conflict, envelopes, and status ===
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+context_created_at_replay_controls=true
+context_counts={"instruments":0,"quotes":0,"quoteLinks":0,"hasLegLinks":0,"offeredOnLinks":0,"listsLinks":0,"ingestEvents":0}
+
+=== D3 fresh / pre-D1 / D1 / WO-107b upgrade matrix ===
+pre_d1_upgrade_open=begin
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-upgrades-AxTprS\pre_d1.db provenance=explicit journal=wal sync=2 schema_meta=89
+pre_d1_upgrade_open=end
+pre_d1_upgrade_preserved=true
+d1_upgrade_open=begin
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-upgrades-AxTprS\d1.db provenance=explicit journal=wal sync=2 schema_meta=89
+d1_upgrade_open=end
+d1_upgrade_preserved=true
+wo_107b_upgrade_open=begin
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-upgrades-AxTprS\wo_107b.db provenance=explicit journal=wal sync=2 schema_meta=89
+wo_107b_upgrade_open=end
+wo_107b_upgrade_preserved=true
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-upgrades-AxTprS\fresh.db provenance=explicit journal=wal sync=2 schema_meta=89
+fresh_current=true
+damaged_predecessor_fail_closed=true
+
+=== D2 null market-event receipt ordering ===
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+null_event_receipt_lists_then_quotes=true
+
+=== D3/D4 atomic ingest, replay, conflict, poison, reads, links ===
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+market_counts={"instruments":2,"quotes":2,"quoteLinks":2,"hasLegLinks":1,"offeredOnLinks":2,"listsLinks":2,"ingestEvents":4}
+
+=== D3 packaged 0002 + 0003 authority hooks ===
+packaged_0002_hook=node_modules/qf-kernel-schema/golden/upgrades/0002-market-ingest.sql packaged_0003_hook=node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql real_package=deferred_to_release_verifier
+
+=== D4 MCP hidden context action boundary ===
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-discovery-qzR7KV\kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+mcp_connect=begin
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-discovery-qzR7KV\kernel.db provenance=env journal=wal sync=2 schema_meta=89
+mcp_connect=end
+mcp_tools_list=begin
+mcp_tools_list=end
+context_tools_list_absent=true
+qf_register_venue_direct_tool_not_found=true
+qf_schedule_market_event_direct_tool_not_found=true
+mcp_context_actions_unlisted_and_not_found=true
+
+PASS market-context
+PASS  market-context

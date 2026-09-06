@@ -1,0 +1,8 @@
+typecheck: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\collab-electron\node_modules\qf-bovada-football
+typecheck: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\collab-electron\node_modules\qf-kernel
+typecheck: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\collab-electron\node_modules\qf-kernel-schema
+bun install v1.3.12 (700fc117)
+
+error: bun is unable to write files to tempdir: AccessDenied
+typecheck: bun install --frozen-lockfile --backend hardlink --linker isolated exited 1; the original Bun install error above is authoritative (no retry was attempted)
+FAIL  typecheck
