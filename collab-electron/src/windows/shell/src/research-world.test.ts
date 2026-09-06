@@ -4,6 +4,7 @@ import {
   deriveResearchWorkflow,
   latestSavedWorldRoot,
 	mergeResearchWorlds,
+	researchFullLineageLayout,
 	savedWorldRoots,
 	researchCableProjectionOpacity,
 	researchCurrentMissionLinkKeys,
@@ -286,6 +287,25 @@ describe("research world renderer seam", () => {
 		expect(merged.links).toHaveLength(2);
 	});
 
+	test("gives colliding Mission worlds distinct non-overlapping Full Lineage lanes", () => {
+		const workflowFor = (suffix: string) => deriveResearchWorkflow({
+			root: { type: "mission", id: `mission-${suffix}` },
+			objects: [
+				{ type: "mission", id: `mission-${suffix}`, fields: {} },
+				{ type: "quote", id: `quote-${suffix}`, fields: {} },
+			],
+			links: [{ kind: "investigates", from_id: `mission-${suffix}`, to_id: `quote-${suffix}` }],
+			report_ids: [],
+		});
+		const layout = researchFullLineageLayout([workflowFor("2"), workflowFor("1")]);
+		const first = layout.get("mission:mission-2");
+		const second = layout.get("mission:mission-1");
+		expect(first).toBeDefined();
+		expect(second).toBeDefined();
+		expect(first.x + first.width).toBeLessThan(second.x);
+		expect(layout.get("quote:quote-2")?.x).not.toBe(layout.get("quote:quote-1")?.x);
+	});
+
 	test("uses durable market fields for ordinary-language status instead of saying recorded objects are missing", () => {
 		const marketObjects = [
 			{ type: "mission", id: "mission-1", fields: { objective: "Research the captured line", quote_id: "quote-1", state: "ready to staff", observed_at: "2026-09-06T12:00:00Z" } },
@@ -358,6 +378,9 @@ describe("research world renderer seam", () => {
 					tileManager: {
 						createResearchTile: () => { creates += 1; },
 						repositionAllTiles: () => {},
+						applyTileLayout: (layout: Array<Record<string, unknown>>) => {
+							for (const projected of layout) Object.assign(restoredTiles.find((tile) => tile.id === projected.id)!, projected);
+						},
 					},
 					getTileDOMs: () => doms,
 					onCables: () => {},
@@ -394,6 +417,10 @@ describe("research world renderer seam", () => {
 				expect(doms.get("ontology:mission:mission-1")?.container.hidden).toBe(false);
 				expect(doms.get("ontology:quote:quote-1")?.container.hidden).toBe(false);
 				expect(doms.get("ontology:mission:mission-2")?.container.hidden).toBe(false);
+				const firstMission = restoredTiles.find((tile) => tile.id === "ontology:mission:mission-1")!;
+				const secondMission = restoredTiles.find((tile) => tile.id === "ontology:mission:mission-2")!;
+				expect(firstMission.x).not.toBe(secondMission.x);
+				expect(firstMission.x + firstMission.width <= secondMission.x || secondMission.x + secondMission.width <= firstMission.x).toBe(true);
 			} finally {
 				canvasTiles.splice(0, canvasTiles.length);
 				if (previousWindow === undefined) delete (globalThis as Record<string, unknown>).window;

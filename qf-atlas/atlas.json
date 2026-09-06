@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-wave1-foundation",
-    "commit": "2e8d8872",
+    "commit": "b6a3974c",
     "generatedAt": "2026-09-06",
     "filesScanned": 418,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "299172f3919fcca1"
+    "fingerprint": "f585ba418d16ebb0"
   },
   "stats": {
     "live": 113,
@@ -2735,7 +2735,7 @@
       "id": "4:collab-electron/src/windows/shell/src::research",
       "layer": 4,
       "name": "research-world.js",
-      "kb": 77.4,
+      "kb": 79.3,
       "x": 1.01,
       "z": 0.85,
       "status": "ok",
@@ -2746,7 +2746,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/research-world.js",
-          "kb": 77.4,
+          "kb": 79.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -18181,7 +18181,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 952 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 974 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -54956,12 +54956,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-wave1-foundation",
-      "commit": "8eb763b9",
+      "commit": "2e8d8872",
       "generatedAt": "2026-09-06"
     },
     "to": {
       "branch": "codex/wo-wave1-foundation",
-      "commit": "2e8d8872",
+      "commit": "b6a3974c",
       "generatedAt": "2026-09-06"
     },
     "verdict": "better",

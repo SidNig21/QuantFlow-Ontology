@@ -459,6 +459,28 @@ export function researchWorldLayout(workflow) {
 	return byId;
 }
 
+export function researchFullLineageLayout(workflows) {
+	const layout = new Map();
+	let nextX = 0;
+	for (const workflow of Array.isArray(workflows) ? workflows.filter(Boolean) : []) {
+		const canonical = researchWorldLayout(workflow);
+		const entries = workflow.objects.map((object) => ({
+			object,
+			rect: canonical.get(tileId(object.type, object.id)),
+		})).filter((entry) => entry.rect);
+		if (entries.length === 0) continue;
+		const minX = Math.min(...entries.map((entry) => entry.rect.x));
+		const maxX = Math.max(...entries.map((entry) => entry.rect.x + entry.rect.width));
+		const offsetX = nextX - minX;
+		for (const { object, rect } of entries) {
+			const key = objectKey(object);
+			if (!layout.has(key)) layout.set(key, { ...rect, x: rect.x + offsetX });
+		}
+		nextX += maxX - minX + WORLD_LANE_GAP * 2;
+	}
+	return layout;
+}
+
 export function savedWorldRoots(canvasTiles) {
 	const roots = [];
 	const seen = new Set();
@@ -978,6 +1000,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 	let projectionControls = null;
 	let cableObserver = null;
 	let savedWorldContexts = [];
+	let savedProjectionLayout = null;
 
 	function rememberWorldContext(context) {
 		const key = `${context.root.type}\u0000${context.root.id}`;
@@ -987,6 +1010,22 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 	function projectionWorkflow() {
 		if (projectionState !== PROJECTION_FULL || savedWorldContexts.length < 2) return lastWorkflow;
 		return deriveResearchWorkflow(mergeResearchWorlds(savedWorldContexts.map((context) => context.world), lastRoot));
+	}
+
+	function applyFullLineageLayout() {
+		if (savedWorldContexts.length < 2) return;
+		const layout = researchFullLineageLayout(savedWorldContexts.map((context) => context.workflow));
+		const projected = [];
+		for (const context of savedWorldContexts) {
+			for (const object of context.workflow.objects) {
+				const position = layout.get(objectKey(object));
+				const tile = object.type === "agent_session"
+					? tiles.find((entry) => entry.sessionId === object.id)
+					: tiles.find((entry) => entry.type === "research" && entry.ontologyType === object.type && entry.ontologyId === object.id);
+				if (tile && position && !projected.some((entry) => entry.id === tile.id)) projected.push({ ...tile, ...position });
+			}
+		}
+		tileManager.applyTileLayout?.(projected);
 	}
 
 	function currentDockMode() {
@@ -1007,11 +1046,13 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		projectionControls.querySelector("[data-qf-world-full]")?.addEventListener("click", () => {
 			if (projectionState !== PROJECTION_FULL) {
 				savedOverview = saveLineageOverview(projectionState, currentDockMode(), selectedSubject);
+				savedProjectionLayout = tiles.map(({ id, x, y, width, height }) => ({ id, x, y, width, height }));
 			}
 			selectedSubject = null;
 			onClearCableSelection?.();
 			clearInspectSurface();
 			projectionState = PROJECTION_FULL;
+			applyFullLineageLayout();
 			applyProjection({ fit: true });
 		});
 		return projectionControls;
@@ -1275,6 +1316,8 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		projectionState = restored.state;
 		selectedSubject = restored.selectedSubject;
 		savedOverview = null;
+		if (savedProjectionLayout) tileManager.applyTileLayout?.(savedProjectionLayout);
+		savedProjectionLayout = null;
 		onClearCableSelection?.();
 		if (!selectedSubject) clearInspectSurface();
 		applyProjection();
@@ -1422,6 +1465,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		projectionState = PROJECTION_MISSION;
 		selectedSubject = null;
 		savedOverview = null;
+		savedProjectionLayout = null;
 		onClearCableSelection?.();
 		clearInspectSurface();
 		ensureProjectionControls();
@@ -1542,6 +1586,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		projectionState = PROJECTION_ORDINARY;
 		selectedSubject = null;
 		savedOverview = null;
+		savedProjectionLayout = null;
 		clearInspectSurface();
 		const controls = ensureProjectionControls();
 		if (controls) {
