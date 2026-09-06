@@ -24,7 +24,9 @@ obvious `Research this market` action—rather than another feasibility document
   hashing, cancellation, replay/idempotency, Kernel market lineage, CLI/RPC integration, and package
   closure. It currently selects one earliest NFL event and is not a consumer product surface.
 - Existing `market_event`, `instrument`, `quote`, `venue`, `mission`, `task`, `tool`, and `artifact`
-  semantics are sufficient for this slice. No schema change is authorized.
+  object semantics are sufficient, but the accepted schema has no market-investigation link and no action
+  that registers a Dock capability. This order authorizes the smallest exact schema extension in
+  Deliverables 2–3. It authorizes no new object type.
 - Existing `create_mission` does not require a Technique. The current app form does. Remove that UI/app
   prerequisite only for the new investigation path; do not weaken deterministic Run or Report authority.
 - The current research-world `reveal()` can remove unrelated research tiles and impose a replacement
@@ -35,8 +37,10 @@ obvious `Research this market` action—rather than another feasibility document
 Do this before product mutation and preserve a credential-safe receipt. It is part of this order, not a
 separate project.
 
-1. Use the existing bounded transport on native Windows to inspect one real current Bovada UFC event and
-   one pre-event moneyline market. Prove event/competition identity, start time, both selections and
+1. Use one disposable, uncommitted native-Windows probe outside the product tree to call the candidate UFC
+   endpoint under the existing transport's exact 20-second and 5-MB bounds. The production transport is
+   currently fixed to the NFL URL and is not mutated until this door chooses a path. Inspect one real
+   current Bovada UFC event and one pre-event moneyline market. Prove event/competition identity, start time, both selections and
    prices, provider identifiers, local observation time, source timestamp when available, source hash,
    and whether the same identities can resolve into trustworthy historical records available before the
    event cutoff.
@@ -49,7 +53,8 @@ separate project.
 5. If neither path passes, stop with the exact missing external dependency. Do not use a fixture, synthetic
    market, guessed identity, or agent-written probability as the live positive path.
 
-The receipt is required release evidence for this feature and stays concise. It records no credential.
+The probe is deleted after the decision. The receipt is required release evidence for this feature and
+stays concise. It records no credential and no raw response containing private data.
 
 ## Deliverable 1 — one real governed Bovada capability
 
@@ -72,9 +77,13 @@ name dishonest. Preserve one implementation, not old-plus-new duplication.
 
 ## Deliverable 2 — Dock and Canvas consumer path
 
-- CATALOG gains one real DATA row: `Bovada Live Markets`, with readiness and plain-language failure state.
-  It is Kernel-backed or bootstrapped into Kernel through the existing sole-writer path; it is not a
-  renderer-only row.
+- Add the smallest capability-registration seam over the existing `tool` object: `register_tool` creates or
+  idempotently confirms an explicit tool id, human name, summary, capability class (`data` or `tool` in
+  this slice), and implementation version through `execute()`. Extend the existing `tool` shape only with
+  those fields; regenerate every schema golden. No general plugin system or sixth Dock class.
+- CATALOG gains one real DATA row backed by that registered object: `Bovada Live Markets`, with readiness
+  derived from its bounded probe and a plain-language failure state. It is not a renderer-only row and the
+  Bovada `venue` is not misrepresented as the capture capability.
 - `Open markets` uses the normal rendered Dock action and the governed app boundary. It places a compact
   current-market surface on the existing Canvas. The surface shows event, start time, market, both
   selections/prices, observation age, and source. Exact ids/hash live in Inspect.
@@ -89,10 +98,17 @@ name dishonest. Preserve one implementation, not old-plus-new duplication.
 
 ## Deliverable 3 — Technique-free investigation entry
 
-- Clicking `Research this market` creates one durable bounded `mission`/investigation plus its first exact
-  Task and links it to the selected market evidence through existing Kernel actions.
-- The same operation is available to the Director through its governed capability; the Director remains
-  Ryan's primary AI colleague but is not the only front door.
+- Add one experimental `investigates` link from `mission` to the exact starting `quote`, and one atomic
+  `create_market_investigation` action that creates the Mission plus that link through `execute()`. The
+  quote already reaches its instrument, event, competitors, and venue through accepted market links. Do
+  not encode the quote id in prose or renderer state.
+- Clicking `Research this market` invokes that action and creates one durable bounded investigation in
+  `ready to staff` state. It does **not** create a Task without a governed participant principal.
+- The same action is available to the Director through its governed capability. When Ryan asks the
+  Director to proceed, or recruits it from the Dock, the existing running Director session remains the
+  trusted delegator and assigns the first exact Task through the unchanged Task authority. Ryan can still
+  inspect markets and open an investigation without the Director; this slice does not invent an operator
+  session or weaken `create_task`.
 - No named Technique is required. Do not fabricate a placeholder Strategy. This slice does not execute or
   publish a decision-bearing Run, Report, or CANDIDATE/WATCH/PASS conclusion.
 - The research focus bar shows market/question, observation age, state, and `Method: not selected` without
@@ -103,10 +119,12 @@ name dishonest. Preserve one implementation, not old-plus-new duplication.
 ## Deliverable 4 — truthful use, reopen, and cleanup
 
 - Inspect reaches venue, event, instrument, quote, observation/source times, source hash, and the exact
-  investigation/Task links from the rendered market surface.
+  investigation link plus any later participant-owned Task links from the rendered market surface.
 - Refresh preserves the prior immutable observation and visibly marks which observation is current.
-- Close/reopen restores the same desk, market evidence, investigation focus, and Task from Kernel truth;
-  nothing dead appears live and no DOM/chat state is needed to reconstruct it.
+- Close/reopen restores durable desk contents, market evidence, investigations, and Tasks from Kernel
+  truth. Focus/selection remains ephemeral under Law C: existing layout persistence may restore it as a
+  disposable convenience, otherwise the app deterministically frames the most recently current
+  investigation. Neither path creates institutional truth, and nothing dead appears live.
 - Cancel/quit terminates QuantFlow-owned requests/processes and isolated roots. Normal founder state and
   Hermes credentials remain untouched.
 - No bet/ticket placement, stake field, bankroll control, outcome claim, or profit claim appears.
@@ -119,7 +137,9 @@ The Builder must make these claims fail before trusting the new guard, then rest
 |---|---|---|
 | Live identity | rendered source and captured bytes agree on event, both selections, market and prices | swap one selection/provider id |
 | Freshness | UI distinguishes provider time, local observation time, current/superseded evidence | reuse old bytes as if newly updated |
-| Technique-free start | normal UI creates linked investigation + exact Task with no Strategy | inject renderer-only Task or require fake Strategy |
+| Technique-free start | normal UI creates an exact quote-linked investigation with no Strategy; a Task appears only after a running Director assigns it | inject renderer-only link/Task, fake Strategy, or untrusted principal |
+| Governed Dock identity | registered `tool` object and DATA row agree on id/class/version | render an unregistered constant or substitute `venue` identity |
+| Historical viability door | selected sport identities resolve to a pre-event historical sample and one statistic recomputes from source rows | post-event field leakage or unresolved competitor identity |
 | Continuous desk | open two investigations while a bench tile remains; focus/lineage/return preserves all identities | old replacement `reveal()` removes one |
 | Sole truth | rendered rows/links equal Kernel readback after reopen | forge a renderer-only market row |
 | Failure honesty | timeout, empty, malformed and ambiguous results stay distinct and actionable | stale success returned on failure |
@@ -145,6 +165,10 @@ bun qa/run.ts bovada-football
 bun qa/run.ts market-ingest
 bun qa/run.ts market-context
 bun qa/run.ts research-director-front-door
+bun qa/run.ts schema
+bun qa/run.ts doc-action-surface
+bun qa/run.ts tool-discovery
+bun qa/run.ts kernel
 bun qa/run.ts golden-g10-canvas-runtime
 bun qa/run.ts pre-r18-coherence
 bun qa/run.ts wave1-market-desk
