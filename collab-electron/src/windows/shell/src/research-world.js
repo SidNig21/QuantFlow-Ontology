@@ -428,10 +428,21 @@ export function researchWorldLayout(workflow) {
 	return byId;
 }
 
+export function savedWorldRoots(canvasTiles) {
+	const roots = [];
+	const seen = new Set();
+	for (const tile of [...(Array.isArray(canvasTiles) ? canvasTiles : [])].reverse()) {
+		if (tile?.type !== "research" || (tile.ontologyType !== "mission" && tile.ontologyType !== "task")) continue;
+		const key = `${tile.ontologyType}\u0000${tile.ontologyId}`;
+		if (seen.has(key)) continue;
+		seen.add(key);
+		roots.push(tile);
+	}
+	return roots;
+}
+
 export function latestSavedWorldRoot(canvasTiles) {
-	return [...(Array.isArray(canvasTiles) ? canvasTiles : [])].reverse().find((tile) =>
-		tile?.type === "research" && (tile.ontologyType === "mission" || tile.ontologyType === "task")
-	) || null;
+	return savedWorldRoots(canvasTiles)[0] || null;
 }
 
 export function researchWorldLayoutIsMalformed(worldTiles) {
@@ -1484,34 +1495,63 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			controls.hidden = true;
 			controls.dataset.qfProjectionState = PROJECTION_ORDINARY;
 		}
-		const rootTile = latestSavedWorldRoot(tiles);
-		if (!rootTile) {
+		const rootTiles = savedWorldRoots(tiles);
+		if (rootTiles.length === 0) {
 			if (lastWorkflow) applyProjection();
 			return null;
 		}
-		const result = await window.shellApi.qf.getResearchWorldProjection({
-			root_type: rootTile.ontologyType,
-			root_id: rootTile.ontologyId,
-		});
-		if (!result?.ok) {
-			showStatus?.(result?.message || "Saved research world unavailable");
-			return result;
-		}
-		lastRoot = { type: rootTile.ontologyType, id: rootTile.ontologyId };
-		lastWorld = result.world;
-		lastWorkflow = deriveResearchWorkflow(result.world);
-		for (const object of lastWorkflow.objects) {
-			if (object.type === "agent_session") decorateSession(object);
-			else {
-				const tile = existing(object.type, object.id);
-				if (tile) renderTile(getTileDOMs().get(tile.id), tile, object);
+		const coveredRoots = new Set();
+		const contexts = [];
+		let lastFailure = null;
+		for (const rootTile of rootTiles) {
+			const rootKey = `${rootTile.ontologyType}\u0000${rootTile.ontologyId}`;
+			if (coveredRoots.has(rootKey)) continue;
+			const result = await window.shellApi.qf.getResearchWorldProjection({
+				root_type: rootTile.ontologyType,
+				root_id: rootTile.ontologyId,
+			});
+			if (!result?.ok) {
+				lastFailure = result;
+				showStatus?.(result?.message || "Saved research world unavailable");
+				continue;
+			}
+			const workflow = deriveResearchWorkflow(result.world);
+			const context = {
+				root: { type: rootTile.ontologyType, id: rootTile.ontologyId },
+				world: result.world,
+				workflow,
+				result,
+			};
+			contexts.push(context);
+			for (const object of workflow.objects) {
+				if (object.type === "mission" || object.type === "task") coveredRoots.add(`${object.type}\u0000${object.id}`);
 			}
 		}
+		if (contexts.length === 0) return lastFailure;
+		const activateContext = (context, subject) => {
+			lastRoot = context.root;
+			lastWorld = context.world;
+			lastWorkflow = context.workflow;
+			selectSubject(subject);
+		};
+		for (const context of [...contexts].reverse()) {
+			for (const object of context.workflow.objects) {
+				if (object.type === "agent_session") continue;
+				const tile = existing(object.type, object.id);
+				const dom = tile && getTileDOMs().get(tile.id);
+				if (dom) renderObject(dom, tile, object, reveal, context.workflow, () => reveal(context.root.type, context.root.id), (subject) => activateContext(context, subject), getParticipantView);
+			}
+		}
+		const current = contexts[0];
+		lastRoot = current.root;
+		lastWorld = current.world;
+		lastWorkflow = current.workflow;
+		for (const object of lastWorkflow.objects) if (object.type === "agent_session") decorateSession(object);
 		document.dispatchEvent?.(new CustomEvent("qf:research-world-active", {
-			detail: { missionId: lastWorkflow.mission?.id || rootTile.ontologyId, world: result.world },
+			detail: { missionId: lastWorkflow.mission?.id || current.root.id, world: current.world },
 		}));
 		applyProjection();
-		return result;
+		return current.result;
 	}
 
 	installCableSelectionBridge();

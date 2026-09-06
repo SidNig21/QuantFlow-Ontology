@@ -3,6 +3,7 @@ import {
   createResearchWorldController,
   deriveResearchWorkflow,
   latestSavedWorldRoot,
+	savedWorldRoots,
 	researchCableProjectionOpacity,
 	researchCurrentMissionLinkKeys,
 	researchCablePorts,
@@ -121,7 +122,7 @@ async function withDocument<T>(run: () => Promise<T>): Promise<T> {
   const previous = (globalThis as Record<string, unknown>).document;
   Object.defineProperty(globalThis, "document", {
     configurable: true,
-    value: { createElement: () => new FakeElement() },
+    value: { createElement: () => new FakeElement(), getElementById: () => null },
   });
   try {
     return await run();
@@ -265,11 +266,13 @@ describe("research world renderer seam", () => {
 	});
 
 	test("rehydrates the newest persisted world root instead of the oldest", () => {
-		expect(latestSavedWorldRoot([
+		const roots = [
 			{ id: "old", type: "research", ontologyType: "mission", ontologyId: "mission-old" },
 			{ id: "middle", type: "research", ontologyType: "task", ontologyId: "task-middle" },
 			{ id: "new", type: "research", ontologyType: "mission", ontologyId: "mission-new" },
-		])?.id).toBe("new");
+		];
+		expect(latestSavedWorldRoot(roots)?.id).toBe("new");
+		expect(savedWorldRoots(roots).map((tile) => tile.id)).toEqual(["new", "middle", "old"]);
 	});
 
 	test("uses durable market fields for ordinary-language status instead of saying recorded objects are missing", () => {
@@ -290,23 +293,47 @@ describe("research world renderer seam", () => {
 		]);
 	});
 
-	test("rebuilds persisted research tile bodies from one Kernel world read without creating replacement tiles", async () => {
+	test("rebuilds and binds two disconnected persisted investigations without creating replacement tiles", async () => {
 		await withDocument(async () => {
 			const previousWindow = (globalThis as Record<string, unknown>).window;
-			const mission = { type: "mission", id: "mission-1", fields: { objective: "Research the captured line", state: "ready to staff" } };
-			const quote = { type: "quote", id: "quote-1", fields: { book: "bovada", current: true, coverage: { observed_at: "2026-09-06T12:00:00Z" } } };
-			const world = { root: { type: "mission", id: "mission-1" }, objects: [mission, quote], links: [{ kind: "investigates", from_id: "mission-1", to_id: "quote-1" }], missing_lineage: [], current_report_id: null, report_ids: [] };
-			const restoredTiles = [
-				{ id: "ontology:mission:mission-1", type: "research", ontologyType: "mission", ontologyId: "mission-1", x: 0, y: 0, width: 300, height: 190 },
-				{ id: "ontology:quote:quote-1", type: "research", ontologyType: "quote", ontologyId: "quote-1", x: 460, y: 0, width: 300, height: 190 },
-			];
+			const worldFor = (suffix: string) => {
+				const mission = { type: "mission", id: `mission-${suffix}`, fields: { objective: `Research line ${suffix}`, quote_id: `quote-${suffix}`, state: "ready to staff" } };
+				const venue = { type: "venue", id: `venue-${suffix}`, fields: { name: `Bovada ${suffix}`, kind: "sportsbook" } };
+				const event = { type: "market_event", id: `market_event-${suffix}`, fields: { competition: "UFC", starts_at: "2026-09-12T20:00:00Z" } };
+				const instrument = { type: "instrument", id: `instrument-${suffix}`, fields: { kind: "moneyline", params: { market_label: `Fight Winner ${suffix}` } } };
+				const quote = { type: "quote", id: `quote-${suffix}`, fields: { book: "bovada", current: true, coverage: { observed_at: "2026-09-06T12:00:00Z" } } };
+				const artifact = { type: "artifact", id: `artifact-${suffix}`, fields: { name: `Source receipt ${suffix}`, kind: "source_data" } };
+				return {
+					root: { type: "mission", id: mission.id },
+					objects: [mission, venue, event, instrument, quote, artifact],
+					links: [
+						{ kind: "investigates", from_id: mission.id, to_id: quote.id },
+						{ kind: "quotes", from_id: quote.id, to_id: instrument.id },
+						{ kind: "offered_on", from_id: instrument.id, to_id: event.id },
+						{ kind: "lists", from_id: venue.id, to_id: instrument.id },
+					],
+					missing_lineage: [], current_report_id: null, report_ids: [],
+				};
+			};
+			const worlds = new Map([["mission-1", worldFor("1")], ["mission-2", worldFor("2")]]);
+			const restoredTypes = ["mission", "venue", "market_event", "instrument", "quote", "artifact"];
+			const restoredTiles = ["1", "2"].flatMap((suffix, worldIndex) => restoredTypes.map((type, typeIndex) => ({
+				id: `ontology:${type}:${type}-${suffix}`,
+				type: "research",
+				ontologyType: type,
+				ontologyId: `${type}-${suffix}`,
+				x: typeIndex * 460,
+				y: worldIndex * 230,
+				width: 300,
+				height: 190,
+			})));
 			const doms = new Map(restoredTiles.map((tile) => [tile.id, { container: new FakeElement(), contentArea: new FakeElement() }]));
 			let reads = 0;
 			let creates = 0;
 			canvasTiles.splice(0, canvasTiles.length, ...restoredTiles);
 			Object.defineProperty(globalThis, "window", {
 				configurable: true,
-				value: { shellApi: { qf: { getResearchWorldProjection: async () => { reads += 1; return { ok: true, world }; } } } },
+				value: { shellApi: { qf: { getResearchWorldProjection: async ({ root_id }: { root_id: string }) => { reads += 1; return { ok: true, world: worlds.get(root_id) }; } } } },
 			});
 			try {
 				const controller = createResearchWorldController({
@@ -318,13 +345,26 @@ describe("research world renderer seam", () => {
 					onCables: () => {},
 				});
 				await controller.hydrateSaved();
-				expect(reads).toBe(1);
+				expect(reads).toBe(2);
 				expect(creates).toBe(0);
-				expect(doms.get(restoredTiles[0].id)?.contentArea.children.length).toBeGreaterThan(0);
-				expect(treeText(doms.get(restoredTiles[0].id)?.contentArea)).toContain("ready to staff");
-				expect(doms.get(restoredTiles[1].id)?.contentArea.children.length).toBeGreaterThan(0);
-				expect(treeText(doms.get(restoredTiles[1].id)?.contentArea)).toContain("CURRENT OBSERVATION");
+				for (const tile of restoredTiles) {
+					expect(doms.get(tile.id)?.contentArea.children.length).toBeGreaterThan(0);
+					expect(treeText(doms.get(tile.id)?.contentArea).trim().length).toBeGreaterThan(0);
+				}
+				expect(treeText(doms.get("ontology:mission:mission-1")?.contentArea)).toContain("ready to staff");
+				expect(treeText(doms.get("ontology:artifact:artifact-1")?.contentArea)).toContain("Source receipt 1");
+				expect(treeText(doms.get("ontology:mission:mission-2")?.contentArea)).toContain("Research line 2");
+				expect(treeText(doms.get("ontology:venue:venue-2")?.contentArea)).toContain("Bovada 2");
+				expect(treeText(doms.get("ontology:market_event:market_event-2")?.contentArea)).toContain("RECORDED EVENT");
+				expect(treeText(doms.get("ontology:instrument:instrument-2")?.contentArea)).toContain("Fight Winner 2");
+				expect(treeText(doms.get("ontology:quote:quote-2")?.contentArea)).toContain("CURRENT OBSERVATION");
+				expect(treeText(doms.get("ontology:artifact:artifact-2")?.contentArea)).toContain("Source receipt 2");
 				expect(controller.getProjectionState()).toBe("ORDINARY_CANVAS");
+				const olderQuote = doms.get("ontology:quote:quote-1")?.container;
+				expect(olderQuote?.listeners.has("pointerdown")).toBe(true);
+				olderQuote?.listeners.get("pointerdown")?.({ button: 0, target: { closest: () => null } });
+				expect(controller.getProjectionModel()?.mission?.id).toBe("mission-1");
+				expect(olderQuote?.dataset.qfWorldId).toBe("quote-1");
 			} finally {
 				canvasTiles.splice(0, canvasTiles.length);
 				if (previousWindow === undefined) delete (globalThis as Record<string, unknown>).window;

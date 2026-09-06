@@ -78,6 +78,7 @@ export async function runWave1MarketDeskGate(): Promise<{ ok: boolean }> {
       "src/main/market-research-world.test.ts",
       "src/windows/shell/src/back-to-world.test.ts",
       "src/windows/shell/src/market-desk.test.ts",
+      "src/windows/shell/src/research-world.test.ts",
     ]);
     console.log("wave1-market-desk gate OK");
     return { ok: true };
