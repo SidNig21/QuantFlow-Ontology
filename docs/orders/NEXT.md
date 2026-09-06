@@ -1,15 +1,20 @@
-# NEXT — CLOSED
+# NEXT — W1-01 LIVE MARKET DESK
 
-status: CLOSED
-active-order: none
-builder-authority: CLOSED
-router-authority: CLOSED
+status: OPEN
+active-order: docs/orders/active/WO-W1-01-LIVE-MARKET-DESK.md
+builder-authority: OPEN
+router-authority: OPEN
 g11-status: CLOSED
 r18-status: FROZEN / SUPERSEDED
 foundation-status: ACCEPTED — candidate 58b444d858443debeac8b13e041b2bb65e4e370e; independent YES / YES
+reader-status: YES / YES — task 01a074fa-2603-7f21-b73d-be5c44fca106; candidate 177de00469716cff90998a7e3b5cabbb0dda6938
 
-Golden and the Post-Golden Foundation closure are accepted. FM-0 and Proof A remain CLOSED.
-No product implementation is authorized until a later order opens through this pointer.
+Golden and the Post-Golden Foundation remain accepted and closed. The rejected FM-0 candidate remains
+unmerged. Only WO-W1-01 is open: ship the real Bovada market desk and Technique-free investigation entry.
+No historical calculation, recommendation, second runtime, betting action, or other Wave-1 work is
+authorized by this pointer.
+
+- [Active order](active/WO-W1-01-LIVE-MARKET-DESK.md)
 
 - [Official Roadmap](../plans/OFFICIAL-ROADMAP.md)
 - [Institution Contracts](../plans/INSTITUTION-CONTRACTS.md)

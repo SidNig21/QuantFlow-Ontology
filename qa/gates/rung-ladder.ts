@@ -66,9 +66,34 @@ function rungOrder(id: string): number {
   return Number(m[1]) * 10 + (m[2] === "b" ? 1 : 0);
 }
 
+function fieldValues(markdown: string, name: string): string[] {
+  return [...markdown.matchAll(new RegExp("^" + name + ": *(.+)$", "gm"))].map((match) => match[1]!.trim());
+}
+
+/** A post-Golden pointer opens one non-rung order while the historical ladder stays frozen. */
+export function postGoldenPointerReasons(markdown: string, orderText: string | null): string[] | null {
+  if (!fieldValues(markdown, "status").includes("OPEN")) return null;
+  const reasons: string[] = [];
+  const expected = [["status", "OPEN"], ["builder-authority", "OPEN"], ["router-authority", "OPEN"]] as const;
+  for (const [name, value] of expected) {
+    const values = fieldValues(markdown, name);
+    if (values.length !== 1 || values[0] !== value) reasons.push(`open NEXT requires exactly one ${name}: ${value}`);
+  }
+  const orders = fieldValues(markdown, "active-order");
+  if (orders.length !== 1 || !/^docs\/orders\/active\/[A-Za-z0-9._-]+\.md$/.test(orders[0] ?? "")) {
+    reasons.push("open NEXT requires exactly one active-order under docs/orders/active/");
+  }
+  if (!/^# NEXT — (?!CLOSED\b|R\d+\b).+$/m.test(markdown)) {
+    reasons.push("post-Golden NEXT title must name the non-rung delivery");
+  }
+  if (orderText === null) reasons.push("active post-Golden order is missing");
+  else if (!/^status: OPEN\b/m.test(orderText)) reasons.push("active post-Golden order must declare status: OPEN");
+  return reasons;
+}
+
 /** A closed pointer authorizes no work, regardless of historical rung tables. */
 export function closedPointerReasons(markdown: string): string[] | null {
-  const fields = (name: string) => [...markdown.matchAll(new RegExp("^" + name + ": *(.+)$", "gm"))].map((match) => match[1]!.trim());
+  const fields = fieldValues.bind(null, markdown);
   const status = fields("status");
   const order = fields("active-order");
   if (!status.includes("CLOSED") && !order.includes("none")) return null;
@@ -96,6 +121,32 @@ export function checkRungLadder(): { ok: boolean; reasons: string[] } {
     return { ok: closed.length === 0, reasons: closed };
   }
   const route = readFileSync(join(REPO_ROOT, ROUTE), "utf8");
+  const activeOrder = fieldValues(next, "active-order")[0];
+  const activeOrderPath = activeOrder ? join(REPO_ROOT, activeOrder) : null;
+  const postGolden = postGoldenPointerReasons(
+    next,
+    activeOrderPath && existsSync(activeOrderPath) && statSync(activeOrderPath).isFile()
+      ? readFileSync(activeOrderPath, "utf8")
+      : null,
+  );
+  if (postGolden !== null) {
+    const rows = statusRows(route);
+    if (rows.some((row) => row.state === "active")) postGolden.push("post-Golden order cannot reactivate a historical rung");
+    if (rows.filter((row) => row.rung === "R18" && row.state === "frozen").length !== 1) {
+      postGolden.push("historical R18 must remain frozen exactly once");
+    }
+    if (!/^status: HISTORICAL /m.test(route)) postGolden.push("Golden route must remain historical");
+    for (const rel of secondLadderCandidates()) {
+      const text = readFileSync(join(REPO_ROOT, rel), "utf8");
+      if ([...text.matchAll(/^\|\s*\*?\*?(R\d+[ab]?)\*?\*?\s*\|.*\|.*\|/gm)].length >= 3) {
+        postGolden.push(`${rel} defines its own rung table — the ladder lives only in ${ROUTE}`);
+      }
+      if (/^\|\s*\*?\*?L\d/m.test(text)) postGolden.push(`${rel} still carries a retired L-numbered ladder`);
+    }
+    for (const reason of postGolden) console.error(`rung-ladder: ${reason}`);
+    if (postGolden.length === 0) console.log(`rung-ladder: PASS (post-Golden active order=${activeOrder}; historical ladder frozen)`);
+    return { ok: postGolden.length === 0, reasons: postGolden };
+  }
 
   const routeIds = routeRungIds(route);
   const rows = statusRows(route);

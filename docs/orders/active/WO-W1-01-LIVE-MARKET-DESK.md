@@ -1,10 +1,11 @@
 # WO-W1-01 — real Bovada market desk
 
-status: DRAFT — AWAITING INDEPENDENT READER; NO BUILD AUTHORITY
+status: OPEN — Reader YES/YES on amended candidate `177de004`; authorized only through `NEXT.md`
 base: accepted local `main` `6340d78f109eeed0fccea26a04f42557263db0a8`
 route: Wave 1 — First Useful Market Desk
 depends: Golden and Post-Golden Foundation accepted; product-model correction in this candidate
 builder: one fresh visible Codex task using `gpt-6-astra`, low reasoning, after `NEXT.md` opens
+reader: visible task `01a074fa-2603-7f21-b73d-be5c44fca106`; final `YES/YES`
 verifier: one different fresh visible Codex task; immutable candidate only
 
 ## Objective
