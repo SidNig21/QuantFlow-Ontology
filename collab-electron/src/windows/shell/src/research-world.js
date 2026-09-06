@@ -198,6 +198,37 @@ function objectKey(object) {
 	return object ? `${object.type}:${object.id}` : "";
 }
 
+export function mergeResearchWorlds(worlds, root) {
+	const rows = Array.isArray(worlds) ? worlds.filter(Boolean) : [];
+	const objects = new Map();
+	const links = new Map();
+	const missing = new Map();
+	const reportIds = new Set();
+	for (const world of rows) {
+		for (const object of world.objects || []) {
+			const key = objectKey(object);
+			if (!objects.has(key)) objects.set(key, object);
+		}
+		for (const link of world.links || []) {
+			const key = `${link.kind}\u0000${link.from_id}\u0000${link.to_id}`;
+			if (!links.has(key)) links.set(key, link);
+		}
+		for (const fact of world.missing_lineage || []) {
+			const key = `${fact.owning_type}\u0000${fact.owning_id}\u0000${fact.kind}`;
+			if (!missing.has(key)) missing.set(key, fact);
+		}
+		for (const id of world.report_ids || []) reportIds.add(id);
+	}
+	return {
+		root: root || rows[0]?.root,
+		objects: [...objects.values()],
+		links: [...links.values()],
+		missing_lineage: [...missing.values()],
+		current_report_id: rows.find((world) => world.current_report_id)?.current_report_id || null,
+		report_ids: [...reportIds],
+	};
+}
+
 function stableObjectOrder(a, b) {
 	return (WORLD_TYPE_ORDER.get(a?.type) ?? 99) - (WORLD_TYPE_ORDER.get(b?.type) ?? 99) ||
 		String(a?.type ?? "").localeCompare(String(b?.type ?? "")) ||
@@ -946,6 +977,17 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 	let savedOverview = null;
 	let projectionControls = null;
 	let cableObserver = null;
+	let savedWorldContexts = [];
+
+	function rememberWorldContext(context) {
+		const key = `${context.root.type}\u0000${context.root.id}`;
+		savedWorldContexts = [context, ...savedWorldContexts.filter((candidate) => `${candidate.root.type}\u0000${candidate.root.id}` !== key)];
+	}
+
+	function projectionWorkflow() {
+		if (projectionState !== PROJECTION_FULL || savedWorldContexts.length < 2) return lastWorkflow;
+		return deriveResearchWorkflow(mergeResearchWorlds(savedWorldContexts.map((context) => context.world), lastRoot));
+	}
 
 	function currentDockMode() {
 		const tab = document.querySelector?.('[data-dock-mode][aria-selected="true"]');
@@ -1085,26 +1127,26 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		pane.appendChild(technical);
 	}
 
-	function visibleObjectIds() {
-		if (!lastWorkflow) return new Set();
-		if (projectionState === PROJECTION_ORDINARY) return new Set(lastWorkflow.objects.map((object) => object.id));
-		if (projectionState === PROJECTION_FULL) return new Set(lastWorkflow.objects.map((object) => object.id));
-		return new Set(lastWorkflow.currentMissionIds);
+	function visibleObjectIds(workflow) {
+		if (!workflow) return new Set();
+		if (projectionState === PROJECTION_ORDINARY) return new Set(workflow.objects.map((object) => object.id));
+		if (projectionState === PROJECTION_FULL) return new Set(workflow.objects.map((object) => object.id));
+		return new Set(workflow.currentMissionIds);
 	}
 
-	function visibleLinkKeys() {
-		if (!lastWorkflow) return new Set();
-		const objectIds = visibleObjectIds();
+	function visibleLinkKeys(workflow) {
+		if (!workflow) return new Set();
+		const objectIds = visibleObjectIds(workflow);
 		if (projectionState === PROJECTION_ORDINARY) return new Set();
-		if (projectionState === PROJECTION_MISSION) return researchCurrentMissionLinkKeys(lastWorkflow, Boolean(selectedSubject));
-		return new Set(lastWorkflow.links
+		if (projectionState === PROJECTION_MISSION) return researchCurrentMissionLinkKeys(workflow, Boolean(selectedSubject));
+		return new Set(workflow.links
 			.filter((link) => objectIds.has(link.from_id) && objectIds.has(link.to_id))
 			.map((link) => `${link.kind}\u0000${link.from_id}\u0000${link.to_id}`));
 	}
 
-	function syncStageLabels(visibleIds) {
+	function syncStageLabels(workflow, visibleIds) {
 		for (const label of document.querySelectorAll?.(".qf-world-stage-label") || []) label.remove();
-		for (const [stage, members] of lastWorkflow.stages.entries()) {
+		for (const [stage, members] of workflow.stages.entries()) {
 			const anchor = members.find((object) => visibleIds.has(object.id));
 			if (!anchor) continue;
 			const tile = anchor.type === "agent_session"
@@ -1145,8 +1187,9 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 
 	function applyProjection({ fit = false } = {}) {
 		if (!lastWorkflow) return;
+		const workflow = projectionWorkflow();
 		const ordinary = projectionState === PROJECTION_ORDINARY;
-		const visibleIds = visibleObjectIds();
+		const visibleIds = visibleObjectIds(workflow);
 		const local = selectedSubject ? localLineage(selectedSubject) : null;
 		const doms = getTileDOMs();
 		const visibleTiles = [];
@@ -1160,8 +1203,17 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 				delete dom.container.dataset.qfProjectionVisibility;
 				delete dom.container.dataset.qfSelected;
 			}
+		} else {
+			for (const tile of tiles) {
+				const dom = doms.get(tile.id);
+				if (!dom?.container?.dataset?.qfWorldType) continue;
+				dom.container.hidden = true;
+				dom.container.setAttribute("aria-hidden", "true");
+				dom.container.style.pointerEvents = "none";
+				dom.container.dataset.qfProjectionVisibility = "hidden";
+			}
 		}
-		for (const object of lastWorkflow.objects) {
+		for (const object of workflow.objects) {
 			const tile = object.type === "agent_session"
 				? tiles.find((entry) => entry.sessionId === object.id)
 				: tiles.find((entry) => entry.type === "research" && entry.ontologyType === object.type && entry.ontologyId === object.id);
@@ -1183,9 +1235,9 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		const viewer = document.getElementById?.("panel-viewer");
 		if (ordinary) viewer?.removeAttribute("data-qf-research-projection-active");
 		else viewer?.setAttribute("data-qf-research-projection-active", "true");
-		syncStageLabels(ordinary ? new Set() : visibleIds);
-		const keySet = visibleLinkKeys();
-		const cables = lastWorkflow.links.filter((link) => keySet.has(`${link.kind}\u0000${link.from_id}\u0000${link.to_id}`)).map((link) => makeWorldCable(link, lastWorkflow));
+		syncStageLabels(workflow, ordinary ? new Set() : visibleIds);
+		const keySet = visibleLinkKeys(workflow);
+		const cables = workflow.links.filter((link) => keySet.has(`${link.kind}\u0000${link.from_id}\u0000${link.to_id}`)).map((link) => makeWorldCable(link, workflow));
 		tileManager.repositionAllTiles?.();
 		onCables?.(cables.filter(Boolean));
 		observeCablePaint();
@@ -1366,6 +1418,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		lastRoot = { type: rootType, id: rootId };
 		lastWorld = result.world;
 		lastWorkflow = deriveResearchWorkflow(result.world);
+		rememberWorldContext({ root: lastRoot, world: lastWorld, workflow: lastWorkflow, result });
 		projectionState = PROJECTION_MISSION;
 		selectedSubject = null;
 		savedOverview = null;
@@ -1528,6 +1581,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			}
 		}
 		if (contexts.length === 0) return lastFailure;
+		savedWorldContexts = contexts;
 		const activateContext = (context, subject) => {
 			lastRoot = context.root;
 			lastWorld = context.world;

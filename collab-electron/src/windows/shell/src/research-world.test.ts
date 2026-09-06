@@ -3,6 +3,7 @@ import {
   createResearchWorldController,
   deriveResearchWorkflow,
   latestSavedWorldRoot,
+	mergeResearchWorlds,
 	savedWorldRoots,
 	researchCableProjectionOpacity,
 	researchCurrentMissionLinkKeys,
@@ -275,6 +276,16 @@ describe("research world renderer seam", () => {
 		expect(savedWorldRoots(roots).map((tile) => tile.id)).toEqual(["new", "middle", "old"]);
 	});
 
+	test("merges disconnected Kernel worlds without duplicating their shared evidence", () => {
+		const shared = { type: "venue", id: "venue-bovada", fields: { name: "Bovada" } };
+		const merged = mergeResearchWorlds([
+			{ root: { type: "mission", id: "mission-2" }, objects: [{ type: "mission", id: "mission-2", fields: {} }, shared], links: [{ kind: "lists", from_id: shared.id, to_id: "instrument-2" }], report_ids: [] },
+			{ root: { type: "mission", id: "mission-1" }, objects: [{ type: "mission", id: "mission-1", fields: {} }, shared], links: [{ kind: "lists", from_id: shared.id, to_id: "instrument-1" }], report_ids: [] },
+		]);
+		expect(merged.objects.map((object) => object.id)).toEqual(["mission-2", "venue-bovada", "mission-1"]);
+		expect(merged.links).toHaveLength(2);
+	});
+
 	test("uses durable market fields for ordinary-language status instead of saying recorded objects are missing", () => {
 		const marketObjects = [
 			{ type: "mission", id: "mission-1", fields: { objective: "Research the captured line", quote_id: "quote-1", state: "ready to staff", observed_at: "2026-09-06T12:00:00Z" } },
@@ -330,6 +341,13 @@ describe("research world renderer seam", () => {
 			const doms = new Map(restoredTiles.map((tile) => [tile.id, { container: new FakeElement(), contentArea: new FakeElement() }]));
 			let reads = 0;
 			let creates = 0;
+			const fullButton = new FakeElement();
+			const projectionControls = {
+				dataset: {} as Record<string, string>,
+				hidden: false,
+				querySelector: (selector: string) => selector === "[data-qf-world-full]" ? fullButton : null,
+			};
+			(globalThis.document as unknown as { getElementById: (id: string) => unknown }).getElementById = (id) => id === "research-world-projection" ? projectionControls : null;
 			canvasTiles.splice(0, canvasTiles.length, ...restoredTiles);
 			Object.defineProperty(globalThis, "window", {
 				configurable: true,
@@ -365,6 +383,17 @@ describe("research world renderer seam", () => {
 				olderQuote?.listeners.get("pointerdown")?.({ button: 0, target: { closest: () => null } });
 				expect(controller.getProjectionModel()?.mission?.id).toBe("mission-1");
 				expect(olderQuote?.dataset.qfWorldId).toBe("quote-1");
+
+				await controller.reveal("mission", "mission-2");
+				expect(doms.get("ontology:mission:mission-1")?.container.hidden).toBe(true);
+				expect(doms.get("ontology:quote:quote-1")?.container.hidden).toBe(true);
+				expect(doms.get("ontology:mission:mission-2")?.container.hidden).toBe(false);
+				expect(doms.get("ontology:quote:quote-2")?.container.hidden).toBe(false);
+				fullButton.listeners.get("click")?.({});
+				expect(controller.getProjectionState()).toBe("FULL_LINEAGE");
+				expect(doms.get("ontology:mission:mission-1")?.container.hidden).toBe(false);
+				expect(doms.get("ontology:quote:quote-1")?.container.hidden).toBe(false);
+				expect(doms.get("ontology:mission:mission-2")?.container.hidden).toBe(false);
 			} finally {
 				canvasTiles.splice(0, canvasTiles.length);
 				if (previousWindow === undefined) delete (globalThis as Record<string, unknown>).window;

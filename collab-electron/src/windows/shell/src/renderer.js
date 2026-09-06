@@ -632,17 +632,23 @@ async function init() {
 		edgeIndicators.update();
 		minimap.update();
 		cableOverlay?.redraw();
-		void animateViewportFit(tiles);
+		const focusedTile = tiles.find((tile) => tile.id === tileManager.getFocusedTileId?.());
+		const baseSize = focusedTile ? defaultSize(focusedTile.type) : null;
+		const expandedParticipant = focusedTile?.sessionId && baseSize &&
+			(focusedTile.width > baseSize.width || focusedTile.height > baseSize.height)
+			? focusedTile : null;
+		void animateViewportFit(tiles, 48, expandedParticipant ? { minZoom: 0.6, anchorTile: expandedParticipant } : {});
 		showCanvasToast(formatTidyToast(result), { tone: "ok" });
 		return result;
 	}
 
-	function animateViewportFit(layoutTiles, margin = 48) {
+	function animateViewportFit(layoutTiles, margin = 48, options = {}) {
 		const fit = fitViewportToTiles(
 			layoutTiles,
 			panelViewer.clientWidth,
 			panelViewer.clientHeight,
 			margin,
+			options,
 		);
 		if (!fit) return;
 		const start = {

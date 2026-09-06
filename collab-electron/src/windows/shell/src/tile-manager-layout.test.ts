@@ -22,6 +22,8 @@ describe("Tidy authority boundary", () => {
     const body = functionBody(rendererSource, "tidyTilesToGrid", "\n\t// -- Canvas RPC --");
     expect(body).toContain("applyTileLayout");
     expect(body).not.toContain("saveCanvas");
+		expect(body).toContain("minZoom: 0.6");
+		expect(body).toContain("anchorTile: expandedParticipant");
   });
 
 });

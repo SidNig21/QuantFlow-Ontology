@@ -88,6 +88,24 @@ describe("WO-g6 D5 tidy fit", () => {
 		expect(right).toBeLessThanOrEqual(800);
 		expect(bottom).toBeLessThanOrEqual(600);
 	});
+
+	test("keeps an expanded participant readable when the whole desk cannot fit at readable scale", () => {
+		const participant = { id: "director", x: 420, y: 320, width: 720, height: 520 };
+		const tiles = [
+			participant,
+			...Array.from({ length: 12 }, (_, index) => ({ x: index * 460, y: 900, width: 300, height: 190 })),
+		];
+		const fit = fitViewportToTiles(tiles, 1200, 800, 48, { minZoom: 0.6, anchorTile: participant });
+		expect(fit.zoom).toBe(0.6);
+		const left = participant.x * fit.zoom + fit.panX;
+		const top = participant.y * fit.zoom + fit.panY;
+		const right = (participant.x + participant.width) * fit.zoom + fit.panX;
+		const bottom = (participant.y + participant.height) * fit.zoom + fit.panY;
+		expect(left).toBeGreaterThanOrEqual(48);
+		expect(top).toBeGreaterThanOrEqual(48);
+		expect(right).toBeLessThanOrEqual(1200 - 48);
+		expect(bottom).toBeLessThanOrEqual(800 - 48);
+	});
 });
 
 describe("WO-g6 D1 declared label", () => {

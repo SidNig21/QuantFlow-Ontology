@@ -63,8 +63,9 @@ export function formatRelative(iso, nowMs = Date.now()) {
  * @param {number} viewportW
  * @param {number} viewportH
  * @param {number} [margin]
+ * @param {{minZoom?:number,anchorTile?:{x:number,y:number,width:number,height:number}}} [options]
  */
-export function fitViewportToTiles(tiles, viewportW, viewportH, margin = 48) {
+export function fitViewportToTiles(tiles, viewportW, viewportH, margin = 48, options = {}) {
 	if (!Array.isArray(tiles) || tiles.length === 0) return null;
 	if (!(viewportW > 0) || !(viewportH > 0)) return null;
 
@@ -87,13 +88,26 @@ export function fitViewportToTiles(tiles, viewportW, viewportH, margin = 48) {
 	const boxH = Math.max(24, maxY - minY);
 	const availW = Math.max(24, viewportW - margin * 2);
 	const availH = Math.max(24, viewportH - margin * 2);
-	let zoom = Math.min(availW / boxW, availH / boxH);
-	zoom = Math.min(1, Math.max(0.25, zoom));
+	const naturalZoom = Math.min(availW / boxW, availH / boxH);
+	const requestedMinZoom = Math.min(1, Math.max(0.25, Number(options.minZoom) || 0.25));
+	const anchor = options.anchorTile;
+	const anchorWidth = Number(anchor?.width) || 0;
+	const anchorHeight = Number(anchor?.height) || 0;
+	const anchorFitZoom = anchorWidth > 0 && anchorHeight > 0
+		? Math.min(1, availW / anchorWidth, availH / anchorHeight)
+		: 1;
+	const minZoom = Math.max(0.25, Math.min(requestedMinZoom, anchorFitZoom));
+	const zoom = Math.min(1, Math.max(minZoom, naturalZoom));
 
 	const contentW = boxW * zoom;
 	const contentH = boxH * zoom;
-	const panX = (viewportW - contentW) / 2 - minX * zoom;
-	const panY = (viewportH - contentH) / 2 - minY * zoom;
+	const anchorReadable = anchor && naturalZoom < minZoom;
+	const panX = anchorReadable
+		? viewportW / 2 - (Number(anchor.x) + anchorWidth / 2) * zoom
+		: (viewportW - contentW) / 2 - minX * zoom;
+	const panY = anchorReadable
+		? viewportH / 2 - (Number(anchor.y) + anchorHeight / 2) * zoom
+		: (viewportH - contentH) / 2 - minY * zoom;
 	return { zoom, panX, panY, minX, minY, maxX, maxY };
 }
 

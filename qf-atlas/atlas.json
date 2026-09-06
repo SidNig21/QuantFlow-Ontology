@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-wave1-foundation",
-    "commit": "8eb763b9",
+    "commit": "2e8d8872",
     "generatedAt": "2026-09-06",
     "filesScanned": 418,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "4bc7f42eb8d991c5"
+    "fingerprint": "299172f3919fcca1"
   },
   "stats": {
     "live": 113,
@@ -2707,7 +2707,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 60.5,
+      "kb": 60.9,
       "x": -1.24,
       "z": 0.45,
       "status": "ice",
@@ -2718,7 +2718,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 60.5,
+          "kb": 60.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2735,7 +2735,7 @@
       "id": "4:collab-electron/src/windows/shell/src::research",
       "layer": 4,
       "name": "research-world.js",
-      "kb": 75.3,
+      "kb": 77.4,
       "x": 1.01,
       "z": 0.85,
       "status": "ok",
@@ -2746,7 +2746,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/research-world.js",
-          "kb": 75.3,
+          "kb": 77.4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3288,7 +3288,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1288.6,
+      "kb": 1288.7,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3755,7 +3755,7 @@
         },
         {
           "path": "qa/gates/wave1-market-desk.ts",
-          "kb": 5.1,
+          "kb": 5.2,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -5172,7 +5172,7 @@
       "id": "4:residue",
       "layer": 4,
       "name": "69 small modules*",
-      "kb": 153.3,
+      "kb": 154,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -5302,6 +5302,16 @@
           "executes": 0
         },
         {
+          "path": "collab-electron/src/windows/shell/src/glacier-feel.js",
+          "kb": 4.5,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "collab-electron/packages/components/src/TreeView/fileIcons.tsx",
           "kb": 4.3,
           "spawns": 0,
@@ -5344,16 +5354,6 @@
         {
           "path": "collab-electron/packages/components/src/Editor/ImageBlock.tsx",
           "kb": 4.1,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/shell/src/glacier-feel.js",
-          "kb": 3.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -18181,7 +18181,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 921 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 952 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -54956,12 +54956,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-wave1-foundation",
-      "commit": "604438c0",
+      "commit": "8eb763b9",
       "generatedAt": "2026-09-06"
     },
     "to": {
       "branch": "codex/wo-wave1-foundation",
-      "commit": "8eb763b9",
+      "commit": "2e8d8872",
       "generatedAt": "2026-09-06"
     },
     "verdict": "better",
