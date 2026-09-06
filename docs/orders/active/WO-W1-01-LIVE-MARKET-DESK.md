@@ -1,13 +1,13 @@
 # WO-W1-01 — real Bovada market desk
 
-status: OPEN — UFC-first founder amendment pending fresh Reader; implementation paused
+status: OPEN — UFC-first founder amendment `8748d34c`; fresh Reader `YES/YES`; Builder may resume
 base: accepted local `main` `6340d78f109eeed0fccea26a04f42557263db0a8`
 route: Wave 1 — First Useful Market Desk
 depends: Golden and Post-Golden Foundation accepted; product-model correction in this candidate
 builder: one fresh visible Codex task using `gpt-6-astra`, low reasoning, after `NEXT.md` opens
 reader: visible task `01a074fa-2603-7f21-b73d-be5c44fca106`; final `YES/YES`
 verifier: one different fresh visible Codex task; immutable candidate only
-amendment-review: PENDING — no Builder resumes until fresh Reader YES/YES
+amendment-review: YES/YES — visible task `01a07514-e9e2-7651-8837-c1035d48e56d`
 
 ## Objective
 

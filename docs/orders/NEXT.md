@@ -7,7 +7,7 @@ router-authority: OPEN
 g11-status: CLOSED
 r18-status: FROZEN / SUPERSEDED
 foundation-status: ACCEPTED — candidate 58b444d858443debeac8b13e041b2bb65e4e370e; independent YES / YES
-reader-status: PRIOR YES / YES superseded by founder UFC-first amendment; fresh review pending; Builder operationally paused
+reader-status: YES / YES — UFC-first amendment `8748d34c`; task 01a07514-e9e2-7651-8837-c1035d48e56d
 
 Golden and the Post-Golden Foundation remain accepted and closed. The rejected FM-0 candidate remains
 unmerged. Only WO-W1-01 is open: ship the real UFC-first Bovada market desk and Technique-free investigation entry.
