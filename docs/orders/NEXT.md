@@ -1,20 +1,22 @@
-# NEXT — W1-01 LIVE MARKET DESK
+# NEXT — CLOSED
 
-status: OPEN
-active-order: docs/orders/active/WO-W1-01-LIVE-MARKET-DESK.md
-builder-authority: OPEN
-router-authority: OPEN
+status: CLOSED
+active-order: none
+builder-authority: CLOSED
+router-authority: CLOSED
 g11-status: CLOSED
 r18-status: FROZEN / SUPERSEDED
 foundation-status: ACCEPTED — candidate 58b444d858443debeac8b13e041b2bb65e4e370e; independent YES / YES
-reader-status: YES / YES — UFC-first amendment `8748d34c`; task 01a07514-e9e2-7651-8837-c1035d48e56d
+reader-status: COMPLETE — W1-01 reader YES / YES; independent Verifier PASS on `b506cca0`
 
 Golden and the Post-Golden Foundation remain accepted and closed. The rejected FM-0 candidate remains
-unmerged. Only WO-W1-01 is open: ship the real UFC-first Bovada market desk and Technique-free investigation entry.
-No historical calculation, recommendation, second runtime, betting action, or other Wave-1 work is
-authorized by this pointer.
+unmerged. WO-W1-01 is accepted: the real UFC-first Bovada market desk and Technique-free investigation
+entry run in the packaged Windows app and survive reopen. No Builder is open. The Router may draft and
+send the next concise Wave-1 historical-evidence and transparent-calculation order to one semantic Reader;
+implementation remains closed until that result is recorded here.
 
 - [Active order](active/WO-W1-01-LIVE-MARKET-DESK.md)
+- [W1-01 acceptance](evidence/w1-01/ACCEPTANCE.md)
 
 - [Official Roadmap](../plans/OFFICIAL-ROADMAP.md)
 - [Institution Contracts](../plans/INSTITUTION-CONTRACTS.md)

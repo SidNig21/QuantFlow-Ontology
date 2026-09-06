@@ -1,6 +1,6 @@
 # WO-W1-01 — real Bovada market desk
 
-status: OPEN — UFC-first founder amendment `8748d34c`; fresh Reader `YES/YES`; Builder may resume
+status: DONE — accepted candidate `b506cca0d2c41fd1e15f7b03a86fa1a3ed29f4e2`; independent Verifier PASS; Router-owned packaged-app founder check PASS
 base: accepted local `main` `6340d78f109eeed0fccea26a04f42557263db0a8`
 route: Wave 1 — First Useful Market Desk
 depends: Golden and Post-Golden Foundation accepted; product-model correction in this candidate
