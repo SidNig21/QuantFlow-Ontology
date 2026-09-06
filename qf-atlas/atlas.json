@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "codex/wo-wave1-foundation",
-    "commit": "b6a3974c",
+    "commit": "18c189c7",
     "generatedAt": "2026-09-06",
     "filesScanned": 418,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -54956,12 +54956,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-wave1-foundation",
-      "commit": "2e8d8872",
+      "commit": "b6a3974c",
       "generatedAt": "2026-09-06"
     },
     "to": {
       "branch": "codex/wo-wave1-foundation",
-      "commit": "b6a3974c",
+      "commit": "18c189c7",
       "generatedAt": "2026-09-06"
     },
     "verdict": "better",

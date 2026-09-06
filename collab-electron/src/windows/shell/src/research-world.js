@@ -1320,7 +1320,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		savedProjectionLayout = null;
 		onClearCableSelection?.();
 		if (!selectedSubject) clearInspectSurface();
-		applyProjection();
+		applyProjection({ fit: true });
 		setDockMode(restored.dockMode);
 	}
 

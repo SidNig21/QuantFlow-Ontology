@@ -361,6 +361,8 @@ describe("research world renderer seam", () => {
 			const doms = new Map(restoredTiles.map((tile) => [tile.id, { container: new FakeElement(), contentArea: new FakeElement() }]));
 			let reads = 0;
 			let creates = 0;
+			let documentClick: ((event: unknown) => void) | null = null;
+			const fittedTileIds: string[][] = [];
 			const fullButton = new FakeElement();
 			const projectionControls = {
 				dataset: {} as Record<string, string>,
@@ -368,6 +370,9 @@ describe("research world renderer seam", () => {
 				querySelector: (selector: string) => selector === "[data-qf-world-full]" ? fullButton : null,
 			};
 			(globalThis.document as unknown as { getElementById: (id: string) => unknown }).getElementById = (id) => id === "research-world-projection" ? projectionControls : null;
+			(globalThis.document as unknown as { addEventListener: (type: string, listener: (event: unknown) => void) => void }).addEventListener = (type, listener) => {
+				if (type === "click") documentClick = listener;
+			};
 			canvasTiles.splice(0, canvasTiles.length, ...restoredTiles);
 			Object.defineProperty(globalThis, "window", {
 				configurable: true,
@@ -378,6 +383,7 @@ describe("research world renderer seam", () => {
 					tileManager: {
 						createResearchTile: () => { creates += 1; },
 						repositionAllTiles: () => {},
+						onResearchWorldReady: (visibleTiles: Array<{ id: string }>) => fittedTileIds.push(visibleTiles.map((tile) => tile.id)),
 						applyTileLayout: (layout: Array<Record<string, unknown>>) => {
 							for (const projected of layout) Object.assign(restoredTiles.find((tile) => tile.id === projected.id)!, projected);
 						},
@@ -421,6 +427,12 @@ describe("research world renderer seam", () => {
 				const secondMission = restoredTiles.find((tile) => tile.id === "ontology:mission:mission-2")!;
 				expect(firstMission.x).not.toBe(secondMission.x);
 				expect(firstMission.x + firstMission.width <= secondMission.x || secondMission.x + secondMission.width <= firstMission.x).toBe(true);
+				(documentClick as ((event: unknown) => void) | null)?.({ target: { closest: () => ({}) } });
+				expect(controller.getProjectionState()).toBe("CURRENT_MISSION");
+				expect(fittedTileIds).toHaveLength(3);
+				expect(fittedTileIds.at(-1)).toEqual(restoredTiles
+					.filter((tile) => tile.ontologyId?.endsWith("-2"))
+					.map((tile) => tile.id));
 			} finally {
 				canvasTiles.splice(0, canvasTiles.length);
 				if (previousWindow === undefined) delete (globalThis as Record<string, unknown>).window;
