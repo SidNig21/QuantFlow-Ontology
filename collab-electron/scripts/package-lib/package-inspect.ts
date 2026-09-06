@@ -386,9 +386,18 @@ export function removeHermesPackage(baitPackageRoot: string): void {
   rmSync(target, { force: true });
 }
 
-function asarEntryPath(path: string): string {
-  return process.platform === "win32" ? path.replaceAll("/", "\\") : path;
+export function normalizeAsarEntryPath(
+  path: string,
+  platform: NodeJS.Platform = process.platform,
+): string {
+  const normalized = path.replaceAll("\\", "/").replace(/^\/+/, "");
+  return platform === "win32" ? normalized.replaceAll("/", "\\") : normalized;
 }
+
+export function hasStaticBunSqliteImport(source: string): boolean {
+  return /(?:^|\n)\s*import(?:\s+[^"'\n]+?\s+from)?\s*["']bun:sqlite["'];?/.test(source);
+}
+
 function sha256Buffer(buf: Buffer): string {
   return createHash("sha256").update(buf).digest("hex");
 }
@@ -410,7 +419,7 @@ export function inspectBovadaPackagedSurface(
 
   let mainBundle: Buffer;
   try {
-    mainBundle = extractFile(asarPath, asarEntryPath("out/main/index.js"));
+    mainBundle = extractFile(asarPath, normalizeAsarEntryPath("out/main/index.js"));
   } catch {
     return {
       ok: false,
@@ -418,6 +427,12 @@ export function inspectBovadaPackagedSurface(
     };
   }
   const bundleText = mainBundle.toString("utf8");
+  if (hasStaticBunSqliteImport(bundleText)) {
+    return {
+      ok: false,
+      reason: "Bovada main bundle contains a static bun:sqlite import that Electron cannot load",
+    };
+  }
   const requiredNeedles = [
     "https://www.bovada.lv/services/sports/event/v2/events/A/description/football/nfl",
     "https://www.bovada.lv/services/sports/event/v2/events/A/description/ufc-mma/ufc",
@@ -438,8 +453,8 @@ export function inspectBovadaPackagedSurface(
   }
 
   const rendererEntries = listPackage(asarPath, { isPack: false }).filter((entry) => {
-    const normalized = entry.replaceAll("\\", "/");
-    return normalized.includes("/out/renderer/") && normalized.endsWith(".js");
+    const normalized = normalizeAsarEntryPath(entry, "linux");
+    return normalized.startsWith("out/renderer/") && normalized.endsWith(".js");
   });
   if (rendererEntries.length === 0) {
     return { ok: false, reason: "Bovada package proof missing rendered JavaScript" };
@@ -447,7 +462,7 @@ export function inspectBovadaPackagedSurface(
   let rendererText = "";
   let rendererBytes = 0;
   for (const entry of rendererEntries) {
-    const bytes = extractFile(asarPath, entry);
+    const bytes = extractFile(asarPath, normalizeAsarEntryPath(entry));
     rendererBytes += bytes.length;
     rendererText += bytes.toString("utf8");
   }
@@ -532,7 +547,7 @@ function inspectAsarSqlArtifacts(
   for (const pair of pairs) {
     let packagedBytes: Buffer;
     try {
-      packagedBytes = extractFile(asarPath, asarEntryPath(pair.packaged));
+      packagedBytes = extractFile(asarPath, normalizeAsarEntryPath(pair.packaged));
     } catch {
       return {
         ok: false,
@@ -591,7 +606,7 @@ function inspectPackagedProductIdentity(
   const asarPath = join(resourcesRoot, "app.asar");
   let manifestBytes: Buffer;
   try {
-    manifestBytes = extractFile(asarPath, asarEntryPath("package.json"));
+    manifestBytes = extractFile(asarPath, normalizeAsarEntryPath("package.json"));
   } catch {
     return { ok: false, reason: "packaged app.asar manifest missing: package.json" };
   }

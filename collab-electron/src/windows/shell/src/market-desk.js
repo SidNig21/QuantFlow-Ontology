@@ -39,11 +39,13 @@ export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
 			return;
 		}
 		for (const row of rows) {
-			const card = element("article", `market-row ${row.current ? "is-current" : "is-historical"}`);
+			const state = row.state === "superseded" ? "superseded" : row.current ? "current" : "historical";
+			const stateClass = state === "current" ? "is-current" : state === "superseded" ? "is-superseded" : "is-historical";
+			const card = element("article", `market-row ${stateClass}`);
 			card.dataset.quoteId = String(row.quote_id ?? "");
 			card.dataset.current = row.current ? "true" : "false";
 			const head = element("div", "market-row-head");
-			head.appendChild(element("span", "market-row-state", row.current ? "CURRENT" : "HISTORICAL"));
+			head.appendChild(element("span", "market-row-state", state.toUpperCase()));
 			head.appendChild(element("time", null, new Date(row.starts_at).toLocaleString()));
 			card.appendChild(head);
 			card.appendChild(element("h3", null, row.event));

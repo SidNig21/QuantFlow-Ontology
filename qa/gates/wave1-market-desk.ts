@@ -73,7 +73,12 @@ export async function runWave1MarketDeskGate(): Promise<{ ok: boolean }> {
     if (falsifier === "unregistered_capability") throw new Error("falsifier: Dock row identity was not registered through execute()");
     await run("capture identity/freshness falsifiers", join(REPO, "tools/qf-bovada-football"), ["src/live-markets.test.ts"]);
     await run("Kernel investigation falsifiers", join(REPO, "packages/qf-kernel"), ["src/market-desk.test.ts"]);
-    await run("render/projection/reopen seams", join(REPO, "collab-electron"), ["src/main/market-research-world.test.ts", "src/windows/shell/src/market-desk.test.ts"]);
+    await run("render/projection/reopen seams", join(REPO, "collab-electron"), [
+      "src/main/market-desk-main.test.ts",
+      "src/main/market-research-world.test.ts",
+      "src/windows/shell/src/back-to-world.test.ts",
+      "src/windows/shell/src/market-desk.test.ts",
+    ]);
     console.log("wave1-market-desk gate OK");
     return { ok: true };
   } catch (error) {

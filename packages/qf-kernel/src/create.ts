@@ -1459,7 +1459,7 @@ function createMarketInvestigation(
   try { coverage = JSON.parse(quote.coverage) as Record<string, unknown>; } catch { /* invalid observation is refused below */ }
   const quoteTime = Date.parse(String(coverage.observed_at ?? ""));
   const now = Date.now();
-  if (!Number.isFinite(quoteTime) || quoteTime > now + 60_000 || now - quoteTime > 15 * 60_000) {
+  if (!Number.isFinite(quoteTime) || quoteTime > now + 60_000 || now - quoteTime > MARKET_QUOTE_FRESHNESS_MS) {
     throw new KernelError("create_market_investigation requires a quote observed within the last 15 minutes");
   }
   const quoteEdges = db.query("SELECT to_id FROM links WHERE kind = 'quotes' AND from_id = ?").all(quoteId) as Array<{ to_id: string }>;
@@ -1494,6 +1494,8 @@ function createMarketInvestigation(
   });
   return creationResult(cmd, id, cmd.event, state, "ready to staff");
 }
+
+export const MARKET_QUOTE_FRESHNESS_MS = 15 * 60_000;
 
 function parseTicketFields(
   input: Record<string, unknown>,

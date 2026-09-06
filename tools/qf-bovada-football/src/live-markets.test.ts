@@ -4,8 +4,8 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { closeKernel, execute, getLinks, getObject, openKernel, queryObjects, type KernelDb } from "qf-kernel";
 import { BOVADA_LIVE_USER_AGENT, BOVADA_UFC_URL } from "./constants.ts";
-import { BovadaSelectionError } from "./errors.ts";
-import { runBovadaLiveMarketsCapture } from "./live-markets.ts";
+import { BovadaSelectionError, KernelClassificationError } from "./errors.ts";
+import { probeBovadaLiveMarketsAvailability, runBovadaLiveMarketsCapture } from "./live-markets.ts";
 import { parseBovadaLiveMarketsResponse } from "./parser.ts";
 import { createBovadaLiveMarketsTransport, type BovadaTransport } from "./transport.ts";
 
@@ -21,7 +21,13 @@ afterEach(() => {
   }
 });
 
-function market(id: string, first = "c1", second = "c2") {
+const FIRST_COMPETITOR_ID = "29195963-16503226";
+const SECOND_COMPETITOR_ID = "29195963-16512926";
+const FIRST_SELECTION_ID = "2380264633";
+const SECOND_SELECTION_ID = "2380264634";
+
+function market(id: string, first = FIRST_COMPETITOR_ID, second = SECOND_COMPETITOR_ID) {
+  const exact = id === "519394567";
   return {
     id,
     description: "Fight Winner",
@@ -30,8 +36,8 @@ function market(id: string, first = "c1", second = "c2") {
     status: "O",
     period: { id: "12122", description: "Bout", live: false, main: true },
     outcomes: [
-      { id: `${id}-o1`, competitorId: first, description: "Manon Fiorot", status: "O", type: "A", price: { id: `${id}-p1`, american: "-220", decimal: "1.454545", fractional: "5/11" } },
-      { id: `${id}-o2`, competitorId: second, description: "Alexa Grasso", status: "O", type: "H", price: { id: `${id}-p2`, american: "+185", decimal: "2.850", fractional: "37/20" } },
+      { id: exact ? FIRST_SELECTION_ID : `${id}-o1`, competitorId: first, description: "Manon Fiorot", status: "O", type: "A", price: { id: exact ? "38267337143" : `${id}-p1`, american: "-220", decimal: "1.454545", fractional: "5/11" } },
+      { id: exact ? SECOND_SELECTION_ID : `${id}-o2`, competitorId: second, description: "Alexa Grasso", status: "O", type: "H", price: { id: exact ? "38267337144" : `${id}-p2`, american: "+185", decimal: "2.850", fractional: "37/20" } },
     ],
   };
 }
@@ -51,7 +57,7 @@ function coupon({ league = "UFC Fight Night: Silva vs Delgado", eventId = "29195
       live: false,
       status: "U",
       competitionId: "29388400",
-      competitors: [{ id: "c1", name: "Manon Fiorot", home: false }, { id: "c2", name: "Alexa Grasso", home: true }],
+      competitors: [{ id: FIRST_COMPETITOR_ID, name: "Manon Fiorot", home: false }, { id: SECOND_COMPETITOR_ID, name: "Alexa Grasso", home: true }],
       displayGroups: [{ description: "Main", markets: marketRows }],
     }],
   };
@@ -84,12 +90,15 @@ describe("Bovada Live Markets UFC path", () => {
       competitionId: "29388400",
       event: { id: "29195963" },
       market: { id: "519394567" },
-      outcomes: [{ id: "519394567-o1", competitorId: "c1" }, { id: "519394567-o2", competitorId: "c2" }],
+      outcomes: [
+        { id: FIRST_SELECTION_ID, competitorId: FIRST_COMPETITOR_ID },
+        { id: SECOND_SELECTION_ID, competitorId: SECOND_COMPETITOR_ID },
+      ],
     });
   });
 
   test("swapped provider competitor identity and ambiguous markets fail closed", () => {
-    expect(() => parseBovadaLiveMarketsResponse(bytes([coupon({ marketRows: [market("swapped", "c2", "c1")] })]), "2099-09-06T05:15:58.076Z", { sport: "ufc", competition: "ufc", market_class: "moneyline" })).toThrow(BovadaSelectionError);
+    expect(() => parseBovadaLiveMarketsResponse(bytes([coupon({ marketRows: [market("swapped", SECOND_COMPETITOR_ID, FIRST_COMPETITOR_ID)] })]), "2099-09-06T05:15:58.076Z", { sport: "ufc", competition: "ufc", market_class: "moneyline" })).toThrow(BovadaSelectionError);
     expect(() => parseBovadaLiveMarketsResponse(bytes([coupon({ marketRows: [market("a"), market("b")] })]), "2099-09-06T05:15:58.076Z", { sport: "ufc", competition: "ufc", market_class: "moneyline" })).toThrow("ambiguous matching markets");
     expect(() => parseBovadaLiveMarketsResponse(bytes([]), "2099-09-06T05:15:58.076Z", { sport: "ufc", competition: "ufc", market_class: "moneyline" })).toThrow("no coupons");
   });
@@ -105,6 +114,47 @@ describe("Bovada Live Markets UFC path", () => {
     expect(seen[0]?.input).toBe(BOVADA_UFC_URL);
     expect(seen[0]?.init).toMatchObject({ method: "GET", credentials: "omit", redirect: "follow" });
     expect(new Headers(seen[0]?.init.headers).get("user-agent")).toBe(BOVADA_LIVE_USER_AGENT);
+  });
+
+  test("bounded availability probe reads real-shaped rows without a Kernel write seam", async () => {
+    const body = bytes([coupon()]);
+    const receipt = await probeBovadaLiveMarketsAvailability({
+      request: { sport: "ufc", competition: "ufc", market_class: "moneyline" },
+      transport: responseTransport(body),
+      now: () => new Date("2099-09-06T05:15:58.076Z"),
+    });
+    expect(receipt).toEqual({
+      available: true,
+      rows: 1,
+      bytes: body.byteLength,
+      observed_at: "2099-09-06T05:15:58.076Z",
+    });
+  });
+
+  test("exact captured selection-id swap fails against admitted Kernel identity while unchanged bytes pass", async () => {
+    const db = openKernel(":memory:");
+    dbs.push(db);
+    const artifactRoot = mkdtempSync(join(tmpdir(), "qf-w1-markets-"));
+    roots.push(artifactRoot);
+    const original = [coupon()];
+    const originalBytes = bytes(original);
+    const kernel = { execute, getObject, getLinks };
+    await runBovadaLiveMarketsCapture({ db, artifactRoot, request: { sport: "ufc", competition: "ufc", market_class: "moneyline" }, kernel, transport: responseTransport(originalBytes), now: () => new Date("2099-09-06T05:15:58.076Z") });
+    await runBovadaLiveMarketsCapture({ db, artifactRoot, request: { sport: "ufc", competition: "ufc", market_class: "moneyline" }, kernel, transport: responseTransport(originalBytes), now: () => new Date("2099-09-06T05:16:58.076Z") });
+
+    const swapped = structuredClone(original) as ReturnType<typeof coupon>[];
+    const outcomes = swapped[0]!.events[0]!.displayGroups[0]!.markets[0]!.outcomes;
+    [outcomes[0]!.id, outcomes[1]!.id] = [outcomes[1]!.id, outcomes[0]!.id];
+    await expect(runBovadaLiveMarketsCapture({
+      db,
+      artifactRoot,
+      request: { sport: "ufc", competition: "ufc", market_class: "moneyline" },
+      kernel,
+      transport: responseTransport(bytes(swapped)),
+      now: () => new Date("2099-09-06T05:17:58.076Z"),
+    })).rejects.toThrow(KernelClassificationError);
+    expect(queryObjects(db, "instrument", undefined, null)).toHaveLength(1);
+    expect(queryObjects(db, "quote", undefined, null)).toHaveLength(2);
   });
 
   test("identical bytes reuse one Artifact but create honest observation boundaries", async () => {

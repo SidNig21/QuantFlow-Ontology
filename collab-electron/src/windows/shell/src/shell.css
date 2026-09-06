@@ -2897,7 +2897,8 @@ button.task-fact:focus-visible {
 .market-desk-status[data-tone="error"] { color: var(--qf-gl-alert); }
 .market-desk-status[data-tone="ok"] { color: var(--qf-ok); }
 .market-row { margin-top: 10px; padding: 14px; border: 1px solid var(--qf-gl-rule); border-radius: 8px; background: var(--qf-gl-void); }
-.market-row.is-historical { opacity: .62; }
+.market-row.is-historical,
+.market-row.is-superseded { opacity: .62; }
 .market-row h3 { margin: 8px 0 3px; font-size: 15px; }
 .market-row time,
 .market-row-kind,

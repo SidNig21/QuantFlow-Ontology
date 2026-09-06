@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { bindBackToWorldControls } from "./research-world.js";
+import {
+  bindBackToWorldControls,
+  restoreLineageOverview,
+  saveLineageOverview,
+} from "./research-world.js";
 
 class FakeControl {
   constructor(private readonly selectors: string) {}
@@ -30,6 +34,18 @@ class FakeDocument {
 }
 
 describe("Back to world restoration seam", () => {
+  test("restores the exact continuous-desk projection, Dock mode, and selected inspect subject", () => {
+    const subject = { kind: "object", id: "quote-current" };
+    const saved = saveLineageOverview("CURRENT_MISSION", "INSPECT", subject);
+    const swapped = restoreLineageOverview({ ...saved, selectedSubject: { kind: "object", id: "quote-other" } });
+    expect(swapped).not.toEqual(saved);
+    expect(restoreLineageOverview(saved)).toEqual({
+      state: "CURRENT_MISSION",
+      dockMode: "INSPECT",
+      selectedSubject: subject,
+    });
+  });
+
   test("Canvas and Dock controls share one ephemeral action, including a replaced painted target", () => {
     const document = new FakeDocument();
     let projection = "FULL_LINEAGE";

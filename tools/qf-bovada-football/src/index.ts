@@ -81,8 +81,10 @@ export {
   type TraceContext,
 } from "./runner.ts";
 export {
+  probeBovadaLiveMarketsAvailability,
   runBovadaLiveMarketsCapture,
   type BovadaLiveMarketRow,
   type BovadaLiveMarketsOptions,
+  type BovadaLiveMarketsProbeReceipt,
   type BovadaLiveMarketsReceipt,
 } from "./live-markets.ts";

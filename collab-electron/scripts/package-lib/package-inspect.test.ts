@@ -12,7 +12,9 @@ import { createPackage } from "@electron/asar";
 import {
   HERMES_REF,
   HERMES_DOCK_PROFILES,
+  hasStaticBunSqliteImport,
   inspectPackagedResources,
+  normalizeAsarEntryPath,
   QF_KERNEL_SCHEMA_MIGRATION,
   QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE,
   QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE,
@@ -29,6 +31,21 @@ import {
   removeDockProfilesManifest,
   removeHermesPackage,
 } from "./package-inspect.ts";
+
+describe("ASAR entry normalization", () => {
+  test("strips archive-root slashes before Windows extraction", () => {
+    expect(normalizeAsarEntryPath("/out/renderer/shell/index.js", "win32")).toBe("out\\renderer\\shell\\index.js");
+    expect(normalizeAsarEntryPath("\\out\\renderer\\shell\\index.js", "linux")).toBe("out/renderer/shell/index.js");
+  });
+});
+
+describe("Electron main runtime imports", () => {
+  test("rejects static bun:sqlite imports while allowing the portable runtime lookup", () => {
+    expect(hasStaticBunSqliteImport('import "bun:sqlite";\n')).toBe(true);
+    expect(hasStaticBunSqliteImport('import { Database } from "bun:sqlite";\n')).toBe(true);
+    expect(hasStaticBunSqliteImport('requireRuntimeModule("bun:sqlite");\n')).toBe(false);
+  });
+});
 
 const collabRoot = join(import.meta.dir, "../..");
 const packageRoot = join(collabRoot, "dist/linux-unpacked");

@@ -59,6 +59,7 @@ import {
   captureBovadaMarketDesk,
   createMarketDeskInvestigation,
   ensureBovadaLiveMarketsCapability,
+  getBovadaLiveMarketsCapability,
   listBovadaMarketDeskRows,
 } from "./market-desk";
 
@@ -208,6 +209,7 @@ async function trustedActorForTile(tileId: unknown): Promise<string> {
 }
 
 export function registerKernelHandlers(): void {
+  ensureBovadaLiveMarketsCapability();
   registerHostAcpPermissionHandlers();
   onSessionChunk((sessionId, text) => {
     broadcast("qf:session:chunk", { sessionId, text });
@@ -255,10 +257,10 @@ export function registerKernelHandlers(): void {
     },
   );
 
-  ipcMain.handle("qf:markets:capability", (event) => {
+  ipcMain.handle("qf:markets:capability", async (event) => {
     try {
       assertTrustedSender(event);
-      return { ok: true as const, capability: ensureBovadaLiveMarketsCapability() };
+      return { ok: true as const, capability: await getBovadaLiveMarketsCapability() };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }

@@ -1,8 +1,8 @@
 80 | type Falsifier = Exclude<CaseId, "C14"> | C14Falsifier;
 81 | const captureReceipts: CaptureReceipt[] = [];
-82 | 
+82 |
 83 | const JSON_FIELDS = new Set(["sources", "coverage", "params", "metrics", "rubric", "run_metrics", "source_work", "block_reason"]);
-84 | 
+84 |
 85 | function assert(condition: unknown, message: string): asserts condition { if (!condition) throw new Error(message); }
                                                                                                          ^
 error: candidate build exited 1

@@ -36,6 +36,7 @@ export {
 } from "./read.ts";
 export {
   assertCreationHandlersComplete,
+  MARKET_QUOTE_FRESHNESS_MS,
 } from "./create.ts";
 export { assertPipelineHandlersComplete } from "./pipeline.ts";
 export {

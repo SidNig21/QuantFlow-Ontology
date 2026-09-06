@@ -4,14 +4,14 @@ falsifier=old-orchestrator-id result=red
 falsifier=generic-orchestrator-prompt result=red
 falsifier=ui-boundary-or-auto-tile-shortcut result=red
 research-director-front-door: FAIL Windows process snapshot unavailable: Command failed: powershell.exe -NoProfile -NonInteractive -Command $ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEach-Object { [pscustomobject]@{ pid=[int]$_.ProcessId; parentPid=[int]$_.ParentProcessId; name=[string]$_.Name; executablePath=if ($_.ExecutablePath) {[string]$_.ExecutablePath} else {''}; commandLine=if ($_.CommandLine) {[string]$_.CommandLine} else {''} } }) | ConvertTo-Json -Compress
-Get-CimInstance : Access denied 
+Get-CimInstance : Access denied
 At line:1 char:34
 + ... ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEa ...
 +                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : PermissionDenied: (root\cimv2:Win32_Process:String) [Get-CimInstance], CimException
     + FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand
- 
- (Get-CimInstance : Access denied 
+
+ (Get-CimInstance : Access denied
 At line:1 char:34
 + ... ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEa ...
 +                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,14 +26,14 @@ convergence_remaining=[]
 236 |             new Error(
                       ^
 error: Windows process snapshot unavailable: Command failed: powershell.exe -NoProfile -NonInteractive -Command $ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEach-Object { [pscustomobject]@{ pid=[int]$_.ProcessId; parentPid=[int]$_.ParentProcessId; name=[string]$_.Name; executablePath=if ($_.ExecutablePath) {[string]$_.ExecutablePath} else {''}; commandLine=if ($_.CommandLine) {[string]$_.CommandLine} else {''} } }) | ConvertTo-Json -Compress
-Get-CimInstance : Access denied 
+Get-CimInstance : Access denied
 At line:1 char:34
 + ... ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEa ...
 +                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : PermissionDenied: (root\cimv2:Win32_Process:String) [Get-CimInstance], CimException
     + FullyQualifiedErrorId : HRESULT 0x80041003,Microsoft.Management.Infrastructure.CimCmdlets.GetCimInstanceCommand
- 
- (Get-CimInstance : Access denied 
+
+ (Get-CimInstance : Access denied
 At line:1 char:34
 + ... ErrorActionPreference='Stop'; @(Get-CimInstance Win32_Process | ForEa ...
 +                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

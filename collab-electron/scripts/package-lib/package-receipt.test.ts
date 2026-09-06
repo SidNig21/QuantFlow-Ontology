@@ -73,4 +73,23 @@ describe("package receipt log path binding", () => {
       reason: "package receipt logPath mismatch",
     });
   });
+
+  test("accepts an explicitly allowed Windows package root and rejects a stale run id", () => {
+    const { collabRoot } = fixture();
+    const packageRoot = join(collabRoot, "dist/win-unpacked");
+    mkdirSync(join(packageRoot, "resources"), { recursive: true });
+    const logPath = canonicalPackageVerifyLogPath(collabRoot);
+    writeReceiptForLog(packageRoot, logPath);
+
+    expect(validatePackageReceipt(RUN_ID, collabRoot, packageRoot)).toMatchObject({ ok: true });
+    expect(validatePackageReceipt("other-run", collabRoot, packageRoot)).toEqual({
+      ok: false,
+      reason: "stale package receipt run id",
+    });
+    writeFileSync(logPath, "tampered package log\n");
+    expect(validatePackageReceipt(RUN_ID, collabRoot, packageRoot)).toEqual({
+      ok: false,
+      reason: "package receipt log hash mismatch",
+    });
+  });
 });

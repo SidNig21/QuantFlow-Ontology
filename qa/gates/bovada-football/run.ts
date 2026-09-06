@@ -16,7 +16,7 @@ import {
 } from "node:fs";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, parse } from "node:path";
 import { execFileSync } from "node:child_process";
 import { Database } from "bun:sqlite";
 import {
@@ -186,7 +186,10 @@ async function exercisePackagedCli(cliPath: string): Promise<{
   const root = mkdtempSync(join(tmpdir(), "qf-bovada-packaged-cli-"));
   const home = join(root, "home");
   const appRoot = join(home, ".quantflow", "app");
-  const socketPath = join(root, "rpc.sock");
+  const socketPath = process.platform === "win32"
+    ? `\\\\.\\pipe\\qf-bovada-packaged-cli-${createHash("sha256").update(root).digest("hex").slice(0, 16)}`
+    : join(root, "rpc.sock");
+  const homeDrive = parse(home).root;
   mkdirSync(appRoot, { recursive: true });
   writeFileSync(join(appRoot, "socket-path"), socketPath + "\n");
 
@@ -222,7 +225,13 @@ async function exercisePackagedCli(cliPath: string): Promise<{
       ["node", cliPath, "market", "bovada-football", "--once"],
       {
         cwd: root,
-        env: { ...process.env, HOME: home },
+        env: {
+          ...process.env,
+          HOME: home,
+          USERPROFILE: home,
+          HOMEDRIVE: homeDrive,
+          HOMEPATH: home.slice(homeDrive.length) || "\\",
+        },
         stdout: "pipe",
         stderr: "pipe",
       },
@@ -256,9 +265,19 @@ function assertFixedCliDispatch(result: {
 async function packagedSurfaceProof(): Promise<void> {
   const runId = process.env.QF_RELEASE_RUN_ID?.trim();
   assert(runId, "Bovada packaged proof requires the canonical QF_RELEASE_RUN_ID");
-  const receipt = validatePackageReceipt(runId, COLLAB);
+  const allowedPackageRoot = process.platform === "win32"
+    ? join(COLLAB, "dist", "win-unpacked")
+    : undefined;
+  const receipt = validatePackageReceipt(runId, COLLAB, allowedPackageRoot);
   if (!receipt.ok) {
     throw new Error(`Bovada package receipt invalid: ${receipt.reason}`);
+  }
+  if (process.platform === "win32") {
+    const status = JSON.parse(readFileSync(join(COLLAB, "dist", "RELEASE-STATUS.json"), "utf8")) as {
+      build?: { commit_sha?: unknown };
+    };
+    const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: REPO, encoding: "utf8" }).trim();
+    assert(status.build?.commit_sha === head, `Bovada Windows package SHA mismatch: ${String(status.build?.commit_sha)} != ${head}`);
   }
 
   const green = inspectBovadaPackagedSurface(receipt.resourcesRoot, REPO);

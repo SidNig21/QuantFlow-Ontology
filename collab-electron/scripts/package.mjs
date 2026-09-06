@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { normalizeWindowsPath, resolvePackageBin } from "./local-bin.mjs";
 
@@ -115,12 +115,13 @@ function assertTimeRemaining(phase) {
   return remaining;
 }
 
-function run(phase, command, commandArgs, extraEnv = env) {
+function run(phase, command, commandArgs, extraEnv = env, capture = false) {
   const result = spawnSync(
     command,
     commandArgs,
     {
-      stdio: "inherit",
+      stdio: capture ? ["ignore", "pipe", "pipe"] : "inherit",
+      encoding: capture ? "utf8" : undefined,
       cwd,
       env: extraEnv,
       timeout: assertTimeRemaining(phase),
@@ -128,6 +129,9 @@ function run(phase, command, commandArgs, extraEnv = env) {
       windowsHide: true,
     },
   );
+  const output = capture ? `${result.stdout ?? ""}${result.stderr ?? ""}` : "";
+  if (capture && result.stdout) process.stdout.write(result.stdout);
+  if (capture && result.stderr) process.stderr.write(result.stderr);
   if (result.error) {
     const timeout = result.error.code === "ETIMEDOUT";
     console.error(
@@ -140,6 +144,7 @@ function run(phase, command, commandArgs, extraEnv = env) {
     console.error(`package: phase=${phase} failed with exit ${result.status}; last active phase=${phase}`);
     process.exit(result.status ?? 1);
   }
+  return output;
 }
 
 function detectMismatchedToolchain(expectedName, packageName = expectedName) {
@@ -229,7 +234,13 @@ run("renderer build", process.execPath, [electronVite, "build"]);
 // The arch list in package.json's build.<platform>.target already tells
 // electron-builder which architectures to produce, so passing --<arch>
 // per-invocation just causes redundant full builds + notarizations.
-run("electron-builder NSIS package", process.execPath, [electronBuilder, ...builderArgs]);
+const electronBuilderLog = run(
+  "electron-builder NSIS package",
+  process.execPath,
+  [electronBuilder, ...builderArgs],
+  env,
+  true,
+);
 
 if (process.platform === "win32") {
   const dist = join(cwd, "dist");
@@ -288,6 +299,27 @@ if (process.platform === "win32") {
     join(dist, "RELEASE-STATUS.json"),
     `${JSON.stringify(releaseStatus, null, 2)}\n`,
     "utf8",
+  );
+  const {
+    canonicalPackageVerifyLogPath,
+    createReceiptFromLog,
+    writePackageReceipt,
+  } = await import("./package-lib/package-receipt.ts");
+  const { createPackageRunId } = await import("./package-lib/run-id.ts");
+  const runId = env.QF_RELEASE_RUN_ID?.trim() || createPackageRunId();
+  const packageRoot = join(dist, "win-unpacked");
+  const packageLog = canonicalPackageVerifyLogPath(cwd);
+  mkdirSync(join(cwd, ".package-verify"), { recursive: true });
+  writeFileSync(packageLog, `${electronBuilderLog}\n${JSON.stringify({
+    contract: "qf.windows.package-verify.v1",
+    run_id: runId,
+    package_root: packageRoot,
+    commit_sha: buildInputs.commitSha,
+    packaged_at: buildInputs.packagedAt,
+  })}\n`, "utf8");
+  writePackageReceipt(
+    packageRoot,
+    createReceiptFromLog(runId, packageRoot, packageLog),
   );
   for (const artifact of artifacts) {
     console.log(`• Windows signing state: ${artifact.authenticode} · ${artifact.path}`);

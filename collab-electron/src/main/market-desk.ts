@@ -3,10 +3,12 @@ import {
   BOVADA_LIVE_MARKETS_VERSION,
   MAX_RESPONSE_BYTES,
   REQUEST_TIMEOUT_MS,
+  probeBovadaLiveMarketsAvailability,
   runBovadaLiveMarketsCapture,
   type BovadaKernelAccess,
   type BovadaMarketRequest,
 } from "qf-bovada-football";
+import { MARKET_QUOTE_FRESHNESS_MS } from "qf-kernel/portable";
 import {
   getArtifactRoot,
   getKernelDb,
@@ -55,11 +57,41 @@ export function ensureBovadaLiveMarketsCapability(): Record<string, unknown> {
   });
   const tool = kernelGetObject("tool", CAPABILITY.tool_id);
   if (!tool) throw new Error("Bovada Live Markets registration did not persist");
-  return {
-    ...tool,
-    readiness: "ready",
-    readiness_detail: `Public capture is bounded to ${REQUEST_TIMEOUT_MS / 1000}s and ${MAX_RESPONSE_BYTES / (1024 * 1024)} MB.`,
-  };
+  return tool;
+}
+
+export async function getBovadaLiveMarketsCapability(
+  probe: typeof probeBovadaLiveMarketsAvailability = probeBovadaLiveMarketsAvailability,
+): Promise<Record<string, unknown>> {
+  const tool = kernelGetObject("tool", CAPABILITY.tool_id);
+  if (!tool) throw new Error("Bovada Live Markets is not admitted to the Dock");
+  const bounds = `${REQUEST_TIMEOUT_MS / 1000}s and ${MAX_RESPONSE_BYTES / (1024 * 1024)} MB`;
+  const controller = new AbortController();
+  activeCaptures.add(controller);
+  try {
+    const receipt = await probe({
+      request: { sport: "ufc", competition: "ufc", market_class: "moneyline" },
+      signal: controller.signal,
+    });
+    if (!Number.isInteger(receipt.rows) || receipt.rows < 1) {
+      throw new Error("bounded public probe returned no current markets");
+    }
+    return {
+      ...tool,
+      readiness: "ready",
+      readiness_detail: `Public UFC source available: ${receipt.rows} current market${receipt.rows === 1 ? "" : "s"} observed by a probe bounded to ${bounds}.`,
+    };
+  } catch (error) {
+    const name = error instanceof Error ? error.name : "Error";
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      ...tool,
+      readiness: "unavailable",
+      readiness_detail: `Public UFC source unavailable after a probe bounded to ${bounds}: ${name}: ${message}`,
+    };
+  } finally {
+    activeCaptures.delete(controller);
+  }
 }
 
 export type MarketDeskRow = Record<string, unknown> & {
@@ -68,10 +100,11 @@ export type MarketDeskRow = Record<string, unknown> & {
   market_event_id: string;
   source_artifact_id: string;
   current: boolean;
+  state: "current" | "superseded" | "historical";
   investigations: Array<Record<string, unknown>>;
 };
 
-export function listBovadaMarketDeskRows(): MarketDeskRow[] {
+export function listBovadaMarketDeskRows(now = Date.now()): MarketDeskRow[] {
   const quotes = kernelQueryObjects("quote", { book: "bovada" }, null, 0, "desc");
   const candidates: Array<MarketDeskRow & { quote_created_at: string }> = [];
   for (const quote of quotes) {
@@ -121,6 +154,7 @@ export function listBovadaMarketDeskRows(): MarketDeskRow[] {
       period: String(params.period ?? ""),
       venue: { id: venue.id, kind: venue.kind, name: venue.name },
       current: false,
+      state: "historical",
       investigations,
     });
   }
@@ -135,10 +169,14 @@ export function listBovadaMarketDeskRows(): MarketDeskRow[] {
       currentByInstrument.set(row.instrument_id, candidate);
     }
   }
-  return candidates.map(({ quote_created_at: _createdAt, ...row }) => ({
-    ...row,
-    current: currentByInstrument.get(row.instrument_id)?.quoteId === row.quote_id,
-  }));
+  return candidates.map(({ quote_created_at: _createdAt, ...row }) => {
+    const newest = currentByInstrument.get(row.instrument_id)?.quoteId === row.quote_id;
+    const observedAt = Date.parse(String(row.observed_at));
+    const startsAt = Date.parse(String(row.starts_at));
+    const current = newest && Number.isFinite(observedAt) && observedAt <= now + 60_000 &&
+      now - observedAt <= MARKET_QUOTE_FRESHNESS_MS && Number.isFinite(startsAt) && startsAt > now;
+    return { ...row, current, state: current ? "current" : newest ? "historical" : "superseded" };
+  });
 }
 
 export async function captureBovadaMarketDesk(request: BovadaMarketRequest): Promise<MarketDeskRow[]> {

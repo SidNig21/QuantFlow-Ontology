@@ -59,6 +59,13 @@ export type BovadaLiveMarketsReceipt = {
   rows: BovadaLiveMarketRow[];
 };
 
+export type BovadaLiveMarketsProbeReceipt = {
+  available: true;
+  rows: number;
+  bytes: number;
+  observed_at: string;
+};
+
 export type BovadaLiveMarketsOptions = {
   db: KernelDb;
   artifactRoot: string;
@@ -132,7 +139,11 @@ function rowFor(selected: SelectedBovadaMarket, artifactId: string, observedAt: 
   };
 }
 
-export async function runBovadaLiveMarketsCapture(options: BovadaLiveMarketsOptions): Promise<BovadaLiveMarketsReceipt> {
+async function readBovadaLiveMarkets(options: Pick<BovadaLiveMarketsOptions, "request" | "signal" | "transport" | "now">): Promise<{
+  bytes: Uint8Array;
+  observedAt: string;
+  selected: SelectedBovadaMarket[];
+}> {
   const controller = new AbortController();
   const timeout = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
   const signal = options.signal ? AbortSignal.any([controller.signal, timeout, options.signal]) : AbortSignal.any([controller.signal, timeout]);
@@ -151,6 +162,18 @@ export async function runBovadaLiveMarketsCapture(options: BovadaLiveMarketsOpti
   }
   const observedAt = (options.now ?? (() => new Date()))().toISOString();
   const selected = parseBovadaLiveMarketsResponse(bytes, observedAt, options.request);
+  return { bytes, observedAt, selected };
+}
+
+export async function probeBovadaLiveMarketsAvailability(
+  options: Pick<BovadaLiveMarketsOptions, "request" | "signal" | "transport" | "now">,
+): Promise<BovadaLiveMarketsProbeReceipt> {
+  const { bytes, observedAt, selected } = await readBovadaLiveMarkets(options);
+  return { available: true, rows: selected.length, bytes: bytes.byteLength, observed_at: observedAt };
+}
+
+export async function runBovadaLiveMarketsCapture(options: BovadaLiveMarketsOptions): Promise<BovadaLiveMarketsReceipt> {
+  const { bytes, observedAt, selected } = await readBovadaLiveMarkets(options);
   const artifactId = contentHash(bytes);
   const artifactPath = artifactPathForHash(options.artifactRoot, artifactId);
   const durable = ensureArtifactFile(options.artifactRoot, artifactId, bytes);

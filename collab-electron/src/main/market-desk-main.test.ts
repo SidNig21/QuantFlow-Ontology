@@ -3,8 +3,13 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { contentHash } from "qf-kernel";
-import { closeAppKernel, kernelExecute, openAppKernel } from "./kernel";
-import { createMarketDeskInvestigation, ensureBovadaLiveMarketsCapability, listBovadaMarketDeskRows } from "./market-desk";
+import { closeAppKernel, kernelExecute, kernelListEvents, openAppKernel } from "./kernel";
+import {
+  createMarketDeskInvestigation,
+  ensureBovadaLiveMarketsCapability,
+  getBovadaLiveMarketsCapability,
+  listBovadaMarketDeskRows,
+} from "./market-desk";
 
 const saved = { kernel: process.env.QF_KERNEL_DB, artifacts: process.env.QF_ARTIFACT_ROOT };
 const root = mkdtempSync(join(tmpdir(), "qf-market-desk-main-"));
@@ -28,6 +33,37 @@ afterAll(() => {
 });
 
 describe("main market desk Kernel projection", () => {
+  test("reports readiness only from a bounded probe and does not write during the passive read", async () => {
+    ensureBovadaLiveMarketsCapability();
+    const eventCount = kernelListEvents().length;
+    let probes = 0;
+    const ready = await getBovadaLiveMarketsCapability(async () => {
+      probes += 1;
+      return { available: true, rows: 2, bytes: 1024, observed_at: new Date().toISOString() };
+    });
+    expect(ready).toMatchObject({ readiness: "ready" });
+    expect(String(ready.readiness_detail)).toContain("2 current markets");
+    expect(probes).toBe(1);
+    expect(kernelListEvents()).toHaveLength(eventCount);
+
+    const empty = await getBovadaLiveMarketsCapability(async () => {
+      probes += 1;
+      return { available: true, rows: 0, bytes: 2, observed_at: new Date().toISOString() };
+    });
+    expect(empty).toMatchObject({ readiness: "unavailable" });
+    expect(String(empty.readiness_detail)).toContain("returned no current markets");
+    expect(kernelListEvents()).toHaveLength(eventCount);
+
+    const unavailable = await getBovadaLiveMarketsCapability(async () => {
+      probes += 1;
+      throw new Error("HTTP 503 from bounded public probe");
+    });
+    expect(unavailable).toMatchObject({ readiness: "unavailable" });
+    expect(String(unavailable.readiness_detail)).toContain("HTTP 503 from bounded public probe");
+    expect(probes).toBe(3);
+    expect(kernelListEvents()).toHaveLength(eventCount);
+  });
+
   test("registered identity, current/history, investigation, and reopen come only from Kernel rows", () => {
     const capability = ensureBovadaLiveMarketsCapability();
     expect(capability).toMatchObject({ id: "bovada-live-markets", capability_class: "data", implementation_version: "1.0.0" });
@@ -52,7 +88,13 @@ describe("main market desk Kernel projection", () => {
     const rows = listBovadaMarketDeskRows();
     expect(rows).toHaveLength(2);
     expect(rows.filter((row) => row.current).map((row) => row.quote_id)).toEqual(["quote-main-current"]);
+    expect(rows.find((row) => row.quote_id === "quote-main-current")?.state).toBe("current");
     expect(rows.filter((row) => !row.current).map((row) => row.quote_id)).toEqual(["quote-main-old"]);
+    expect(rows.find((row) => row.quote_id === "quote-main-old")?.state).toBe("superseded");
+    const aged = listBovadaMarketDeskRows(now.getTime() + 2 * 60 * 60_000);
+    expect(aged.some((row) => row.current)).toBe(false);
+    expect(aged.find((row) => row.quote_id === "quote-main-current")?.state).toBe("historical");
+    expect(aged.find((row) => row.quote_id === "quote-main-old")?.state).toBe("superseded");
     const investigation = createMarketDeskInvestigation({ quote_id: "quote-main-current", name: "Research Fiorot vs Grasso", objective: "Investigate the current Fight Winner market." });
     expect(investigation.rows.find((row) => row.quote_id === "quote-main-current")?.investigations).toHaveLength(1);
     closeAppKernel();

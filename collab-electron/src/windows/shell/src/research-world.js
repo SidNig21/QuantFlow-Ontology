@@ -35,6 +35,22 @@ const PROJECTION_ORDINARY = RESEARCH_PROJECTION_STATES.ORDINARY_CANVAS;
 const PROJECTION_MISSION = RESEARCH_PROJECTION_STATES.CURRENT_MISSION;
 const PROJECTION_FULL = RESEARCH_PROJECTION_STATES.FULL_LINEAGE;
 
+export function saveLineageOverview(state, dockMode, selectedSubject) {
+	return {
+		state,
+		dockMode,
+		selectedSubject: selectedSubject ? { ...selectedSubject } : null,
+	};
+}
+
+export function restoreLineageOverview(savedOverview) {
+	return savedOverview ?? {
+		state: PROJECTION_ORDINARY,
+		dockMode: "START",
+		selectedSubject: null,
+	};
+}
+
 export function researchCurrentMissionLinkKeys(workflow, inspecting = false) {
 	const objectIds = new Set(workflow?.currentMissionIds || []);
 	const keys = inspecting
@@ -910,7 +926,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 	function currentDockMode() {
 		const tab = document.querySelector?.('[data-dock-mode][aria-selected="true"]');
 		const mode = String(tab?.dataset?.dockMode ?? "START").toUpperCase();
-		return mode === "INSPECT" ? "START" : mode;
+		return mode;
 	}
 
 	function setDockMode(mode) {
@@ -923,7 +939,9 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		if (!projectionControls) return null;
 		projectionControls.dataset.qfProjectionState = projectionState;
 		projectionControls.querySelector("[data-qf-world-full]")?.addEventListener("click", () => {
-			if (projectionState !== PROJECTION_FULL) savedOverview = { state: projectionState, dockMode: currentDockMode() };
+			if (projectionState !== PROJECTION_FULL) {
+				savedOverview = saveLineageOverview(projectionState, currentDockMode(), selectedSubject);
+			}
 			selectedSubject = null;
 			onClearCableSelection?.();
 			clearInspectSurface();
@@ -1165,7 +1183,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 	}
 
 	function saveOverview() {
-		return { state: projectionState, dockMode: currentDockMode() };
+		return saveLineageOverview(projectionState, currentDockMode(), selectedSubject);
 	}
 
 	function selectSubject(subject) {
@@ -1177,13 +1195,14 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 	}
 
 	function restoreOverview() {
-		projectionState = PROJECTION_ORDINARY;
-		selectedSubject = null;
+		const restored = restoreLineageOverview(savedOverview);
+		projectionState = restored.state;
+		selectedSubject = restored.selectedSubject;
 		savedOverview = null;
 		onClearCableSelection?.();
-		clearInspectSurface();
+		if (!selectedSubject) clearInspectSurface();
 		applyProjection();
-		setDockMode("START");
+		setDockMode(restored.dockMode);
 	}
 
 	bindBackToWorldControls(document, restoreOverview);
