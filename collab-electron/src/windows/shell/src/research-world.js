@@ -544,6 +544,7 @@ export function researchTilePresentation(object, workflow, participantViewForId 
 	let badge = String(object?.type ?? "object").replace("agent_session", "participant").toUpperCase();
 	let status = firstRecorded(fields.status);
 	if (object?.type === "mission") {
+		status = firstRecorded(fields.status, fields.state);
 		if (fields.quote_id) {
 			addFact("Observation", fields.observed_at);
 			addFact("State", fields.state);
@@ -552,6 +553,18 @@ export function researchTilePresentation(object, workflow, participantViewForId 
 			const technique = (workflow?.stages?.[2] || []).filter((candidate) => candidate.type === "strategy").sort(stableObjectOrder)[0];
 			addFact("Technique", technique ? titleFor(technique.id) : "Not recorded");
 		}
+	} else if (object?.type === "quote") {
+		status = fields.current === true ? "CURRENT OBSERVATION" : "RECORDED OBSERVATION";
+		addFact("Book", fields.book);
+		addFact("Observed", fields.coverage?.observed_at || fields.created_at);
+	} else if (object?.type === "instrument") {
+		status = recordedText(fields.kind) ? humanizedKind(fields.kind).toUpperCase() : "RECORDED INSTRUMENT";
+		addFact("Market", fields.params?.market_label);
+	} else if (object?.type === "market_event") {
+		status = "RECORDED EVENT";
+		addFact("Starts", fields.starts_at);
+	} else if (object?.type === "venue") {
+		status = recordedText(fields.kind) ? humanizedKind(fields.kind).toUpperCase() : "RECORDED VENUE";
 	} else if (object?.type === "task") {
 		addFact("Owner", titleFor(outgoing.find((link) => link.kind === "assigned_to")?.to_id));
 	} else if (object?.type === "agent_session") {
@@ -1460,7 +1473,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		overlay._qfResearchWorldSelectionBridge = handler;
 	}
 
-	function hydrateSaved() {
+	async function hydrateSaved() {
 		installCableSelectionBridge();
 		projectionState = PROJECTION_ORDINARY;
 		selectedSubject = null;
@@ -1471,7 +1484,34 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			controls.hidden = true;
 			controls.dataset.qfProjectionState = PROJECTION_ORDINARY;
 		}
-		if (lastWorkflow) applyProjection();
+		const rootTile = latestSavedWorldRoot(tiles);
+		if (!rootTile) {
+			if (lastWorkflow) applyProjection();
+			return null;
+		}
+		const result = await window.shellApi.qf.getResearchWorldProjection({
+			root_type: rootTile.ontologyType,
+			root_id: rootTile.ontologyId,
+		});
+		if (!result?.ok) {
+			showStatus?.(result?.message || "Saved research world unavailable");
+			return result;
+		}
+		lastRoot = { type: rootTile.ontologyType, id: rootTile.ontologyId };
+		lastWorld = result.world;
+		lastWorkflow = deriveResearchWorkflow(result.world);
+		for (const object of lastWorkflow.objects) {
+			if (object.type === "agent_session") decorateSession(object);
+			else {
+				const tile = existing(object.type, object.id);
+				if (tile) renderTile(getTileDOMs().get(tile.id), tile, object);
+			}
+		}
+		document.dispatchEvent?.(new CustomEvent("qf:research-world-active", {
+			detail: { missionId: lastWorkflow.mission?.id || rootTile.ontologyId, world: result.world },
+		}));
+		applyProjection();
+		return result;
 	}
 
 	installCableSelectionBridge();

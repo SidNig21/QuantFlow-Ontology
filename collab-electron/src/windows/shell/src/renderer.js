@@ -2054,7 +2054,7 @@ async function init() {
 	// Cold launches have no saved Canvas state, but they must still publish the
 	// same ordinary projection boundary as restores before any deliberate Mission
 	// navigation occurs.
-	researchWorldController?.hydrateSaved();
+	await researchWorldController?.hydrateSaved();
 
 	taskProjectionReady = true;
 	void scheduleTaskProjectionRefresh();

@@ -70,6 +70,7 @@ class FakeElement {
   hidden = false;
   tabIndex = -1;
   dataset: Record<string, string> = {};
+  style: Record<string, string> = {};
   attributes = new Map<string, string>();
   children: FakeElement[] = [];
   parent: FakeElement | null = null;
@@ -269,6 +270,67 @@ describe("research world renderer seam", () => {
 			{ id: "middle", type: "research", ontologyType: "task", ontologyId: "task-middle" },
 			{ id: "new", type: "research", ontologyType: "mission", ontologyId: "mission-new" },
 		])?.id).toBe("new");
+	});
+
+	test("uses durable market fields for ordinary-language status instead of saying recorded objects are missing", () => {
+		const marketObjects = [
+			{ type: "mission", id: "mission-1", fields: { objective: "Research the captured line", quote_id: "quote-1", state: "ready to staff", observed_at: "2026-09-06T12:00:00Z" } },
+			{ type: "quote", id: "quote-1", fields: { book: "bovada", current: true, coverage: { observed_at: "2026-09-06T12:00:00Z" } } },
+			{ type: "instrument", id: "instrument-1", fields: { kind: "moneyline", params: { market_label: "Fight Winner" } } },
+			{ type: "market_event", id: "event-1", fields: { competition: "UFC", starts_at: "2026-09-12T20:00:00Z" } },
+			{ type: "venue", id: "venue-1", fields: { name: "Bovada", kind: "sportsbook" } },
+		];
+		const workflow = { links: [], byId: new Map(marketObjects.map((object) => [object.id, object])), stages: [[], [], [], [], []] };
+		expect(marketObjects.map((object) => researchTilePresentation(object, workflow).status)).toEqual([
+			"ready to staff",
+			"CURRENT OBSERVATION",
+			"MONEYLINE",
+			"RECORDED EVENT",
+			"SPORTSBOOK",
+		]);
+	});
+
+	test("rebuilds persisted research tile bodies from one Kernel world read without creating replacement tiles", async () => {
+		await withDocument(async () => {
+			const previousWindow = (globalThis as Record<string, unknown>).window;
+			const mission = { type: "mission", id: "mission-1", fields: { objective: "Research the captured line", state: "ready to staff" } };
+			const quote = { type: "quote", id: "quote-1", fields: { book: "bovada", current: true, coverage: { observed_at: "2026-09-06T12:00:00Z" } } };
+			const world = { root: { type: "mission", id: "mission-1" }, objects: [mission, quote], links: [{ kind: "investigates", from_id: "mission-1", to_id: "quote-1" }], missing_lineage: [], current_report_id: null, report_ids: [] };
+			const restoredTiles = [
+				{ id: "ontology:mission:mission-1", type: "research", ontologyType: "mission", ontologyId: "mission-1", x: 0, y: 0, width: 300, height: 190 },
+				{ id: "ontology:quote:quote-1", type: "research", ontologyType: "quote", ontologyId: "quote-1", x: 460, y: 0, width: 300, height: 190 },
+			];
+			const doms = new Map(restoredTiles.map((tile) => [tile.id, { container: new FakeElement(), contentArea: new FakeElement() }]));
+			let reads = 0;
+			let creates = 0;
+			canvasTiles.splice(0, canvasTiles.length, ...restoredTiles);
+			Object.defineProperty(globalThis, "window", {
+				configurable: true,
+				value: { shellApi: { qf: { getResearchWorldProjection: async () => { reads += 1; return { ok: true, world }; } } } },
+			});
+			try {
+				const controller = createResearchWorldController({
+					tileManager: {
+						createResearchTile: () => { creates += 1; },
+						repositionAllTiles: () => {},
+					},
+					getTileDOMs: () => doms,
+					onCables: () => {},
+				});
+				await controller.hydrateSaved();
+				expect(reads).toBe(1);
+				expect(creates).toBe(0);
+				expect(doms.get(restoredTiles[0].id)?.contentArea.children.length).toBeGreaterThan(0);
+				expect(treeText(doms.get(restoredTiles[0].id)?.contentArea)).toContain("ready to staff");
+				expect(doms.get(restoredTiles[1].id)?.contentArea.children.length).toBeGreaterThan(0);
+				expect(treeText(doms.get(restoredTiles[1].id)?.contentArea)).toContain("CURRENT OBSERVATION");
+				expect(controller.getProjectionState()).toBe("ORDINARY_CANVAS");
+			} finally {
+				canvasTiles.splice(0, canvasTiles.length);
+				if (previousWindow === undefined) delete (globalThis as Record<string, unknown>).window;
+				else Object.defineProperty(globalThis, "window", { configurable: true, value: previousWindow });
+			}
+		});
 	});
 
 	test("names the single-column runaway layout from the consumer screenshot", () => {
