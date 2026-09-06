@@ -135,6 +135,12 @@ export const tool = defineObject({
       .describe(
         "One-line capability summary for agent selection. Explain what decision this tool enables, not just its transport mechanism.",
       ),
+    capability_class: z.enum(["data", "tool"]).nullable().describe(
+      "Dock category of a registered capability. Legacy unclassified tools remain absent from the capability catalog until explicitly registered.",
+    ),
+    implementation_version: z.string().nullable().describe(
+      "Exact implementation revision admitted for this capability. A changed revision requires a new explicit registration identity rather than silently changing an existing resource.",
+    ),
   }),
 });
 

@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-post-golden-foundation-final @ 80883799` on 2026-09-05 by
+> Generated from `codex/wo-wave1-foundation @ 5bb1e98e` on 2026-09-06 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -32,21 +32,21 @@ and it can die or cheat at any one of them:
 ```mermaid
 flowchart TD
   R["<b>1 · renderer</b><br/>29 surface subsystems<br/>calls a bridge method"]
-  P["<b>2 · preload</b><br/>3 bridges · 117 methods<br/>111 of them called"]
-  M["<b>3 · main</b><br/>113 IPC channels<br/>109 live · 4 unused · 0 dead"]
+  P["<b>2 · preload</b><br/>3 bridges · 121 methods<br/>115 of them called"]
+  M["<b>3 · main</b><br/>117 IPC channels<br/>113 live · 4 unused · 0 dead"]
   H{"<b>4 · is it governed?</b>"}
   E["<b>execute&#40;&#41;</b><br/>the only sanctioned write"]
   DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]
 
   R --> P --> M --> H
-  H -->|"write-door 20"| E
+  H -->|"write-door 23"| E
   E --> DB
   A["<b>ungoverned SQL</b><br/>amber evidence only<br/>not a proven breach"]
   H -->|"reaches-sql 2"| A
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
   H -->|"writes-disk 7"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
-  H -->|"read-only 84"| RO
+  H -->|"read-only 85"| RO
 
   QA["<b>QA · governance</b><br/>11 subsystems<br/>asserts the rules above"]
   SP["<b>Species · runtimes</b><br/>3 subsystems<br/>launched by path,<br/>not imported"]
@@ -81,12 +81,12 @@ handler that mutates state without `execute()` is cheating even when it works.
 
 | At hop 4 the handler… | | Count |
 |---|---|---:|
-| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 20 |
+| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 23 |
 | `cheats` | reaches SQL outside `execute()` **and** a function on that path carries a current hard red | 0 |
 | `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 2 |
 | `writes-disk` | writes a file; never reaches the Kernel at all | 7 |
 | `unknown` | handler or module resolution coverage is incomplete; not claimed read-only | 0 |
-| `read-only` | no mutation seen | 84 |
+| `read-only` | no mutation seen | 85 |
 
 #### Reaches ungoverned SQL, but not a hard red (6)
 
@@ -158,7 +158,7 @@ listeners. That single mistake would have produced 12 false deletes.
 
 #### `no-sender` (1)
 
-- `shell:loading-status` — `collab-electron/src/preload/shell.ts:179` · **INVESTIGATE**
+- `shell:loading-status` — `collab-electron/src/preload/shell.ts:185` · **INVESTIGATE**
   - a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing
 
 **Confidence is `medium` on every row here, and the disposition is `INVESTIGATE`, never
@@ -239,7 +239,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 16 | the app starts here |
-| `reachable` | 203 | imported from an entrypoint |
+| `reachable` | 205 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -269,10 +269,10 @@ _works end to end, but nothing calls it yet_
 > `qf:review:projection` is in this bucket and is exactly what R16 needs to render
 > the Evaluation tile. Deleting this bucket wholesale would remove the next rung.
 
-- `deleteConnectionsForTile() → qf:connections:deleteForTile` — collab-electron/src/preload/shell.ts:129
-- `getGovernedReviewProjection() → qf:review:projection` — collab-electron/src/preload/shell.ts:90
+- `deleteConnectionsForTile() → qf:connections:deleteForTile` — collab-electron/src/preload/shell.ts:135
+- `getGovernedReviewProjection() → qf:review:projection` — collab-electron/src/preload/shell.ts:96
 - `permissionDecision() → qf:sessions:permissionDecision` — collab-electron/src/preload/universal.ts:157
-- `getRuntimeSnapshot() → qf:sessions:runtime-snapshot` — collab-electron/src/preload/shell.ts:99
+- `getRuntimeSnapshot() → qf:sessions:runtime-snapshot` — collab-electron/src/preload/shell.ts:105
 
 ## Write-door violations
 
@@ -285,7 +285,7 @@ the door. Generated schema SQL is included.
 |---|---|
 | derivation state | `partial` |
 | dispatcher found at | `packages/qf-kernel/src/execute.ts:473` |
-| actions mapped | 17 of 43 |
+| actions mapped | 19 of 45 |
 | door files | `create.ts`, `deterministic-execution.ts`, `execute.ts`, `market-context.ts`, `market-ingest.ts`, `pipeline.ts` |
 
 **The retired hand-written allowlist disagreed with the Kernel on 8 files.**
@@ -294,7 +294,7 @@ blanket pass: `insert.ts`, `events.ts`, `db.ts`, `upgrade.ts`.
 Implement a dispatched action but were never on the list, so their SQL was being
 adjudicated as a possible breach: `deterministic-execution.ts`, `market-context.ts`, `market-ingest.ts`, `pipeline.ts`.
 
-> The derivation is **partial**: 26 of 43 schema actions have no
+> The derivation is **partial**: 26 of 45 schema actions have no
 > dispatch-table entry, because the state transitions are dispatched by a mechanism
 > this reader does not follow. Verdicts on those paths rest on reachability rather
 > than on a mapped action, and that is a weaker claim.
@@ -334,8 +334,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 222 of
-223 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 224 of
+225 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/updater/update-manager.ts` — **2 files depend on it**, it imports 1
@@ -346,7 +346,7 @@ asked before the change, when nothing is red yet.
   collab-electron/src/main/index.ts
 ```
 
-`packages/qf-kernel/src/governed-review.ts` — **41 files depend on it**, it imports 8
+`packages/qf-kernel/src/governed-review.ts` — **40 files depend on it**, it imports 8
 
 ```
   packages/qf-kernel/src/index.ts
@@ -359,25 +359,25 @@ asked before the change, when nothing is red yet.
   qa/gates/dock-definition-launch/run.ts
   qa/gates/dock-profile-identity/run.ts
   qa/gates/golden-g10-canvas-runtime.ts
-  …31 more
+  …30 more
 ```
 
 ### Blast-radius coverage
 
-**222 of 223 files that have a reachability verdict** carry a blast radius.
+**224 of 225 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**538 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**548 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 315 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 323 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
 | File | Dependents | Imports | Wires |
 |---|---:|---:|---:|
+| `packages/qf-kernel/src/trace.ts` | 55+ | 1 | 0 |
 | `collab-electron/src/main/file-filter.ts` | 53+ | 2 | 0 |
-| `packages/qf-kernel/src/trace.ts` | 53+ | 1 | 0 |
-| `packages/qf-kernel/src/registry-drift.ts` | 51+ | 0 | 0 |
-| `packages/qf-kernel/src/upgrade.ts` | 51+ | 3 | 0 |
+| `packages/qf-kernel/src/registry-drift.ts` | 52+ | 0 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | 52+ | 3 | 0 |
 | `collab-electron/src/main/files.ts` | 50+ | 2 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
@@ -394,8 +394,8 @@ prevent a clean architectural result.
 
 | File | Coverage | SQL in text | SQL resolved |
 |---|---|---:|---:|
-| `packages/qf-kernel/src/upgrade.ts` | partial | 7 | 5 |
 | `packages/qf-kernel/src/governed-review.ts` | partial | 33 | 32 |
+| `packages/qf-kernel/src/upgrade.ts` | partial | 10 | 9 |
 | `collab-electron/src/main/kernel.ts` | partial | 7 | 6 |
 | `packages/qf-kernel/src/db.ts` | partial | 1 | 0 |
 | `collab-electron/src/main/env.d.ts` | unindexed | 0 | 0 |
@@ -415,7 +415,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (538 files)
+## Per-analyzer coverage (548 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -423,19 +423,19 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 534 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 269 | 0 | 3 | 0 | 266 |
-| `ipcPush` | 7 | 0 | 3 | 0 | 528 |
-| `persistence` | 23 | 29 | 0 | 0 | 486 |
-| `lifetime` | 5 | 59 | 0 | 0 | 474 |
-| `packaging` | 221 | 0 | 0 | 102 | 215 |
-| `ownership` | 20 | 0 | 0 | 336 | 182 |
-| `reach` | 220 | 3 | 0 | 315 | 0 |
+| `imports` | 544 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 274 | 0 | 3 | 0 | 271 |
+| `ipcPush` | 7 | 0 | 3 | 0 | 538 |
+| `persistence` | 23 | 29 | 0 | 0 | 496 |
+| `lifetime` | 5 | 60 | 0 | 0 | 483 |
+| `packaging` | 223 | 0 | 0 | 104 | 221 |
+| `ownership` | 20 | 0 | 0 | 344 | 184 |
+| `reach` | 222 | 3 | 0 | 323 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 315 files means those trees are
+failure — `reach: unsupported` on 323 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
-`packaging: unsupported` on 102 files means the packaging
+`packaging: unsupported` on 104 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
 
 ### The invariant

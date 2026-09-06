@@ -357,7 +357,9 @@ export function attachKernel(
       shape === "task_delegation" ||
       shape === "deterministic_execution" ||
       shape === "task_composition" ||
-      shape === "task_steering")
+      shape === "task_steering" ||
+      shape === "pre_r17_current" ||
+      shape === "pre_market_desk")
   ) {
     const upgradeOrder = [
       PROFILE_IDENTITY_UPGRADE,
@@ -385,6 +387,8 @@ export function attachKernel(
       deterministic_execution: 8,
       task_composition: 9,
       task_steering: 10,
+      pre_r17_current: 12,
+      pre_market_desk: 12,
     } as const;
     const required = upgradeOrder.slice(completedByShape[shape]).join(",");
     process.stderr.write(
@@ -433,7 +437,8 @@ export function attachKernel(
       shape === "deterministic_execution" ||
       shape === "task_composition" ||
       shape === "task_steering" ||
-      shape === "pre_r17_current"
+      shape === "pre_r17_current" ||
+      shape === "pre_market_desk"
     ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",

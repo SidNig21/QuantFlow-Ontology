@@ -58,7 +58,7 @@ const COLLAB = join(REPO, "collab-electron");
 const CORE = join(REPO, "tools", "qf-bovada-football");
 const FIXTURE = join(CORE, "src", "fixtures", "nfl-snapshot.json");
 const SERVED_TOOLS_SHA256 =
-  "03c328e03c08e3b89969c7f05e7c12e3e45f3318c0c325d041bfc1e6be2badc0";
+  "d460d27d0af4509ed87ea308c432f6a31d188a45f84cf50b7c4047a1ff4c573f";
 const CANARIES = {
   requestCookie: "qf-wo107-request-cookie-canary",
   responseCookie: "qf-wo107-response-set-cookie-canary",
@@ -166,12 +166,13 @@ function generatedSurfaceProof(): void {
   const hash = createHash("sha256")
     .update(JSON.stringify(served), "utf8")
     .digest("hex");
-  assert(served.length === 99, `served tool count changed: ${served.length}`);
+  assert(served.length === 100, `served tool count changed: ${served.length}`);
   assert(hash === SERVED_TOOLS_SHA256, `served tool serialization changed: ${hash}`);
   for (const hidden of [
     "qf_register_venue",
     "qf_schedule_market_event",
     "qf_ingest_market_batch",
+    "qf_register_tool",
   ]) {
     assert(!served.some((tool) => tool.name === hidden), `trusted action became served: ${hidden}`);
   }

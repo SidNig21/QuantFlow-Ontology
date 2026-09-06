@@ -394,9 +394,10 @@ function sha256Buffer(buf: Buffer): string {
 }
 
 /**
- * Prove the finished package contains the fixed Bovada boundary and the exact
- * shipped qf-canvas resource. This reads package bytes only; it never starts a
- * vendor request or mutates the package.
+ * Prove the finished package contains the bounded Bovada transports, governed
+ * market desk boundary, rendered consumer surface, and exact shipped qf-canvas
+ * resource. This reads package bytes only; it never starts a vendor request or
+ * mutates the package.
  */
 export function inspectBovadaPackagedSurface(
   resourcesRoot: string,
@@ -419,15 +420,42 @@ export function inspectBovadaPackagedSurface(
   const bundleText = mainBundle.toString("utf8");
   const requiredNeedles = [
     "https://www.bovada.lv/services/sports/event/v2/events/A/description/football/nfl",
+    "https://www.bovada.lv/services/sports/event/v2/events/A/description/ufc-mma/ufc",
     "QuantFlow-Bovada-Football/0.1",
+    "QuantFlow-Bovada-Live-Markets/1.0",
     'credentials: "omit"',
     "market.bovadaFootballCapture",
+    "qf:markets:capture",
+    "qf:markets:investigate",
   ];
   for (const needle of requiredNeedles) {
     if (!bundleText.includes(needle)) {
       return {
         ok: false,
         reason: `Bovada main bundle missing required marker: ${needle}`,
+      };
+    }
+  }
+
+  const rendererEntries = listPackage(asarPath, { isPack: false }).filter((entry) => {
+    const normalized = entry.replaceAll("\\", "/");
+    return normalized.includes("/out/renderer/") && normalized.endsWith(".js");
+  });
+  if (rendererEntries.length === 0) {
+    return { ok: false, reason: "Bovada package proof missing rendered JavaScript" };
+  }
+  let rendererText = "";
+  let rendererBytes = 0;
+  for (const entry of rendererEntries) {
+    const bytes = extractFile(asarPath, entry);
+    rendererBytes += bytes.length;
+    rendererText += bytes.toString("utf8");
+  }
+  for (const marker of ["Bovada Live Markets", "Research this market"]) {
+    if (!rendererText.includes(marker)) {
+      return {
+        ok: false,
+        reason: `Bovada rendered package missing required marker: ${marker}`,
       };
     }
   }
@@ -462,6 +490,7 @@ export function inspectBovadaPackagedSurface(
     ok: true,
     checkedPaths: [
       { path: "app.asar:out/main/index.js", bytes: mainBundle.length },
+      { path: "app.asar:out/renderer/*.js", bytes: rendererBytes },
       { path: "resources/collab-cli.mjs", bytes: packagedCli.length },
     ],
   };

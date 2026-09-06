@@ -232,6 +232,8 @@ A tool is an MCP-exposed capability agents can invoke. It governs action surface
 - **properties:**
 - `name` — Tool identifier exposed to agents (typically qf_*). Keep naming stable because prompts and automations may reference it directly.
 - `summary` — One-line capability summary for agent selection. Explain what decision this tool enables, not just its transport mechanism.
+- `capability_class` — Dock category of a registered capability. Legacy unclassified tools remain absent from the capability catalog until explicitly registered.
+- `implementation_version` — Exact implementation revision admitted for this capability. A changed revision requires a new explicit registration identity rather than silently changing an existing resource.
 
 ### `execution_environment`
 
@@ -438,6 +440,14 @@ Session identity: which agent_definition profile created this agent_session.
 - **from:** `agent_session`
 - **to:** `agent_definition`
 
+### `investigates`
+
+The exact immutable market observation that started an investigation. Only create_market_investigation may establish this edge, so refreshed prices never rewrite the original question's evidence.
+
+- **lifecycle:** `experimental`
+- **from:** `mission`
+- **to:** `quote`
+
 ## Actions
 
 ### `create_hypothesis`
@@ -496,6 +506,29 @@ Register a standing research mission with name and objective.
 - `mission_id` — Optional id; Kernel mints a UUID when omitted.
 - `name` — Operator-facing mission label.
 - `objective` — Decision goal this mission serves.
+
+### `register_tool`
+
+Register an explicit capability identity for the Dock. Identical registration is idempotent; conflicting identity, category or revision is refused.
+
+- **lifecycle:** `experimental`
+- **operator-only:** `true`
+- **input:**
+- `tool_id` — Stable capability identity. Reuse only for exactly the same implementation and presentation contract.
+- `name` — Human-readable capability name. It names the callable resource rather than its venue or implementation package.
+- `summary` — The research operation this capability supplies. Describe its useful outcome and limits.
+- `capability_class` — Catalog category of this capability. It never grants participant permissions.
+- `implementation_version` — Exact admitted implementation version. Conflicting re-registration is rejected.
+
+### `create_market_investigation`
+
+Open a Technique-free investigation anchored to one current quote. The Kernel checks observation age, latest observation and event cutoff before atomically creating the Mission and investigates edge; it never creates a Task or Strategy.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `quote_id` — Exact current quote being researched. A stale or superseded observation must be refreshed before entry.
+- `name` — Short question label visible on the desk. Keep the exact evidence identity in the investigates link.
+- `objective` — Bounded investigation question. This is research intent and carries no probability, recommendation or execution authority.
 
 ### `create_ticket`
 

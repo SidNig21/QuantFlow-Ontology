@@ -322,6 +322,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "wave1-market-desk",
+    description: "W1-01: live UFC identity receipt, governed capture, continuous Canvas desk, and Technique-free investigation",
+    run: async () => {
+      const { runWave1MarketDeskGate } = await import("./gates/wave1-market-desk.ts");
+      const { ok } = await runWave1MarketDeskGate();
+      return ok;
+    },
+  },
+  {
     name: "technique-outcome-loop",
     description: "R17: immutable named Technique selection and operator-settled outcome grade",
     run: async () => {

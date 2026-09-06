@@ -55,6 +55,12 @@ import { loadState as loadCanvasState } from "./canvas-persistence";
 import { resolveSecondOpinionAdmission } from "./second-opinion-admission";
 import { bindMissionToDirectorSession } from "./mission-context";
 import { bindResearchHypothesis } from "./research-context";
+import {
+  captureBovadaMarketDesk,
+  createMarketDeskInvestigation,
+  ensureBovadaLiveMarketsCapability,
+  listBovadaMarketDeskRows,
+} from "./market-desk";
 
 export { QF_EXECUTE_ALLOWLIST };
 
@@ -248,6 +254,65 @@ export function registerKernelHandlers(): void {
       }
     },
   );
+
+  ipcMain.handle("qf:markets:capability", (event) => {
+    try {
+      assertTrustedSender(event);
+      return { ok: true as const, capability: ensureBovadaLiveMarketsCapability() };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:markets:list", (event) => {
+    try {
+      assertTrustedSender(event);
+      return { ok: true as const, rows: listBovadaMarketDeskRows() };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:markets:capture", async (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Open markets requires sport, competition, and market class");
+      const input = args as Record<string, unknown>;
+      const request = {
+        sport: input.sport,
+        competition: input.competition,
+        market_class: input.market_class,
+      };
+      if (request.sport !== "ufc" || request.competition !== "ufc" || request.market_class !== "moneyline") {
+        throw new Error("Bovada Live Markets currently supports UFC fight-winner markets");
+      }
+      const rows = await captureBovadaMarketDesk(request);
+      invalidateDock();
+      return { ok: true as const, rows };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:markets:investigate", (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Research this market requires an exact quote and question");
+      const input = args as Record<string, unknown>;
+      if (typeof input.quote_id !== "string" || typeof input.name !== "string" || typeof input.objective !== "string") {
+        throw new Error("Research this market requires an exact quote and question");
+      }
+      const result = createMarketDeskInvestigation({
+        quote_id: input.quote_id,
+        name: input.name,
+        objective: input.objective,
+      });
+      invalidateDock();
+      return { ok: true as const, ...result };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
 
   ipcMain.handle(
     "qf:research:submitQuestion",

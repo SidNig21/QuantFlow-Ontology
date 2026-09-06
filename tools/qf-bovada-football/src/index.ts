@@ -1,6 +1,10 @@
 export {
   BOVADA_ACCEPT,
   BOVADA_FOOTBALL_URL,
+  BOVADA_LIVE_MARKETS_TOOL_ID,
+  BOVADA_LIVE_MARKETS_VERSION,
+  BOVADA_LIVE_USER_AGENT,
+  BOVADA_UFC_URL,
   BOVADA_ORIGIN,
   BOVADA_REQUEST_HEADERS,
   BOVADA_USER_AGENT,
@@ -31,14 +35,18 @@ export {
   assertBovadaOrigin,
   assertBovadaResponse,
   createFixedBovadaTransport,
+  createBovadaLiveMarketsTransport,
   readBoundedResponseBody,
   type BovadaTransport,
   type BovadaTransportResponse,
   type FixedFetch,
 } from "./transport.ts";
 export {
+  parseBovadaCoupons,
   parseBovadaFootballResponse,
+  parseBovadaLiveMarketsResponse,
   selectBovadaFootballMarket,
+  type BovadaMarketRequest,
   type ProviderCompetitor,
   type ProviderCoupon,
   type ProviderDisplayGroup,
@@ -50,6 +58,7 @@ export {
   type ProviderPrice,
   type ProviderPriceValue,
   type SelectedFootballMarket,
+  type SelectedBovadaMarket,
 } from "./parser.ts";
 export {
   artifactPathForHash,
@@ -71,3 +80,9 @@ export {
   type MarketBatchInput,
   type TraceContext,
 } from "./runner.ts";
+export {
+  runBovadaLiveMarketsCapture,
+  type BovadaLiveMarketRow,
+  type BovadaLiveMarketsOptions,
+  type BovadaLiveMarketsReceipt,
+} from "./live-markets.ts";

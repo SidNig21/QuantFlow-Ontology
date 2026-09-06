@@ -2,7 +2,7 @@ import { tiles } from "./canvas-state.js";
 import { participantFieldRows } from "./participant-projection.js";
 
 const FIELD_ORDER = {
-	mission: ["id", "name", "objective"],
+	mission: ["id", "name", "objective", "quote_id", "observed_at", "state", "method"],
 	task: ["id", "title", "description", "status", "assignee_session_id", "delegator_session_id", "steering_state", "review_state", "mission_id"],
 	hypothesis: ["id", "claim", "success_criteria", "sources", "status"],
 	dataset: ["id", "kind", "as_of", "content_hash", "coverage", "source_artifact"],
@@ -12,6 +12,10 @@ const FIELD_ORDER = {
 	artifact: ["id", "kind", "receipt"],
 	evaluation: ["id", "critic_session_id", "rubric", "overall", "verdict", "confidence", "rationale", "block_reason", "findings_artifact_id", "review_task_id", "report_artifact_id"],
 	agent_session: ["id", "status", "label"],
+	quote: ["id", "book", "coverage", "current", "instrument_id", "data_ref", "source"],
+	instrument: ["id", "kind", "params", "sides", "correlation_group"],
+	market_event: ["id", "sport", "competition", "starts_at", "status"],
+	venue: ["id", "name", "kind"],
 };
 
 function tileId(type, id) { return `ontology:${type}:${id}`; }
@@ -49,7 +53,7 @@ const WORKFLOW_STAGE_LABELS = Object.freeze(["Mission", "Work", "Evidence", "Eva
 const WORLD_TYPE_ORDER = new Map([
 	["mission", 0], ["task", 1], ["hypothesis", 2], ["dataset", 3],
 	["run", 4], ["artifact", 5], ["evaluation", 6],
-	["strategy", 5], ["ticket", 6],
+	["strategy", 5], ["ticket", 6], ["venue", 1], ["market_event", 2], ["instrument", 3], ["quote", 4],
 ]);
 
 const SESSION_TILE_WIDTH = WORLD_TILE_WIDTH;
@@ -59,7 +63,8 @@ function laneFor(object) {
 	if (["evaluation"].includes(object?.type)) return 3;
 	if (object?.type === "artifact" && object?.fields?.kind === "report") return 3;
 	if (["run", "artifact", "strategy"].includes(object?.type)) return 2;
-	if (["hypothesis", "dataset"].includes(object?.type)) return 1;
+	if (["hypothesis", "dataset", "venue", "market_event"].includes(object?.type)) return 1;
+	if (["instrument", "quote"].includes(object?.type)) return 2;
 	return 0;
 }
 
@@ -223,6 +228,16 @@ export function deriveResearchWorkflow(world) {
 	addObject(sourceTask);
 	const sourceTaskMission = sourceTask && linkFrom(sourceTask.id, "belongs_to", mission?.id);
 	addPathLink(sourceTaskMission);
+	const investigationLink = mission && linkFrom(mission.id, "investigates");
+	const marketQuote = objectById(investigationLink?.to_id);
+	const quotedLink = marketQuote && linkFrom(marketQuote.id, "quotes");
+	const marketInstrument = objectById(quotedLink?.to_id);
+	const eventLink = marketInstrument && linkFrom(marketInstrument.id, "offered_on");
+	const marketEvent = objectById(eventLink?.to_id);
+	const venueLink = marketInstrument && linkTo(marketInstrument.id, "lists");
+	const marketVenue = objectById(venueLink?.from_id);
+	for (const object of [marketVenue, marketEvent, marketInstrument, marketQuote]) addObject(object);
+	for (const link of [investigationLink, quotedLink, eventLink, venueLink]) addPathLink(link);
 
 	const executorLink = sourceTask && linkFrom(sourceTask.id, "assigned_to");
 	const executor = objectById(executorLink?.to_id || sourceTask?.fields?.assignee_session_id);
@@ -304,6 +319,7 @@ export function deriveResearchWorkflow(world) {
 		}
 	}
 	if (run) stages[2].push(run);
+	for (const object of [marketVenue, marketEvent, marketInstrument, marketQuote].filter(Boolean)) stages[2].push(object);
 	for (const input of objects.filter((object) => primaryIds.has(object.id) && ["hypothesis", "dataset", "strategy"].includes(object.type)).sort(stableObjectOrder)) stages[2].push(input);
 	if (rawArtifact) stages[2].push(rawArtifact);
 	if (evaluation) stages[3].push(evaluation);
@@ -325,7 +341,7 @@ export function deriveResearchWorkflow(world) {
 	const currentMissionIds = new Set(objects
 		.filter((object) => !historyIds.has(object.id) || (primaryIds.has(object.id) && object.type === "agent_session"))
 		.map((object) => object.id));
-	return { objects, links, byId, stages, stageById, primaryIds, primaryLinkKeys, historyIds, currentMissionIds, mission, sourceTask, executor, director, run, rawArtifact, evaluation, reviewTask, critic, currentReport };
+	return { objects, links, byId, stages, stageById, primaryIds, primaryLinkKeys, historyIds, currentMissionIds, mission, sourceTask, executor, director, run, rawArtifact, evaluation, reviewTask, critic, currentReport, marketQuote, marketInstrument, marketEvent, marketVenue };
 }
 
 function derivedStage(workflow, object) {
@@ -489,6 +505,10 @@ function objectHumanTitle(object, participantView = null, workflow = null) {
 	if (object?.type === "strategy") return firstRecorded(fields.family, fields.name, fields.title, fields.label, humanizedKind(fields.kind));
 	if (object?.type === "hypothesis") return firstRecorded(fields.claim, fields.name, fields.title, fields.label);
 	if (object?.type === "ticket") return firstRecorded(fields.name, fields.title, fields.label, fields.external_ref);
+	if (object?.type === "quote") return "Market observation";
+	if (object?.type === "instrument") return firstRecorded(fields.params?.market_label, humanizedKind(fields.kind));
+	if (object?.type === "market_event") return firstRecorded(fields.competition, "Market event");
+	if (object?.type === "venue") return firstRecorded(fields.name, "Venue");
 	return firstRecorded(fields.name, fields.title, fields.label, humanizedKind(fields.kind));
 }
 
@@ -508,8 +528,14 @@ export function researchTilePresentation(object, workflow, participantViewForId 
 	let badge = String(object?.type ?? "object").replace("agent_session", "participant").toUpperCase();
 	let status = firstRecorded(fields.status);
 	if (object?.type === "mission") {
-		const technique = (workflow?.stages?.[2] || []).filter((candidate) => candidate.type === "strategy").sort(stableObjectOrder)[0];
-		addFact("Technique", technique ? titleFor(technique.id) : "Not recorded");
+		if (fields.quote_id) {
+			addFact("Observation", fields.observed_at);
+			addFact("State", fields.state);
+			addFact("Method", "not selected");
+		} else {
+			const technique = (workflow?.stages?.[2] || []).filter((candidate) => candidate.type === "strategy").sort(stableObjectOrder)[0];
+			addFact("Technique", technique ? titleFor(technique.id) : "Not recorded");
+		}
 	} else if (object?.type === "task") {
 		addFact("Owner", titleFor(outgoing.find((link) => link.kind === "assigned_to")?.to_id));
 	} else if (object?.type === "agent_session") {
@@ -1312,11 +1338,6 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		const worldSessionIds = new Set(result.world.objects
 			.filter((object) => object.type === "agent_session")
 			.map((object) => object.id));
-		const staleProjectionIds = tiles.filter((tile) =>
-			(tile.type === "research" && !worldResearchIds.has(tile.id)) ||
-			(tile.type === "term" && tile.sessionId && !tile.ptySessionId && !worldSessionIds.has(tile.sessionId))
-		).map((tile) => tile.id);
-		if (staleProjectionIds.length > 0) tileManager.removeProjectionTiles?.(staleProjectionIds);
 		const missingSessionObjects = result.world.objects.filter((object) =>
 			object.type === "agent_session" && !tiles.some((tile) => tile.sessionId === object.id));
 		for (const [index, object] of missingSessionObjects.entries()) {
@@ -1387,7 +1408,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		}
 		tileManager.applyTileLayout?.(projectedLayout);
 	}
-		if (staleProjectionIds.length > 0 || projectedLayout.length > 0) tileManager.saveCanvasImmediate?.();
+		if (projectedLayout.length > 0) tileManager.saveCanvasImmediate?.();
 		tileManager.repositionAllTiles?.();
 		applyProjection({ fit: true });
 		setDockMode(dockMode);

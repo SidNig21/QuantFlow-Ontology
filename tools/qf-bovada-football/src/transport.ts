@@ -1,6 +1,8 @@
 import {
   BOVADA_ACCEPT,
   BOVADA_FOOTBALL_URL,
+  BOVADA_LIVE_USER_AGENT,
+  BOVADA_UFC_URL,
   BOVADA_ORIGIN,
   BOVADA_REQUEST_HEADERS,
   BOVADA_USER_AGENT,
@@ -16,6 +18,7 @@ import {
   BovadaTimeoutError,
   BovadaTransportError,
 } from "./errors.ts";
+import type { BovadaMarketRequest } from "./parser.ts";
 
 /** The small response surface the runner needs; headers are never persisted. */
 export type BovadaTransportResponse = {
@@ -43,6 +46,16 @@ function combinedSignal(signal: AbortSignal | undefined): AbortSignal {
   return signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS);
 }
 
+function publicRequestInit(headers: HeadersInit, signal: AbortSignal): RequestInit {
+  return {
+    method: "GET",
+    headers,
+    redirect: "follow",
+    credentials: "omit",
+    signal: combinedSignal(signal),
+  };
+}
+
 /**
  * Build the only production transport. The caller can replace fetch for a fixture, but cannot
  * replace the URL, request method, redirect policy, credentials policy, or request headers.
@@ -53,13 +66,10 @@ export function createFixedBovadaTransport(
   return async (signal: AbortSignal): Promise<BovadaTransportResponse> => {
     let response: Response;
     try {
-      response = await fetchImplementation(BOVADA_FOOTBALL_URL, {
-        method: "GET",
-        headers: { ...BOVADA_REQUEST_HEADERS },
-        redirect: "follow",
-        credentials: "omit",
-        signal: combinedSignal(signal),
-      });
+      response = await fetchImplementation(
+        BOVADA_FOOTBALL_URL,
+        publicRequestInit({ ...BOVADA_REQUEST_HEADERS }, signal),
+      );
     } catch (error) {
       if (signal.aborted) {
         throw new BovadaCancelledError();
@@ -76,6 +86,37 @@ export function createFixedBovadaTransport(
       headers: response.headers,
       body: response.body,
     };
+  };
+}
+
+export function createBovadaLiveMarketsTransport(
+  request: BovadaMarketRequest,
+  fetchImplementation: FixedFetch = (input, init) => fetch(input, init),
+): BovadaTransport {
+  const url = request.sport === "ufc" && request.competition === "ufc"
+    ? BOVADA_UFC_URL
+    : request.sport === "football" && request.competition === "nfl"
+      ? BOVADA_FOOTBALL_URL
+      : null;
+  if (!url || request.market_class !== "moneyline") {
+    throw new BovadaTransportError("Unsupported explicit Bovada sport, competition, or market class");
+  }
+  return async (signal: AbortSignal): Promise<BovadaTransportResponse> => {
+    let response: Response;
+    try {
+      response = await fetchImplementation(
+        url,
+        publicRequestInit(
+          { ...BOVADA_REQUEST_HEADERS, "User-Agent": BOVADA_LIVE_USER_AGENT },
+          signal,
+        ),
+      );
+    } catch (error) {
+      if (signal.aborted) throw new BovadaCancelledError();
+      if (error instanceof DOMException && error.name === "TimeoutError") throw new BovadaTimeoutError();
+      throw new BovadaTransportError();
+    }
+    return { status: response.status, url: response.url, headers: response.headers, body: response.body };
   };
 }
 
@@ -179,6 +220,7 @@ export async function readBoundedResponseBody(
 export {
   BOVADA_ACCEPT,
   BOVADA_FOOTBALL_URL,
+  BOVADA_UFC_URL,
   BOVADA_ORIGIN,
   BOVADA_USER_AGENT,
   MAX_RESPONSE_BYTES,

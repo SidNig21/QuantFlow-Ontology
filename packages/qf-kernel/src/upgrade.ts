@@ -33,6 +33,7 @@ export type KernelShapeState =
   | "task_composition"
   | "task_steering"
   | "pre_r17_current"
+  | "pre_market_desk"
   | "current"
   | "partial";
 
@@ -180,6 +181,7 @@ let preD1Snapshot: StructureSnapshot | null = null;
 let d1Snapshot: StructureSnapshot | null = null;
 let currentSnapshot: StructureSnapshot | null = null;
 let preR17CurrentSnapshot: StructureSnapshot | null = null;
+let preMarketDeskSnapshot: StructureSnapshot | null = null;
 
 function snapshotFromMigrationFile(path: string): StructureSnapshot {
   const sql = readFileSync(path, "utf8");
@@ -224,6 +226,40 @@ function expectedCurrent(): StructureSnapshot {
     currentSnapshot = snapshotFromMigrationFile(resolveCurrentMigrationPath());
   }
   return currentSnapshot;
+}
+
+function tablesWithoutMarketDesk(tables: Map<string, string>): Map<string, string> {
+  const next = new Map(tables);
+  const tool = next.get("tool")
+    ?.replace(/,capability_class TEXT/gi, "")
+    .replace(/,implementation_version TEXT/gi, "")
+    .replace(/,?CHECK\(capability_class IN\('data','tool'\)\)/gi, "");
+  if (tool) next.set("tool", tool);
+  const links = next.get("links")
+    ?.replace(/,'investigates'/gi, "")
+    .replace(/'investigates',/gi, "");
+  if (links) next.set("links", links);
+  return next;
+}
+
+function linkKindsWithoutMarketDesk(kinds: readonly string[]): string[] {
+  return kinds.filter((kind) => kind !== "investigates");
+}
+
+function schemaMetaWithoutMarketDesk(rows: Array<[string, string, string, string]>): Array<[string, string, string, string]> {
+  return rows.filter(([name]) => !["investigates", "register_tool", "create_market_investigation"].includes(name));
+}
+
+function expectedPreMarketDesk(): StructureSnapshot {
+  if (!preMarketDeskSnapshot) {
+    const current = expectedCurrent();
+    preMarketDeskSnapshot = {
+      tables: tablesWithoutMarketDesk(current.tables),
+      linkKinds: linkKindsWithoutMarketDesk(current.linkKinds),
+      schemaMeta: schemaMetaWithoutMarketDesk(current.schemaMeta),
+    };
+  }
+  return preMarketDeskSnapshot;
 }
 
 function expectedPreR17Current(): StructureSnapshot {
@@ -346,18 +382,18 @@ function tablesWithoutTaskDelegation(
 }
 
 function tablesWithoutR17(tables: Map<string, string>): Map<string, string> {
-  const next = new Map(tables);
+  const next = tablesWithoutMarketDesk(tables);
   const links = next.get("links");
   if (links) next.set("links", links.replace(/,'grades_ticket'/gi, "").replace(/,'grades_run'/gi, "").replace(/,'grades_strategy'/gi, "").replace(/,'grades_run_result'/gi, ""));
   return next;
 }
 
 function linkKindsWithoutR17(linkKinds: readonly string[]): string[] {
-  return linkKinds.filter((kind) => !["grades_ticket", "grades_run", "grades_strategy", "grades_run_result"].includes(kind));
+  return linkKindsWithoutMarketDesk(linkKinds).filter((kind) => !["grades_ticket", "grades_run", "grades_strategy", "grades_run_result"].includes(kind));
 }
 
 function schemaMetaWithoutR17(rows: Array<[string, string, string, string]>): Array<[string, string, string, string]> {
-  return rows.filter(([name]) => !["grades_ticket", "grades_run", "grades_strategy", "grades_run_result", "record_strategy_outcome"].includes(name));
+  return schemaMetaWithoutMarketDesk(rows).filter(([name]) => !["grades_ticket", "grades_run", "grades_strategy", "grades_run_result", "record_strategy_outcome"].includes(name));
 }
 
 function tablesWithoutIndependentCritic(
@@ -540,9 +576,7 @@ function expectedD1(): StructureSnapshot {
     const current = expectedCurrent();
     d1Snapshot = {
       tables: tablesWithoutR17(predecessorTables(current.tables)),
-      linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds).filter(
-        (kind) => !["grades_ticket", "grades_run", "grades_strategy", "grades_run_result"].includes(kind),
-      ),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
       schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutTaskActions(current.schemaMeta).filter(
         ([typeName, kind]) =>
           kind !== "action" ||
@@ -838,15 +872,36 @@ function snapshotsEqual(a: StructureSnapshot, b: StructureSnapshot): boolean {
 
 /** R16 schema additions were added after the generated 0012 upgrade authority. */
 function applyCurrentR16SchemaAdditions(db: KernelDb): void {
+  const currentToolSql = expectedCurrent().tables.get("tool");
+  const liveToolSql = readTableSql(db, "tool");
+  if (currentToolSql && liveToolSql !== currentToolSql) {
+    db.exec(`
+      CREATE TABLE tool__w1_upgrade (
+        id TEXT PRIMARY KEY NOT NULL,
+        created_at TEXT NOT NULL,
+        name TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        capability_class TEXT,
+        implementation_version TEXT,
+        CHECK (capability_class IN ('data', 'tool'))
+      );
+      INSERT INTO tool__w1_upgrade (id, created_at, name, summary)
+        SELECT id, created_at, name, summary FROM tool;
+      DROP TABLE tool;
+      ALTER TABLE tool__w1_upgrade RENAME TO tool;
+    `);
+  }
   const currentLinksSql = expectedCurrent().tables.get("links");
   const liveLinksSql = readTableSql(db, "links");
   if (currentLinksSql && liveLinksSql !== currentLinksSql) {
-    const upgradeLinksSql = currentLinksSql.replace(
-      /^CREATE TABLE links\b/i,
-      "CREATE TABLE links__r16_upgrade",
-    );
-    db.exec(`${upgradeLinksSql};`);
     db.exec(`
+      CREATE TABLE links__r16_upgrade (
+        id TEXT PRIMARY KEY NOT NULL,
+        kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'belongs_to', 'grades_ticket', 'grades_run', 'grades_strategy', 'grades_run_result', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from', 'investigates')),
+        from_id TEXT NOT NULL,
+        to_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
       INSERT INTO links__r16_upgrade (id, kind, from_id, to_id, created_at)
         SELECT id, kind, from_id, to_id, created_at FROM links;
       DROP TABLE links;
@@ -857,7 +912,7 @@ function applyCurrentR16SchemaAdditions(db: KernelDb): void {
   const currentMeta = new Map(
     expectedCurrent().schemaMeta.map((row) => [row[0], row] as const),
   );
-  for (const name of ["belongs_to", "governed_review_task", "grades_ticket", "grades_run", "grades_strategy", "grades_run_result", "record_strategy_outcome"] as const) {
+  for (const name of ["belongs_to", "governed_review_task", "grades_ticket", "grades_run", "grades_strategy", "grades_run_result", "record_strategy_outcome", "investigates", "register_tool", "create_market_investigation"] as const) {
     const row = currentMeta.get(name);
     if (!row) continue;
     const present = db
@@ -951,6 +1006,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedTaskCompositionHistorical())) return "task_composition";
   if (snapshotsEqual(live, expectedTaskSteering())) return "task_steering";
   if (snapshotsEqual(live, expectedPreR17Current())) return "pre_r17_current";
+  if (snapshotsEqual(live, expectedPreMarketDesk())) return "pre_market_desk";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -1016,6 +1072,13 @@ export function applyKernelUpgradeChain(
   if (state === "uninitialized") return;
 
   const tx = db.transaction(() => {
+    if (state === "pre_market_desk") {
+      applyCurrentR16SchemaAdditions(db);
+      if (classifyKernelShape(db) !== "current") {
+        throw new KernelUpgradeShapeError(TASK_COMPOSITION_UPGRADE, "market desk additions did not produce the exact current shape");
+      }
+      return;
+    }
     if (state === "pre_r17_current") {
       applyCurrentR16SchemaAdditions(db);
       if (classifyKernelShape(db) !== "current") {

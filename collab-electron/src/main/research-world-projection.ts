@@ -52,13 +52,14 @@ export type ResearchWorldProjectionResult =
 const TRAVERSAL_KINDS = new Set([
   "belongs_to", "tests", "uses", "produces", "evaluated_by", "performed_by",
   "gates", "assigned_to", "delegated_by", "delegates_to", "grades_ticket", "grades_run", "grades_strategy", "grades_run_result",
-  "spawned_from",
+  "spawned_from", "investigates", "quotes", "offered_on", "lists",
 ]);
 const OBJECT_TYPES = [
   "mission", "task", "hypothesis", "dataset", "run", "strategy", "ticket", "artifact", "evaluation", "agent_session",
+  "quote", "instrument", "market_event", "venue",
 ];
 const JSON_FIELDS = new Set([
-  "sources", "coverage", "params", "metrics", "rubric", "run_metrics", "source_work", "block_reason",
+  "sources", "coverage", "params", "sides", "metrics", "rubric", "run_metrics", "source_work", "block_reason",
 ]);
 
 function parseJson(value: unknown): unknown {
@@ -256,6 +257,27 @@ function idsContain(ids: Map<string, Set<string>>, id: string): boolean {
   return [...ids.values()].some((set) => set.has(id));
 }
 
+function addMarketLineage(snapshot: RelationalSnapshot, missionId: string, ids: Map<string, Set<string>>): ResearchWorldLink[] {
+  const selected: ResearchWorldLink[] = [];
+  const addLink = (link: ResearchWorldLink | undefined) => {
+    if (!link) return;
+    selected.push(link);
+    addId(ids, objectType(snapshot, link.from_id), link.from_id);
+    addId(ids, objectType(snapshot, link.to_id), link.to_id);
+  };
+  const investigation = snapshot.links.find((link) => link.kind === "investigates" && link.from_id === missionId);
+  addLink(investigation);
+  if (!investigation) return selected;
+  const quote = snapshot.rows.get("quote")?.get(investigation.to_id);
+  if (typeof quote?.data_ref === "string") addId(ids, "artifact", quote.data_ref);
+  const quoted = snapshot.links.find((link) => link.kind === "quotes" && link.from_id === investigation.to_id);
+  addLink(quoted);
+  if (!quoted) return selected;
+  addLink(snapshot.links.find((link) => link.kind === "offered_on" && link.from_id === quoted.to_id));
+  addLink(snapshot.links.find((link) => link.kind === "lists" && link.to_id === quoted.to_id));
+  return selected;
+}
+
 function sourceWorkMatches(row: Record<string, unknown>, source: Record<string, unknown>): boolean {
   const value = parseJson(row.source_work);
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
@@ -270,7 +292,7 @@ function sourceWorkKey(source: Record<string, unknown>): string {
     .join("\u0000");
 }
 
-type ReportContext = { currentReportId: string | null; reportIds: string[]; runId?: string; runResultArtifactId?: string };
+type ReportContext = { currentReportId: string | null; reportIds: string[]; runId?: string; sourceTaskId?: string; runResultArtifactId?: string; sourceResultArtifactId?: string };
 
 function reportContext(snapshot: RelationalSnapshot, source: Record<string, unknown>): ReportContext {
   const ids = new Set<string>();
@@ -325,7 +347,10 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
     if (context?.runResultArtifactId === id && incoming.some((link) =>
       link.kind === "produces" && link.from_id === context.runId
     )) fields.run_id = context.runId;
-    const source = [...snapshot.sourceWork.values()].flat().find((candidate) => candidate.result_artifact_id === id);
+    if (context?.sourceResultArtifactId === id) fields.run_id = context.runId;
+    const source = context?.sourceResultArtifactId === id
+      ? { run_id: context.runId, source_task_id: context.sourceTaskId }
+      : [...snapshot.sourceWork.values()].flat().find((candidate) => candidate.result_artifact_id === id);
     fields.source_run_id = source?.run_id ?? null;
     fields.source_task_id = source?.source_task_id ?? null;
     if (row.kind === "report") {
@@ -340,6 +365,42 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
     fields.mission_id = outgoing.find((link) => link.kind === "belongs_to")?.to_id ?? null;
     fields.steering_state = row.status;
     fields.review_state = row.status;
+  }
+  if (type === "mission") {
+    const investigation = outgoing.find((link) => link.kind === "investigates");
+    if (investigation) {
+      const quote = snapshot.rows.get("quote")?.get(investigation.to_id);
+      const coverage = parseJson(quote?.coverage);
+      fields.quote_id = investigation.to_id;
+      fields.state = "ready to staff";
+      fields.method = null;
+      fields.observed_at = coverage && typeof coverage === "object" && !Array.isArray(coverage)
+        ? (coverage as Record<string, unknown>).observed_at ?? quote?.created_at ?? null
+        : quote?.created_at ?? null;
+    }
+  }
+  if (type === "quote") {
+    const instrumentId = outgoing.find((link) => link.kind === "quotes")?.to_id;
+    fields.instrument_id = instrumentId ?? null;
+    const sourceId = typeof row.data_ref === "string" ? row.data_ref : "";
+    const artifact = sourceId ? snapshot.rows.get("artifact")?.get(sourceId) : undefined;
+    fields.source = artifact ? artifactReceipt(artifact) : null;
+    const peers = instrumentId
+      ? snapshot.links.filter((link) => link.kind === "quotes" && link.to_id === instrumentId)
+        .map((link) => snapshot.rows.get("quote")?.get(link.from_id))
+        .filter((candidate): candidate is Record<string, unknown> => Boolean(candidate))
+        .sort((a, b) => {
+          const observed = (candidate: Record<string, unknown>) => {
+            const coverage = parseJson(candidate.coverage);
+            const value = coverage && typeof coverage === "object" && !Array.isArray(coverage)
+              ? Date.parse(String((coverage as Record<string, unknown>).observed_at ?? ""))
+              : Number.NEGATIVE_INFINITY;
+            return Number.isFinite(value) ? value : Number.NEGATIVE_INFINITY;
+          };
+          return observed(b) - observed(a) || String(b.created_at ?? "").localeCompare(String(a.created_at ?? "")) || String(b.id ?? "").localeCompare(String(a.id ?? ""));
+        })
+      : [];
+    fields.current = peers[0]?.id === id;
   }
   if (type === "run") {
     fields.dataset_id = outgoing.find((link) => link.kind === "uses" && objectType(snapshot, link.to_id) === "dataset")?.to_id ?? null;
@@ -398,11 +459,15 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   let selectedTaskId: string | undefined;
   let sourceRows: Array<Record<string, unknown>> = [];
   if (request.root_type === "mission") {
+    const marketLinks = addMarketLineage(snapshot, request.root_id, ids);
     const tasks = allLinks.filter((link) => link.kind === "belongs_to" && link.to_id === request.root_id).map((link) => link.from_id);
     if (tasks.length > 1) return { ok: false, code: "WORLD_ROOT_INELIGIBLE", message: `Mission has ${tasks.length} linked research Tasks; choose one before revealing the world.` };
     selectedTaskId = tasks[0];
     if (!selectedTaskId) {
-      return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects: [projectObject(snapshot, "mission", request.root_id)], links: [], missing_lineage: [{ owning_type: "mission", owning_id: request.root_id, kind: "belongs_to", message: "No linked research Task yet." }], current_report_id: null, report_ids: [] }) };
+      const objects: ResearchWorldObject[] = [];
+      for (const type of OBJECT_TYPES) for (const id of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, id));
+      objects.sort((a, b) => a.type.localeCompare(b.type) || a.id.localeCompare(b.id));
+      return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects, links: marketLinks, missing_lineage: [{ owning_type: "mission", owning_id: request.root_id, kind: "belongs_to", message: marketLinks.length > 0 ? "Ready to staff — no participant-owned Task yet." : "No linked research Task yet." }], current_report_id: null, report_ids: [] }) };
     }
     addId(ids, "task", selectedTaskId);
   } else {
@@ -426,7 +491,7 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   const runParams = parseJson(run.params);
   const runFields = runParams && typeof runParams === "object" && !Array.isArray(runParams)
     ? runParams as Record<string, unknown> : {};
-  const projectionContext = { ...reports, runId: String(source.run_id), runResultArtifactId: String(runFields.result_artifact_id) };
+  const projectionContext = { ...reports, runId: String(source.run_id), sourceTaskId: selectedTaskId, runResultArtifactId: String(runFields.result_artifact_id), sourceResultArtifactId: String(source.result_artifact_id) };
   addId(ids, "dataset", runFields.dataset_id);
   addId(ids, "artifact", runFields.result_artifact_id);
 
@@ -486,6 +551,9 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   const executorId = source.executor_session_id;
   const directorId = sourceTaskLinks.find((link) => link.kind === "delegated_by")?.to_id;
   addSelectedLink("belongs_to", selectedTaskId, missionId);
+  if (missionId) {
+    for (const link of addMarketLineage(snapshot, missionId, ids)) addSelectedLink(link.kind, link.from_id, link.to_id);
+  }
   addSelectedLink("assigned_to", selectedTaskId, executorId);
   addSelectedLink("delegated_by", selectedTaskId, directorId);
   addSelectedLink("delegates_to", directorId, executorId);

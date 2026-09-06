@@ -202,7 +202,7 @@ function sessionSpeciesLabel(row) {
 
 /**
  * @param {HTMLElement} panelEl
- * @param {{ onTidy?: () => void, onResearchSubmitted?: (result: object) => void, qaMode?: boolean }} [options]
+ * @param {{ onTidy?: () => void, onResearchSubmitted?: (result: object) => void, onOpenMarkets?: () => Promise<void> | void, qaMode?: boolean }} [options]
  */
 export function createCoalescedRefresh(runPass, { onError = (error) => console.error("[dock] refresh failed", error) } = {}) {
 	let running = false;
@@ -373,11 +373,15 @@ export function initDock(panelEl, options = {}) {
 			const runtimeRequest = options.refreshRuntimeSnapshot
 				? options.refreshRuntimeSnapshot()
 				: Promise.resolve(window.shellApi.qf.getRuntimeSnapshot?.()).then((runtimeResult) => runtimeResult?.ok && Array.isArray(runtimeResult.snapshot) ? runtimeResult.snapshot : []);
-			const [nextRuntimeSnapshot, defsRes, sessRes, surfaceRes] = await Promise.all([
+			const marketCapabilityRequest = typeof window.shellApi.qf.getMarketCapability === "function"
+				? window.shellApi.qf.getMarketCapability()
+				: Promise.resolve({ ok: false, error: { message: "Market capability boundary unavailable" } });
+			const [nextRuntimeSnapshot, defsRes, sessRes, surfaceRes, marketCapabilityRes] = await Promise.all([
 				runtimeRequest,
 				window.shellApi.qf.listDefinitions(),
 				window.shellApi.qf.listSessions(),
 				window.shellApi.qf.listTaskSurface(),
+				marketCapabilityRequest,
 			]);
 			runtimeSnapshot = Array.isArray(nextRuntimeSnapshot) ? nextRuntimeSnapshot : [];
 			const taskAssignments = surfaceRes?.ok && Array.isArray(surfaceRes.assignments)
@@ -449,6 +453,39 @@ export function initDock(panelEl, options = {}) {
 						});
 					speciesList.appendChild(card);
 				}
+			}
+			if (marketCapabilityRes?.ok && marketCapabilityRes.capability) {
+				const capability = marketCapabilityRes.capability;
+				const card = el("div", "lrow dock-data-row");
+				card.tabIndex = 0;
+				card.setAttribute("role", "button");
+				card.dataset.capabilityId = String(capability.id ?? "");
+				card.dataset.capabilityClass = String(capability.capability_class ?? "");
+				card.dataset.implementationVersion = String(capability.implementation_version ?? "");
+				card.appendChild(el("b", null, String(capability.name ?? "")));
+				card.appendChild(el("span", "dock-adapter", "DATA · public source"));
+				card.appendChild(el("span", "dock-capabilities", String(capability.summary ?? "")));
+				card.appendChild(el("span", "dock-ready", String(capability.readiness ?? "unavailable")));
+				const cue = el("em", null, "open markets ⏎");
+				card.appendChild(cue);
+				card.title = String(capability.readiness_detail ?? "");
+				const open = async () => {
+					if (card.getAttribute("aria-disabled") === "true") return;
+					card.setAttribute("aria-disabled", "true");
+					cue.textContent = "capturing…";
+					try { await options.onOpenMarkets?.(); }
+					finally { card.removeAttribute("aria-disabled"); cue.textContent = "open markets ⏎"; }
+				};
+				card.addEventListener("click", () => { void open(); });
+				card.addEventListener("keydown", (event) => {
+					if (event.key === "Enter" || event.key === " ") { event.preventDefault(); void open(); }
+				});
+				speciesList.appendChild(card);
+				launchable += 1;
+			} else {
+				const failure = el("div", "qf-empty", `Bovada Live Markets unavailable · ${marketCapabilityRes?.error?.message ?? "registration failed"}`);
+				failure.dataset.capabilityFailure = "bovada-live-markets";
+				speciesList.appendChild(failure);
 			}
 
 			latestDefinitions = defsRes?.ok ? launchableDockDefinitions(defsRes.definitions, {

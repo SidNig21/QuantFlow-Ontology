@@ -96,7 +96,7 @@ export class BovadaSchemaError extends BovadaFootballError {
 
 export class BovadaSelectionError extends BovadaFootballError {
   constructor(message: string) {
-    super("selection", "Bovada football selection rejected: " + message);
+    super("selection", "Bovada market selection rejected: " + message);
     this.name = "BovadaSelectionError";
   }
 }

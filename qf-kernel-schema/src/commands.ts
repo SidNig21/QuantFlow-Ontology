@@ -250,6 +250,8 @@ export const creationCommands: readonly CreationCommand[] = [
     object_type: "mission",
     event: "mission.created",
   },
+  { action: "register_tool", object_type: "tool", event: "tool.registered" },
+  { action: "create_market_investigation", object_type: "mission", event: "mission.created" },
   {
     action: "create_ticket",
     object_type: "ticket",

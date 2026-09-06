@@ -31,6 +31,7 @@ import { fitViewportToTiles } from "./glacier-feel.js";
 import { renderTaskFoot } from "./task-composition.js";
 import { createResearchWorldController } from "./research-world.js";
 import { participantViewForSession } from "./participant-projection.js";
+import { createMarketDesk } from "./market-desk.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
 const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
@@ -303,6 +304,7 @@ async function init() {
 		}, 2800);
 	}
 
+	let marketDeskController = null;
 	const dockController = initDock(panelAgent, {
 		onTidy: () => tidyTilesToGrid(),
 		getRuntimeSnapshot: () => runtimeSnapshot,
@@ -311,6 +313,7 @@ async function init() {
 			planningDirectorSubmission = { sessionId: String(result.sessionId), missionId: String(result.missionId) };
 			void researchWorldController?.reveal("mission", String(result.missionId));
 		},
+		onOpenMarkets: () => marketDeskController?.open(),
 	});
 
 	const agentPanel = createPanel("agent", {
@@ -572,6 +575,11 @@ async function init() {
 		onClearCableSelection: () => cableOverlay?.setSelectedId?.(null),
 		showStatus: (message) => showCanvasToast(message),
 		getParticipantView: participantViewFor,
+	});
+	marketDeskController = createMarketDesk({
+		layerEl: tileLayer,
+		onResearch: (missionId) => researchWorldController?.reveal("mission", missionId),
+		showStatus: (message, options) => showCanvasToast(message, options),
 	});
 	tileManager.onResearchWorldReady = (worldTiles) => {
 		edgeIndicators.update();

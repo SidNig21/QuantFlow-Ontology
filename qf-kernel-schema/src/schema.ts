@@ -1,4 +1,5 @@
 import baselineJson from "../schema-baseline.json" with { type: "json" };
+import { investigates, register_tool, create_market_investigation } from "./ontology/market-desk.ts";
 import { commands, creationCommands, pipelineCommands, internalCommands } from "./commands.ts";
 import {
   type ActiveSchemaBaseline,
@@ -159,6 +160,7 @@ export const schema: Schema = {
     delegated_by,
     delegates_to,
     spawned_from,
+    investigates,
   ],
   actions: [
     create_hypothesis,
@@ -166,6 +168,8 @@ export const schema: Schema = {
     create_run,
     execute_deterministic_run,
     create_mission,
+    register_tool,
+    create_market_investigation,
     create_ticket,
     observe_ticket,
     record_strategy_outcome,

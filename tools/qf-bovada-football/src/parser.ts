@@ -25,6 +25,8 @@ export type ProviderOutcome = {
   description: string;
   status: string;
   type: string;
+  competitorId: string | null;
+  priceId: string | null;
   price: ProviderPrice;
 };
 
@@ -38,6 +40,8 @@ export type ProviderPeriod = {
 export type ProviderMarket = {
   id: string;
   description: string;
+  descriptionKey: string | null;
+  marketTypeId: string | null;
   status: string;
   period: ProviderPeriod;
   outcomes: ProviderOutcome[];
@@ -50,7 +54,9 @@ export type ProviderDisplayGroup = {
 
 export type ProviderEvent = {
   id: string;
+  description: string | null;
   startTime: number;
+  lastModified: number | null;
   live: boolean;
   status: string;
   competitionId: string;
@@ -62,6 +68,7 @@ export type ProviderPathNode = {
   type: string;
   id: string;
   description: string;
+  sportCode: string | null;
 };
 
 export type ProviderCoupon = {
@@ -77,6 +84,22 @@ export type SelectedFootballMarket = {
   home: ProviderCompetitor;
   awayOutcome: ProviderOutcome;
   homeOutcome: ProviderOutcome;
+};
+
+export type BovadaMarketRequest = {
+  sport: "ufc" | "football";
+  competition: "ufc" | "nfl";
+  market_class: "moneyline";
+};
+
+export type SelectedBovadaMarket = {
+  sport: "ufc" | "football";
+  competitionId: string;
+  competitionName: string;
+  event: ProviderEvent;
+  market: ProviderMarket;
+  competitors: [ProviderCompetitor, ProviderCompetitor];
+  outcomes: [ProviderOutcome, ProviderOutcome];
 };
 
 function record(value: unknown, path: string): Record<string, unknown> {
@@ -143,6 +166,7 @@ function parsePath(value: unknown, path: string): ProviderPathNode[] {
       type: stringValue(row.type, path + "[" + index + "].type"),
       id: stringValue(row.id, path + "[" + index + "].id"),
       description: stringValue(row.description, path + "[" + index + "].description"),
+      sportCode: typeof row.sportCode === "string" ? row.sportCode : null,
     };
   });
 }
@@ -158,12 +182,15 @@ function parseCompetitor(value: unknown, path: string): ProviderCompetitor {
 
 function parseOutcome(value: unknown, path: string): ProviderOutcome {
   const row = record(value, path);
+  const price = record(row.price, path + ".price");
   return {
     id: stringValue(row.id, path + ".id"),
     description: stringValue(row.description, path + ".description"),
     status: stringValue(row.status, path + ".status"),
     type: stringValue(row.type, path + ".type"),
-    price: parsePrice(row.price, path + ".price"),
+    competitorId: typeof row.competitorId === "string" ? row.competitorId : null,
+    priceId: typeof price.id === "string" ? price.id : null,
+    price: parsePrice(price, path + ".price"),
   };
 }
 
@@ -182,6 +209,8 @@ function parseMarket(value: unknown, path: string): ProviderMarket {
   return {
     id: stringValue(row.id, path + ".id"),
     description: stringValue(row.description, path + ".description"),
+    descriptionKey: typeof row.descriptionKey === "string" ? row.descriptionKey : null,
+    marketTypeId: typeof row.marketTypeId === "string" ? row.marketTypeId : null,
     status: stringValue(row.status, path + ".status"),
     period: parsePeriod(row.period, path + ".period"),
     outcomes: array(row.outcomes, path + ".outcomes").map((entry, index) =>
@@ -204,7 +233,9 @@ function parseEvent(value: unknown, path: string): ProviderEvent {
   const row = record(value, path);
   return {
     id: stringValue(row.id, path + ".id"),
+    description: typeof row.description === "string" ? row.description : null,
     startTime: timestampValue(row.startTime, path + ".startTime"),
+    lastModified: typeof row.lastModified === "number" && Number.isFinite(row.lastModified) ? row.lastModified : null,
     live: booleanValue(row.live, path + ".live"),
     status: stringValue(row.status, path + ".status"),
     competitionId: stringValue(row.competitionId, path + ".competitionId"),
@@ -307,34 +338,87 @@ function decodeJson(bytes: Uint8Array): unknown {
   }
 }
 
+export function parseBovadaCoupons(body: Uint8Array | string): ProviderCoupon[] {
+  let root: unknown;
+  if (typeof body === "string") {
+    if (new TextEncoder().encode(body).byteLength > MAX_RESPONSE_BYTES) throw new BovadaBodyTooLargeError(MAX_RESPONSE_BYTES);
+    try { root = JSON.parse(body) as unknown; } catch { throw new BovadaJsonError(); }
+  } else {
+    if (body.byteLength > MAX_RESPONSE_BYTES) throw new BovadaBodyTooLargeError(MAX_RESPONSE_BYTES);
+    root = decodeJson(body);
+  }
+  const coupons = array(root, "response");
+  if (coupons.length === 0) throw new BovadaSelectionError("response contained no coupons");
+  return coupons.map((coupon, index) => parseCoupon(coupon, "response[" + index + "]"));
+}
+
+function exactTwoSided(event: ProviderEvent, market: ProviderMarket): SelectedBovadaMarket["outcomes"] | null {
+  if (market.outcomes.length !== 2 || market.outcomes.some((outcome) => outcome.status !== "O")) return null;
+  const byCompetitor = event.competitors.map((competitor) =>
+    market.outcomes.find((outcome) => outcome.competitorId === competitor.id && outcome.description === competitor.name),
+  );
+  if (!byCompetitor[0] || !byCompetitor[1] || byCompetitor[0].id === byCompetitor[1].id) return null;
+  return [byCompetitor[0], byCompetitor[1]];
+}
+
+/** Enumerate a bounded current market list for an explicit sport, competition and market class. */
+export function parseBovadaLiveMarketsResponse(
+  body: Uint8Array | string,
+  observedAt: string,
+  request: BovadaMarketRequest,
+): SelectedBovadaMarket[] {
+  const coupons = parseBovadaCoupons(body);
+  const observedMilliseconds = parseObservedAt(observedAt);
+  const selected: SelectedBovadaMarket[] = [];
+  for (const coupon of coupons) {
+    const sportNode = coupon.path.find((node) => node.type === "SPORT");
+    const tourNode = coupon.path.find((node) => node.type === "TOUR");
+    const leagueNode = coupon.path.find((node) => node.type === "LEAGUE");
+    const ufc = request.sport === "ufc" && request.competition === "ufc" &&
+      sportNode?.description === "UFC/MMA" && tourNode?.description === "UFC" &&
+      leagueNode?.description !== "Potential Fights";
+    const nfl = request.sport === "football" && request.competition === "nfl" &&
+      sportNode?.description === "Football" && leagueNode?.description === "NFL";
+    if (!ufc && !nfl) continue;
+    const competitionNode = ufc ? leagueNode : leagueNode;
+    if (!competitionNode) continue;
+    for (const event of coupon.events) {
+      if (event.competitionId !== competitionNode.id || event.live || event.status !== "U" || event.startTime <= observedMilliseconds) continue;
+      if (event.competitors.length !== 2 || new Set(event.competitors.map((row) => row.id)).size !== 2) continue;
+      const matches = event.displayGroups.flatMap((group) => group.markets).filter((market) =>
+        market.status === "O" && market.period.live === false && market.period.main === true &&
+        (ufc
+          ? market.description === "Fight Winner" && market.period.description === "Bout"
+          : market.description === "Moneyline" && market.period.description === "Game") &&
+        exactTwoSided(event, market) !== null,
+      );
+      if (matches.length > 1) throw new BovadaSelectionError(`event ${event.id} has ambiguous matching markets`);
+      if (matches.length === 0) continue;
+      const market = matches[0]!;
+      selected.push({
+        sport: request.sport,
+        competitionId: competitionNode.id,
+        competitionName: competitionNode.description,
+        event,
+        market,
+        competitors: [event.competitors[0]!, event.competitors[1]!],
+        outcomes: exactTwoSided(event, market)!,
+      });
+    }
+  }
+  if (selected.length === 0) throw new BovadaSelectionError(
+    `no future open ${request.competition.toUpperCase()} ${request.market_class} markets satisfied every predicate`,
+  );
+  selected.sort((a, b) => a.event.startTime - b.event.startTime || compareIds(a.event.id, b.event.id));
+  return selected.slice(0, 32);
+}
+
 /** Parse a bounded JSON body and select exactly one future open NFL Game-Line moneyline. */
 export function parseBovadaFootballResponse(
   body: Uint8Array | string,
   observedAt: string,
 ): SelectedFootballMarket {
-  let root: unknown;
-  if (typeof body === "string") {
-    if (new TextEncoder().encode(body).byteLength > MAX_RESPONSE_BYTES) {
-      throw new BovadaBodyTooLargeError(MAX_RESPONSE_BYTES);
-    }
-    try {
-      root = JSON.parse(body) as unknown;
-    } catch {
-      throw new BovadaJsonError();
-    }
-  } else {
-    if (body.byteLength > MAX_RESPONSE_BYTES) {
-      throw new BovadaBodyTooLargeError(MAX_RESPONSE_BYTES);
-    }
-    root = decodeJson(body);
-  }
-  const coupons = array(root, "response");
-  if (coupons.length === 0) {
-    throw new BovadaSelectionError("response contained no coupons");
-  }
-  const parsedCoupons = coupons.map((coupon, index) =>
-    parseCoupon(coupon, "response[" + index + "]"),
-  );
+  const parsedCoupons = parseBovadaCoupons(body);
   const observedMilliseconds = parseObservedAt(observedAt);
   const candidates: Array<{
     selected: SelectedFootballMarket;

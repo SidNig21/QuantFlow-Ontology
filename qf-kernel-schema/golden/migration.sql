@@ -59,11 +59,14 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('assig
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegated_by', 'link', 'experimental', 'Task provenance: which admitted agent session delegated a task. It is written only from trusted execution context so callers cannot forge responsibility.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegates_to', 'link', 'experimental', 'Hire provenance: which admitted orchestrator created an agent session. It authorizes worker ownership only; task cables must use task delegated_by and assigned_to links.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('spawned_from', 'link', 'experimental', 'Session identity: which agent_definition profile created this agent_session.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('investigates', 'link', 'experimental', 'The exact immutable market observation that started an investigation. Only create_market_investigation may establish this edge, so refreshed prices never rewrite the original question''s evidence.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_hypothesis', 'action', 'experimental', 'Open a new research hypothesis with claim, success criteria, and optional sources.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_dataset_version', 'action', 'experimental', 'Register a new content-hashed, point-in-time dataset version in the Kernel.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_run', 'action', 'experimental', 'Enqueue a new run in queued status with full invocation params. Rejectable when params are invalid.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('execute_deterministic_run', 'action', 'experimental', 'Execute one canonical strategy specification against one immutable Dataset. The Kernel owns the execution version, result bytes, content hash, and complete uses/executes_in/produces lineage; a claimed repeat is rejected unless its manifest and result hash match.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_mission', 'action', 'experimental', 'Register a standing research mission with name and objective.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_tool', 'action', 'experimental', 'Register an explicit capability identity for the Dock. Identical registration is idempotent; conflicting identity, category or revision is refused.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_market_investigation', 'action', 'experimental', 'Open a Technique-free investigation anchored to one current quote. The Kernel checks observation age, latest observation and event cutoff before atomically creating the Mission and investigates edge; it never creates a Task or Strategy.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_ticket', 'action', 'experimental', 'Record a strategy-proposed ticket starting pending. Does not accept a grade; use observe_ticket for externally observed slips.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('observe_ticket', 'action', 'experimental', 'Ingest an externally observed ticket at its settlement grade. Writes an observation event, never a synthetic transition.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('record_strategy_outcome', 'action', 'experimental', 'Record one already-settled operator outcome for an exact forward Strategy selection and grade its immutable lineage.');
@@ -452,7 +455,12 @@ CREATE TABLE tool (
   -- Tool identifier exposed to agents (typically qf_*). Keep naming stable because prompts and automations may reference it directly.
   name TEXT NOT NULL,
   -- One-line capability summary for agent selection. Explain what decision this tool enables, not just its transport mechanism.
-  summary TEXT NOT NULL
+  summary TEXT NOT NULL,
+  -- Dock category of a registered capability. Legacy unclassified tools remain absent from the capability catalog until explicitly registered.
+  capability_class TEXT,
+  -- Exact implementation revision admitted for this capability. A changed revision requires a new explicit registration identity rather than silently changing an existing resource.
+  implementation_version TEXT,
+  CHECK (capability_class IN ('data', 'tool'))
 );
 
 -- An execution_environment identifies where a run actually executes. It governs reproducibility by separating runtime substrate from run intent.
@@ -487,7 +495,7 @@ CREATE TABLE links (
   -- Primary key for this link instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- Link kind (schema link name), e.g. offered_on.
-  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'belongs_to', 'grades_ticket', 'grades_run', 'grades_strategy', 'grades_run_result', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from')),
+  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'belongs_to', 'grades_ticket', 'grades_run', 'grades_strategy', 'grades_run_result', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from', 'investigates')),
   -- Source object id.
   from_id TEXT NOT NULL,
   -- Target object id.

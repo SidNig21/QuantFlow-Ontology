@@ -1,0 +1,47 @@
+W1-01 UFC live-input door — PASS
+Observed 2026-09-06. Public reads only; no account data or credentials recorded.
+
+THREE-WAY IDENTITY
+1. Rendered Bovada session, reached by Sports -> UFC/MMA -> SHOW MORE:
+   UFC Fight Night: Silva vs Delgado; Manon Fiorot vs Alexa Grasso;
+   09/12/2026 2:40 PM PDT; Win: Fiorot -220, Grasso +185.
+2. Official UFC event page:
+   https://www.ufc.com/event/ufc-fight-night-september-12-2026
+   Noche UFC: Silva vs Delgado; Sat, Sep 12, 2026; Manon Fiorot vs Alexa Grasso.
+3. Fresh bounded Bovada public response:
+   URL https://www.bovada.lv/services/sports/event/v2/events/A/description/ufc-mma/ufc
+   HTTP 200; 34,201 bytes; observed_at 2026-09-06T05:15:58.076Z
+   source_sha256 530d36bc19564b77ab2bea84893d6c9dbe2b8b840c1e4af096501e86fbf30236
+   competition 29388400 / UFC Fight Night: Silva vs Delgado
+   event 29195963 / Manon Fiorot vs Alexa Grasso / 2026-09-12T21:40:00.000Z
+   event_last_modified 2026-09-06T04:49:23.729Z; quote provider time unavailable
+   competitor 29195963-16503226 / Manon Fiorot
+   competitor 29195963-16512926 / Alexa Grasso
+   market 519394567 / Fight Winner / type 120789 / period 12122 Bout
+   selection 2380264633 / competitor 29195963-16503226 / price 38267337143 / -220 / 1.454545
+   selection 2380264634 / competitor 29195963-16512926 / price 38267337144 / +185 / 2.850
+   Potential Fights event 26624931 was excluded.
+
+HISTORICAL VIABILITY
+Both public official UFC athlete pages resolve the same upcoming pairing and date:
+https://www.ufc.com/athlete/manon-fiorot
+source_sha256 7bed37cd66fa3000416d453bde10f4ffc9834c7607fd1868c5d0ffce86dd3b91
+https://www.ufc.com/athlete/alexa-grasso
+source_sha256 205dec35694eb14dc27ee63d197423981b9592095a7b5607dc14dd162119d116
+
+Manon Fiorot source rows used for the recomputation, all before the event cutoff:
+2025-10-18 WIN — stopped Jasmine Jasudavicius
+2025-05-10 LOSS — lost to Valentina Shevchenko
+2024-03-30 WIN — won over Erin Blanchfield
+Recomputed recent listed-UFC win fraction: 2 wins / 3 completed bouts = 0.6666666667.
+Alexa Grasso control row: 2026-03-28 WIN — knocked out Maycee Barber; before cutoff.
+
+FALSIFIERS
+RED: swapping either provider competitor or selection id fails exact identity resolution.
+GREEN: event 29195963, market 519394567, both competitor ids and both selection ids resolve exactly.
+RED: any source row dated at or after 2026-09-12T21:40:00.000Z is rejected from the statistic.
+GREEN: every listed source row predates the cutoff and the statistic recomputes from those rows.
+
+BOUNDS AND CLEANUP
+Each disposable probe used a 20-second whole-request abort and 5 MiB streamed response limit.
+The probes completed with no live request left behind and are not part of the product tree.

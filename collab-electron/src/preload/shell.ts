@@ -62,6 +62,12 @@ contextBridge.exposeInMainWorld("shellApi", {
     listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
     listResearchLedger: () => ipcRenderer.invoke("qf:research:ledger"),
     listStrategyVersions: () => ipcRenderer.invoke("qf:research:strategies"),
+    getMarketCapability: () => ipcRenderer.invoke("qf:markets:capability"),
+    listMarkets: () => ipcRenderer.invoke("qf:markets:list"),
+    captureMarkets: (args: { sport: string; competition: string; market_class: string }) =>
+      ipcRenderer.invoke("qf:markets:capture", args),
+    investigateMarket: (args: { quote_id: string; name: string; objective: string }) =>
+      ipcRenderer.invoke("qf:markets:investigate", args),
     getResearchWorldProjection: (args: { root_type: "mission" | "task"; root_id: string }) =>
       ipcRenderer.invoke("qf:research-world:projection", args),
     recordStrategyOutcome: (args: Record<string, unknown>) =>

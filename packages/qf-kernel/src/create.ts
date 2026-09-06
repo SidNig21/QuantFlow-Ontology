@@ -1407,6 +1407,94 @@ function createMission(
   return creationResult(cmd, id, cmd.event, state);
 }
 
+function registerTool(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ObjectExecuteResult {
+  if (links.length > 0) throw new KernelError("register_tool does not accept caller-supplied links");
+  const id = String(input.tool_id ?? "");
+  const name = String(input.name ?? "");
+  const summary = String(input.summary ?? "");
+  const capabilityClass = input.capability_class;
+  const implementationVersion = String(input.implementation_version ?? "");
+  if (!id || !name || !summary || !implementationVersion || (capabilityClass !== "data" && capabilityClass !== "tool")) {
+    throw new KernelError("register_tool requires exact id, name, summary, class, and implementation version");
+  }
+  const existing = db.query("SELECT * FROM tool WHERE id = ?").get(id) as Record<string, unknown> | null;
+  if (existing) {
+    if (
+      existing.name !== name || existing.summary !== summary ||
+      existing.capability_class !== capabilityClass ||
+      existing.implementation_version !== implementationVersion
+    ) throw new KernelError(`tool "${id}" already exists with a conflicting registered identity`);
+    return creationResult(cmd, id, cmd.event, existing);
+  }
+  const state = commitCreation(db, {
+    object_type: "tool", object_id: id, event: cmd.event, trace, links: [],
+    payload: { command: cmd.action, name, summary, capability_class: capabilityClass, implementation_version: implementationVersion },
+    insert: () => db.query(
+      "INSERT INTO tool (id, created_at, name, summary, capability_class, implementation_version) VALUES (?, ?, ?, ?, ?, ?)",
+    ).run(id, new Date().toISOString(), name, summary, capabilityClass, implementationVersion),
+  });
+  return creationResult(cmd, id, cmd.event, state);
+}
+
+function createMarketInvestigation(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ObjectExecuteResult {
+  if (links.length > 0) throw new KernelError("create_market_investigation owns its investigates link");
+  const quoteId = String(input.quote_id ?? "");
+  const name = String(input.name ?? "");
+  const objective = String(input.objective ?? "");
+  const quote = db.query("SELECT id, coverage, created_at FROM quote WHERE id = ?").get(quoteId) as { id: string; coverage: string; created_at: string } | null;
+  if (!quote) throw new KernelError(`create_market_investigation quote "${quoteId}" not found`);
+  let coverage: Record<string, unknown> = {};
+  try { coverage = JSON.parse(quote.coverage) as Record<string, unknown>; } catch { /* invalid observation is refused below */ }
+  const quoteTime = Date.parse(String(coverage.observed_at ?? ""));
+  const now = Date.now();
+  if (!Number.isFinite(quoteTime) || quoteTime > now + 60_000 || now - quoteTime > 15 * 60_000) {
+    throw new KernelError("create_market_investigation requires a quote observed within the last 15 minutes");
+  }
+  const quoteEdges = db.query("SELECT to_id FROM links WHERE kind = 'quotes' AND from_id = ?").all(quoteId) as Array<{ to_id: string }>;
+  if (quoteEdges.length !== 1) throw new KernelError("create_market_investigation requires one exact quoted instrument");
+  const instrumentId = quoteEdges[0]!.to_id;
+  const current = (db.query(
+    "SELECT quote.id, quote.coverage, quote.created_at FROM quote JOIN links ON links.from_id = quote.id AND links.kind = 'quotes' WHERE links.to_id = ?",
+  ).all(instrumentId) as Array<{ id: string; coverage: string; created_at: string }>).sort((left, right) => {
+    const observed = (row: { coverage: string }) => {
+      try {
+        const value = Date.parse(String((JSON.parse(row.coverage) as Record<string, unknown>).observed_at ?? ""));
+        return Number.isFinite(value) ? value : Number.NEGATIVE_INFINITY;
+      }
+      catch { return Number.NEGATIVE_INFINITY; }
+    };
+    return observed(right) - observed(left) || right.created_at.localeCompare(left.created_at) || right.id.localeCompare(left.id);
+  })[0] ?? null;
+  if (current?.id !== quoteId) throw new KernelError("create_market_investigation refuses a superseded quote; refresh first");
+  const eventEdges = db.query("SELECT to_id FROM links WHERE kind = 'offered_on' AND from_id = ?").all(instrumentId) as Array<{ to_id: string }>;
+  if (eventEdges.length !== 1) throw new KernelError("create_market_investigation requires one exact scheduled event");
+  const marketEvent = db.query("SELECT starts_at, status FROM market_event WHERE id = ?").get(eventEdges[0]!.to_id) as { starts_at: string; status: string } | null;
+  if (!marketEvent || marketEvent.status !== "scheduled" || Date.parse(marketEvent.starts_at) <= now) {
+    throw new KernelError("create_market_investigation refuses an event at or beyond its start cutoff");
+  }
+  const id = crypto.randomUUID();
+  const state = commitCreation(db, {
+    object_type: "mission", object_id: id, event: cmd.event, trace,
+    links: [{ kind: "investigates", to_id: quoteId }],
+    payload: { command: cmd.action, quote_id: quoteId, name, objective, state: "ready to staff" },
+    insert: () => db.query("INSERT INTO mission (id, created_at, name, objective) VALUES (?, ?, ?, ?)")
+      .run(id, new Date().toISOString(), name, objective),
+  });
+  return creationResult(cmd, id, cmd.event, state, "ready to staff");
+}
+
 function parseTicketFields(
   input: Record<string, unknown>,
   action: string,
@@ -1582,6 +1670,8 @@ export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
   execute_deterministic_run: executeDeterministicRun,
   record_evaluation: recordEvaluation,
   create_mission: createMission,
+  register_tool: registerTool,
+  create_market_investigation: createMarketInvestigation,
   create_ticket: createTicket,
   observe_ticket: observeTicket,
   register_venue: registerVenue,

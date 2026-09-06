@@ -58,7 +58,7 @@ const PACKAGE_INSPECTOR = join(
 const INGEST_ACTION = "ingest_market_batch";
 const CONTEXT_ACTIONS = ["register_venue", "schedule_market_event"] as const;
 const SERVED_TOOLS_SHA256 =
-  "03c328e03c08e3b89969c7f05e7c12e3e45f3318c0c325d041bfc1e6be2badc0";
+  "d460d27d0af4509ed87ea308c432f6a31d188a45f84cf50b7c4047a1ff4c573f";
 const INGEST_EVENTS = ["instrument.ingested", "quote.ingested"] as const;
 const TRACE = { trace_id: "market-gate-trace", span_id: "market-gate-span" };
 
@@ -509,7 +509,7 @@ function commandInventoryProof(): void {
 function generatedSurfaceProof(): void {
   console.log("\n=== D0/D1 generated authority, served hash, and hidden context actions ===");
   assert(schema.objects.length === 23, `expected 23 objects, got ${schema.objects.length}`);
-  assert(schema.actions.length === 43, `expected 43 actions, got ${schema.actions.length}`);
+  assert(schema.actions.length === 45, `expected 45 actions, got ${schema.actions.length}`);
   const action = schema.actions.find((candidate) => candidate.name === INGEST_ACTION);
   assert(action?.pipelineOnly === true, "ingest_market_batch is not pipelineOnly");
   assert(action.operatorOnly !== true, "pipeline action must not also be operatorOnly");
@@ -525,17 +525,17 @@ function generatedSurfaceProof(): void {
     .update(JSON.stringify(served), "utf8")
     .digest("hex");
   assert(servedHash === SERVED_TOOLS_SHA256, `served tool serialization hash changed: ${servedHash}`);
-  assert(theoreticalCount === 112, `theoretical schema tool count expected 112, got ${theoreticalCount}`);
+  assert(theoreticalCount === 114, `theoretical schema tool count expected 114, got ${theoreticalCount}`);
   assert(internalActions.length === 8, `internal-only action count expected 8, got ${internalActions.length}`);
   assert(
-    generatedCount === theoreticalCount - internalActions.length && generatedCount === 104,
+    generatedCount === theoreticalCount - internalActions.length && generatedCount === 106,
     `generated authority must omit exactly 8 internal-only actions: theoretical=${theoreticalCount} internal=${internalActions.length} generated=${generatedCount}`,
   );
   assert(
-    restrictedGeneratedActions.length === 5,
-    `generated operator/pipeline action count expected 5, got ${restrictedGeneratedActions.length}`,
+    restrictedGeneratedActions.length === 6,
+    `generated operator/pipeline action count expected 6, got ${restrictedGeneratedActions.length}`,
   );
-  assert(served.length === 99, `served tool count expected 99, got ${served.length}`);
+  assert(served.length === 100, `served tool count expected 100, got ${served.length}`);
   assert(
     actionToolForAction(action).name === "qf_ingest_market_batch",
     "complete action generator does not map ingest_market_batch",
@@ -709,7 +709,7 @@ function assertCurrentMeta(db: KernelDb, label: string): void {
     );
   }
   const actionCount = count(db, "schema_meta", " WHERE kind = ?", ["action"]);
-  assert(actionCount === 43, `${label} action meta count expected 43, got ${actionCount}`);
+  assert(actionCount === 45, `${label} action meta count expected 45, got ${actionCount}`);
   assert(kernel.classifyKernelShape(db) === "current", `${label} did not classify current`);
 }
 
