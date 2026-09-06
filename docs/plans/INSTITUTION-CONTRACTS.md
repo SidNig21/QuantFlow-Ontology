@@ -1,8 +1,8 @@
 # INSTITUTION-CONTRACTS.md — the seams every participant and capability must honor
 
 status: APPROVED — INSTITUTION CONTRACTS; architecture authority, not build authority
-revised: 2026-09-03 (final four-point clarification; no build authority)
-measured against: `main` @ `ab40524d` (product bytes byte-equivalent to Golden final product `a91b5dee`)
+revised: 2026-09-05 (founder product-model correction; no build authority)
+measured against: accepted local `main` @ `6340d78f` (product bytes retain the accepted Golden/Foundation baseline)
 build authority: none — `docs/orders/NEXT.md` remains the only order authority (DOCTRINE A9)
 owns: Participant Contract · Capability Contract · Agent Operating Contract · evidence and computation laws · role versus runtime · provenance · admission lifecycle · runtime-neutrality exit condition
 does not own: sequence and packages → [Official Roadmap](OFFICIAL-ROADMAP.md); surface floor and grammar → [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md); inventory → non-authoritative Vault research `03-DOCK-CAPABILITY-RATIONALIZATION.md`
@@ -54,9 +54,11 @@ schema; **PARTIAL** as a written admission rule.)
 produces no `task`, `artifact`, or `evaluation` is permitted but is not institutional work and appears in no
 Report. (**PARTIAL** — Director route creates tasks; bare Dock spawn allows un-tasked chat.)
 
-**P3 — Bounded Mission context.** On assignment a participant receives, from the Kernel only: Mission id and
-question, selected Technique id/version/hash, exact input `dataset` ids with as-of, its role's grants, and
-predecessor artifact ids. Nothing it did not need. (**PLANNED** — today carried as prose in
+**P3 — Bounded work context.** On assignment a participant receives, from the Kernel only: Mission/investigation
+id and question; selected Technique id/version/hash when one exists; otherwise the exact calculation/method
+envelope when the Task is decision-bearing; exact input `dataset` ids with as-of; its role's grants; and
+predecessor artifact ids. Exploration does not fabricate a Technique merely to populate the envelope.
+Nothing it did not need. (**PLANNED** — today carried as prose in
 `species/hermes/prompts/`.)
 
 **P4 — Discover, read, publish.** A participant discovers authorized capabilities and reads shared truth
@@ -125,8 +127,8 @@ participant and never poses as one.
 | Layer | Dock-visible? | Example |
 |---|---|---|
 | Implementation dependency | never | `nflreadpy`, `polars`, `better-sqlite3` |
-| Product capability (bundle) | yes | "NFL Historical Evidence (nflverse, pinned release)" |
-| Method / Technique | yes, on the Mission form | `strategy` object, versioned, hashed |
+| Product capability (bundle) | yes | "Bovada Live Markets" or "Selected-sport Historical Evidence" |
+| Method / Technique | yes when a reusable method exists; optional at investigation entry | `strategy` object, versioned, hashed |
 | Compute | semantic class; nested under a Tool or Run during Proof A; separately visible when capacity, cost, readiness, scarcity, scheduling, authorization, or founder approval materially affect the Mission | `execute_deterministic_run` inside the app |
 
 ### 2.3 Contract clauses
@@ -139,7 +141,8 @@ existing truth without manufacturing new domain objects.** (**PROVEN** for the t
 R7/R11/WO-107.)
 
 **C2 — Deterministic and stochastic execution.** A deterministic capability declares a replay envelope:
-Dataset ids and content hashes; Technique hash; capability/code version; dependency/environment identity;
+Dataset ids and content hashes; exact method/specification hash (and Technique hash when a reusable Technique
+is selected); capability/code version; dependency/environment identity;
 parameters; seed where applicable; canonical serialization or numerical tolerance rules. Same envelope →
 same result hash. A stochastic capability declares itself stochastic, preserves seed/configuration and
 distributional output, and makes no byte-identical replay promise. Non-deterministic *reasoning* is a
@@ -161,8 +164,9 @@ Kernel records as-of on `dataset`/`quote`. (**PARTIAL** — as-of exists; licenc
 **C6 — Single write path.** A capability never writes SQLite; it returns values; the app writes through
 `execute()`. (**PROVEN**.)
 
-**C7 — Inspectable.** From any Decision Set or Report the operator reaches each input's bundle identity,
-version, as-of, and hash in-app. (**PLANNED** — lineage exists; bundle identity is not yet clickable.)
+**C7 — Inspectable.** From any CANDIDATE/WATCH/PASS Decision Set or Report the operator reaches each input's
+bundle identity, version, observation/as-of time, and hash in-app. (**PLANNED** — lineage exists; bundle
+identity is not yet clickable.)
 
 **C8 — Admission lifecycle (one lifecycle everywhere).**
 
@@ -171,18 +175,19 @@ DISCOVERED → PROBED → BOUNDED → CERTIFIED → PRODUCTION → OBSERVED → 
 ```
 
 "Installed" is not "certified". "Certified" is not "useful". Real Mission observation determines
-retention. No capability skips PROBED; none enters PRODUCTION without a selected Mission consumer. The
+retention. No capability skips PROBED; none enters PRODUCTION without a real founder research consumer. The
 Capability Foundry is governance metadata, not a UI, during Proof A. (**PLANNED**.)
 
-**C9 — Decision-bearing quantitative semantics.** Every quantitative metric used by a Technique to
-support, condition, reject, or grade a decision has one versioned deterministic definition covering its
+**C9 — Decision-bearing quantitative semantics.** Every quantitative metric used to support, condition,
+reject, or grade a decision—whether or not it belongs to a named Technique—has one versioned deterministic definition covering its
 formula, unit, eligible population, exclusions, missing-data behaviour, point-in-time/as-of rule,
 precision or tolerance, and implementation version. A participant may select, invoke, interpret, or
-criticize that metric; it may not redefine the metric in prose. Proof A implements only the definitions
-required by its selected Technique through the Football Quant Lab and binds them to the Technique and
-Run. This is a contract on existing capability output, not a semantic-layer service, database, Ontology
-subsystem, or architecture phase. (**PARTIAL** — R17 has frozen `qf.metrics.v1` definitions; the selected
-Proof-A Technique and its complete metric set do not yet exist.)
+criticize that metric; it may not redefine the metric in prose. Wave 1 implements only the definitions
+required by its proved live-market calculation through the Research Lab and binds them to the Run plus the
+selected Technique when one exists. A calculation becomes a reusable Technique only after evaluated work
+earns that promotion. This is a contract on existing capability output, not a semantic-layer service,
+database, Ontology subsystem, or architecture phase. (**PARTIAL** — R17 has frozen `qf.metrics.v1`
+definitions; the first useful sports calculation and its complete metric set do not yet exist.)
 
 **C10 — Dataset and corpus purpose.** Every admitted Dataset or corpus declares exactly which purpose it
 serves in the invoking boundary: **EVIDENCE** (facts about the researched world), **TRAINING** (examples
@@ -200,15 +205,17 @@ law. (**PLANNED**.)
 
 Behavioural obligations bound into prompts and manifests, not the schema. **PLANNED** unless tagged.
 
-1. **Read before act.** First action on any task is an ontology read of Mission, Technique, and
-   predecessors. (**PROVEN as capability** — P14-B; **PLANNED as obligation**.)
+1. **Read before act.** First action on any task is an ontology read of the Mission/investigation,
+   predecessors, evidence timing, and selected Technique when one exists. (**PROVEN as capability** —
+   P14-B; **PLANNED as obligation**.)
 2. **Task output contract.** A task closes against one bounded output contract with **one primary
    institutional result**; explicitly named supporting Artifacts are permitted and each is linked to the
    primary result. Transcript dumps or unrelated multi-claim bundles do not satisfy the Task.
 3. **Attack, do not agree.** The Critic's `record_evaluation` names **at least one material
    falsification or attack** and whether it was checked. A ceremonial objection is `insufficient`.
 4. **Ask through the Kernel.** Blocked participants use `block_agent_session` plus a task note.
-5. **Accretive work.** Reuse predecessor artifacts by id; re-derive only when the Technique version changed.
+5. **Accretive work.** Reuse predecessor artifacts by id; re-derive only when an input, cutoff, calculation
+   envelope, or selected Technique version changed.
 6. **Resource discipline.** Budgets are task-envelope properties; exceeding them fails the session with a
    named reason, never a silent retry. (**UNVERIFIED** — no budget field exists.)
 7. **No world access outside grants** (P9).

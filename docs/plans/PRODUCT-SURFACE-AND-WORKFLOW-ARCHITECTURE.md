@@ -1,7 +1,7 @@
 # 10 — Product Surface and Workflow Architecture
 
 status: APPROVED — product-surface authority companion; canonical repository path `docs/plans/PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md`; not build authority
-date: 2026-09-03 (final four-point clarification; surface route unchanged)
+date: 2026-09-05 (continuous-desk and optional-Technique founder correction)
 owns: founder operating model · Dock grammar · Canvas modes · tile families · runtime/TUI presentation · selection/Inspect/History behaviour · first-use behaviour · PS-0 Product Surface acceptance
 does not own: sequence and packages → `docs/plans/OFFICIAL-ROADMAP.md`; seam contracts → `docs/plans/INSTITUTION-CONTRACTS.md`; inventory → non-authoritative Vault research `03-DOCK-CAPABILITY-RATIONALIZATION.md`; demo scripts → `docs/plans/DEMO-SPEC.md`
 reads beside: `docs/DESIGN.md` (current visual contract), `docs/PRODUCT.md` (register, anti-references)
@@ -23,14 +23,14 @@ Where a claim depends on the founder-relayed observations rather than a frame th
 
 ## A. Product thesis for the surface
 
-QuantFlow Ontology is a **research institution rendered on an infinite desk**. One operator runs it. Different kinds of intelligence — a Hermes Research Director, specialist researchers, an independent Critic, deterministic calculators, pinned datasets, live market feeds — join one Mission, work through one shared Ontology, and hand durable work to each other without the operator wiring anything by hand. The operator watches the institution work, steers it, inspects what it produced, and takes the decision outside the app.
+QuantFlow Ontology is **Ryan's sports-betting research institution rendered on one persistent infinite desk**. Different kinds of intelligence—a Hermes Research Director, specialist researchers, an independent Critic, deterministic calculators, trustworthy historical evidence, and live Bovada markets—may join the same bounded investigation, work through one shared Ontology, and hand durable work to each other without Ryan wiring them by hand. Ryan may work through the Director, another participant, or the evidence directly. The operator watches the institution work, steers it, inspects what it produced, and takes every real-world decision outside the app.
 
 It is **not** a terminal launcher with a dark theme. It is not a chat wrapper. It is not an agent-framework demo where the spectacle is the number of tiles. It is not a debugger for its own Kernel. It is not a graph viewer. The Canvas that looks like a wall of terminals has failed even if every gate is green.
 
 The Dock, the Canvas, and the Ontology are inseparable because each answers one question the others cannot:
 
 - **Dock** — *what may the institution employ?* The governed inventory. Participants, data, tools, methods, compute, each with readiness and authorization.
-- **Canvas** — *what is the institution doing right now, for this Mission?* Only Mission-bound work. Everything visible is a projection of a Kernel object or a live seat bound to one.
+- **Canvas** — *what is on Ryan's desk, and what is the current investigation doing?* The desk stays continuous; focusing one investigation changes emphasis and layout, never replaces the world or hides unrelated bench equipment. Institutional objects are Kernel projections; ordinary bench tiles are visibly non-institutional.
 - **Ontology / Kernel** — *what is true, and how do we know?* The single durable record. Neither Dock nor Canvas stores a second version of anything.
 
 Remove the Dock and the Canvas becomes a free-for-all of ad hoc processes. Remove the Canvas and the institution is invisible; the operator reads logs. Remove the Ontology and both become theatre. The feel that follows from this is **precise, governed, alive** (`PRODUCT.md`): an expert instrument with visible provenance and real motion — not a dashboard, not a console.
@@ -57,13 +57,13 @@ What follows from each (design consequences, owned here, packaged by the roadmap
 
 | Observation | Consequence |
 |---|---|
-| Full Lineage too dense for work | Full Lineage is a **provenance mode**, entered deliberately; CURRENT MISSION is the default whenever a Mission exists (§E) |
-| Cluster too small / unused space | **Viewport use**: TIDY fits the Mission to the visible viewport at a readable label size; compact family tiles first; zoom-to-Mission is the default framing after TIDY and after reopen |
+| Full Lineage too dense for work | Full Lineage is a **provenance overlay**, entered deliberately; the continuous working desk remains the default (§E) |
+| Cluster too small / unused space | **Viewport use**: TIDY frames the selected investigation at a readable label size without deleting or relocating unrelated desk tiles; compact family tiles first |
 | Cables dominate | **Cable quieting**: unselected cables at low emphasis; selected-tile cables bright; link kind on hover only; cables never drawn for links the current mode does not need |
 | Labels unreadable at overview | Labels scale to a minimum readable size or collapse to the family label + state word; ids never appear at overview zoom |
-| Dock fixed width | **Adaptive/collapsible Dock**: rail state by default while a Mission is active; expanded only on demand; never steals Mission viewport |
+| Dock fixed width | **Adaptive/collapsible Dock**: rail state while Ryan is working; expanded only on demand; never steals the working viewport |
 | Inventory as a sentence | The ACTIVE roster is a **composed list** of role · name · state · task, never prose |
-| TIDY does not explain | **Mission-aware TIDY**: region- and family-ordered placement (§E), Director first, Decision last, evidence between; same world → same picture |
+| TIDY does not explain | **Investigation-aware TIDY**: family-ordered placement (§E), participants and Tasks near their evidence, judgment after the exact Artifact, current decision last; same truth → same picture |
 
 ### Already feels like QuantFlow (keep)
 
@@ -92,8 +92,8 @@ What follows from each (design consequences, owned here, packaged by the roadmap
 
 ### Missing for coherence and premium feel
 
-- A **Mission header**: one line naming the question, Technique, evidence as-of, and Mission status, always visible while a Mission is active (the founder mock has it; the product does not).
-- **Canvas regions** with meaning: Team & Work · Evidence & Computation · Judgment & Conclusion — a Proof-A design hypothesis from the founder mock, to be validated on the populated Mission (§E).
+- A **research focus bar**: one line naming the selected question/market, current price age, work state, and optional Technique, always visible while an investigation is focused. It is a view control, not a separate world.
+- A **readable local workflow** around each investigation: Team & Work → Evidence & Computation → Judgment & Conclusion. These are layout relationships, not permanent global columns and not Ontology truth.
 - **Non-participant tiles** for Dataset, Run, Evaluation, Decision Set that look like *records*, not like minimized terminals.
 - A **Decision surface** that is the terminal object of a Mission and is visually unmistakable (green-edged in the mock; today nothing).
 - A **compact participant state** where the TUI is hidden and the tile shows role, task, status, last artifact.
@@ -107,29 +107,28 @@ Every surface below is a projection. The Kernel owns the object; the surface own
 
 ### Dock
 
-- **For:** the governed inventory of what may enter the workspace, and the front door to a Mission (START).
-- **Belongs:** five classes of item (§D), each with name, class, institutional job, readiness, authorization, and live/closed counts; the Mission start form; the ACTIVE roster for the current Mission; HISTORY of Missions.
+- **For:** the governed inventory of what may enter the workspace and a direct way to employ it. The Director is one important row, not the Dock itself.
+- **Belongs:** five classes of item (§D), each with name, class, institutional job, readiness, authorization, and live/closed counts; entry actions such as `Research this market`; the ACTIVE roster for current work; HISTORY of prior investigations.
 - **Must not live here:** implementation dependencies (`nflreadpy`, `DuckDB`, `better-sqlite3`), raw processes, a package browser, per-item terminals, anything that lets the Dock become a second truth (the Dock reads `agent_definition`/`tool`/`dataset` rows; it never writes state of its own).
 - **Compact:** a right rail with mode tabs and a live count line. **Expanded:** full-height catalog with class sections. Never a modal.
 - **Kernel truth:** every row is a Kernel object (`agent_definition` today; `tool`/`dataset`/`strategy` as bundles arrive). Presence in the Dock ≠ presence on the Canvas.
 
 ### Canvas
 
-- **For:** the visible operating field of the current Mission.
-- **Belongs:** Mission-bound tiles only; cables for existing Kernel links; the Mission header; regions.
-- **Must not live here:** catalog items, settings, logs, build hashes, anything not bound to the active Mission.
-- **Three modes** (the first two already exist in code as ORDINARY_CANVAS · CURRENT_MISSION · FULL_LINEAGE):
-  - **BENCH / ORDINARY CANVAS** — founder equipment and unbound seats; ordinary terminals may exist here; never presented as institutional Mission truth.
-  - **CURRENT MISSION** — the default working mode whenever a Mission exists: Mission-centred hierarchy, compact tiles, quiet cables, clear current authority.
-  - **FULL LINEAGE** — forensic/provenance mode; may be dense; shows complete objects, links and ids; entered deliberately and never mistaken for the default.
-- **The bench/institution resolution:** Mission-bound Canvas tiles are Kernel-derived institutional projections. Bench equipment may be ephemeral, local and non-institutional. Bench tiles never appear as Mission participants, Task owners, lineage, or evidence — a bench object that needs to matter to a Mission enters the Dock as a capability or a participant first.
-- **Kernel truth:** tile positions are ephemeral layout; Mission tile *existence* is Kernel-derived. Deleting a tile never deletes an object.
+- **For:** Ryan's continuous visible operating desk. It holds ordinary equipment plus one or more current or historical investigations without jumping into a replacement world.
+- **Belongs:** bench tiles; Kernel-derived participants, Tasks, evidence, Runs, Artifacts, Evaluations and decisions; cables for existing links; a research focus bar; local workflow groupings.
+- **Must not live here:** catalog inventory that has not entered the work, settings, logs, build hashes, or renderer-invented institutional state.
+- **One desk, three gears:**
+  - **WORKSPACE** — the normal continuous desk: ordinary equipment and compact institutional work together, visibly distinguished.
+  - **FOCUS** — selecting an investigation frames and emphasizes its bounded Kernel-derived context while every other desk object remains reachable and unchanged.
+  - **FULL LINEAGE** — forensic/provenance overlay for the selected investigation; may be dense; entered deliberately; leaving it returns to the same desk and focus.
+- **The bench/institution resolution:** institutional Canvas tiles are Kernel-derived projections. Bench equipment may be ephemeral, local and non-institutional. Bench tiles never appear as participants, Task owners, lineage, or evidence; a bench object that needs institutional effect enters through a governed capability or participant.
+- **Kernel truth:** tile positions, focus, zoom, expansion and dimming are ephemeral layout. Institutional tile *existence* is Kernel-derived. Hiding or deleting a tile never deletes the object.
 
-**Projection invariant.** CURRENT MISSION is a bounded, derived context projection over existing
-Kernel/Ontology truth. It is not a second context database, a manually maintained graph, or a new
-authority plane. FULL LINEAGE exposes the broader provenance graph; CURRENT MISSION shows only the
-decision-specific slice relevant to the active work. Search indexes, layout state, summaries, and
-assembled context remain replaceable projections.
+**Projection invariant.** FOCUS and FULL LINEAGE are bounded derived views over the same Kernel/Ontology
+truth and the same Canvas. Neither may remove unrelated desk tiles, maintain a second workflow graph, or
+become a new authority plane. Search indexes, layout state, summaries, and assembled context remain
+replaceable projections.
 
 ### Inspect
 
@@ -141,22 +140,22 @@ assembled context remain replaceable projections.
 
 ### History
 
-- **For:** what this Mission (and the institution) did over time: tasks, steering, handoffs, evaluations, reports (current vs historical), outcomes.
-- **Belongs:** a Mission timeline; the settled-outcome ledger (R17 grades).
+- **For:** what an investigation and the institution did over time: Tasks, steering, observations, handoffs, evaluations, current/superseded conclusions, and outcomes.
+- **Belongs:** an investigation timeline; recommendation revisions; the settled-outcome ledger (R17 grades).
 - **Must not:** be a chat log or a raw event dump.
 - **Kernel truth:** derived from `task`/`artifact`/`evaluation`/`ticket` rows and steering records.
 
-### Start / Mission entry
+### Start / research entry
 
-- **For:** turning founder intent into a governed Mission. Entry **may be conversational** (a sentence to the Director) or a form; either way it must **resolve visibly** into: the explicit question · the selected Technique (version · hash) · the coverage/evidence state · a governed Mission creation or a refusal sentence. Conversation is never the only representation of a Mission.
-- **Must not:** be a chat wrapper where the transcript is the Mission; nor a wizard.
-- **Kernel truth:** resolution → `create_mission` + `hypothesis`, Director session; nothing is created on refusal (R17 proves this mechanically for the form path).
+- **For:** turning founder intent or a visible market into governed work. Entry may be `Research this market`, a sentence to the Director, direct interaction with another participant, or an explicit form. It resolves visibly into the bounded question/market, current evidence state, assigned Task(s), and either created work or an actionable refusal sentence. A named Technique is optional. Before a conclusion becomes authoritative, its exact calculation/method envelope is mandatory.
+- **Must not:** force every action through the Director, require a Technique to explore, turn a transcript into institutional truth, or open a replacement Canvas world.
+- **Kernel truth:** resolution uses existing Mission/Task/evidence objects and links. The operator-facing word may be *investigation* while the Kernel keeps `mission`. Nothing is created on a precondition refusal; a failure after creation remains durable and inspectable.
 
 ### Participant tile
 
 - **For:** one live seat holding a role in this Mission.
 - **Compact state (always visible):** role · human display name · current state (ready / working / waiting / blocked / closed) · current Task · last or expected output · runtime species (small, second).
-- **Expanded state:** TUI/input pane; bounded runtime details (species, profile version, model/provider provenance); explicit focus and resize behaviour; the institutional frame and Task/output context remain around the pane.
+- **Expanded state:** TUI/input pane; bounded runtime details (species, profile version, model/provider provenance); explicit focus and resize behaviour; the institutional frame and Task/output context remain around the pane and the desk never disappears.
 - **Secondary (Inspect):** session id, recruiter, budget, execution receipt.
 - **Must not:** show a raw metadata dump; show `Create Task` to the operator by default (steering controls appear on the *task*, not the seat); let the TUI become the tile.
 - **Kernel truth:** `agent_definition` → `agent_session` → `assigned_to task`.
@@ -165,7 +164,7 @@ assembled context remain replaceable projections.
 
 - **For:** one exact unit of work: title, owner role, state, the artifact it must produce.
 - **Controls:** clarify · redirect · reassign · second opinion · cancel — these exist (R14) and belong here.
-- **Compact:** one line. **Expanded:** description, envelope (Technique, inputs), steering history.
+- **Compact:** one line. **Expanded:** description, inputs, exact method/Technique envelope when relevant, steering history.
 - **Kernel truth:** `task` and its links.
 
 ### Artifact tile
@@ -182,7 +181,7 @@ assembled context remain replaceable projections.
 
 ### Result / Decision surface
 
-- **For:** the Mission's terminal object: Decision Set (candidates with probability, uncertainty, source times, exclusions) or explicit No candidate with reasons.
+- **For:** the investigation's current governed conclusion: CANDIDATE (specific current Bovada selection and valid-price condition), WATCH (what must change or be refreshed), or PASS (why no supported action exists).
 - **Visual:** the only accented tile on the desk. If two tiles glow, the grammar is broken.
 - **Must not:** show stake, unit, bankroll, or any placement control — ever.
 - **Kernel truth:** the artifact the current published Report cites (`publication_report_id`, G9).
@@ -211,9 +210,9 @@ The Dock is a governed catalog. It has five classes and the operator must be abl
 | Class | What the operator sees | Row shows | Enters the workspace by |
 |---|---|---|---|
 | **PARTICIPANTS** | roles: Research Director, Evidence Researcher, Market Researcher, Critic | role · display name · species (small) · readiness (`ready` / `needs sign-in` / `unavailable`) · live count | *Recruit* — the Director recruits by default; the founder retains the governed direct ability to recruit, replace, constrain, stop and steer through the same Dock and institutional actions. Produces a participant tile. |
-| **DATA / RESOURCES** | evidence bundles: NFL Historical Evidence, Live Market Evidence | name · as-of rule · licence class · readiness | *Bind* — bound to a Mission by the Director or the operator. Produces a Dataset/Quote tile when evidence actually enters. Never a process. |
-| **TOOLS** | bounded capabilities: Football Quant Lab, Browser/Literature | name · what it computes/produces · deterministic or external · readiness | *Use* — invoked in a task. Produces a Run tile and its result Artifact. |
-| **METHODS / TECHNIQUES** | versioned Techniques: `<Technique> v0.1 · hash` | name · version · hash prefix · status (candidate / selected / retired) | *Select* — on the Mission form. Appears in the Mission header, never as a tile. |
+| **DATA / RESOURCES** | evidence bundles: Bovada Live Markets, selected-sport Historical Evidence | name · observation/as-of rule · source/rights class · readiness | *Open / Bind* — Ryan or the Director may inspect live markets and bind evidence to an investigation. Produces a Dataset/Quote tile only when evidence enters. Never a process. |
+| **TOOLS** | bounded capabilities: Research Lab, Browser/Literature | name · what it computes/produces · deterministic or external · readiness | *Use* — invoked in a Task. Produces a Run tile and its result Artifact. |
+| **METHODS / TECHNIQUES** | optional versioned Techniques: `<Technique> v0.1 · hash` | name · version · hash prefix · status (candidate / selected / retired) | *Use* — when a reusable evaluated method exists. Appears in the focus bar, never as a participant or mandatory entry field. |
 | **COMPUTE** | where deterministic work runs: local, later remote GPU | name · capacity · cost class | A semantic class always; during local Proof A it may stay visually nested under a Tool or Run. It becomes a separately visible Dock row when capacity, cost, readiness, scarcity, scheduling, authorization or founder approval materially affect the Mission. |
 
 Models and providers are **not a Dock class**. A hosted model is provenance under a participant (shown in the seat's expanded state and Inspect). A separately served or owned model becomes a TOOL (governed inference capability) or a COMPUTE-bound resource only when the institution must select, authorize, compare or route it independently. No sixth class without a demonstrated Product Surface need (`INSTITUTION-CONTRACTS.md` §4).
@@ -221,11 +220,11 @@ Models and providers are **not a Dock class**. A hosted model is provenance unde
 Rules the Dock must make visible without explanation:
 
 1. **Not everything in the Dock is an agent.** The class label leads the row. A Dataset row has no Recruit control; a Technique has no readiness dot; a Participant has no as-of.
-2. **Catalog presence ≠ Canvas presence.** Rows show `in Mission` when bound; the Canvas stays empty until real work exists.
+2. **Catalog presence ≠ Canvas presence.** Rows show `in work` when bound; the Canvas gains an institutional tile only when real work or evidence exists.
 3. **Species second.** `Research Director · Hermes` not `hermes-research-director`. The Golden frame gets the display name right and the subtitle wrong (`Hermes · native CLI` reads as tech).
 4. **Readiness is institutional, not process state.** `ready`, `needs sign-in (Ubuntu)`, `unavailable — WSL missing`, `probe only` — sentences the operator can act on.
-5. **One verb per class.** Recruit · Bind · Use · Select. "Spawn" disappears from operator-facing copy.
-6. **Bundles hide implementation; Inspect reveals it.** Clicking `Football Quant Lab` in Inspect shows Python, DuckDB, versions, hashes. The Dock row never does.
+5. **One plain verb per action.** Recruit · Open/Bind · Use. Techniques also use `Use`; "Spawn" and mandatory `Select Technique` disappear from operator-facing copy.
+6. **Bundles hide implementation; Inspect reveals it.** Clicking `Research Lab` in Inspect shows its actual implementation, versions, and hashes. The Dock row never does.
 
 What the founder should understand from the Dock in five seconds: *what the institution can employ, what is ready, what is already working on this Mission, and what I would have to fix (sign-in, coverage) to use the rest.*
 
@@ -261,11 +260,11 @@ Single click selects (border emphasis, connected cables brighten, unrelated tile
 
 Cables are **Kernel links, nothing else**: `assigned_to`, `produces`, `evaluated_by`, `uses`, `tests`, `spawned_from`. Direction is drawn (source → target). Kind is a small label on hover, not a legend. Unselected cables are quiet; selected-tile cables are bright; cables never cross a region boundary unless the link does. If a cable exists that does not correspond to a link, the grammar is broken (`glacier-feel` gate already asserts geometry tracking; this extends it to meaning).
 
-### Mission-centred legibility without clutter
+### Investigation legibility without clutter
 
-The Canvas has **three regions** in CURRENT MISSION mode: **Team & Work** (participants, tasks), **Evidence & Computation** (datasets, quotes, runs, result artifacts), **Judgment & Conclusion** (evaluations, decision). Regions are layout, not truth. Mission-aware TIDY places tiles into regions by family and fits the result to the viewport. A Mission of eight tiles should read as three columns, not a scatter. The **Mission header** sits above the regions: question · Technique version · evidence as-of · Mission state. That header is the answer to "what am I looking at" from any zoom.
+Each focused investigation reads locally as **Team & Work → Evidence & Computation → Judgment & Conclusion**. These are layout relationships, not a global replacement view and not truth. Investigation-aware TIDY arranges only the selected investigation by family, frames it at readable scale, and preserves every unrelated desk tile. The **research focus bar** names the question/market, current evidence time, work state, and optional Technique. It answers "what am I looking at" without implying the rest of the desk vanished.
 
-**Status of the three-region model:** a **Proof-A design hypothesis**, not ontology law. It is prototyped and validated against the actual populated Proof-A Mission; if the real Mission reads better with a different partition, the partition changes and this section is amended. What is *not* a hypothesis: regions are layout only, the Decision surface is the single accent, and the Mission header is always visible.
+The three-part reading order is a **Wave-1 design hypothesis**, validated against the real populated investigation. The grouping may change if real use reads better. What is not negotiable: layout is projection only; the decision is the single accent; all current work remains reachable; focus never destroys or replaces the desk.
 
 **New tile families.** New additions map to an existing Dock class and tile family by default. A genuinely new family requires an explicit amendment to this document, a demonstrated operator need on a real Mission, and founder validation. Runtime convenience never justifies a new grammar.
 
@@ -292,7 +291,7 @@ An Artifact that moves or glows is lying. A participant that is static is dead.
 
 ### "I just want to work" vs "I need lineage"
 
-Two gears, one Canvas: **CURRENT MISSION** (compact tiles, three regions, header, quiet cables) is working mode. **FULL LINEAGE** (every object in the Mission, every link, ids visible) is provenance mode — the real overhead frame (§B.0) shows why it cannot be the default. Both exist in code today. The switch is one control in the Mission header. Inspect is available in both. The operator never has to leave the desk to answer "where did this number come from" — but is never forced to look at ids while working.
+Two gears, one Canvas: **WORKSPACE/FOCUS** (compact tiles, quiet cables, selected investigation framed) is working mode. **FULL LINEAGE** (every linked object, every link, ids visible) is a provenance overlay—the real overhead frame (§B.0) shows why it cannot be the default. Leaving lineage returns to the same desk and selection. Inspect is available in both. Ryan never leaves the desk to answer "where did this number come from" and is never forced to look at ids while working.
 
 ---
 
@@ -308,7 +307,7 @@ Ownership order. In the Golden frame the QuantFlow frame owns the tile: role rai
 - When the operator wants to watch reasoning during a task.
 - When the seat is blocked and asks something.
 
-Otherwise the TUI is noise. **Default state in CURRENT_MISSION is compact** (role, name, state, task). Expanding shows the TUI. A seat that is `working` shows a quiet activity indicator in compact mode; the operator opens it if curious.
+Otherwise the TUI is noise. **Default state during institutional work is compact** (role, name, state, Task). Expanding shows the TUI without replacing the desk. A seat that is `working` shows a quiet activity indicator in compact mode; the operator opens it if curious.
 
 ### When compact runtime summary is enough
 
@@ -344,17 +343,17 @@ A Hermes seat launched in a plain terminal by hand is a bench terminal, not a pa
 
 ## G. Founder workflow script (intended product language)
 
-1. **Open QuantFlow.** The desk opens to the last Mission if one exists, else to a one-sentence first-run desk: *"QuantFlow is your research institution. Start a Mission from the Dock."* The Dock shows what is ready: `Research Director · ready`, `Critic · ready`, `NFL Historical Evidence · ready · as-of 2025 season`, `Live Market Evidence · needs key`. Ryan understands in one glance what the institution can do today and what he'd have to fix.
-2. **Understand what is live.** The Dock's live line: `0 live · 4 ready · 1 needs attention`. No seat is running. The Canvas is the bench: empty except a WSL terminal he left open, clearly labelled as his.
-3. **Start a Mission.** Dock → START, or a sentence to the Director. Either way the entry resolves on screen into the explicit question and a Technique picked from METHODS: `<Technique> v0.1 · a3f9…`. Submit. If the bookmaker market is not covered, the form says one sentence — *"No coverage for this market at the selected bookmaker. Choose an alternate or change the component."* — and nothing is created. If covered, the Mission header appears: question · Technique · *evidence as of —* · `COMPOSING`.
-4. **Choose a Technique.** Already done in step 3 — the Technique is part of starting, not a later menu. Its version and hash are in the header for the life of the Mission.
-5. **Recruit or use.** The Director recruits by default. The Research Director tile appears in Team & Work with `composing Mission`. It binds `NFL Historical Evidence` and `Live Market Evidence` (Dock rows now read `in Mission`), recruits an Evidence Researcher and the Critic. Ryan watches the roster fill. He may recruit, replace, constrain or stop a seat himself through the same Dock rows and Task controls; when he disagrees with a plan he steers on the task rather than killing seats.
-6. **See work appear.** Evidence & Computation fills: a `CURRENT EVIDENCE` tile (`Bovada · exact price · captured 2:15 PM`), a `HISTORICAL EVIDENCE` tile (`version pinned · future data excluded`), a `DETERMINISTIC RUN` tile (`baseline · vig adjustment · uncertainty`) with a result Artifact cabled from it. Compact tiles; cables quiet; the Director pulses `working`.
-7. **Inspect evidence.** He clicks the market snapshot. Inspect shows venue, market key, capture time, source hash, the quote rows. He clicks the run: inputs by id, Technique hash, result hash, replay. He never sees a log.
-8. **Outputs become Artifacts / Evaluation / Result.** The Evidence Researcher publishes one claim with one uncertainty. The Critic's `INDEPENDENT EVALUATION` tile appears in Judgment & Conclusion: verdict, the one attack it made, whether it held. Then the single accented tile: `CURRENT DECISION SET — one supported candidate · only at +145 or better · refresh after lineup` — or `NO CANDIDATE — insufficient coverage; excluded: …`. Ryan reads the decision, opens lineage once if he wants, and acts outside the app.
-9. **Close and reopen.** He closes QuantFlow. Tomorrow it opens to the same Mission header, the same tiles in the same regions, seats shown `closed` honestly, the Decision Set still accented, History showing the timeline. Nothing pretends to be live. Nothing is lost. If he settles the outcome later, he records it from the Decision tile and the grade appears in History.
+1. **Open QuantFlow.** The same desk returns. If no work exists, one sentence says: *"Inspect a live Bovada market, talk to the Director, or recruit a participant from the Dock."* The Dock shows what is available and what needs attention. Nothing forces a wizard.
+2. **Inspect the market.** Ryan opens `Bovada Live Markets` from DATA. A bounded current market list appears on the Canvas with event, start time, market, both sides, prices, and observation time. `Research this market` is the obvious next action. If Bovada is unreachable or ambiguous, the same surface explains exactly what failed and whether retry is safe.
+3. **Open an investigation.** Ryan clicks `Research this market` or asks the Director about that exact visible market. The focus bar names it; current evidence remains beside it. No named Technique is required. The Director may help plan, but Ryan can still select evidence, another participant, or a tool directly.
+4. **Compose real help.** The Director or Ryan binds trustworthy historical evidence, uses the Research Lab, and recruits an Evidence/Market Researcher and independent Critic as Tasks require. The Dock rows read `in work`; participant tiles show role, Task, state, and expected output. Ryan can steer, replace, or stop them through the same institutional controls.
+5. **See work form on the same desk.** Around the selected market, compact tiles read locally as Team & Work → Evidence & Computation → Judgment & Conclusion. Existing terminals and other investigations remain reachable. TIDY frames this work without deleting anything else.
+6. **Inspect evidence and calculation.** Clicking the market observation shows provider identity, event/market keys, both quoted sides, observation/source time, source hash, and freshness limits. Clicking the Run shows exact historical inputs, cutoff, formula/method version, result hash, limitations, and replay. A named Technique appears only if one was actually selected or previously earned.
+7. **Receive independent judgment.** The researcher publishes one bounded result with uncertainty. The Critic evaluates that exact hash-bound Artifact and names a material attack. Contradicted or insufficient work remains visible as judgment; it is never disguised as support.
+8. **Read the current conclusion.** The single accented surface says `CANDIDATE` with the exact Bovada selection and valid-price condition, `WATCH` with what must change or refresh, or `PASS` with the evidence-backed reason. Ryan can distinguish current from superseded observations and recommendations and acts outside the app.
+9. **Close, reopen, and track.** Reopening restores the same desk, focus, evidence, calculation, criticism, decision revisions, and honest closed participant states. When verified outcome truth later exists, Ryan records it without inventing a wager; History shows the original recommendation, later price/outcome, and resulting evaluation.
 
-What he feels at each step: *I know what the institution can do (1–2); I asked one question and picked one method (3–4); the institution did the work, I watched it (5–6); I can see where every number came from (7); I got a decision or an honest no (8); it is still there tomorrow (9).*
+What he understands: *I can see the market; I can choose what deserves research; different participants and tools work on the same durable problem; I can inspect why they concluded CANDIDATE, WATCH, or PASS; and tomorrow the institution remembers exactly what happened.*
 
 ---
 
@@ -362,9 +361,10 @@ What he feels at each step: *I know what the institution can do (1–2); I asked
 
 ### H.0 PS-0 — the behavioural usability floor (owned here)
 
-PS-0 is a usability floor, not a taste judgment; subjective premium quality is never encoded as Kernel architecture. A Mission passes PS-0 when, in the packaged app:
+PS-0 is a usability floor, not a taste judgment; subjective premium quality is never encoded as Kernel architecture. An investigation passes PS-0 when, in the packaged app:
 
-- the current Mission is obvious;
+- the current market/investigation and its price age are obvious;
+- the Canvas remains one continuous desk before, during, and after focus or lineage inspection;
 - every transition (composing → evidence → computation → judgment → decision) is understandable;
 - for every seat, role, reason for presence, Task, state and output are readable;
 - evidence, computation, Evaluation and conclusion are distinguishable by family;
@@ -375,23 +375,23 @@ PS-0 is a usability floor, not a taste judgment; subjective premium quality is n
 - close/reopen is truthful;
 - Ryan can explain the next action.
 
-Golden status of the mechanics behind the floor: first-run explanation absent (PARTIAL); Mission form + refusal sentence PROVEN for the fixture Technique; tile role/name/state PROVEN, task title PARTIAL; Inspect for tested objects PROVEN; product-language failures PARTIAL (Technique coverage only); close/reopen PROVEN for mechanical Missions; in-app backup UNVERIFIED; performance budget UNVERIFIED; no placement surface PROVEN.
+Golden status of the mechanics behind the floor: first-run explanation absent (PARTIAL); Mission form + refusal sentence PROVEN for the fixture Technique but Technique-free entry is not; tile role/name/state PROVEN, task title PARTIAL; Inspect for tested objects PROVEN; continuous-desk focus is not; product-language failures PARTIAL; close/reopen PROVEN for mechanical Missions; in-app backup UNVERIFIED; performance budget UNVERIFIED; no placement surface PROVEN.
 
 ### H.3 Product Surface Maturity / External Pilot Readiness (later outcome, named here so it is not confused with PS-0)
 
 After Operator Season, repeated evidence may authorize: refined layout grammar; stranger-ready first use; Dock information architecture; typography and density; accessibility; performance; visual consistency; external-pilot presentation. That is the bridge from *usable and true* to *premium and show-ready*. Until then PS-0 is the only bar, and every visible proof preserves its screenshots.
 
-### Proof A — one real football Mission, understandable, operable, coherent
+### Proof A — one real live Bovada investigation, understandable, operable, coherent
 
 Passes when a person who did not build it can, in the packaged app, with no explanation of repository internals:
 
-1. read the Mission header and say what question, which Technique, and how fresh the evidence is;
+1. read the focus bar and say which market/question is being researched, how fresh its price is, and whether a Technique is in use;
 2. name every tile's family from its label alone;
 3. find the market snapshot's capture time and the dataset's pinned version in two clicks;
 4. tell which tile is the decision without being told;
 5. see the Critic's attack and its outcome;
-6. see a refusal sentence when coverage is absent, and see that nothing was created;
-7. reopen the app and find the same Mission legible;
+6. see an actionable failure sentence when coverage or history is absent, without stale evidence appearing current;
+7. reopen the app and find the same desk and investigation legible;
 8. never see a raw key/value dump, a build hash, a process word (`spawn`, `PTY`, `session id`) in operator-facing copy, or a stake.
 
 Mechanical correctness with a wall of terminals, or with tiles that need a guide, does not pass. Visual polish beyond the grammar (animation, typography refinement, minimap beauty) is not required.
@@ -424,11 +424,11 @@ What stays stable when adding:
 | Claude / Codex (second, third runtime) | PARTICIPANTS | participant | frame, role rail, state vocabulary, species-second rule, Task/Artifact/Evaluation semantics |
 | Local or hosted models / providers | provenance *inside* a participant's manifest by default; a TOOL (governed inference capability) or COMPUTE resource only when selected, authorized, compared or routed independently | none by default (Inspect of the seat); run/artifact when a capability | the Dock: no "models" class without a demonstrated need |
 | Future RL workers (PufferLib policy learning) | PARTICIPANTS (Policy Learning Researcher) + TOOLS (trainer) + DATA (settled corpus) + COMPUTE (GPU) | participant, run, artifact (checkpoint), evaluation | no new object types — `environment`, `policy`, `evaluation` exist |
-| Additional data sources (UFC, tennis, crypto feeds) | DATA / RESOURCES bundles | evidence | as-of · licence · hash on every row and tile |
-| Future Techniques | METHODS | none — header only | version · hash in header; immutable once selected |
-| New sports / markets | new bundles and Techniques, same Dock, same Canvas | same | the Mission form, the three regions, the decision surface |
+| Additional data sources (UFC, NFL, tennis, crypto feeds) | DATA / RESOURCES bundles | evidence | observation/as-of · source/rights · hash on every row and tile |
+| Future Techniques | METHODS | none — focus bar only | optional at entry; version · hash visible when used; immutable once selected |
+| New sports / markets | new evidence/capability bundles and earned Techniques, same Dock, same Canvas | same | research entry, local workflow grammar, decision surface |
 
-Corollaries: species branding stays small and secondary forever; the Decision surface stays the only accent; the Mission header is the only always-visible text; Inspect absorbs all new depth so tiles stay compact. A runtime that requires its own panel has not been admitted; it has been bolted on.
+Corollaries: species branding stays small and secondary forever; the Decision surface stays the only accent; the focus bar is the only always-visible investigation text; Inspect absorbs all new depth so tiles stay compact. A runtime that requires its own panel has not been admitted; it has been bolted on.
 
 ---
 
@@ -438,7 +438,7 @@ Corollaries: species branding stays small and secondary forever; the Decision su
 - **Marketing fiction.** No "AI hedge fund", no edge claims, no investor deck language in the product.
 - **Plugin marketplace.** The Dock is a governed catalog for one operator. No store, no ratings, no third-party install flow.
 - **Later maturity rungs now.** No learning loops, no AlphaEvolve, no memory/recall surfaces, no multi-user.
-- **All sports, all models.** Proof A is one Technique, one bookmaker, one corpus, Hermes only. UFC, tennis, crypto, second runtime, local models wait their turn in the roadmap.
+- **All sports, all models.** Proof A completes one Bovada sport/market class, one historical path, one transparent calculation, and Hermes only. Cross-sport contracts are preserved, but a second full sport, second runtime, local models, and broad inventory wait their turn.
 - **Observability dashboards.** Status lives on the work (`PRODUCT.md` principle 2). No separate metrics panel.
 - **Fixing the tile with configuration.** No per-tile theme switches, layout presets, or user-defined families.
 

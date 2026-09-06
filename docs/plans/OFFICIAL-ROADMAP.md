@@ -1,15 +1,15 @@
-# OFFICIAL-ROADMAP.md — from Golden to a useful football Mission, real collaboration, and repeated founder use
+# OFFICIAL-ROADMAP.md — from Golden to a useful live-market research desk, real collaboration, and repeated founder use
 
 status: APPROVED — OFFICIAL PRODUCT PROGRAM; not build authority
-revised: 2026-09-03 (final four-point clarification; sequence unchanged)
-measured against: `main` @ `ab40524d`; Golden product candidate `7c26141f`; Golden evidence head `d3951366`; final founder product `a91b5dee`
+revised: 2026-09-05 (founder product-model correction; Golden remains closed)
+measured against: accepted local `main` @ `6340d78f`; Golden product candidate `7c26141f`; Golden evidence head `d3951366`; final founder product `a91b5dee`
 build authority: `docs/orders/NEXT.md` only (DOCTRINE A9). This file names the route; `NEXT.md` opens each door.
 owns: product sequence · dependencies · Proof A / Proof B · Founder Survival · Operator Season · maturity outcomes · open decisions by timing · stop conditions
 does not own: contract clauses → [Institution Contracts](INSTITUTION-CONTRACTS.md); surface grammar → [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md); demo scripts → [Demo Spec](DEMO-SPEC.md); capability inventory → non-authoritative Vault research `03-DOCK-CAPABILITY-RATIONALIZATION.md`
 supersedes on approval: the R18–R25 route in `docs/history/plans/INSTITUTIONAL-BUILD-PLAN.md`, the rung sequence after R17 in `docs/history/orders/GOLDEN-RUN.md`, and DOCTRINE Part V — all preserved as history of the pre-Golden plan
 founder sources (Vault, non-authoritative research): Official Roadmap Draft 4 · Dock Clarification · Founder Closure Addendum · two founder-review responses of 2026-09-02
 
-> **This file authorizes nothing.** Approving it does not start FM-0. Starting FM-0 is a `NEXT.md` rotation under PROTOCOL, after the Post-Golden Authority Normalization package (§6) is accepted, and FM-0 itself ends at a founder decision, not at code.
+> **This file authorizes nothing.** Post-Golden Authority Normalization is accepted history. `NEXT.md` opens exactly one vertical delivery order. The first order begins with a bounded live-input decision door and continues directly into working product when a viable path is proved; it is not another planning rung.
 
 ---
 
@@ -25,36 +25,36 @@ Class key: **PROVEN** (gate or receipt on `main`) · **PARTIAL** · **PLANNED** 
 | One real production turn: Dock click → Hermes → OpenCode Go / Kimi K3 → four governed Ontology reads → Kernel-bound session → zero leaks | PROVEN (one nonce turn, one founder-created Task) | P14-B receipt; founder walkthrough 2026-08-30 |
 | Task delegation, steering, second opinion, cancellation, durable history | PROVEN (fixture Missions and one real Task) | R5, R14 |
 | Independent Critic gating Report publication, refusal, replay | PROVEN | R15, G9 |
-| Immutable named Technique (`strategy`) selection; coverage refusal creates nothing; operator-settled grading (calibration, CLV); no placement surface | PROVEN on a **fixture** Technique | R17 |
+| Immutable named Technique (`strategy`) selection; coverage refusal creates nothing; operator-settled grading (calibration, CLV); no placement surface | PROVEN on a **fixture** Technique; named Technique selection is optional in the target product | R17 |
 | Bovada NFL public capture → Kernel market graph with replay | PROVEN as component; **not composed into any Mission** | WO-107 |
-| Close/reopen restores Canvas and Kernel world | PROVEN for **mechanical** Missions; **UNVERIFIED** for a complete real football Mission | G5, Act I |
+| Close/reopen restores Canvas and Kernel world | PROVEN for **mechanical** work; **UNVERIFIED** for a complete real live-market investigation | G5, Act I |
 | Object inspection (Inspect pane, lineage views) | PROVEN for **tested objects**; **UNVERIFIED** as complete real-Mission inspection | G10 |
 | Founder Hermes credentials never read or written by QuantFlow | PROVEN | R0 |
-| Mission entry form with Technique selection | PROVEN **mechanically**; real Proof-A Mission entry **PLANNED** | R17, WO-RD-1 |
+| Mission entry form with Technique selection | PROVEN **mechanically**; Technique-free investigation entry is **PLANNED** | R17, WO-RD-1 |
 | Runtime-neutral institution | **UNVERIFIED — falsifier RED.** Source-observed Hermes coupling in Kernel and app seams (§9) | `execute.ts:237`, `ipc-kernel.ts`, `mission-activation.ts`, `dock-profiles.ts`, `agent-host.ts`, `host-native-tui.ts` |
-| A complete useful current+historical football Mission; a Decision Set Ryan accepts; a second certified runtime; cross-runtime handoff/Evaluation; stranger-ready surface | **do not exist** | — |
+| A complete useful current+historical Bovada investigation; a price-sensitive CANDIDATE/WATCH/PASS conclusion Ryan accepts; a second certified runtime; cross-runtime handoff/Evaluation; stranger-ready surface | **do not exist** | — |
 
 Not claimed anywhere in this program: a betting edge; a validated Pressure Cascade Technique; PFF access; a working updater; commercial readiness; external demand; second-runtime certification; stranger-ready usability; production AlphaEvolve, TimesFM, PufferLib, or owned models.
 
 ## 2. Product definition
 
-QuantFlow Ontology is a **governed quantitative research institution for one operator, rendered on an infinite workspace.** The operator states intent; a Research Director turns it into a Mission with a selected Technique; the Technique's requirements compose the Dock; participants ground the Technique in real current and pinned historical evidence; deterministic computation runs; an independent Critic attacks; the Canvas ends in a **Current Decision Set** or an explicit **No candidate**; outcomes are recorded and the Technique is revalidated. The operator acts in the world. QuantFlow never places a bet, exposes no placement control, and claims no profitability.
+QuantFlow Ontology is **Ryan's governed sports-betting research institution, rendered on one persistent infinite desk.** Ryan may work through the Research Director, another participant, or the evidence directly. The Dock supplies governed Participants, Data, Tools, optional Methods, and Compute; the Director is Ryan's primary AI colleague and may compose and coordinate them, but is neither the whole application nor its only front door. The Canvas keeps current investigations understandable and controllable without replacing the desk with a special graph world. The Kernel/Ontology preserves shared questions, Tasks, observations, calculations, Artifacts, criticism, decisions, revisions, and outcomes as one durable truth. Bovada is the primary live-market environment. QuantFlow produces price-sensitive **CANDIDATE, WATCH, or PASS** research; Ryan acts in the world. QuantFlow never places a bet, exposes no placement control, or claims profitability.
 
 ## 3. System model
 
 ```
-FOUNDER INTENT → MISSION → TECHNIQUE → CAPABILITY REQUIREMENTS → DOCK COMPOSITION → TASKS
+FOUNDER INTENT → BOUNDED INVESTIGATION → OPTIONAL TECHNIQUE / EXACT METHOD → DOCK COMPOSITION → TASKS
 → CURRENT + HISTORICAL EVIDENCE → DETERMINISTIC RUNS → ARTIFACTS → GOVERNED HANDOFFS
-→ INDEPENDENT EVALUATION → CURRENT DECISION SET or NO-CANDIDATE → OUTCOME → REVALIDATION
+→ INDEPENDENT EVALUATION → CANDIDATE / WATCH / PASS → REVISION → OUTCOME → REVALIDATION
 ```
 
 | Component | Job | Not its job |
 |---|---|---|
-| **Director** | interpret intent, compose the institution, supervise ordinary work, escalate founder decisions | be an ungoverned chatbot |
-| **Technique** | methodology, evidence requirements, computation, uncertainty, refusal, Evaluation and grading rules | live outside the Kernel (`strategy` object) |
+| **Director** | serve as Ryan's primary AI colleague; interpret intent, operate the desk, compose participants/capabilities, supervise work, escalate founder decisions | become the whole product or the only way to work |
+| **Technique** | preserve a reusable, evaluated research method when one exists | block exploration, or replace the exact method/envelope every decision-bearing calculation must record |
 | **Dock** | govern what the institution may employ (Participants · Data · Tools · Methods · Compute) | package manager; agent launcher |
 | **Ontology / Kernel** | define and preserve shared truth | graph spectacle |
-| **Canvas** | explain the current Mission | mirror the Dock |
+| **Canvas** | keep the continuous working desk and its current investigations understandable and controllable | become a replacement Mission world, graph spectacle, or mirror of the Dock |
 | **Inspect** | exact detail and provenance | mutate |
 | **History** | what happened over time | chat log |
 | **Participants** | own Tasks, produce work and judgment | terminal logos |
@@ -66,8 +66,8 @@ The Dock contains what the institution may employ. The Canvas displays only what
 
 | Term | Means | Kernel shape today |
 |---|---|---|
-| Mission | one operator question with a selected Technique | `mission` + `hypothesis` |
-| Technique | versioned, hashed research method | `strategy` (spec artifact, family, version) |
+| Mission / investigation | one bounded operator question or market investigation; it does not require a named Technique | `mission` + optional `hypothesis` |
+| Technique | optional versioned, hashed reusable research method promoted from evaluated work | `strategy` (spec artifact, family, version) |
 | Participant | a process holding a governed seat | `agent_definition` → `agent_session` |
 | Role | institutional identity of a seat | `agent_definition.role` |
 | Runtime species | the adapter a participant runs on (Hermes today) | manifest `adapter.id`; provenance, not semantics |
@@ -76,7 +76,7 @@ The Dock contains what the institution may employ. The Canvas displays only what
 | Task | one exact unit of work | `task` |
 | Artifact / Report | immutable content-addressed output; Report is `artifact.kind` | `artifact` |
 | Evaluation | independent judgment on an artifact | `evaluation` |
-| Decision Set | the Mission's terminal research projection over governed Artifact/Report authority | *artifact kind to be defined in FM-0*; never a new object type |
+| Decision Set | current price-sensitive CANDIDATE/WATCH/PASS research projection over governed Artifact/Report authority | an existing governed Artifact/Report shape unless implementation proves a narrow schema need; never a parallel truth store |
 | Bench | ordinary operator equipment (WSL terminal, files) on the canvas, outside institutional truth | none — not Kernel objects |
 
 ## 5. Product laws
@@ -86,7 +86,7 @@ Carried forward unchanged: Kernel owns truth (START_HERE); one write path (LAWS 
 Added by this program:
 
 9. **Participant ≠ Capability.** Different contracts; a participant uses a capability only via a role grant.
-10. **No tool, model, or runtime without a Mission consumer.** Nothing enters the critical path until a selected Mission names it; nothing enters production because it is impressive.
+10. **No production capability without a real research consumer.** The Dock may describe governed inventory, but nothing enters a delivery's critical path until a current founder job needs it; nothing enters production because it is impressive.
 11. **Docs, gates, and receipts are not the capability.** A package closes only when the operator runs the thing in the normal app.
 12. **Runtime species and provider do not define institutional semantics.** They remain inspectable provenance bound to the exact participant and execution.
 13. **Adding to the institution never adds to the grammar.** New things enter through an existing Dock class and tile family, or they are misclassified.
@@ -94,34 +94,25 @@ Added by this program:
 ## 6. Critical path
 
 ```
-GOLDEN — COMPLETE (closed, untouched)
+GOLDEN + POST-GOLDEN FOUNDATION — COMPLETE (closed, untouched)
    ↓
-FINAL CANONICAL APPROVAL (this document set)
+WAVE 1 — FIRST USEFUL MARKET DESK
+  live-input door → one current Bovada market class → trustworthy history → transparent calculation
+  → independent criticism → CANDIDATE/WATCH/PASS → continuous Canvas → reopen/tracking
    ↓
-POST-GOLDEN AUTHORITY NORMALIZATION (bounded QA/docs package; independently verified)
+WAVE 2 — REAL HETEROGENEOUS COLLABORATION
+  de-Hermes institutional seams → second production runtime → exact Artifact handoff/Evaluation
    ↓
-FM-0 — FEASIBILITY DECISION (read/spike; ends at founder decision)
+WAVE 3 — PROVE AND MATURE
+  repeated live use → outcomes/CLV/calibration/baselines → multi-sport/Dock expansion
+  → successful methods become Techniques → founder survival/release/visual hardening
    ↓
-MINIMUM IC-0 — Participant + Capability boundary as gates on the existing Hermes path
-   ↓
-PROOF-A INGREDIENTS  + PS-0 usability floor  + FOUNDER SURVIVAL in parallel
-   ↓
-PROOF A — USEFUL FOOTBALL MISSION
-   ↓
-PB-0 — GENERALIZE HERMES-SPECIFIC INSTITUTIONAL SEAMS
-   ↓
-PROOF B — REAL HETEROGENEOUS COLLABORATION
-   ↓
-OPERATOR SEASON
-   ↓
-PRODUCT SURFACE MATURITY / EXTERNAL PILOT READINESS  + EVIDENCE-LED INSTITUTION MATURITY
-   ↓
-LATER DOMAIN EXPANSION AND EXTERNAL FUNDABILITY EVIDENCE
+FOUNDER-PROVEN PERSONAL RESEARCH PRODUCT
 ```
 
-### 6.1 Post-Golden Authority Normalization (one package, approve yes/no)
+### 6.1 Post-Golden Authority Normalization — COMPLETE
 
-A bounded, independently verified QA/documentation package that runs **before** FM-0 and after the canonical documents are approved. It:
+Accepted Foundation history already present in the `6340d78f` baseline. It:
 
 1. preserves immutable Golden evidence and the product/runtime/config bytes it certifies;
 2. replaces the P14-B receipt's "every tracked file outside four prefixes" fingerprint with an **explicit product-relevant fingerprint set**: every tracked file under `collab-electron/`, `packages/`, `qf-kernel-schema/`, `species/`, and `tools/`; all tracked standard lockfiles; every `.github/workflows/` file; and root `install.sh`. The exact non-packaged `species/hermes/README.md` is the only content exclusion inside those trees — neither living authority prose nor packaged Markdown is blindly exempted;
@@ -133,17 +124,17 @@ A bounded, independently verified QA/documentation package that runs **before** 
 8. moves this roadmap and the contracts to `docs/plans/` with `README`/`START_HERE` links, so `docs/orders/` holds only orders, protocol, evidence — the authority/route distinction becomes visible in the path;
 9. changes no product bytes, no schema, no Golden evidence.
 
-Exit: all Windows release-door stages green; bait transcripts for each changed gate; independent verifier; then merge/push of the canonical documentation.
+Exit: accepted and closed. Do not reopen it as Wave-1 work.
 
-### 6.2 FM-0 — feasibility decision
+### 6.2 Wave-1 live-input decision door (formerly FM-0)
 
-Read-only investigation plus at most one throwaway spike outside the product tree. **Decides with evidence:** first Technique and market family (Pressure Cascade / QB interceptions is a *candidate*, not a protected conclusion); current provider and desired bookmaker/venue feasibility; pinned historical corpus, required point-in-time fields, as-of rules, rights/access boundary, and Dataset/corpus purpose under [Institution Contracts](INSTITUTION-CONTRACTS.md) C10; the deterministic analytical core and exact decision-bearing metric definitions required by C9; Decision Set payload (artifact kind over existing `artifact`, current vs historical authority explicit); no-candidate behaviour; failure/refusal taxonomy with the exact operator sentence per class; the minimum Proof-A Dock; the minimum Product Surface bar; whether catalog metadata needs new persisted semantics (`tool` object) or stays governance metadata.
-**Does not:** select runtime two; implement product code; install tools; reopen R18; create partial Mission truth.
-**Exit:** one versioned repository decision record under `docs/plans/decisions/`; `main` clean; no product bytes changed; founder selects a Technique or stops.
+A bounded first deliverable inside the opening product order, not a separate audit, rung, or founder decision ceremony. It proves one real current Bovada event/market with reliable participant identities, both sides and prices, event time, provider identity, local observation time, and an honest freshness statement; then proves one trustworthy historical path whose inputs can be reconstructed before the event cutoff. Attempt UFC first because it is live and useful to Ryan; use NFL as the reserved fallback under the same evidence bar. The order sets a hard timebox and switches promptly rather than protecting a favorite sport.
+
+This door also identifies the smallest transparent calculation that the available evidence can honestly support. It does **not** require Ryan to invent or select a named Technique. Exploration begins without one; before any conclusion can influence CANDIDATE/WATCH/PASS, the exact formula, inputs, version, cutoff, missing-data behavior, and limitations become an immutable Run envelope. If both real-data paths fail inside the timebox, stop with the exact missing dependency. Never substitute fixtures on the live claim.
 
 ### 6.3 Minimum IC-0
 
-Two gates with bait, green on the **existing Hermes path** before any second species exists: `participant-contract` (P-clauses) and `capability-contract` (C-clauses) from [Institution Contracts](INSTITUTION-CONTRACTS.md) §1–§2. The only new process before Proof A.
+The minimum Participant and Capability boundaries needed by the live slice ship with that slice and are exercised on the existing Hermes path. They are not standalone process work. Full runtime-neutral conformance remains Wave 2.
 
 ### 6.4 Proof-A ingredients
 
@@ -151,10 +142,10 @@ FM labels are **dependency units, not mandatory mini-rungs**; compose adjacent u
 
 | Unit | Runnable outcome | Proof proportional to risk |
 |---|---|---|
-| **FM-1 Evidence ingress** | Live Market Evidence and NFL Historical Evidence enter as `quote`/`market_event` and `dataset` versions with as-of + hash through two Dock bundles | one real provider read + deterministic fixture |
-| **FM-2 Technique computation** | Football Quant Lab runs the selected Technique and its C9 metric definitions via `execute_deterministic_run`; replay envelope per contracts C2 | replay gate; bait: perturb one input byte or metric definition |
-| **FM-3 Director composition** | Director reads Technique requirements, binds bundles, recruits roles; refusal is a sentence | live Hermes Director turn (P14-B route reused) |
-| **FM-4 Decision Set + failure diagnosis** | Decision Set / No-candidate artifact kind; failure sentences on the Canvas | UI oracle + fixture failures |
+| **FM-1 Evidence ingress** | Live Bovada evidence and one sport's trustworthy historical evidence enter as `quote`/`market_event` and `dataset` versions with source time/as-of + hash through real Dock capabilities | one real provider read + deterministic negative fixtures |
+| **FM-2 Transparent computation** | The Research Lab runs an exact versioned calculation envelope through `execute_deterministic_run`; a reusable named Technique is used only when one actually exists | independent recomputation; bait: perturb one input byte or formula version |
+| **FM-3 Director and direct composition** | Ryan or the Director can open an investigation, bind capabilities, and recruit roles without a Technique prerequisite; refusal is a founder-readable sentence | real Hermes Director turn plus direct UI path |
+| **FM-4 Governed conclusion + failure diagnosis** | Price-sensitive CANDIDATE/WATCH/PASS conclusion; failed or contradicted work remains visible without being published as support | rendered UI oracle + fixture failures |
 | **PS-0 floor** | [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md) §H behavioural floor | normal-app founder check |
 | **FM-5 Interpretation + attack** | Researcher interprets the deterministic artifact; Critic evaluation names ≥ 1 material attack | governed-review extension |
 | **FM-6 Lineage & Inspect** | From Decision Set to every input's bundle, as-of, hash | UI oracle |
@@ -163,15 +154,15 @@ FM labels are **dependency units, not mandatory mini-rungs**; compose adjacent u
 
 Recommended composition (architect decision): FM-1+FM-2 "evidence + computation"; FM-3+FM-4 "Director + decision"; FM-5+FM-6 "attack + lineage"; FM-7+FM-8 "survive + regress".
 
-### 6.5 Proof A — useful football Mission
+### 6.5 Proof A — useful live Bovada investigation
 
-**Proves:** the operator opens the normal Windows app, states a question, selects a Technique, and the institution grounds it in real current market evidence and pinned historical evidence, computes deterministically, interprets, is attacked by an independent Critic, and ends in a Decision Set or an honest No candidate — with every number traceable to source, as-of time, Technique hash, and producer; surviving close/reopen; with no bet, placement control, or edge claim. All participants may be Hermes profiles; that does not satisfy Proof B.
+**Proves:** Ryan opens the normal Windows app, inspects a current Bovada market, opens one bounded investigation without first inventing a Technique, and uses real current and trustworthy historical evidence plus a transparent reproducible calculation. An independent Critic attacks the exact result. The desk ends in a price-sensitive CANDIDATE, WATCH, or PASS whose numbers trace to source, observation/as-of time, exact method envelope, and producer; previous observations and recommendation revisions survive close/reopen; no wager is invented or placed. All participants may be Hermes profiles; that does not satisfy Proof B.
 
-**Minimum Proof-A Dock:** Participants — Research Director, one Evidence/Market Researcher, Independent Critic. Data — NFL Historical Evidence, Live Market Evidence. Tools/Compute — Football Quant Lab. Method — the selected Technique. Optional — Literature/Browser Evidence only if the Technique requires it.
+**Minimum Proof-A Dock:** Participants — Research Director, one Evidence/Market Researcher, Independent Critic. Data — Bovada Live Markets and the selected sport's Historical Evidence. Tools/Compute — one Research Lab capable of the proved calculation. Method — optional; show a named Technique only if evaluated work has earned one. Literature/Browser Evidence remains optional when the investigation requires it.
 
 **Acceptance:** independent verifier runs the Mission in the packaged app with real provider contact and pinned corpus; every decision-bearing metric satisfies C9 and every admitted Dataset/corpus satisfies C10; `participant-contract`, `capability-contract`, replay gate green with bait; Founder-Proven exit (Closure Addendum): founder completes it once unassisted from a fresh install; [Demo Spec](DEMO-SPEC.md) Demo A rejection conditions absent; product-surface acceptance per [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md) §H; screenshots preserved in the receipt.
 
-**Outside Proof A:** second runtime; more than one Technique/bookmaker; stake logic; AlphaEvolve, PufferLib, TimesFM, Multivariate Forecast Engine; recall/learning.
+**Outside Proof A:** second runtime; more than one completed sport/market class; stake logic; AlphaEvolve, PufferLib, TimesFM, Multivariate Forecast Engine; recall/learning.
 
 ### 6.6 Founder Survival lane (parallel, never blocking)
 
@@ -187,13 +178,13 @@ Operator-visible fixes that keep the founder using the product while Proof A bui
 
 **Proves:** one real Mission + two genuinely different certified Participant runtimes + exact durable Tasks + shared role-authorized capabilities + at least one non-chat Data/Tool/Compute capability + one hash-bound Artifact produced by runtime A + governed handoff + independent Evaluation or meaningful extension by runtime B + shared Kernel/Dock/Canvas/Inspect lineage + stop/replacement/reopen without durable truth loss. Peer messaging and terminal prose may notify; they never constitute the handoff. Proof B is not two terminals.
 
-**Sequence after PB-0:** select runtime two from the exact useful role and independence need Proof A revealed (open until then — not decided in FM-0); implement only runtime-specific adapter/manifest/package/probe differences (PB-1); run the real cross-runtime Mission (PB-2); prove runtime-three admission requires only adapter/manifest/package declaration + bounded readiness/transport probes + the existing conformance suite, with no change to Kernel truth, role semantics, Dock semantics, Canvas identity, Task ownership, Artifact publication, Evaluation authority, collaboration truth, or History (PB-3, falsifier F1–F6).
+**Sequence after PB-0:** select runtime two from the exact useful role and independence need Proof A revealed (open until then); implement only runtime-specific adapter/manifest/package/probe differences (PB-1); run the real cross-runtime Mission (PB-2); prove runtime-three admission requires only adapter/manifest/package declaration + bounded readiness/transport probes + the existing conformance suite, with no change to Kernel truth, role semantics, Dock semantics, Canvas identity, Task ownership, Artifact publication, Evaluation authority, collaboration truth, or History (PB-3, falsifier F1–F6).
 
 **Outside Proof B:** a third runtime; runtime marketplaces; model routing; swarm framing.
 
 ### 6.9 Operator Season
 
-Proof A's Mission run weekly across a real NFL season by the founder as operator; outcomes settled through the R17 grade path; no edge claim. Produces the first real history. Decisions that need history open only after it.
+The accepted investigation loop runs repeatedly on real upcoming events by Ryan as operator; outcomes are recorded only from verified external truth, with no placement or edge claim. This produces the first real history for CLV, calibration, coverage, failure, and baseline comparison. Decisions that need history open only after it.
 
 ### 6.10 Product Surface Maturity / External Pilot Readiness
 
@@ -211,7 +202,7 @@ establishes truth. Search indexes remain derived, replaceable projections.
 
 ### 6.12 Domain expansion
 
-UFC, tennis, then broader markets / crypto — same Kernel, same Dock classes, same tile families; new bundles and Techniques only.
+After the first completed sport/market class, UFC, NFL, tennis, and later broader markets use the same Kernel, Dock classes, Canvas grammar, and institutional contracts. Expansion adds evidence/capability bundles and only those Techniques earned by evaluated work—not new architecture.
 
 ### 6.13 Fundability evidence boundary
 
@@ -219,12 +210,12 @@ Proof A + Proof B produce a **first-class show-ready technical/product demonstra
 
 ## 7. Stop conditions
 
-Stop and return to the founder if: FM-0 finds no bookmaker coverage and no authorized alternate; any unit requires a second truth store; any unit passes only with a fixture on the live path; product bytes change without an authorized receipt re-anchor; a tool/model/runtime is proposed without a Mission consumer; two failed attempts on one symptom occur without a layer classification; five active working days pass without a founder-visible packaged checkpoint and no foundation defect is named.
+Stop and return to the founder only if: the bounded input door proves neither UFC nor NFL can supply the required real evidence without a credential or external access decision; any unit requires a second truth store; any unit passes only with a fixture on the live path; a real safety/authority conflict appears; the same semantic assertion fails twice after repair; or working software exposes a genuinely founder-only product choice. Do not stop for naming, ceremony, optional Technique selection, or implementation choices the architect can make from evidence.
 
 ## 8. Open decisions by timing
 
-**Founder approves now:** this canonical document set; the Post-Golden Authority Normalization package in principle (yes/no); whether to proceed to a separately authorized FM-0 afterward.
-**FM-0 decides with evidence:** §6.2 list.
+**Already settled by the founder:** this corrected product model and continuous execution through the three delivery waves; Golden remains closed.
+**The Wave-1 input door decides from evidence:** §6.2 list, including UFC versus NFL fallback and the smallest honest calculation.
 **After Proof A:** second runtime; exact PB-0/PB-1 implementation plan informed by the real role; adapter shape; untrusted-CLI security; Operator Season threshold.
 **After real history:** §6.11–6.13.
 Architect-settled (not founder questions): document ownership, contract wording, PB-0 placement, surface operating model, participant/capability distinction, compute/model placement, normalization shape, cadence. The Vault founder decision pack is non-authoritative research input; decisions that open or close work land in Git under the normal `NEXT.md`/order protocol.
@@ -238,5 +229,5 @@ One vertical operator-visible outcome at a time; adjacent dependency units combi
 **APPROVED — OFFICIAL ROADMAP 2026-09-03**
 
 - Approval: the founder writes `APPROVED — OFFICIAL ROADMAP <date>` under this line, or it stays a candidate.
-- `NEXT.md` opens the normalization package first, then FM-0, naming this file as route and the contracts as reference.
+- `NEXT.md` opens one concise vertical order at a time, beginning with the real live-market opportunity desk; the bounded input door is Deliverable 0 of that order.
 - Historical routes are preserved and not edited into agreement; they are history the moment this file is approved.

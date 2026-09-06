@@ -12,7 +12,7 @@
 
 ## 0. Mission (fixed)
 
-**QuantFlow is a Windows-first, single-user, ontology-centered quantitative research and learning environment.** Its default front door is **Research Director**, a custom Hermes Agent Profile. Ryan states a research mission naturally; the Director uses governed Kernel actions to plan, recruit exact specialists, assign work, and route evidence. The canvas automatically reveals that active work and lets Ryan steer it. The Dock is optional manual inventory and control. Quantitative research is the invariant domain, sports betting is the first application, and QuantFlow never places a bet or trade.
+**QuantFlow is Ryan's Windows-first, single-user, ontology-centered sports-betting research desk.** Ryan works on one continuous Canvas and may talk to the **Research Director**, another governed participant, or the evidence itself. The Director is Ryan's primary AI colleague: it can coordinate work and operate QuantFlow through governed actions, but it is not the whole product and it is not the only front door. The Dock is the governed supply of Participants, Data, Tools, Methods, and Compute that Ryan or the Director may bring into the work. The Kernel/Ontology keeps every question, task, observation, calculation, artifact, criticism, decision, and revision attached to the same durable institutional truth. Bovada is the primary live-market environment. Reusable Techniques are optional and accrete from evaluated work; exploration never requires one, while every decision-bearing calculation still records its exact method, inputs, version, and timing. QuantFlow researches and advises; it never places a bet or trade.
 
 ## 1. The one rule
 
