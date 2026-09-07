@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "codex/wo-wave1-evidence-computation",
-    "commit": "989d7cf1",
+    "commit": "82081dc4",
     "generatedAt": "2026-09-07",
     "filesScanned": 421,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -56131,12 +56131,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-wave1-evidence-computation",
-      "commit": "966d77ff",
+      "commit": "989d7cf1",
       "generatedAt": "2026-09-07"
     },
     "to": {
       "branch": "codex/wo-wave1-evidence-computation",
-      "commit": "989d7cf1",
+      "commit": "82081dc4",
       "generatedAt": "2026-09-07"
     },
     "verdict": "better",

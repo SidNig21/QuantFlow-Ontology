@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-wave1-evidence-computation @ 989d7cf1` on 2026-09-07 by
+> Generated from `codex/wo-wave1-evidence-computation @ 82081dc4` on 2026-09-07 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
