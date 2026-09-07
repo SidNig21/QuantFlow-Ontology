@@ -1,0 +1,228 @@
+# WO-W1-02 — UFC historical evidence and transparent calculation
+
+status: PROPOSED — semantic Reader pending; no Builder authority
+base: W1-01 closure `ecd420918e55eb1377eea627152d402246f8fa22`
+route: Wave 1 — First Useful Market Desk
+depends: WO-W1-01 accepted at product candidate `b506cca0d2c41fd1e15f7b03a86fa1a3ed29f4e2`
+reader: one fresh visible Codex task; return exactly `YES/YES` or numbered defects
+builder: one fresh visible Codex task only after Reader `YES/YES` and `NEXT.md` opens
+verifier: one different fresh visible Codex task against one immutable candidate
+
+## In plain terms
+
+Ryan can add trustworthy pre-fight UFC history to the exact Bovada investigation already on his desk and
+run one understandable calculation without QuantFlow pretending that the calculation is a proven betting
+Technique or recommendation.
+
+## Current floor
+
+- Golden and the Post-Golden Foundation remain closed. Do not requalify or rewrite them.
+- W1-01 supplies a real current UFC Bovada market, exact Quote identity, Technique-free investigation,
+  continuous Canvas, Inspect, Full Lineage, and close/reopen.
+- The accepted live door proved official UFC athlete pages can resolve the same fighter identities and
+  pre-event result rows. That receipt proves feasibility, not a product capability.
+- `register_dataset_version` already binds `qf.dataset.v1` bytes to an immutable Artifact, hash, as-of,
+  kind, and coverage.
+- `execute_deterministic_run` currently supports ranking a Dataset through `qf.strategy.v1`. Even when the
+  caller supplies only an inline spec, it materializes a `strategy` object and Strategy Artifact. That is
+  not an honest implementation of the accepted rule that exploration may run without a named Technique.
+- `belongs_to` currently binds only Task to Mission. Direct capability work therefore has no honest
+  durable Mission edge unless this order extends the existing link narrowly to Run.
+
+## Lockstep scope ladder
+
+| Rung | Status | Outcome | Proof | Stop condition |
+|---|---|---|---|---|
+| W1-01 | DONE | Real UFC Bovada market desk | accepted candidate and founder walkthrough | do not reopen |
+| W1-02 | ACTIVE AFTER READER | Historical Dataset plus transparent technique-free calculation | live source, deterministic recomputation, packaged UI | source identity/cutoff cannot be proved or semantics need a new truth store |
+| W1-03 | NEXT | Independent Critic plus price-sensitive CANDIDATE/WATCH/PASS | exact Artifact review and rendered decision | not part of this order |
+| W1-04 | PARKED | Close/outcome tracking, backup, regression, complete Proof A | real settled event and founder run | not part of this order |
+
+## Deliverable 1 — one real historical-evidence capability
+
+Add one governed DATA capability named **UFC Historical Evidence**.
+
+1. Use bounded public official UFC athlete/event pages for the positive path. For each exact competitor in
+   the selected Bovada Quote, preserve canonical fighter identity, source URL, local observation time,
+   source hash, parser version, every admitted completed-bout row, opponent, event date, outcome, and the
+   investigated event cutoff.
+2. Reject unresolved or ambiguous fighter identity. Provider label normalization may locate candidates,
+   but only exact canonical-page identity plus the investigated matchup/event context may admit evidence.
+3. Exclude every row at or after the investigated event start. Draws and no-contests remain explicit; they
+   are never silently counted as wins or losses. Missing history produces an honest zero-coverage record,
+   not invented evidence.
+4. Publish canonical `qf.dataset.v1` bytes and register one content-hashed Dataset version through
+   `execute()`. Declare its C10 purpose as `EVIDENCE`, kind as `results` or the narrowest honest existing
+   kind, as-of as the actual pre-event observation boundary, and coverage with row counts, range, excluded
+   rows, missing fields, and both source hashes.
+5. The Dataset bytes cite the exact starting Quote id and immutable observation/source hash already in the
+   Kernel. The app validates those values against Kernel readback before registration; caller prose cannot
+   bind the market.
+6. Reuse W1-01 request limits: a 20-second whole-request abort and 5 MiB streamed-response ceiling per
+   source request. Timeout, HTTP failure, malformed page, identity ambiguity, no history, and cutoff leak
+   remain distinct founder-readable outcomes.
+7. Register the capability through the existing `register_tool` action. Do not add a feed database,
+   scraper service, background poller, credential store, browser automation dependency, or second copy of
+   durable evidence.
+
+The product implementation is source-specific at its adapter edge and neutral above it. UFC is the only
+positive sport in this slice; no claim of broad historical coverage is authorized.
+
+## Deliverable 2 — technique-free deterministic calculation
+
+Extend the existing deterministic execution seam rather than building a second runner.
+
+1. `execute_deterministic_run` gains one calculation mode accepting an immutable declarative calculation
+   envelope. Exactly one semantic mode is allowed: existing Strategy/Technique execution or the new
+   calculation envelope. Existing Strategy inputs, results, replay, outcome grading, and tests remain
+   compatible.
+2. A calculation envelope is stored as a content-addressed existing Artifact kind appropriate for exact
+   executable/declarative method bytes. It is **not** stored as a `strategy`, does not create a Strategy
+   object, and never renders as a Technique.
+3. Extend the existing `uses` link only as needed so the Run names the exact Dataset, registered
+   **Research Lab** Tool, calculation-envelope Artifact, and starting Quote. Extend `belongs_to` from Task
+   alone to Task or Run so the calculation Run belongs to the exact investigated Mission. Do not create a
+   new link kind or object type.
+4. The trusted Mission context is required. Before mutation, verify that the Mission has exactly one
+   `investigates` edge to the supplied Quote. Direct founder invocation creates no fake participant or
+   fake Task. A later participant invocation records its real actor session in the unchanged trace path.
+5. Register **Research Lab** as one governed TOOL capability through `register_tool`. It is a capability,
+   not a Participant, terminal, Technique, or separate truth store.
+6. Ship one bounded, sport-neutral operation: `two_way_market_history_baseline` version 1. For both sides
+   of the exact moneyline Quote it computes and records:
+   - decimal price and raw implied probability `1 / decimal_price`;
+   - two-way overround as the sum of raw implied probabilities;
+   - normalized market probability as raw implied probability divided by overround;
+   - source-listed wins, losses, draws, no-contests, decisive sample size, and recent decisive win fraction
+     `wins / (wins + losses)`, or explicit unavailable when the denominator is zero.
+7. Use deterministic fixed-point decimal arithmetic with one documented rounding rule. Preserve exact
+   formula version, implementation version, Dataset id/hash, Quote id/observation time/source hash,
+   parameters, event cutoff, calculation-envelope hash, capability id/version, execution environment, and
+   result hash in the Run envelope and output.
+8. The output presents market probability and descriptive recent results side by side. It must not
+   subtract them into an `edge`, rank a bet, estimate a fighter's true win probability, recommend a wager,
+   imply statistical sufficiency, or create `CANDIDATE`, `WATCH`, or `PASS`.
+9. Same exact envelope produces the same result bytes/hash. A changed input byte, Quote observation,
+   formula version, or parameter produces a different manifest and cannot pass as an identical replay.
+
+## Deliverable 3 — one founder-operable Dock and Canvas path
+
+Starting from an existing W1-01 investigation in the normal packaged app:
+
+1. CATALOG shows two real governed capability rows: **UFC Historical Evidence** under DATA and
+   **Research Lab** under TOOLS. Each row shows readiness and its current bounded purpose. Neither appears
+   in participant counts or launch controls.
+2. The selected investigation exposes one clear action, **Add evidence and calculate**. It uses the exact
+   selected Mission and Quote; it never chooses a global latest market or hidden replacement Mission.
+3. During work, the Dock reports the current stage and one founder-readable failure if it stops. It does
+   not manufacture an AgentSession for the deterministic capabilities.
+4. The existing Canvas remains the desk. The selected investigation gains a compact historical Dataset,
+   Analysis Run, and raw result Artifact downstream of its Quote. Existing unrelated tiles remain in place.
+5. The visible hierarchy says `HISTORICAL EVIDENCE`, `TRANSPARENT CALCULATION`, and `RAW RESULT — NOT
+   REVIEWED`. It separately says `Technique: none selected`. The calculation name must not occupy a
+   Technique tile or imply independent judgment.
+6. The raw result surface shows both fighters, current observed prices, normalized market probabilities,
+   source-listed record counts/fractions, sample sizes, cutoff, and a concise limitation: descriptive
+   history is not an estimated win probability.
+7. Inspect reaches every source URL/hash/time, excluded-row count, Dataset id/hash/as-of/purpose,
+   calculation formulas/version/hash, Run environment/status, Quote identity/time/hash, and result hash.
+8. TIDY and focus keep required controls on-screen and prevent overlap, unreadable scale, cable crossings
+   through tiles, and unrelated full-lineage clutter. No raw page payload or debug identifiers dominate the
+   normal tile face.
+9. Close/reopen reconstructs all visible objects and semantic relationships from Kernel truth. The
+   capability catalog may recompute readiness; it may not remember completion outside the Kernel.
+
+## Deliverable 4 — honest failure, freshness, and later-measurement boundary
+
+- If source capture fails before Dataset registration, no Dataset or succeeded Run appears. If the Dataset
+  was durably registered before a later calculation failure, it remains visible with the named failure;
+  no success Artifact is fabricated.
+- If the selected Quote is no longer the Mission's exact investigated observation, refuse and ask Ryan to
+  select or refresh explicitly. Never silently substitute a newer Quote.
+- W1-01 observations remain immutable and current/superseded truth remains unchanged.
+- Label the observed market price as `observation`, never `closing price`. This slice preserves enough
+  exact identity/timing for W1-04 to attach a real closing snapshot or explicit unavailability later; it
+  does not guess a close now.
+- Normal close cancels outstanding history requests and reaches zero QuantFlow-owned processes and
+  disposable roots. Founder state and runtime credentials remain untouched.
+
+## Acceptance matrix
+
+| Claim | Positive proof | Required red control |
+|---|---|---|
+| Exact history identity | live official UFC pages resolve both exact Bovada competitors and pre-cutoff rows | swap one competitor or admit an ambiguous page |
+| Point-in-time fence | every admitted row predates the event cutoff and coverage lists exclusions | insert one at/post-cutoff row |
+| Durable Dataset | canonical bytes, Artifact, Dataset, purpose, as-of and hash agree after reopen | forge a renderer-only Dataset or alter stored bytes |
+| No fake Technique | calculation creates Run + method Artifact + result, zero new Strategy rows/tiles | re-enable legacy inline-spec Strategy materialization on the calculation path |
+| Mission ownership | Run has exactly one `belongs_to` edge to the Mission that investigates its exact Quote | use a different Mission or Quote |
+| Transparent math | independent recomputation matches every displayed value and rounding rule | perturb price, record count, formula version, or result byte |
+| Governed capabilities | Dock rows, registered Tool objects, Run `uses` links and versions agree | render an unregistered constant or count a capability as a Participant |
+| No recommendation | result contains descriptive baseline only | inject edge/ranking/recommendation/CANDIDATE language |
+| Continuous desk | W1-01 market and unrelated tiles survive calculation, focus, TIDY and reopen | remove, overlap, or replace an existing tile/world |
+| Failure honesty | timeout, malformed source, no coverage, ambiguity and cutoff rejection stay distinct | return stale success after a failed refresh |
+| Cleanup | normal shutdown reaches zero owned requests/processes/roots | deliberately retain one request or child process |
+
+The positive historical path and packaged founder path use live public evidence. Deterministic fixtures may
+falsify negative boundaries but cannot satisfy either live claim.
+
+## Required checks
+
+Before product mutation:
+
+```text
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+```
+
+Changed-surface checks first:
+
+```text
+bun qa/run.ts schema
+bun qa/run.ts kernel
+bun qa/run.ts market-ingest
+bun qa/run.ts market-context
+bun qa/run.ts wave1-market-desk
+bun qa/run.ts golden-g10-canvas-runtime
+bun qa/run.ts wave1-evidence-computation
+bun qa/run.ts typecheck
+```
+
+After focused green, regenerate Atlas once, inspect the W1-01 closure diff, and run the package boundary
+once because this changes a shipped external-data, Kernel, and Canvas path:
+
+```text
+bun qf-atlas/generate.mjs
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+bun qf-atlas/generate.mjs --diff ecd420918e55eb1377eea627152d402246f8fa22
+bun qa/run.ts golden-g12-package-operations
+```
+
+The Builder must show the new combined gate red for the intended cause before trusting its green result.
+The immutable candidate then goes to one fresh independent visible-task Verifier. The Router finally uses
+Computer Use on the real packaged app for W1-01 investigation → add evidence and calculate → Inspect →
+focus/lineage/return → close/reopen → shutdown. That observation supplements rather than replaces gates.
+
+## Out of scope
+
+Critic recruitment or Evaluation; CANDIDATE/WATCH/PASS; predictive probability or betting edge; closing
+price capture/automation; outcome grading; backup control or regression-corpus closure; personal betting
+history ingestion; a named Technique; a second runtime; NFL completion; props/parlays; background scanning;
+stake/bankroll/placement controls; broad Canvas redesign; new UI framework; Golden reopening; rejected FM-0.
+
+## Stop conditions
+
+- Live UFC history cannot be bound to the exact current Bovada competitors and pre-event cutoff.
+- The calculation requires a second runner, truth store, fake participant, or fake Technique rather than a
+  bounded extension of the existing Run path.
+- The same semantic assertion fails after two bounded Builder repair cycles.
+- Any requested action would place or automate a wager or handle credentials.
+
+## Reader questions
+
+Return exactly `YES/YES` or numbered defects:
+
+1. Can every acceptance claim fail for the intended semantic reason, with no fixture, renderer state, or
+   generated Strategy satisfying the live positive path?
+2. Does every deliverable have one implementation meaning, preserve Kernel sole truth and W1-01, and stop
+   before Critic judgment, decision publication, outcome tracking, or Wave 2?
