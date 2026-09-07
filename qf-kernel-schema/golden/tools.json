@@ -1152,6 +1152,16 @@
           "type": "string",
           "format": "date-time",
           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "purpose": {
+          "description": "Equality filter on purpose. The declared institutional use of these exact bytes. Existing snapshots may reopen as Not recorded, but every newly registered Dataset must declare one canonical purpose.",
+          "type": "string",
+          "enum": [
+            "evidence",
+            "training",
+            "evaluation",
+            "context"
+          ]
         }
       }
     }
@@ -2137,6 +2147,16 @@
           ],
           "description": "Dataset kind being registered."
         },
+        "purpose": {
+          "type": "string",
+          "enum": [
+            "evidence",
+            "training",
+            "evaluation",
+            "context"
+          ],
+          "description": "Exact institutional purpose declared for this immutable Dataset version."
+        },
         "artifact_id": {
           "type": "string",
           "description": "Existing immutable result_set Artifact that contains qf.dataset.v1 bytes."
@@ -2162,6 +2182,7 @@
       },
       "required": [
         "kind",
+        "purpose",
         "artifact_id",
         "content_hash",
         "as_of",
@@ -2211,7 +2232,7 @@
   },
   {
     "name": "qf_execute_deterministic_run",
-    "description": "Execute one canonical strategy specification against one immutable Dataset. The Kernel owns the execution version, result bytes, content hash, and complete uses/executes_in/produces lineage; a claimed repeat is rejected unless its manifest and result hash match.",
+    "description": "Execute either one canonical Strategy specification or one immutable transparent calculation against one Dataset. The Kernel owns exact market and Mission validation, versions, result bytes, hashes, and complete uses/executes_in/produces/belongs_to lineage.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -2238,6 +2259,26 @@
         "strategy_id": {
           "type": "string",
           "description": "Exact existing immutable Strategy selected for an R17 forward run."
+        },
+        "calculation": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {},
+          "description": "Immutable qf.calculation.v1 envelope for a technique-free transparent calculation. It is mutually exclusive with every Strategy input."
+        },
+        "mission_id": {
+          "type": "string",
+          "description": "Exact Mission that owns a technique-free calculation Run."
+        },
+        "quote_id": {
+          "type": "string",
+          "description": "Exact starting Quote investigated by the Mission and bound into the Dataset context."
+        },
+        "tool_id": {
+          "type": "string",
+          "description": "Exact registered Research Lab Tool consumed by a technique-free calculation."
         },
         "params": {
           "type": "object",

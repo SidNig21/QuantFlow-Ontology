@@ -43,14 +43,14 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('lists
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('settles', 'link', 'experimental', 'Truth edge from a result row to the market_event it settles.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('tests', 'link', 'experimental', 'Why this run or strategy exists — it tests a named hypothesis.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('has_leg', 'link', 'experimental', 'Which instruments a ticket bets; enables correlation traversal.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('uses', 'link', 'experimental', 'Full input manifest for a run: datasets, strategies, and tools consumed.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('uses', 'link', 'experimental', 'The immutable input manifest for a Run. It names each Dataset, selected Strategy when one exists, Tool, method Artifact, and starting Quote actually consumed.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('executes_in', 'link', 'experimental', 'Where computation for a run happened.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('produces', 'link', 'experimental', 'Output provenance: datasets or artifacts produced by a run or agent session.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('derived_from', 'link', 'experimental', 'Version and transformation lineage among datasets, artifacts, and strategies.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('evaluated_by', 'link', 'experimental', 'Verdict attachment: which evaluation judged an artifact or run.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('performed_by', 'link', 'experimental', 'Independent review provenance: which admitted critic session authored an Evaluation.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('gates', 'link', 'experimental', 'Publication authorization: which evaluation approved an artifact for release. Ends evaluation''s sink status so WO-110 can read the gating fact.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('belongs_to', 'link', 'experimental', 'Mission context: which standing Mission owns a delegated Task.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('belongs_to', 'link', 'experimental', 'The standing Mission that owns an institutional Task or direct deterministic Run. Direct calculation work uses the Run edge without manufacturing a participant or Task.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grades_ticket', 'link', 'experimental', 'Outcome-grade lineage from an immutable grade Artifact to its operator-supplied Ticket.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grades_run', 'link', 'experimental', 'Outcome-grade lineage from an immutable grade Artifact to the succeeded Run it grades.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grades_strategy', 'link', 'experimental', 'Outcome-grade lineage from an immutable grade Artifact to the exact Strategy selected by the Run.');
@@ -63,7 +63,7 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('inves
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_hypothesis', 'action', 'experimental', 'Open a new research hypothesis with claim, success criteria, and optional sources.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_dataset_version', 'action', 'experimental', 'Register a new content-hashed, point-in-time dataset version in the Kernel.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_run', 'action', 'experimental', 'Enqueue a new run in queued status with full invocation params. Rejectable when params are invalid.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('execute_deterministic_run', 'action', 'experimental', 'Execute one canonical strategy specification against one immutable Dataset. The Kernel owns the execution version, result bytes, content hash, and complete uses/executes_in/produces lineage; a claimed repeat is rejected unless its manifest and result hash match.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('execute_deterministic_run', 'action', 'experimental', 'Execute either one canonical Strategy specification or one immutable transparent calculation against one Dataset. The Kernel owns exact market and Mission validation, versions, result bytes, hashes, and complete uses/executes_in/produces/belongs_to lineage.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_mission', 'action', 'experimental', 'Register a standing research mission with name and objective.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_tool', 'action', 'experimental', 'Register an explicit capability identity for the Dock. Identical registration is idempotent; conflicting identity, category or revision is refused.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_market_investigation', 'action', 'experimental', 'Open a Technique-free investigation anchored to one current quote. The Kernel checks observation age, latest observation and event cutoff before atomically creating the Mission and investigates edge; it never creates a Task or Strategy.');
@@ -309,9 +309,12 @@ CREATE TABLE dataset (
   content_hash TEXT NOT NULL,
   -- Latest timestamp allowed in this snapshot (ISO-8601 UTC). Agents must treat it as a leakage boundary for pre-event decisions.
   as_of TEXT NOT NULL,
+  -- The declared institutional use of these exact bytes. Existing snapshots may reopen as Not recorded, but every newly registered Dataset must declare one canonical purpose.
+  purpose TEXT,
   -- Machine-readable coverage summary (sports, range, counts). This is a sufficiency hint and must never override missing raw lineage.
   coverage TEXT NOT NULL,
-  CHECK (kind IN ('odds_history', 'results', 'features', 'mixed'))
+  CHECK (kind IN ('odds_history', 'results', 'features', 'mixed')),
+  CHECK (purpose IN ('evidence', 'training', 'evaluation', 'context'))
 );
 
 -- A run is the canonical execution record for ingest, feature build, backtest, analysis, or training work. It governs ontology shape by encoding mode in kind instead of creating subtype objects.

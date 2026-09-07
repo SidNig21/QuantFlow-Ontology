@@ -246,6 +246,8 @@ describe("WO-107b upgrade chain", () => {
       raw.exec(`
         INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref)
         VALUES ('legacy-artifact', '2026-01-01T00:00:00.000Z', 'report', 'legacy-hash', 'legacy://artifact');
+        INSERT INTO dataset (id, created_at, kind, content_hash, as_of, coverage)
+        VALUES ('legacy-dataset', '2026-01-01T00:00:00.000Z', 'results', 'legacy-dataset-hash', '2026-01-01T00:00:00.000Z', '{}');
         INSERT INTO links (id, kind, from_id, to_id, created_at)
         VALUES ('legacy-link', 'tests', 'left', 'right', '2026-01-01T00:00:00.000Z');
         INSERT INTO events (id, type, object_type, object_id, payload, trace_id, created_at)
@@ -268,6 +270,7 @@ describe("WO-107b upgrade chain", () => {
         payload: '{"kept":true}',
         trace_id: "legacy-trace",
       });
+      expect(db.query("SELECT purpose FROM dataset WHERE id = 'legacy-dataset'").get()).toEqual({ purpose: null });
       expect(
         (db
           .query(`SELECT COUNT(*) AS n FROM schema_meta WHERE type_name = 'ingest_market_batch'`)

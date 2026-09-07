@@ -68,6 +68,9 @@ contextBridge.exposeInMainWorld("shellApi", {
       ipcRenderer.invoke("qf:markets:capture", args),
     investigateMarket: (args: { quote_id: string; name: string; objective: string }) =>
       ipcRenderer.invoke("qf:markets:investigate", args),
+    getEvidenceCapabilities: () => ipcRenderer.invoke("qf:evidence:capabilities"),
+    addEvidenceAndCalculate: (args: { mission_id: string; quote_id: string }) =>
+      ipcRenderer.invoke("qf:evidence:add-and-calculate", args),
     getResearchWorldProjection: (args: { root_type: "mission" | "task"; root_id: string }) =>
       ipcRenderer.invoke("qf:research-world:projection", args),
     recordStrategyOutcome: (args: Record<string, unknown>) =>

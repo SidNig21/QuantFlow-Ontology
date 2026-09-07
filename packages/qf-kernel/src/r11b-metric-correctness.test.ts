@@ -43,6 +43,7 @@ function runFixture(observations: Array<Record<string, unknown>>, runId: string)
     "register_dataset_version",
     {
       kind: "results",
+      purpose: "evaluation",
       artifact_id: artifact.object_id,
       content_hash: artifact.object_id,
       as_of: "2026-08-09T12:00:00.000Z",

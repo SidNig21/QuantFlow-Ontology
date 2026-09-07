@@ -460,6 +460,7 @@ describe("qf-kernel", () => {
       "register_dataset_version",
       {
         kind: "odds_history",
+        purpose: "evidence",
         artifact_id: datasetArtifact.object_id,
         content_hash: datasetArtifact.object_id,
         as_of: "2026-07-25T00:00:00.000Z",

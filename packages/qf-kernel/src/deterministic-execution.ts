@@ -201,10 +201,12 @@ function loadDataset(db: KernelDb, datasetId: string): {
   contentHash: string;
   artifactId: string;
   observations: JsonRecord[];
+  marketContext: JsonRecord | null;
+  purpose: string | null;
 } {
   const dataset = db
-    .query(`SELECT content_hash FROM dataset WHERE id = ?`)
-    .get(datasetId) as { content_hash: string } | null;
+    .query(`SELECT content_hash, purpose FROM dataset WHERE id = ?`)
+    .get(datasetId) as { content_hash: string; purpose: string | null } | null;
   if (!dataset) {
     throw new KernelError(`deterministic execution Dataset not found: ${datasetId}`);
   }
@@ -250,6 +252,8 @@ function loadDataset(db: KernelDb, datasetId: string): {
     artifactId: lineage[0]!.id,
     observations: payload.observations.map((observation, index) =>
       objectValue(observation, `Dataset observation ${index}`)),
+    marketContext: payload.market_context === undefined ? null : objectValue(payload.market_context, "Dataset market_context"),
+    purpose: dataset.purpose,
   };
 }
 
@@ -523,7 +527,7 @@ function assertRepeat(
 function insertArtifact(
   db: KernelDb,
   id: string,
-  kind: "strategy_spec" | "result_set",
+  kind: "strategy_spec" | "code" | "result_set",
   storageRef: string,
   trace: TrustedExecutionContext,
 ): void {
@@ -544,6 +548,132 @@ function insertArtifact(
     },
     trace_id: trace.trace_id,
   });
+}
+
+const CALCULATION_OPERATION = "two_way_market_history_baseline";
+const CALCULATION_FORMULA_VERSION = 1;
+const CALCULATION_IMPLEMENTATION_VERSION = "qf-two-way-history-v1";
+
+function fixedProbability(price: unknown, label: string): { price_units: number; raw_probability_units: number; raw_probability: string } {
+  const priceUnits = parsePositiveFixed(price, label);
+  if (priceUnits <= METRIC_SCALE || priceUnits > BigInt(Number.MAX_SAFE_INTEGER)) throw new KernelError(`${label} must be greater than 1 and within the fixed-point domain`);
+  const raw = roundDivide(1_000_000_000_000n, priceUnits);
+  return { price_units: Number(priceUnits), raw_probability_units: Number(raw), raw_probability: formatFixed(raw) };
+}
+
+function parseCalculation(input: unknown): { value: JsonRecord; bytes: Uint8Array; hash: string } {
+  const value = objectValue(input, "calculation");
+  exactKeys(value, ["contract", "operation", "version", "formula_version", "implementation_version"], "calculation");
+  if (value.contract !== "qf.calculation.v1" || value.operation !== CALCULATION_OPERATION || value.version !== 1 || value.formula_version !== CALCULATION_FORMULA_VERSION || value.implementation_version !== CALCULATION_IMPLEMENTATION_VERSION) {
+    throw new KernelError("calculation must name two_way_market_history_baseline version 1 with the exact formula and implementation version");
+  }
+  const bytes = new TextEncoder().encode(`${canonicalJson(value)}\n`);
+  return { value, bytes, hash: contentHash(bytes) };
+}
+
+function parseStoredObject(value: unknown, label: string): JsonRecord {
+  try { return objectValue(typeof value === "string" ? JSON.parse(value) : value, label); }
+  catch (error) { if (error instanceof KernelError) throw error; throw new KernelError(`${label} is not valid JSON`); }
+}
+
+function exactOne(rows: Array<{ from_id: string; to_id: string }>, label: string): { from_id: string; to_id: string } {
+  if (rows.length !== 1) throw new KernelError(`${label} requires exactly one lineage edge`);
+  return rows[0]!;
+}
+
+function validateMarketCalculationContext(db: KernelDb, missionId: string, quoteId: string, dataset: ReturnType<typeof loadDataset>, toolId: string): { context: JsonRecord; selections: JsonRecord[]; toolVersion: string } {
+  if (dataset.purpose !== "evidence" || !dataset.marketContext) throw new KernelError("technique-free calculation requires an evidence-purpose Dataset with market_context");
+  const investigation = db.query("SELECT from_id, to_id FROM links WHERE kind = 'investigates' AND from_id = ?").all(missionId) as Array<{ from_id: string; to_id: string }>;
+  if (exactOne(investigation, "calculation Mission investigates").to_id !== quoteId) throw new KernelError("calculation Mission does not investigate the exact starting Quote");
+  const quote = db.query("SELECT id, created_at, data_ref, coverage FROM quote WHERE id = ?").get(quoteId) as { id: string; created_at: string; data_ref: string; coverage: string } | null;
+  if (!quote) throw new KernelError(`calculation Quote not found: ${quoteId}`);
+  const quoteSource = db.query("SELECT id, content_hash FROM artifact WHERE id = ?").get(quote.data_ref) as { id: string; content_hash: string } | null;
+  if (!quoteSource || quoteSource.id !== quoteSource.content_hash) throw new KernelError("calculation Quote source Artifact identity is invalid");
+  const quotes = db.query("SELECT from_id, to_id FROM links WHERE kind = 'quotes' AND from_id = ?").all(quoteId) as Array<{ from_id: string; to_id: string }>;
+  const instrumentId = exactOne(quotes, "calculation Quote quotes").to_id;
+  const instrument = db.query("SELECT id, params, sides FROM instrument WHERE id = ?").get(instrumentId) as { id: string; params: string; sides: string } | null;
+  if (!instrument) throw new KernelError("calculation Instrument not found");
+  const offered = db.query("SELECT from_id, to_id FROM links WHERE kind = 'offered_on' AND from_id = ?").all(instrumentId) as Array<{ from_id: string; to_id: string }>;
+  const eventId = exactOne(offered, "calculation Instrument offered_on").to_id;
+  const event = db.query("SELECT id, starts_at FROM market_event WHERE id = ?").get(eventId) as { id: string; starts_at: string } | null;
+  if (!event) throw new KernelError("calculation Market Event not found");
+  const coverage = parseStoredObject(quote.coverage, "Quote coverage");
+  const params = parseStoredObject(instrument.params, "Instrument params");
+  const sides = JSON.parse(instrument.sides) as unknown;
+  const selections = Array.isArray(coverage.selections) ? coverage.selections.map((row, index) => objectValue(row, `Quote selection ${index}`)) : [];
+  const competitorIds = Array.isArray(params.competitor_ids) ? params.competitor_ids : [];
+  const selectionIds = Array.isArray(params.selection_ids) ? params.selection_ids : [];
+  if (selections.length !== 2 || competitorIds.length !== 2 || selectionIds.length !== 2 || !Array.isArray(sides) || sides.length !== 2) throw new KernelError("calculation requires exact ordered two-way Quote identity");
+  if (coverage.source_hash !== quoteSource.content_hash) throw new KernelError("calculation Quote coverage source hash differs from its source Artifact");
+  for (const [index, selection] of selections.entries()) {
+    if (selection.competitor_id !== competitorIds[index] || selection.selection_id !== selectionIds[index] || selection.label !== sides[index]) {
+      throw new KernelError(`calculation Quote selection ${index} differs from ordered Instrument identity`);
+    }
+  }
+  if (typeof params.provider_event_id === "string" && typeof coverage.provider_event_id === "string" && params.provider_event_id !== coverage.provider_event_id) throw new KernelError("calculation Quote provider event identity differs from its Instrument");
+  if (typeof params.provider_market_id === "string" && typeof coverage.provider_market_id === "string" && params.provider_market_id !== coverage.provider_market_id) throw new KernelError("calculation Quote provider market identity differs from its Instrument");
+  const competitors = selections.map((selection, index) => ({ competitor_id: competitorIds[index], selection_id: selectionIds[index], label: sides[index] }));
+  const live = { quote_id: quoteId, quote_observed_at: coverage.observed_at, quote_source_hash: quoteSource.content_hash, market_event_id: eventId, event_cutoff: event.starts_at, competitors, selection_ids: selectionIds };
+  if (canonicalJson(dataset.marketContext) !== canonicalJson(live)) throw new KernelError("calculation Dataset market_context differs from live Quote lineage");
+  const tool = db.query("SELECT name, capability_class, implementation_version FROM tool WHERE id = ?").get(toolId) as { name: string; capability_class: string | null; implementation_version: string | null } | null;
+  if (!tool || tool.name !== "Research Lab" || tool.capability_class !== "tool" || !tool.implementation_version) throw new KernelError("calculation requires the registered Research Lab Tool");
+  return { context: live, selections, toolVersion: tool.implementation_version };
+}
+
+function buildCalculationResult(dataset: ReturnType<typeof loadDataset>, selections: JsonRecord[], context: JsonRecord, calculationHash: string, toolId: string, toolVersion: string): { bytes: Uint8Array; hash: string; output: JsonRecord } {
+  const summaries = new Map(dataset.observations.map((row) => [String(row.competitor_id), row]));
+  const priced = selections.map((selection, index) => {
+    const decimal = selection.decimal;
+    const probability = fixedProbability(decimal, `Quote selection ${index} decimal price`);
+    return { selection, probability, history: summaries.get(String((context.competitors as JsonRecord[])[index]!.competitor_id)) };
+  });
+  const overround = BigInt(priced[0]!.probability.raw_probability_units) + BigInt(priced[1]!.probability.raw_probability_units);
+  const sides = priced.map(({ selection, probability, history }, index) => {
+    if (!history) throw new KernelError(`Dataset has no summary for ordered competitor ${index}`);
+    for (const field of ["wins", "losses", "draws", "no_contests", "decisive_sample_size"]) if (!Number.isSafeInteger(history[field]) || (history[field] as number) < 0) throw new KernelError(`Dataset history ${field} is outside the integer domain`);
+    const wins = BigInt(history.wins as number), losses = BigInt(history.losses as number), decisive = wins + losses;
+    if (Number(decisive) !== history.decisive_sample_size) throw new KernelError("Dataset decisive sample size does not equal wins plus losses");
+    const normalizedUnits = roundDivide(BigInt(probability.raw_probability_units) * METRIC_SCALE, overround);
+    const fractionUnits = decisive === 0n ? null : roundDivide(wins * METRIC_SCALE, decisive);
+    return { competitor_id: history.competitor_id, selection_id: history.selection_id, label: selection.label, decimal_price: selection.decimal, price_units: probability.price_units, raw_implied_probability_units: probability.raw_probability_units, raw_implied_probability: probability.raw_probability, normalized_market_probability_units: Number(normalizedUnits), normalized_market_probability: formatFixed(normalizedUnits), source_listed_wins: Number(wins), source_listed_losses: Number(losses), source_listed_draws: history.draws, source_listed_no_contests: history.no_contests, decisive_sample_size: Number(decisive), source_listed_decisive_fraction_units: fractionUnits === null ? null : Number(fractionUnits), source_listed_decisive_fraction: fractionUnits === null ? null : formatFixed(fractionUnits) };
+  });
+  const output: JsonRecord = { contract: "qf.calculation.result.v1", operation: CALCULATION_OPERATION, formula_version: CALCULATION_FORMULA_VERSION, implementation_version: CALCULATION_IMPLEMENTATION_VERSION, scale: 6, formulas: { raw_implied_probability: "round_half_up(1000000000000 / price_units)", overround: "sum(raw_implied_probability_units)", normalized_market_probability: "round_half_up(raw_implied_probability_units * 1000000 / overround_units)", source_listed_decisive_fraction: "round_half_up(wins * 1000000 / (wins + losses)); unavailable when denominator is zero" }, market_context: context, dataset_id: `dataset:${dataset.contentHash}`, dataset_content_hash: dataset.contentHash, calculation_envelope_hash: calculationHash, capability_id: toolId, capability_version: toolVersion, execution_environment: EXECUTION_ENVIRONMENT_ID, overround_units: Number(overround), overround: formatFixed(overround), sides, limitation: "Source-listed descriptive history is not an estimated win probability." };
+  const bytes = new TextEncoder().encode(`${canonicalJson(output)}\n`);
+  return { bytes, hash: contentHash(bytes), output };
+}
+
+function executeTransparentCalculation(db: KernelDb, cmd: CreationCommand, input: Record<string, unknown>, trace: TrustedExecutionContext, runId: string, datasetId: string, repeatOfRunId: string | undefined): ObjectExecuteResult {
+  if (input.strategy_spec !== undefined || input.strategy_id !== undefined || input.hypothesis_id !== undefined) throw new KernelError("calculation mode is mutually exclusive with Strategy and Hypothesis inputs");
+  const params = objectValue(input.params, "params"); exactKeys(params, [], "calculation params");
+  const missionId = input.mission_id, quoteId = input.quote_id, toolId = input.tool_id;
+  if (typeof missionId !== "string" || !missionId || typeof quoteId !== "string" || !quoteId || typeof toolId !== "string" || !toolId) throw new KernelError("calculation mode requires exact mission_id, quote_id, and tool_id");
+  const calculation = parseCalculation(input.calculation);
+  const dataset = loadDataset(db, datasetId);
+  const validated = validateMarketCalculationContext(db, missionId, quoteId, dataset, toolId);
+  const result = buildCalculationResult(dataset, validated.selections, validated.context, calculation.hash, toolId, validated.toolVersion);
+  const manifest = { contract: "qf.execution.manifest.v1", execution_version: DETERMINISTIC_EXECUTION_VERSION, mode: "calculation", operation: CALCULATION_OPERATION, formula_version: CALCULATION_FORMULA_VERSION, implementation_version: CALCULATION_IMPLEMENTATION_VERSION, dataset_id: datasetId, dataset_content_hash: dataset.contentHash, quote_id: quoteId, quote_observed_at: validated.context.quote_observed_at, quote_source_hash: validated.context.quote_source_hash, event_cutoff: validated.context.event_cutoff, mission_id: missionId, calculation_envelope_hash: calculation.hash, capability_id: toolId, capability_version: validated.toolVersion, execution_environment: EXECUTION_ENVIRONMENT_ID, params };
+  const manifestHash = contentHash(new TextEncoder().encode(`${canonicalJson(manifest)}\n`));
+  assertRepeat(db, repeatOfRunId, manifestHash, result.hash);
+  const root = resolveArtifactRoot().path;
+  const methodExisting = verifyExistingBytes(db, calculation.hash, "code", calculation.bytes);
+  const resultExisting = verifyExistingBytes(db, result.hash, "result_set", result.bytes);
+  const methodStorage = methodExisting.exists ? methodExisting.storageRef : ensureFile(join(root, "calculation-envelopes"), calculation.hash, calculation.bytes);
+  const resultStorage = resultExisting.exists ? resultExisting.storageRef : ensureFile(join(root, "deterministic-results"), result.hash, result.bytes);
+  const runParams = { ...manifest, execution_manifest_hash: manifestHash, dataset_artifact_id: dataset.artifactId, result_artifact_id: result.hash, ...(trace.actor_session_id ? { executor_session_id: trace.actor_session_id } : {}), ...(repeatOfRunId ? { repeat_of_run_id: repeatOfRunId } : {}) };
+  const commitCalculation = db.transaction(() => {
+    if (!methodExisting.exists) insertArtifact(db, calculation.hash, "code", methodStorage, trace);
+    const environmentLabel = `QuantFlow deterministic executor ${DETERMINISTIC_EXECUTION_VERSION}`;
+    const environment = db.query("SELECT kind, label FROM execution_environment WHERE id = ?").get(EXECUTION_ENVIRONMENT_ID) as { kind: string; label: string } | null;
+    if (!environment) { db.query("INSERT INTO execution_environment (id, created_at, kind, label) VALUES (?, ?, 'local_process', ?)").run(EXECUTION_ENVIRONMENT_ID, new Date().toISOString(), environmentLabel); appendEvent(db, { type: "execution_environment.registered", object_type: "execution_environment", object_id: EXECUTION_ENVIRONMENT_ID, payload: { command: cmd.action, kind: "local_process", label: environmentLabel, version: DETERMINISTIC_EXECUTION_VERSION, span_id: trace.span_id }, trace_id: trace.trace_id }); }
+    else if (environment.kind !== "local_process" || environment.label !== environmentLabel) throw new KernelError(`immutable execution environment conflict: ${EXECUTION_ENVIRONMENT_ID}`);
+    if (!resultExisting.exists) insertArtifact(db, result.hash, "result_set", resultStorage, trace);
+    db.query("INSERT INTO run (id, created_at, kind, status, params, trace_id) VALUES (?, ?, 'analysis', 'succeeded', ?, ?)").run(runId, new Date().toISOString(), JSON.stringify(runParams), trace.trace_id);
+    writeLinks(db, "run", runId, [{ kind: "uses", to_id: datasetId }, { kind: "uses", to_id: toolId }, { kind: "uses", to_id: calculation.hash }, { kind: "uses", to_id: quoteId }, { kind: "executes_in", to_id: EXECUTION_ENVIRONMENT_ID }, { kind: "produces", to_id: result.hash }, { kind: "belongs_to", to_id: missionId }]);
+    for (const event of ["run.created", "run.started", "run.succeeded"]) appendEvent(db, { type: event, object_type: "run", object_id: runId, payload: { command: cmd.action, execution_manifest_hash: manifestHash, result_artifact_id: result.hash, span_id: trace.span_id }, trace_id: trace.trace_id });
+    return db.query("SELECT * FROM run WHERE id = ?").get(runId) as JsonRecord;
+  });
+  const state = commitCalculation();
+  return { kind: "object", object_type: "run", object_id: runId, from: "(none)", to: "succeeded", event: "run.succeeded", state: { ...state, execution_manifest_hash: manifestHash, result_artifact_id: result.hash, output: result.output } };
 }
 
 export function executeDeterministicRun(
@@ -578,6 +708,13 @@ export function executeDeterministicRun(
   if (repeatOfRunId !== undefined &&
       (typeof repeatOfRunId !== "string" || repeatOfRunId.length === 0)) {
     throw new KernelError("repeat_of_run_id must be a non-empty string");
+  }
+
+  if (input.calculation !== undefined) {
+    return executeTransparentCalculation(db, cmd, input, trace, runId, datasetId, repeatOfRunId as string | undefined);
+  }
+  if (input.mission_id !== undefined || input.quote_id !== undefined || input.tool_id !== undefined) {
+    throw new KernelError("Strategy mode rejects calculation-only Mission, Quote, and Tool inputs");
   }
 
   const selectedStrategyId = typeof input.strategy_id === "string" && input.strategy_id.length > 0

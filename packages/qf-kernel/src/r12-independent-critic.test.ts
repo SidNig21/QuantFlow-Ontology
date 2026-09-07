@@ -97,6 +97,7 @@ function createResearchRun(executorSessionId: string) {
     "register_dataset_version",
     {
       kind: "results",
+      purpose: "evaluation",
       artifact_id: datasetArtifact.object_id,
       content_hash: datasetArtifact.object_id,
       as_of: "2026-08-09T11:00:00.000Z",

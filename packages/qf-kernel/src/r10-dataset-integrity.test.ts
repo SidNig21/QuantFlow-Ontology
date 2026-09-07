@@ -44,6 +44,7 @@ describe("R10 point-in-time Dataset integrity", () => {
     ]);
     const input = {
       kind: "odds_history" as const,
+      purpose: "evidence" as const,
       artifact_id: artifact.object_id,
       content_hash: artifact.object_id,
       as_of: "2026-08-09T12:00:00.000Z",
@@ -84,6 +85,7 @@ describe("R10 point-in-time Dataset integrity", () => {
         "register_dataset_version",
         {
           kind: "odds_history",
+          purpose: "evidence",
           artifact_id: artifact.object_id,
           content_hash: "a".repeat(64),
           as_of: "2026-08-09T12:00:00.000Z",
@@ -93,6 +95,17 @@ describe("R10 point-in-time Dataset integrity", () => {
       ),
     ).toThrow(/must match the immutable Artifact identity/);
     expect(eventCount(db)).toBe(before);
+  });
+
+  test("requires one canonical non-null purpose for every new Dataset", () => {
+    db = openKernel(":memory:");
+    const { artifact } = publishDatasetArtifact([{ observed_at: "2026-08-09T10:00:00.000Z" }]);
+    const base = { kind: "results", artifact_id: artifact.object_id, content_hash: artifact.object_id, as_of: "2026-08-09T12:00:00.000Z", coverage: {} };
+    const before = eventCount(db);
+    expect(() => execute(db, "register_dataset_version", base as never, trace)).toThrow(/purpose/);
+    expect(() => execute(db, "register_dataset_version", { ...base, purpose: "prediction" } as never, trace)).toThrow(/purpose/);
+    expect(eventCount(db)).toBe(before);
+    expect(db.query("SELECT COUNT(*) AS count FROM dataset").get()).toEqual({ count: 0 });
   });
 
   test("rejects observations after the declared as_of fence", () => {
@@ -108,6 +121,7 @@ describe("R10 point-in-time Dataset integrity", () => {
         "register_dataset_version",
         {
           kind: "odds_history",
+          purpose: "evidence",
           artifact_id: artifact.object_id,
           content_hash: artifact.object_id,
           as_of: "2026-08-09T12:00:00.000Z",
@@ -134,6 +148,7 @@ describe("R10 point-in-time Dataset integrity", () => {
         "register_dataset_version",
         {
           kind: "odds_history",
+          purpose: "evidence",
           artifact_id: artifact.object_id,
           content_hash: artifact.object_id,
           as_of: "2026-08-09T12:00:00.000Z",

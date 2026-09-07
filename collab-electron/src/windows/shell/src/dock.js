@@ -202,7 +202,7 @@ function sessionSpeciesLabel(row) {
 
 /**
  * @param {HTMLElement} panelEl
- * @param {{ onTidy?: () => void, onResearchSubmitted?: (result: object) => void, onOpenMarkets?: () => Promise<void> | void, qaMode?: boolean }} [options]
+ * @param {{ onTidy?: () => void, onResearchSubmitted?: (result: object) => void, onEvidenceCalculated?: (result: object) => void, onOpenMarkets?: () => Promise<void> | void, qaMode?: boolean }} [options]
  */
 export function createCoalescedRefresh(runPass, { onError = (error) => console.error("[dock] refresh failed", error) } = {}) {
 	let running = false;
@@ -376,12 +376,16 @@ export function initDock(panelEl, options = {}) {
 			const marketCapabilityRequest = typeof window.shellApi.qf.getMarketCapability === "function"
 				? window.shellApi.qf.getMarketCapability()
 				: Promise.resolve({ ok: false, error: { message: "Market capability boundary unavailable" } });
-			const [nextRuntimeSnapshot, defsRes, sessRes, surfaceRes, marketCapabilityRes] = await Promise.all([
+			const evidenceCapabilitiesRequest = typeof window.shellApi.qf.getEvidenceCapabilities === "function"
+				? window.shellApi.qf.getEvidenceCapabilities()
+				: Promise.resolve({ ok: false, error: { message: "Evidence capability boundary unavailable" } });
+			const [nextRuntimeSnapshot, defsRes, sessRes, surfaceRes, marketCapabilityRes, evidenceCapabilitiesRes] = await Promise.all([
 				runtimeRequest,
 				window.shellApi.qf.listDefinitions(),
 				window.shellApi.qf.listSessions(),
 				window.shellApi.qf.listTaskSurface(),
 				marketCapabilityRequest,
+				evidenceCapabilitiesRequest,
 			]);
 			runtimeSnapshot = Array.isArray(nextRuntimeSnapshot) ? nextRuntimeSnapshot : [];
 			const taskAssignments = surfaceRes?.ok && Array.isArray(surfaceRes.assignments)
@@ -486,6 +490,39 @@ export function initDock(panelEl, options = {}) {
 				const failure = el("div", "qf-empty", `Bovada Live Markets unavailable · ${marketCapabilityRes?.error?.message ?? "registration failed"}`);
 				failure.dataset.capabilityFailure = "bovada-live-markets";
 				speciesList.appendChild(failure);
+			}
+			if (evidenceCapabilitiesRes?.ok && Array.isArray(evidenceCapabilitiesRes.capabilities)) {
+				for (const capability of evidenceCapabilitiesRes.capabilities) {
+					const card = el("div", `lrow dock-capability-row dock-${String(capability.capability_class)}-row`);
+					card.dataset.capabilityId = String(capability.id ?? "");
+					card.dataset.capabilityClass = String(capability.capability_class ?? "");
+					card.dataset.implementationVersion = String(capability.implementation_version ?? "");
+					card.appendChild(el("b", null, String(capability.name ?? "")));
+					card.appendChild(el("span", "dock-adapter", `${String(capability.capability_class ?? "CAPABILITY").toUpperCase()} · governed capability`));
+					card.appendChild(el("span", "dock-capabilities", String(capability.summary ?? "")));
+					card.appendChild(el("span", "dock-ready", String(capability.readiness ?? "unavailable")));
+					card.title = String(capability.readiness_detail ?? "");
+					speciesList.appendChild(card);
+				}
+			}
+			const investigation = (missionWorld?.links || []).find((link) => link.kind === "investigates" && link.from_id === activeMissionId);
+			if (activeMissionId && investigation?.to_id) {
+				const action = el("div", "lrow dock-evidence-action");
+				const title = el("b", null, "Add evidence and calculate");
+				const stage = el("span", "dock-capabilities", "Ready · exact selected Mission and observation");
+				const cue = el("em", null, "run ⏎");
+				action.tabIndex = 0; action.setAttribute("role", "button"); action.dataset.missionId = activeMissionId; action.dataset.quoteId = String(investigation.to_id);
+				action.append(title, stage, cue);
+				const run = async () => {
+					if (action.getAttribute("aria-disabled") === "true") return;
+					action.setAttribute("aria-disabled", "true"); stage.textContent = "Historical evidence · requesting two official UFC pages"; cue.textContent = "working…";
+					const result = await window.shellApi.qf.addEvidenceAndCalculate({ mission_id: activeMissionId, quote_id: String(investigation.to_id) });
+					if (!result?.ok) { stage.textContent = `Stopped · ${result?.error?.message ?? "Evidence or calculation failed"}`; cue.textContent = "retry ⏎"; action.removeAttribute("aria-disabled"); return; }
+					stage.textContent = "Transparent calculation · complete"; cue.textContent = "inspect on Canvas ⏎"; action.removeAttribute("aria-disabled"); options.onEvidenceCalculated?.(result.receipt);
+				};
+				action.addEventListener("click", () => { void run(); });
+				action.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); void run(); } });
+				speciesList.appendChild(action);
 			}
 
 			latestDefinitions = defsRes?.ok ? launchableDockDefinitions(defsRes.definitions, {

@@ -310,7 +310,7 @@ export function deriveResearchWorkflow(world) {
 		for (const link of outgoing(run.id)) {
 			if (link.kind === "tests" || link.kind === "uses") {
 				const input = objectById(link.to_id);
-				if (["hypothesis", "dataset", "strategy"].includes(input?.type)) {
+				if (["hypothesis", "dataset", "strategy", "tool", "quote", "artifact"].includes(input?.type)) {
 					addObject(input);
 					addPathLink(link);
 				}
@@ -367,7 +367,7 @@ export function deriveResearchWorkflow(world) {
 	}
 	if (run) stages[2].push(run);
 	for (const object of [marketVenue, marketEvent, marketInstrument, marketQuote].filter(Boolean)) stages[2].push(object);
-	for (const input of objects.filter((object) => primaryIds.has(object.id) && ["hypothesis", "dataset", "strategy"].includes(object.type)).sort(stableObjectOrder)) stages[2].push(input);
+	for (const input of objects.filter((object) => primaryIds.has(object.id) && ["hypothesis", "dataset", "strategy", "tool", "artifact"].includes(object.type) && object.id !== rawArtifact?.id && (object.type !== "artifact" || links.some((link) => link.kind === "uses" && link.from_id === run?.id && link.to_id === object.id))).sort(stableObjectOrder)) stages[2].push(input);
 	if (rawArtifact) stages[2].push(rawArtifact);
 	if (evaluation) stages[3].push(evaluation);
 	if (currentReport) stages[4].push(currentReport);
@@ -612,7 +612,7 @@ export function researchTilePresentation(object, workflow, participantViewForId 
 		if (fields.quote_id) {
 			addFact("Observation", fields.observed_at);
 			addFact("State", fields.state);
-			addFact("Method", "not selected");
+			addFact("Technique", "none selected");
 		} else {
 			const technique = (workflow?.stages?.[2] || []).filter((candidate) => candidate.type === "strategy").sort(stableObjectOrder)[0];
 			addFact("Technique", technique ? titleFor(technique.id) : "Not recorded");
@@ -641,16 +641,26 @@ export function researchTilePresentation(object, workflow, participantViewForId 
 			value: `${firstRecorded(participantView?.session)} · Work ${firstRecorded(participantView?.work)} · Recovery ${firstRecorded(participantView?.recovery)}`,
 		});
 	} else if (object?.type === "run") {
-		addFact("Context", `${titleFor(workflow?.mission?.id)} · ${titleFor(workflow?.sourceTask?.id)}`);
+		if (fields.operation === "two_way_market_history_baseline") {
+			badge = "TRANSPARENT CALCULATION";
+			addFact("Operation", "two-way market history baseline v1");
+			addFact("Technique", "none selected");
+		} else addFact("Context", `${titleFor(workflow?.mission?.id)} · ${titleFor(workflow?.sourceTask?.id)}`);
 	} else if (object?.type === "dataset") {
-		addFact("Rows", fields.coverage?.record_count);
+		if (fields.purpose === "evidence") badge = "HISTORICAL EVIDENCE";
+		addFact("Purpose", fields.purpose);
 		addFact("As of", fields.as_of);
 	} else if (object?.type === "artifact") {
 		badge = fields.kind === "report" ? "REPORT" : "ARTIFACT";
 		const historical = workflow?.historyIds?.has(object.id) || fields.historical === true;
 		const grade = outgoing.some((link) => String(link.kind).startsWith("grades_"));
 		if (fields.kind === "report") status = object.id === workflow?.currentReport?.id ? "PUBLISHED CURRENT" : "HISTORICAL";
-		else if (object.id === workflow?.rawArtifact?.id) status = "RAW UNREVIEWED";
+		else if (object.id === workflow?.rawArtifact?.id) {
+			if (fields.calculation_result?.contract === "qf.calculation.result.v1") {
+				badge = "RAW RESULT — NOT REVIEWED";
+				status = "Technique: none selected";
+			} else status = "RAW UNREVIEWED";
+		}
 		else if (historical) status = "HISTORICAL";
 		else if (grade) status = "GRADE ARTIFACT";
 		else status = firstRecorded(fields.status, semanticMarkers(object)[0]);
@@ -662,6 +672,13 @@ export function researchTilePresentation(object, workflow, participantViewForId 
 		if (fields.kind === "report") {
 			facts.splice(0, facts.length);
 			addFact("Gated by", titleFor(incoming.find((link) => link.kind === "gates")?.from_id || fields.gating_evaluation_id));
+		} else if (fields.calculation_result?.contract === "qf.calculation.result.v1") {
+			facts.splice(0, facts.length);
+			for (const side of fields.calculation_result.sides || []) {
+				addFact(String(side.label), `${side.decimal_price} observation · market ${side.normalized_market_probability} · record ${side.source_listed_wins}-${side.source_listed_losses}-${side.source_listed_draws} (${side.source_listed_no_contests} NC) · n=${side.decisive_sample_size} · fraction ${side.source_listed_decisive_fraction ?? "unavailable"}`);
+			}
+			addFact("Cutoff", fields.calculation_result.market_context?.event_cutoff);
+			addFact("Limitation", fields.calculation_result.limitation);
 		}
 	} else if (object?.type === "evaluation") {
 		badge = "EVALUATION";
@@ -679,7 +696,7 @@ export function researchTilePresentation(object, workflow, participantViewForId 
 		title: objectHumanTitle(object, participantView, workflow),
 		badge,
 		status,
-		facts: facts.slice(0, 2),
+		facts: facts.slice(0, fields.calculation_result?.contract === "qf.calculation.result.v1" ? 4 : 2),
 	});
 }
 

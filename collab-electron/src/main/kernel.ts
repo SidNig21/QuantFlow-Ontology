@@ -1433,6 +1433,7 @@ export function kernelEnsureSampleResearchDataset(
   }, trace) as { object_id: string };
   return kernelExecute("register_dataset_version", {
     kind: "results",
+    purpose: "evaluation",
     artifact_id: artifact.object_id,
     content_hash: artifact.object_id,
     as_of: "2026-08-09T12:00:00.000Z",
@@ -1459,7 +1460,7 @@ export function kernelEnsureR17TechniqueFixture(): { dataset: Record<string, unk
   const trace = { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() };
   const source = kernelExecute("publish_artifact", { kind: "result_set", path, storage_ref: path, content_hash: hash }, trace) as { object_id: string };
   const dataset = kernelExecute("register_dataset_version", {
-    kind: "results", artifact_id: source.object_id, content_hash: source.object_id,
+    kind: "results", purpose: "evaluation", artifact_id: source.object_id, content_hash: source.object_id,
     as_of: "2026-08-22T00:00:00.000Z", coverage: { deterministic_score_field: "edge" },
   }, { ...trace, span_id: crypto.randomUUID() }) as unknown as Record<string, unknown>;
   const strategies: Array<Record<string, unknown>> = [];

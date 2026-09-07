@@ -62,6 +62,11 @@ import {
   getBovadaLiveMarketsCapability,
   listBovadaMarketDeskRows,
 } from "./market-desk";
+import {
+  addEvidenceAndCalculate,
+  ensureEvidenceComputationCapabilities,
+  getEvidenceComputationCapabilities,
+} from "./evidence-computation";
 
 export { QF_EXECUTE_ALLOWLIST };
 
@@ -210,6 +215,7 @@ async function trustedActorForTile(tileId: unknown): Promise<string> {
 
 export function registerKernelHandlers(): void {
   ensureBovadaLiveMarketsCapability();
+  ensureEvidenceComputationCapabilities();
   registerHostAcpPermissionHandlers();
   onSessionChunk((sessionId, text) => {
     broadcast("qf:session:chunk", { sessionId, text });
@@ -314,6 +320,23 @@ export function registerKernelHandlers(): void {
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }
+  });
+
+  ipcMain.handle("qf:evidence:capabilities", (event) => {
+    try { assertTrustedSender(event); return { ok: true as const, capabilities: getEvidenceComputationCapabilities() }; }
+    catch (err) { return { ok: false as const, error: serializeError(err) }; }
+  });
+
+  ipcMain.handle("qf:evidence:add-and-calculate", async (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Add evidence and calculate requires the selected Mission and Quote");
+      const input = args as Record<string, unknown>;
+      if (typeof input.mission_id !== "string" || typeof input.quote_id !== "string" || Object.keys(input).some((key) => key !== "mission_id" && key !== "quote_id")) throw new Error("Add evidence and calculate requires exactly mission_id and quote_id");
+      const receipt = await addEvidenceAndCalculate({ mission_id: input.mission_id, quote_id: input.quote_id });
+      invalidateDock();
+      return { ok: true as const, receipt };
+    } catch (err) { return { ok: false as const, error: serializeError(err) }; }
   });
 
   ipcMain.handle(

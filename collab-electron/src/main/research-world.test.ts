@@ -273,6 +273,7 @@ describe("Main research-world projection", () => {
       }, localTrace);
       const dataset = execute(db, "register_dataset_version", {
         kind: "results",
+        purpose: "evaluation",
         artifact_id: sourceArtifact.object_id,
         content_hash: sourceArtifact.object_id,
         as_of: "2026-08-22T00:00:00.000Z",
@@ -489,7 +490,7 @@ describe("Main research-world projection", () => {
         kind: "result_set", bytes: datasetBytes, storage_ref: datasetPath,
       }, localTrace);
       const dataset = execute(db, "register_dataset_version", {
-        kind: "results", artifact_id: datasetArtifact.object_id, content_hash: datasetArtifact.object_id,
+        kind: "results", purpose: "evaluation", artifact_id: datasetArtifact.object_id, content_hash: datasetArtifact.object_id,
         as_of: "2026-08-22T00:00:00.000Z", coverage: { deterministic_score_field: "edge" },
       }, localTrace);
 

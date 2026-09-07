@@ -212,6 +212,7 @@ describe("R15 production governed-review seams", () => {
       const sourceArtifact = kernelExecute("publish_artifact", { kind: "result_set", bytes, storage_ref: datasetPath }, trace()) as { object_id: string };
       const dataset = kernelExecute("register_dataset_version", {
         kind: "results",
+        purpose: "evaluation",
         artifact_id: sourceArtifact.object_id,
         content_hash: sourceArtifact.object_id,
         as_of: "2026-08-22T00:00:00.000Z",
@@ -333,6 +334,7 @@ describe("R15 production governed-review seams", () => {
         const caseArtifact = kernelExecute("publish_artifact", { kind: "result_set", bytes: caseBytes, storage_ref: casePath }, trace()) as { object_id: string };
         const caseDataset = kernelExecute("register_dataset_version", {
           kind: "results",
+          purpose: "evaluation",
           artifact_id: caseArtifact.object_id,
           content_hash: caseArtifact.object_id,
           as_of: "2026-08-22T00:00:00.000Z",

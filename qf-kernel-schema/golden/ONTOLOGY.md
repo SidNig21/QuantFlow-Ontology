@@ -138,6 +138,7 @@ A dataset is a versioned, point-in-time-fenced snapshot consumed by runs. It gov
 - `kind` — Primary data family captured by this snapshot. Mixed should only be used when cross-family coupling is deliberate and documented.
 - `content_hash` — Hash over the underlying bytes for this snapshot. Equal hashes mean byte-identical data and therefore equivalent replay input.
 - `as_of` — Latest timestamp allowed in this snapshot (ISO-8601 UTC). Agents must treat it as a leakage boundary for pre-event decisions.
+- `purpose` — The declared institutional use of these exact bytes. Existing snapshots may reopen as Not recorded, but every newly registered Dataset must declare one canonical purpose.
 - `coverage` — Machine-readable coverage summary (sports, range, counts). This is a sufficiency hint and must never override missing raw lineage.
 
 ### `run`
@@ -314,11 +315,11 @@ Which instruments a ticket bets; enables correlation traversal.
 
 ### `uses`
 
-Full input manifest for a run: datasets, strategies, and tools consumed.
+The immutable input manifest for a Run. It names each Dataset, selected Strategy when one exists, Tool, method Artifact, and starting Quote actually consumed.
 
 - **lifecycle:** `experimental`
 - **from:** `run`
-- **to:** `dataset` | `strategy` | `tool`
+- **to:** `dataset` | `strategy` | `tool` | `artifact` | `quote`
 
 ### `executes_in`
 
@@ -370,10 +371,10 @@ Publication authorization: which evaluation approved an artifact for release. En
 
 ### `belongs_to`
 
-Mission context: which standing Mission owns a delegated Task.
+The standing Mission that owns an institutional Task or direct deterministic Run. Direct calculation work uses the Run edge without manufacturing a participant or Task.
 
 - **lifecycle:** `experimental`
-- **from:** `task`
+- **from:** `task` | `run`
 - **to:** `mission`
 
 ### `grades_ticket`
@@ -467,6 +468,7 @@ Register a new content-hashed, point-in-time dataset version in the Kernel.
 - **lifecycle:** `experimental`
 - **input:**
 - `kind` — Dataset kind being registered.
+- `purpose` — Exact institutional purpose declared for this immutable Dataset version.
 - `artifact_id` — Existing immutable result_set Artifact that contains qf.dataset.v1 bytes.
 - `content_hash` — Hash of the underlying dataset bytes; must equal the Artifact identity.
 - `as_of` — Point-in-time boundary for this version.
@@ -485,7 +487,7 @@ Enqueue a new run in queued status with full invocation params. Rejectable when 
 
 ### `execute_deterministic_run`
 
-Execute one canonical strategy specification against one immutable Dataset. The Kernel owns the execution version, result bytes, content hash, and complete uses/executes_in/produces lineage; a claimed repeat is rejected unless its manifest and result hash match.
+Execute either one canonical Strategy specification or one immutable transparent calculation against one Dataset. The Kernel owns exact market and Mission validation, versions, result bytes, hashes, and complete uses/executes_in/produces/belongs_to lineage.
 
 - **lifecycle:** `experimental`
 - **input:**
@@ -494,6 +496,10 @@ Execute one canonical strategy specification against one immutable Dataset. The 
 - `hypothesis_id` — Exact existing Hypothesis tested by this deterministic research run.
 - `strategy_spec` — Declarative qf.strategy.v1 specification. R11a supports deterministic descending ranking by one numeric observation field.
 - `strategy_id` — Exact existing immutable Strategy selected for an R17 forward run.
+- `calculation` — Immutable qf.calculation.v1 envelope for a technique-free transparent calculation. It is mutually exclusive with every Strategy input.
+- `mission_id` — Exact Mission that owns a technique-free calculation Run.
+- `quote_id` — Exact starting Quote investigated by the Mission and bound into the Dataset context.
+- `tool_id` — Exact registered Research Lab Tool consumed by a technique-free calculation.
 - `params` — Exact execution parameters. R11a supports limit and optional minimum_score.
 - `repeat_of_run_id` — Optional succeeded run claimed as an identical replay. The Kernel rejects any manifest or result mismatch.
 

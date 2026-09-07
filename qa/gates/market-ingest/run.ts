@@ -58,7 +58,7 @@ const PACKAGE_INSPECTOR = join(
 const INGEST_ACTION = "ingest_market_batch";
 const CONTEXT_ACTIONS = ["register_venue", "schedule_market_event"] as const;
 const SERVED_TOOLS_SHA256 =
-  "d460d27d0af4509ed87ea308c432f6a31d188a45f84cf50b7c4047a1ff4c573f";
+  "db727eec8841cde2346ca1503fc524bbca5697d409670301506be29cdc495a01";
 const INGEST_EVENTS = ["instrument.ingested", "quote.ingested"] as const;
 const TRACE = { trace_id: "market-gate-trace", span_id: "market-gate-span" };
 

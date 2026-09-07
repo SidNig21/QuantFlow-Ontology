@@ -500,6 +500,7 @@ test("an admitted governed critic receives and records the verified Artifact rec
     );
     const datasetVersion = kernelExecute("register_dataset_version", {
       kind: "results",
+      purpose: "evaluation",
       artifact_id: dataset.id,
       content_hash: dataset.id,
       as_of: "2026-08-22T00:00:00.000Z",

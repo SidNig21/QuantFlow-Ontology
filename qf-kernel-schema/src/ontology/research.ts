@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defineAction, defineLink, defineObject } from "../define.ts";
 import { agent_session, execution_environment, task, tool } from "./agent.ts";
-import { instrument } from "./market.ts";
+import { instrument, quote } from "./market.ts";
 
 const jsonObject = z.record(z.string(), z.unknown());
 const jsonArray = z.array(jsonObject);
@@ -204,6 +204,12 @@ export const dataset = defineObject({
       .describe(
         "Latest timestamp allowed in this snapshot (ISO-8601 UTC). Agents must treat it as a leakage boundary for pre-event decisions.",
       ),
+    purpose: z
+      .enum(["evidence", "training", "evaluation", "context"])
+      .nullable()
+      .describe(
+        "The declared institutional use of these exact bytes. Existing snapshots may reopen as Not recorded, but every newly registered Dataset must declare one canonical purpose.",
+      ),
     coverage: jsonObject.describe(
       "Machine-readable coverage summary (sports, range, counts). This is a sufficiency hint and must never override missing raw lineage.",
     ),
@@ -346,10 +352,10 @@ export const has_leg = defineLink({
 
 export const uses = defineLink({
   name: "uses",
-  description: "Full input manifest for a run: datasets, strategies, and tools consumed.",
+  description: "The immutable input manifest for a Run. It names each Dataset, selected Strategy when one exists, Tool, method Artifact, and starting Quote actually consumed.",
   lifecycle: "experimental",
   from: run,
-  to: [dataset, strategy, tool],
+  to: [dataset, strategy, tool, artifact, quote],
 });
 
 export const executes_in = defineLink({
@@ -404,9 +410,9 @@ export const gates = defineLink({
 
 export const belongs_to = defineLink({
   name: "belongs_to",
-  description: "Mission context: which standing Mission owns a delegated Task.",
+  description: "The standing Mission that owns an institutional Task or direct deterministic Run. Direct calculation work uses the Run edge without manufacturing a participant or Task.",
   lifecycle: "experimental",
-  from: task,
+  from: [task, run],
   to: mission,
 });
 
@@ -463,6 +469,9 @@ export const register_dataset_version = defineAction({
     kind: z
       .enum(["odds_history", "results", "features", "mixed"])
       .describe("Dataset kind being registered."),
+    purpose: z
+      .enum(["evidence", "training", "evaluation", "context"])
+      .describe("Exact institutional purpose declared for this immutable Dataset version."),
     artifact_id: z
       .string()
       .describe("Existing immutable result_set Artifact that contains qf.dataset.v1 bytes."),
@@ -497,7 +506,7 @@ export const create_run = defineAction({
 export const execute_deterministic_run = defineAction({
   name: "execute_deterministic_run",
   description:
-    "Execute one canonical strategy specification against one immutable Dataset. The Kernel owns the execution version, result bytes, content hash, and complete uses/executes_in/produces lineage; a claimed repeat is rejected unless its manifest and result hash match.",
+    "Execute either one canonical Strategy specification or one immutable transparent calculation against one Dataset. The Kernel owns exact market and Mission validation, versions, result bytes, hashes, and complete uses/executes_in/produces/belongs_to lineage.",
   lifecycle: "experimental",
   capabilityGroup: "desk.orchestrate",
   input: z.object({
@@ -513,6 +522,12 @@ export const execute_deterministic_run = defineAction({
       "Declarative qf.strategy.v1 specification. R11a supports deterministic descending ranking by one numeric observation field.",
     ).optional(),
     strategy_id: z.string().describe("Exact existing immutable Strategy selected for an R17 forward run.").optional(),
+    calculation: jsonObject.describe(
+      "Immutable qf.calculation.v1 envelope for a technique-free transparent calculation. It is mutually exclusive with every Strategy input.",
+    ).optional(),
+    mission_id: z.string().describe("Exact Mission that owns a technique-free calculation Run.").optional(),
+    quote_id: z.string().describe("Exact starting Quote investigated by the Mission and bound into the Dataset context.").optional(),
+    tool_id: z.string().describe("Exact registered Research Lab Tool consumed by a technique-free calculation.").optional(),
     params: jsonObject.describe(
       "Exact execution parameters. R11a supports limit and optional minimum_score.",
     ),

@@ -113,6 +113,7 @@ import { listTerminalTargets } from "./terminal-target";
 import { readSessionMeta } from "./tmux";
 import { registerBrowserIpc } from "./ipc-browser";
 import { cancelBovadaMarketDeskCaptures } from "./market-desk";
+import { cancelEvidenceComputation } from "./evidence-computation";
 
 import {
   bootstrapPackagedDockProfiles,
@@ -904,6 +905,7 @@ async function shutdownBackgroundServices(): Promise<void> {
   bovadaCaptureBinding?.cancelOnAppShutdown();
   bovadaCaptureBinding = null;
   cancelBovadaMarketDeskCaptures();
+  cancelEvidenceComputation();
   pty.setShuttingDown(true);
   await pty.killAllAndWait();
   await pty.shutdownSidecarIfIdle();

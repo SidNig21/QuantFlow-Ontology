@@ -331,6 +331,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "wave1-evidence-computation",
+    description: "W1-02: exact official UFC history, purpose-bound Dataset, technique-free fixed-point calculation, and continuous desk",
+    run: async () => {
+      const { runWave1EvidenceComputationGate } = await import("./gates/wave1-evidence-computation.ts");
+      const { ok } = await runWave1EvidenceComputationGate();
+      return ok;
+    },
+  },
+  {
     name: "technique-outcome-loop",
     description: "R17: immutable named Technique selection and operator-settled outcome grade",
     run: async () => {

@@ -61,7 +61,7 @@ function dataset(id: string, asOf: string): string {
   writeFileSync(path, bytes);
   const source = execute(db!, "publish_artifact", { kind: "result_set", bytes, storage_ref: path }, trace);
   const version = execute(db!, "register_dataset_version", {
-    kind: "results", artifact_id: source.object_id, content_hash: source.object_id,
+    kind: "results", purpose: "evaluation", artifact_id: source.object_id, content_hash: source.object_id,
     as_of: asOf, coverage: { deterministic_score_field: "edge" },
   }, trace);
   return version.object_id;

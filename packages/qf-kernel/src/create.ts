@@ -921,6 +921,12 @@ function registerDatasetVersion(
       'register_dataset_version requires kind in odds_history|results|features|mixed',
     );
   }
+  const purpose = input.purpose;
+  if (purpose !== "evidence" && purpose !== "training" && purpose !== "evaluation" && purpose !== "context") {
+    throw new KernelError(
+      'register_dataset_version requires purpose in evidence|training|evaluation|context',
+    );
+  }
   const content_hash = input.content_hash;
   if (typeof content_hash !== "string" || content_hash.length === 0) {
     throw new KernelError('register_dataset_version requires non-empty "content_hash"');
@@ -1023,6 +1029,7 @@ function registerDatasetVersion(
   if (existing) {
     if (
       existing.kind !== kind ||
+      existing.purpose !== purpose ||
       existing.as_of !== as_of ||
       existing.coverage !== JSON.stringify(verifiedCoverage)
     ) {
@@ -1050,6 +1057,7 @@ function registerDatasetVersion(
     payload: {
       command: cmd.action,
       kind,
+      purpose,
       content_hash,
       as_of,
       coverage: verifiedCoverage,
@@ -1058,9 +1066,9 @@ function registerDatasetVersion(
     insert: () => {
       const created_at = new Date().toISOString();
       db.query(
-        `INSERT INTO dataset (id, created_at, kind, content_hash, as_of, coverage)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-      ).run(id, created_at, kind, content_hash, as_of, JSON.stringify(verifiedCoverage));
+        `INSERT INTO dataset (id, created_at, kind, content_hash, as_of, coverage, purpose)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      ).run(id, created_at, kind, content_hash, as_of, JSON.stringify(verifiedCoverage), purpose);
     },
   });
   return creationResult(cmd, id, cmd.event, state);

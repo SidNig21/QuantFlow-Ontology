@@ -15,7 +15,7 @@ function setup() {
   const bytes = new TextEncoder().encode(JSON.stringify({ contract: "qf.dataset.v1", observations: [{ id: "selection-a", observed_at: "2026-08-21T00:00:00.000Z", edge: 0.8, predicted_probability: 0.8 }] }));
   const path = join(root, "dataset.json"); writeFileSync(path, bytes);
   const artifact = execute(db, "publish_artifact", { kind: "result_set", bytes, storage_ref: path }, trace);
-  const dataset = execute(db, "register_dataset_version", { kind: "results", artifact_id: artifact.object_id, content_hash: artifact.object_id, as_of: "2026-08-22T00:00:00.000Z", coverage: { deterministic_score_field: "edge" } }, trace);
+  const dataset = execute(db, "register_dataset_version", { kind: "results", purpose: "evaluation", artifact_id: artifact.object_id, content_hash: artifact.object_id, as_of: "2026-08-22T00:00:00.000Z", coverage: { deterministic_score_field: "edge" } }, trace);
   return String(dataset.object_id);
 }
 

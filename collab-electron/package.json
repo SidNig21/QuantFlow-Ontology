@@ -174,6 +174,7 @@
     "node-pty": "^1.1.0",
     "posthog-node": "^5.28.0",
     "qf-bovada-football": "file:../tools/qf-bovada-football",
+    "qf-ufc-history": "file:../tools/qf-ufc-history",
     "qf-kernel": "file:../packages/qf-kernel",
     "qf-kernel-schema": "file:../qf-kernel-schema",
     "sharp": "0.34.5",

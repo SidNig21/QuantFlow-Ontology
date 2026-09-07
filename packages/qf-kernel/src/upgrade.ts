@@ -34,6 +34,7 @@ export type KernelShapeState =
   | "task_steering"
   | "pre_r17_current"
   | "pre_market_desk"
+  | "pre_wave1_evidence"
   | "current"
   | "partial";
 
@@ -182,6 +183,7 @@ let d1Snapshot: StructureSnapshot | null = null;
 let currentSnapshot: StructureSnapshot | null = null;
 let preR17CurrentSnapshot: StructureSnapshot | null = null;
 let preMarketDeskSnapshot: StructureSnapshot | null = null;
+let preWave1EvidenceSnapshot: StructureSnapshot | null = null;
 
 function snapshotFromMigrationFile(path: string): StructureSnapshot {
   const sql = readFileSync(path, "utf8");
@@ -228,6 +230,32 @@ function expectedCurrent(): StructureSnapshot {
   return currentSnapshot;
 }
 
+const PRE_W1_EVIDENCE_DESCRIPTIONS = new Map<string, string>([
+  ["uses", "Full input manifest for a run: datasets, strategies, and tools consumed."],
+  ["belongs_to", "Mission context: which standing Mission owns a delegated Task."],
+  ["execute_deterministic_run", "Execute one canonical strategy specification against one immutable Dataset. The Kernel owns the execution version, result bytes, content hash, and complete uses/executes_in/produces lineage; a claimed repeat is rejected unless its manifest and result hash match."],
+]);
+
+function expectedPreWave1Evidence(): StructureSnapshot {
+  if (!preWave1EvidenceSnapshot) {
+    const current = expectedCurrent();
+    const tables = new Map(current.tables);
+    const dataset = tables.get("dataset")
+      ?.replace(/,purpose TEXT/gi, "")
+      .replace(/,CHECK\(purpose IN\('evidence','training','evaluation','context'\)\)/gi, "");
+    if (dataset) tables.set("dataset", dataset);
+    preWave1EvidenceSnapshot = {
+      tables,
+      linkKinds: [...current.linkKinds],
+      schemaMeta: current.schemaMeta.map((row) => {
+        const prior = PRE_W1_EVIDENCE_DESCRIPTIONS.get(row[0]);
+        return prior ? [row[0], row[1], row[2], prior] : row;
+      }),
+    };
+  }
+  return preWave1EvidenceSnapshot;
+}
+
 function tablesWithoutMarketDesk(tables: Map<string, string>): Map<string, string> {
   const next = new Map(tables);
   const tool = next.get("tool")
@@ -252,7 +280,7 @@ function schemaMetaWithoutMarketDesk(rows: Array<[string, string, string, string
 
 function expectedPreMarketDesk(): StructureSnapshot {
   if (!preMarketDeskSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     preMarketDeskSnapshot = {
       tables: tablesWithoutMarketDesk(current.tables),
       linkKinds: linkKindsWithoutMarketDesk(current.linkKinds),
@@ -264,7 +292,7 @@ function expectedPreMarketDesk(): StructureSnapshot {
 
 function expectedPreR17Current(): StructureSnapshot {
   if (!preR17CurrentSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     preR17CurrentSnapshot = {
       tables: tablesWithoutR17(current.tables),
       linkKinds: linkKindsWithoutR17(current.linkKinds),
@@ -573,7 +601,7 @@ function predecessorTables(tables: Map<string, string>): Map<string, string> {
 /** 0001/0002 precede the context actions; derive both historical metadata shapes from current authority. */
 function expectedD1(): StructureSnapshot {
   if (!d1Snapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     d1Snapshot = {
       tables: tablesWithoutR17(predecessorTables(current.tables)),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
@@ -599,7 +627,7 @@ let marketIngestSnapshot: StructureSnapshot | null = null;
 /** 0002 adds ingest_market_batch; 0003 adds the two trusted context actions. */
 function expectedMarketIngest(): StructureSnapshot {
   if (!marketIngestSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     marketIngestSnapshot = {
       tables: tablesWithoutR17(predecessorTables(current.tables)),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
@@ -618,7 +646,7 @@ let marketContextSnapshot: StructureSnapshot | null = null;
 /** Post-0003 / pre-0004 — no capability_groups, no task.status, no R5 actions. */
 function expectedMarketContext(): StructureSnapshot {
   if (!marketContextSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     marketContextSnapshot = {
       tables: tablesWithoutR17(predecessorTables(current.tables)),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
@@ -633,7 +661,7 @@ let capabilityGrantsSnapshot: StructureSnapshot | null = null;
 /** Post-0004 / pre-0005 — capability_groups present; task.status and R5 actions absent. */
 function expectedCapabilityGrants(): StructureSnapshot {
   if (!capabilityGrantsSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     capabilityGrantsSnapshot = {
       tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(
         tablesWithoutTaskDelegation(tablesWithoutTaskStatus(current.tables)),
@@ -650,7 +678,7 @@ let taskStatusSnapshot: StructureSnapshot | null = null;
 /** Post-0005 / pre-0006 — task.status present; create_connection/delete_connection absent. */
 function expectedTaskStatus(): StructureSnapshot {
   if (!taskStatusSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     taskStatusSnapshot = {
       tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables))))),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
@@ -667,7 +695,7 @@ let connectionActionsSnapshot: StructureSnapshot | null = null;
 /** Post-0006 / pre-0007 — connection actions exist, but task delegation does not. */
 function expectedConnectionActions(): StructureSnapshot {
   if (!connectionActionsSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     connectionActionsSnapshot = {
       tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables))))),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutTaskDelegation(current.linkKinds)),
@@ -683,7 +711,7 @@ let taskDelegationRetainedR16Snapshot: StructureSnapshot | null = null;
 /** Post-0007 / pre-0008 — durable task delegation exists, execution does not. */
 function expectedTaskDelegation(): StructureSnapshot {
   if (!taskDelegationSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     taskDelegationSnapshot = {
       tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables))))),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutIndependentCritic(current.linkKinds)),
@@ -716,11 +744,12 @@ let deterministicExecutionSnapshot: StructureSnapshot | null = null;
 let deterministicExecutionR17Snapshot: StructureSnapshot | null = null;
 let deterministicExecutionR10Snapshot: StructureSnapshot | null = null;
 let deterministicExecutionR10RetainedR16Snapshot: StructureSnapshot | null = null;
+let deterministicExecutionR10RetainedR16HistoricalActionSnapshot: StructureSnapshot | null = null;
 
 /** Post-0008 / pre-0009 — deterministic results exist, independent critic lineage does not. */
 function expectedDeterministicExecution(): StructureSnapshot {
   if (!deterministicExecutionSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     deterministicExecutionSnapshot = {
       tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables))))),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutIndependentCritic(current.linkKinds)),
@@ -732,7 +761,7 @@ function expectedDeterministicExecution(): StructureSnapshot {
 
 function expectedDeterministicExecutionWithR17(): StructureSnapshot {
   if (!deterministicExecutionR17Snapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     deterministicExecutionR17Snapshot = {
       tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)))),
       linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
@@ -744,7 +773,7 @@ function expectedDeterministicExecutionWithR17(): StructureSnapshot {
 
 function expectedDeterministicExecutionR10(): StructureSnapshot {
   if (!deterministicExecutionR10Snapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     deterministicExecutionR10Snapshot = {
       tables: tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)),
       linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
@@ -771,6 +800,20 @@ function expectedDeterministicExecutionR10RetainedR16(): StructureSnapshot {
   return deterministicExecutionR10RetainedR16Snapshot;
 }
 
+function expectedDeterministicExecutionR10RetainedR16HistoricalAction(): StructureSnapshot {
+  if (!deterministicExecutionR10RetainedR16HistoricalActionSnapshot) {
+    const current = expectedDeterministicExecutionR10RetainedR16();
+    deterministicExecutionR10RetainedR16HistoricalActionSnapshot = {
+      tables: current.tables,
+      linkKinds: current.linkKinds,
+      schemaMeta: current.schemaMeta.map((row) => row[0] === "execute_deterministic_run"
+        ? [row[0], row[1], row[2], PRE_W1_EVIDENCE_DESCRIPTIONS.get(row[0])!] as [string, string, string, string]
+        : row),
+    };
+  }
+  return deterministicExecutionR10RetainedR16HistoricalActionSnapshot;
+}
+
 let taskCompositionSnapshot: StructureSnapshot | null = null;
 let taskCompositionRetainedR17Snapshot: StructureSnapshot | null = null;
 let taskCompositionRetainedMetadataSnapshot: StructureSnapshot | null = null;
@@ -779,7 +822,7 @@ let taskCompositionHistoricalSnapshot: StructureSnapshot | null = null;
 /** Post-0009 / pre-0010 — task delegation exists without V2-3 composition state. */
 function expectedTaskComposition(): StructureSnapshot {
   if (!taskCompositionSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     taskCompositionSnapshot = {
       tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(current.tables)))),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutBelongsTo(current.linkKinds)),
@@ -791,7 +834,7 @@ function expectedTaskComposition(): StructureSnapshot {
 
 function expectedTaskCompositionRetainedR17(): StructureSnapshot {
   if (!taskCompositionRetainedR17Snapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     taskCompositionRetainedR17Snapshot = {
       tables: tablesWithoutTaskComposition(current.tables),
       linkKinds: current.linkKinds,
@@ -808,7 +851,7 @@ function expectedTaskCompositionRetainedR17(): StructureSnapshot {
 /** 0009 historical SQL may rebuild links before current R17 metadata is applied. */
 function expectedTaskCompositionRetainedMetadata(): StructureSnapshot {
   if (!taskCompositionRetainedMetadataSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     taskCompositionRetainedMetadataSnapshot = {
       tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(current.tables)))),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutBelongsTo(current.linkKinds)),
@@ -824,7 +867,7 @@ function expectedTaskCompositionRetainedMetadata(): StructureSnapshot {
 
 function expectedTaskCompositionHistorical(): StructureSnapshot {
   if (!taskCompositionHistoricalSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     taskCompositionHistoricalSnapshot = {
       tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(current.tables)))),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutBelongsTo(current.linkKinds)),
@@ -839,7 +882,7 @@ function expectedTaskCompositionHistorical(): StructureSnapshot {
 let taskSteeringSnapshot: StructureSnapshot | null = null;
 function expectedTaskSteering(): StructureSnapshot {
   if (!taskSteeringSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreWave1Evidence();
     taskSteeringSnapshot = {
       tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(current.tables))),
       linkKinds: linkKindsWithoutR17(linkKindsWithoutBelongsTo(current.linkKinds)),
@@ -928,6 +971,36 @@ function applyCurrentR16SchemaAdditions(db: KernelDb): void {
   }
 }
 
+/** W1-02 adds nullable legacy storage for Dataset purpose and widens existing lineage semantics. */
+function applyCurrentWave1EvidenceAdditions(db: KernelDb): void {
+  const currentDatasetSql = expectedCurrent().tables.get("dataset");
+  const liveDatasetSql = readTableSql(db, "dataset");
+  if (currentDatasetSql && normalizeSql(liveDatasetSql ?? "") !== currentDatasetSql) {
+    db.exec(`
+      CREATE TABLE dataset__w1_evidence_upgrade (
+        id TEXT PRIMARY KEY NOT NULL,
+        created_at TEXT NOT NULL,
+        kind TEXT NOT NULL,
+        content_hash TEXT NOT NULL,
+        as_of TEXT NOT NULL,
+        purpose TEXT,
+        coverage TEXT NOT NULL,
+        CHECK (kind IN ('odds_history', 'results', 'features', 'mixed')),
+        CHECK (purpose IN ('evidence', 'training', 'evaluation', 'context'))
+      );
+      INSERT INTO dataset__w1_evidence_upgrade (id, created_at, kind, content_hash, as_of, purpose, coverage)
+        SELECT id, created_at, kind, content_hash, as_of, NULL, coverage FROM dataset;
+      DROP TABLE dataset;
+      ALTER TABLE dataset__w1_evidence_upgrade RENAME TO dataset;
+    `);
+  }
+  const currentMeta = new Map(expectedCurrent().schemaMeta.map((row) => [row[0], row] as const));
+  for (const name of ["uses", "belongs_to", "execute_deterministic_run"] as const) {
+    const row = currentMeta.get(name);
+    if (row) db.query("UPDATE schema_meta SET kind = ?, lifecycle = ?, description = ? WHERE type_name = ?").run(row[1], row[2], row[3], name);
+  }
+}
+
 function objectMetaCount(db: KernelDb): number {
   try {
     const row = db
@@ -994,6 +1067,9 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedDeterministicExecutionR10RetainedR16())) {
     return "deterministic_execution";
   }
+  if (snapshotsEqual(live, expectedDeterministicExecutionR10RetainedR16HistoricalAction())) {
+    return "deterministic_execution";
+  }
   if (snapshotsEqual(live, expectedTaskComposition())) {
     return "task_composition";
   }
@@ -1007,6 +1083,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedTaskSteering())) return "task_steering";
   if (snapshotsEqual(live, expectedPreR17Current())) return "pre_r17_current";
   if (snapshotsEqual(live, expectedPreMarketDesk())) return "pre_market_desk";
+  if (snapshotsEqual(live, expectedPreWave1Evidence())) return "pre_wave1_evidence";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -1072,8 +1149,16 @@ export function applyKernelUpgradeChain(
   if (state === "uninitialized") return;
 
   const tx = db.transaction(() => {
+    if (state === "pre_wave1_evidence") {
+      applyCurrentWave1EvidenceAdditions(db);
+      if (classifyKernelShape(db) !== "current") {
+        throw new KernelUpgradeShapeError(TASK_COMPOSITION_UPGRADE, "W1-02 additions did not produce the exact current shape");
+      }
+      return;
+    }
     if (state === "pre_market_desk") {
       applyCurrentR16SchemaAdditions(db);
+      applyCurrentWave1EvidenceAdditions(db);
       if (classifyKernelShape(db) !== "current") {
         throw new KernelUpgradeShapeError(TASK_COMPOSITION_UPGRADE, "market desk additions did not produce the exact current shape");
       }
@@ -1081,6 +1166,7 @@ export function applyKernelUpgradeChain(
     }
     if (state === "pre_r17_current") {
       applyCurrentR16SchemaAdditions(db);
+      applyCurrentWave1EvidenceAdditions(db);
       if (classifyKernelShape(db) !== "current") {
         throw new KernelUpgradeShapeError(
           TASK_COMPOSITION_UPGRADE,
@@ -1204,6 +1290,7 @@ export function applyKernelUpgradeChain(
     }
     db.exec(upgrades.taskSteeringSql);
     applyCurrentR16SchemaAdditions(db);
+    applyCurrentWave1EvidenceAdditions(db);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(
         TASK_COMPOSITION_UPGRADE,

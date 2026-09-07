@@ -56,7 +56,7 @@ const TRAVERSAL_KINDS = new Set([
 ]);
 const OBJECT_TYPES = [
   "mission", "task", "hypothesis", "dataset", "run", "strategy", "ticket", "artifact", "evaluation", "agent_session",
-  "quote", "instrument", "market_event", "venue",
+  "quote", "instrument", "market_event", "venue", "tool", "execution_environment",
 ];
 const JSON_FIELDS = new Set([
   "sources", "coverage", "params", "sides", "metrics", "rubric", "run_metrics", "source_work", "block_reason",
@@ -221,10 +221,12 @@ export function artifactReceipt(row: Record<string, unknown>): ArtifactReceipt {
   }
   try {
     const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    let calculationResult = false;
+    try { calculationResult = (JSON.parse(text) as Record<string, unknown>)?.contract === "qf.calculation.result.v1"; } catch { /* ordinary preview */ }
     const codePoints = Array.from(text);
     return {
       artifact_id: id, kind, content_hash: hash, durable_bytes_available: true,
-      preview: codePoints.slice(0, 2_048).join("") + (codePoints.length > 2_048 ? "…" : ""),
+      preview: calculationResult ? text : codePoints.slice(0, 2_048).join("") + (codePoints.length > 2_048 ? "…" : ""),
     };
   } catch {
     return { artifact_id: id, kind, content_hash: hash, durable_bytes_available: true, message: "Preview unavailable: artifact is not UTF-8" };
@@ -341,6 +343,12 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
   }
   if (type === "artifact") {
     fields.receipt = artifactReceipt(row);
+    if (typeof fields.receipt === "object" && fields.receipt && "preview" in fields.receipt) {
+      try {
+        const payload = JSON.parse(String((fields.receipt as ArtifactReceipt).preview ?? "")) as Record<string, unknown>;
+        if (payload.contract === "qf.calculation.result.v1") fields.calculation_result = payload;
+      } catch { /* non-JSON and truncated previews retain the ordinary receipt */ }
+    }
     const producer = incoming.find((link) => link.kind === "produces");
     fields.producer_id = producer?.from_id ?? null;
     fields.producer_type = producer ? objectType(snapshot, producer.from_id) : null;
@@ -410,6 +418,20 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
       ? (parseJson(row.params) as Record<string, unknown>).executor_session_id ?? null : null;
     const strategyId = outgoing.find((link) => link.kind === "uses" && objectType(snapshot, link.to_id) === "strategy")?.to_id;
     fields.strategy_id = isNamedTechnique(snapshot, strategyId) ? strategyId : null;
+    fields.technique = fields.strategy_id ? "selected" : "none selected";
+    fields.mission_id = outgoing.find((link) => link.kind === "belongs_to")?.to_id ?? null;
+    fields.quote_id = outgoing.find((link) => link.kind === "uses" && objectType(snapshot, link.to_id) === "quote")?.to_id ?? null;
+    fields.tool_id = outgoing.find((link) => link.kind === "uses" && objectType(snapshot, link.to_id) === "tool")?.to_id ?? null;
+    fields.calculation_artifact_id = outgoing.find((link) => link.kind === "uses" && objectType(snapshot, link.to_id) === "artifact")?.to_id ?? null;
+    const parsedParams = parseJson(row.params);
+    if (parsedParams && typeof parsedParams === "object" && !Array.isArray(parsedParams)) {
+      const params = parsedParams as Record<string, unknown>;
+      fields.operation = params.operation ?? null;
+      fields.formula_version = params.formula_version ?? null;
+      fields.implementation_version = params.implementation_version ?? null;
+      fields.execution_manifest_hash = params.execution_manifest_hash ?? null;
+      fields.event_cutoff = params.event_cutoff ?? null;
+    }
   }
   if (type === "strategy") {
     const specRef = String(row.spec_ref ?? "");
@@ -460,10 +482,36 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   let sourceRows: Array<Record<string, unknown>> = [];
   if (request.root_type === "mission") {
     const marketLinks = addMarketLineage(snapshot, request.root_id, ids);
-    const tasks = allLinks.filter((link) => link.kind === "belongs_to" && link.to_id === request.root_id).map((link) => link.from_id);
+    const tasks = allLinks.filter((link) =>
+      link.kind === "belongs_to" &&
+      link.to_id === request.root_id &&
+      objectType(snapshot, link.from_id) === "task"
+    ).map((link) => link.from_id);
     if (tasks.length > 1) return { ok: false, code: "WORLD_ROOT_INELIGIBLE", message: `Mission has ${tasks.length} linked research Tasks; choose one before revealing the world.` };
     selectedTaskId = tasks[0];
     if (!selectedTaskId) {
+      const directRuns = allLinks.filter((link) => link.kind === "belongs_to" && link.to_id === request.root_id && objectType(snapshot, link.from_id) === "run").map((link) => link.from_id).sort();
+      if (directRuns.length > 0) {
+        const selectedKeys = new Set(marketLinks.map((link) => `${link.kind}\u0000${link.from_id}\u0000${link.to_id}`));
+        for (const runId of directRuns) {
+          addId(ids, "run", runId);
+          for (const link of allLinks.filter((candidate) => candidate.from_id === runId && ["belongs_to", "uses", "executes_in", "produces"].includes(candidate.kind))) {
+            addId(ids, objectType(snapshot, link.to_id), link.to_id);
+            selectedKeys.add(`${link.kind}\u0000${link.from_id}\u0000${link.to_id}`);
+            if (objectType(snapshot, link.to_id) === "dataset") {
+              for (const derived of allLinks.filter((candidate) => candidate.kind === "derived_from" && candidate.from_id === link.to_id)) {
+                addId(ids, objectType(snapshot, derived.to_id), derived.to_id);
+                selectedKeys.add(`${derived.kind}\u0000${derived.from_id}\u0000${derived.to_id}`);
+              }
+            }
+          }
+        }
+        const objects: ResearchWorldObject[] = [];
+        for (const type of OBJECT_TYPES) for (const id of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, id));
+        objects.sort((a, b) => a.type.localeCompare(b.type) || a.id.localeCompare(b.id));
+        const links = allLinks.filter((link) => selectedKeys.has(`${link.kind}\u0000${link.from_id}\u0000${link.to_id}`));
+        return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects, links, missing_lineage: [], current_report_id: null, report_ids: [] }) };
+      }
       const objects: ResearchWorldObject[] = [];
       for (const type of OBJECT_TYPES) for (const id of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, id));
       objects.sort((a, b) => a.type.localeCompare(b.type) || a.id.localeCompare(b.id));
