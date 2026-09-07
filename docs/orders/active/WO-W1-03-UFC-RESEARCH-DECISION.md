@@ -54,8 +54,14 @@ honesty case: absence of the desired prop is product truth, not permission to fa
 ## Deliverable 0 — exact Hypothesis and complete fight menu
 
 Use the existing Hypothesis object to record `Alexa Grasso wins by submission`, bound to the selected
-Mission, exact provider event, pre-event cutoff, author, and creation time. It remains a proposition to
+Mission, exact provider event, pre-event cutoff, and creation time. It remains a proposition to
 falsify, not a recommendation or a Technique. Record explicit invalidation and refresh conditions.
+
+Do not add fields or a new Hypothesis link. Existing Kernel truth proves the binding as one closed lineage:
+the Mission `investigates` a Quote from the exact provider event; the research Task and Run `belongs_to`
+that Mission; the Run `tests` this Hypothesis and `uses` the exact menu Artifact, Quotes, Dataset, and
+method Artifact. The Hypothesis row supplies its creation time, claim, success criteria, and open/resolved
+state. A missing, foreign, duplicated, or cross-Mission member makes the closure invalid.
 
 Extend the existing Bovada acquisition only far enough to preserve every open pre-event market and
 selection actually returned for the exact Fiorot–Grasso provider event—not only Fight Winner. Preserve:
@@ -66,20 +72,21 @@ selection actually returned for the exact Fiorot–Grasso provider event—not o
 - an explicit `selection_unavailable` result with observation time and reason for any requested expression
   not offered, including Grasso by submission in the frozen authoring observation.
 
-The existing public event-list response is the first source. At most one same-origin event-detail request
-may be added when the list response advertises more markets than it returns. No login, wager account,
-browser session, alternate book, hidden RPC, or fabricated selection may fill an absent market. Reject a
-mixed-event menu, duplicate selection identity, closed/suspended market presented as open, stale mixed-time
-quotes, non-finite price/handicap, source drift, timeout, redirect, or byte-limit breach.
+The existing public event-list response is the sole completeness boundary. For the matched event, the
+provider field `numMarkets` must equal the count of unique market ids present across its returned
+`displayGroups[].markets[]`; otherwise acquisition fails explicitly as `market_menu_incomplete`. No second
+request, login, wager account, browser session, alternate book, hidden RPC, or fabricated selection may fill
+an absent market. Reject a mixed-event menu, duplicate selection identity, closed/suspended market presented
+as open, stale mixed-time quotes, non-finite price/handicap, source drift, timeout, redirect, or byte-limit
+breach.
 
 ## Deliverable 1 — meaningful UFC evidence, same bounded acquisition
 
-Extend `qf-ufc-history` from the same two exact official UFC athlete identities already acquired by W1-02.
-The implementation may add one bounded official-source seam for the exact fighters and eligible pre-cutoff
-bouts when the existing athlete pages do not carry the mechanism evidence below. Any added request must be
-deterministically discovered from an admitted official profile/bout link, bounded by eligible bout rows,
-hashed, timed out, size-limited, and recorded. Do not add a commercial data vendor, open web search, broad
-crawl, browser scrape, or unrelated fighter/source.
+Extend `qf-ufc-history` using only the same two exact official UFC athlete page responses already acquired
+by W1-02. The fixed request count remains two, the host/path allowlist remains the existing exact athlete
+route, and the accepted per-request timeout and 5 MiB byte ceiling remain unchanged. Do not add another
+endpoint, fighter, source, vendor, search, crawl, or browser scrape. Missing mechanism evidence is an honest
+reason for probability unavailable and WATCH/PASS, not permission to widen acquisition in this slice.
 
 For each exact fighter identity, preserve the W1-02 bout history and add the pre-event fields actually
 present in those captured bytes that materially help compare a matchup. The minimum accepted family is:
@@ -185,14 +192,16 @@ failure branches but cannot satisfy the positive product proof.
 Generalize the existing Report authority just enough to support this technique-free calculation while
 preserving every accepted Strategy/Technique publication invariant.
 
-One authority partition is derived only from existing Kernel truth and contains this finite tuple: Mission;
-Hypothesis; exact method kind/id/version/hash (selected immutable Strategy when present, otherwise the
-calculation envelope/capability/formula identity); Dataset id/as-of/hash; market-menu observation id/hash;
-and provider event. Do not create a Technique object for an unselected calculation. A newer complete menu
-revision deterministically supersedes the prior current Decision only inside that tuple's investigation
-lineage; history remains explicit. Migrate the existing publication-support table losslessly and atomically;
-an invalid or ambiguous legacy row aborts without partial mutation. Existing Strategy rows retain the exact
-G9 authority key and behavior. Only the support table may change shape for this migration.
+One stable authority partition is derived only from existing Kernel truth and contains this finite tuple:
+Mission; Hypothesis; exact method kind/id/version/hash (selected immutable Strategy when present, otherwise
+the calculation envelope/capability/formula identity); Dataset id/as-of/hash; and provider event. The exact
+market-menu observation id/hash and every Quote id belong to the revision/source-work tuple, not the stable
+partition. Within one partition, the newest completely reviewed menu revision deterministically becomes
+current and supersedes the prior Report; an incomplete, blocked, or rejected revision cannot displace it.
+History remains explicit. Do not create a Technique object for an unselected calculation. Migrate the
+existing publication-support table losslessly and atomically; an invalid or ambiguous legacy row aborts
+without partial mutation. Existing Strategy rows retain the exact G9 authority key and behavior. Only the
+support table may change shape for this migration.
 
 Only a supporting independent Evaluation may publish a Report; the Kernel rule that only independently
 supported Evaluation lineage can publish remains unchanged. The canonical current Report carries the
@@ -273,7 +282,6 @@ bun qa/run.ts governed-review
 bun qa/run.ts governed-review-live
 bun qa/run.ts report-authority
 bun qa/run.ts kernel-market-lineage
-bun qa/run.ts golden-g9-report-authority
 bun qa/run.ts golden-g10-canvas-runtime
 bun qa/run.ts schema
 bun qa/run.ts typecheck
