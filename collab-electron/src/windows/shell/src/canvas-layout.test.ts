@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { formatTidyToast, repackTilesToGrid } from "./canvas-layout.js";
+import { fitViewportToTiles } from "./glacier-feel.js";
 
 function overlap(a: { x: number; y: number; width: number; height: number }, b: typeof a) {
   return a.x < b.x + b.width && a.x + a.width > b.x &&
@@ -66,6 +67,36 @@ describe("canvas Tidy layout", () => {
     expect(tiles[0]).toMatchObject({ x: 260, y: 180 });
     expect(tiles.every((tile) => tile.x >= 260 && tile.y >= 180)).toBe(true);
     assertNoOverlap(tiles);
+  });
+
+  test("arranges the completed 12-object world without shrinking its Mission below readable scale", () => {
+    const tiles = Array.from({ length: 12 }, (_, index) => ({
+      id: index === 0 ? "ontology:mission:mission-1" : `ontology:artifact:object-${index}`,
+      type: "research",
+      ontologyType: index === 0 ? "mission" : "artifact",
+      x: 1400 - index * 70,
+      y: 1800 - index * 90,
+      width: 300,
+      height: 190,
+    }));
+    const mission = tiles[0];
+
+    repackTilesToGrid(tiles, {
+      viewportWidth: 1200,
+      zoom: 1,
+      screenSpace: true,
+      tokens: { gutter: 120 },
+      originX: 40,
+      originY: 40,
+    });
+    assertNoOverlap(tiles);
+
+    const fit = fitViewportToTiles(tiles, 1200, 800, 48, { minZoom: 0.6, anchorTile: mission });
+    expect(fit?.zoom).toBe(0.6);
+    expect(mission.x * fit!.zoom + fit!.panX).toBeGreaterThanOrEqual(48);
+    expect(mission.y * fit!.zoom + fit!.panY).toBeGreaterThanOrEqual(48);
+    expect((mission.x + mission.width) * fit!.zoom + fit!.panX).toBeLessThanOrEqual(1200 - 48);
+    expect((mission.y + mission.height) * fit!.zoom + fit!.panY).toBeLessThanOrEqual(800 - 48);
   });
 
   test("reports a readable operator result", () => {

@@ -640,7 +640,11 @@ async function init() {
 		const expandedParticipant = focusedTile?.sessionId && baseSize &&
 			(focusedTile.width > baseSize.width || focusedTile.height > baseSize.height)
 			? focusedTile : null;
-		void animateViewportFit(tiles, 48, expandedParticipant ? { minZoom: 0.6, anchorTile: expandedParticipant } : {});
+		const missionTiles = tiles.filter((tile) => tile.type === "research" && tile.ontologyType === "mission");
+		const missionTile = missionTiles.find((tile) => tileManager.getTileDOMs().get(tile.id)?.container?.dataset?.qfProjectionVisibility === "normal")
+			?? missionTiles.at(-1);
+		const readableAnchor = expandedParticipant ?? missionTile;
+		void animateViewportFit(tiles, 48, readableAnchor ? { minZoom: 0.6, anchorTile: readableAnchor } : {});
 		showCanvasToast(formatTidyToast(result), { tone: "ok" });
 		return result;
 	}

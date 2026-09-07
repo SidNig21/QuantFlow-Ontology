@@ -9,6 +9,7 @@ import {
 	researchCableProjectionOpacity,
 	researchCurrentMissionLinkKeys,
 	researchCablePorts,
+  renderDockObjectOverview,
   researchSessionReceiptFields,
 	researchTilePresentation,
 	projectedSemanticMarkers,
@@ -177,6 +178,37 @@ function routedCableHitsTile(fromTile: Record<string, number>, fromSide: string,
 }
 
 describe("research world renderer seam", () => {
+	test("Inspect exposes the already-durable raw calculation result", async () => {
+		await withDocument(async () => {
+			const rawArtifact = {
+				type: "artifact", id: "result-1", fields: {
+					calculation_result: {
+						contract: "qf.calculation.result.v1",
+						sides: [
+							{ label: "Manon Fiorot", decimal_price: "1.510000", normalized_market_probability: "0.662091", source_listed_wins: 2, source_listed_losses: 1, source_listed_draws: 0, source_listed_no_contests: 0, decisive_sample_size: 3, source_listed_decisive_fraction: "0.666667" },
+							{ label: "Alexa Grasso", decimal_price: "2.960000", normalized_market_probability: "0.337909", source_listed_wins: 1, source_listed_losses: 2, source_listed_draws: 0, source_listed_no_contests: 0, decisive_sample_size: 3, source_listed_decisive_fraction: "0.333333" },
+						],
+						market_context: { event_cutoff: "2026-09-13T02:00:00.000Z" },
+						limitation: "Source-listed descriptive history is not an estimated win probability.",
+					},
+				},
+			};
+			const run = { type: "run", id: "run-1", fields: { operation: "two_way_market_history_baseline" } };
+			const workflow = {
+				rawArtifact, run, sourceTask: null, currentReport: null,
+				links: [], stages: [[], [], [], [], []],
+				byId: new Map([[rawArtifact.id, rawArtifact], [run.id, run]]),
+			};
+			const overview = renderDockObjectOverview(rawArtifact, workflow, () => null);
+			const text = treeText(overview);
+			expect(text).toContain("Manon Fiorot");
+			expect(text).toContain("1.510000 observation · market 0.662091");
+			expect(text).toContain("record 2-1-0 (0 NC) · n=3 · fraction 0.666667");
+			expect(text).toContain("Alexa Grasso");
+			expect(text).toContain("2026-09-13T02:00:00.000Z");
+			expect(text).toContain("Source-listed descriptive history is not an estimated win probability.");
+		});
+	});
 	test("LOCAL renders every endpoint-in-current cable while overview stays primary", () => {
 		const currentIds = new Set(Array.from({ length: 17 }, (_, index) => `current-${index}`));
 		const primary = Array.from({ length: 12 }, (_, index) => ({ kind: `primary-${index}`, from_id: `current-${index}`, to_id: `current-${index + 1}` }));

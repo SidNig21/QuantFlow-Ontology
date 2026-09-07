@@ -21,9 +21,12 @@ describe("Tidy authority boundary", () => {
   test("renderer Tidy path has no persistence call", () => {
     const body = functionBody(rendererSource, "tidyTilesToGrid", "\n\t// -- Canvas RPC --");
     expect(body).toContain("applyTileLayout");
-    expect(body).not.toContain("saveCanvas");
+		expect(body).not.toContain("saveCanvas");
 		expect(body).toContain("minZoom: 0.6");
-		expect(body).toContain("anchorTile: expandedParticipant");
+		expect(body).toContain('ontologyType === "mission"');
+		expect(body).toContain('qfProjectionVisibility === "normal"');
+		expect(body).toContain("missionTiles.at(-1)");
+		expect(body).toContain("anchorTile: readableAnchor");
   });
 
 });

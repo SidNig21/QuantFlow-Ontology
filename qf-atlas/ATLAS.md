@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-wave1-evidence-computation @ 31149813` on 2026-09-07 by
+> Generated from `codex/wo-wave1-evidence-computation @ 70a17914` on 2026-09-07 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -88,7 +88,7 @@ handler that mutates state without `execute()` is cheating even when it works.
 | `unknown` | handler or module resolution coverage is incomplete; not claimed read-only | 0 |
 | `read-only` | no mutation seen | 86 |
 
-#### Reaches ungoverned SQL, but not a hard red (6)
+#### Reaches ungoverned SQL, but not a hard red (7)
 
 The hop-4 walk is reachability only: it cannot tell a domain-truth bypass from
 review scaffolding. These wires reach SQL outside the write door where **every**
@@ -99,6 +99,8 @@ loop.
 
 | Channel | Reaches | Findings | Confidence · class |
 |---|---|---:|---|
+| `qf:research-world:projection` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
+| `qf:research-world:projection` | `migrateLegacyPublicationTable()` | 3 | medium · `non-domain-store` |
 | `qf:review:projection` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
 | `qf:review:projection` | `migrateLegacyPublicationTable()` | 3 | medium · `non-domain-store` |
 | `qf:review:request` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
@@ -426,7 +428,7 @@ mechanism behind the invariant below, not a promise about it.
 | `imports` | 551 | 0 | 4 | 0 | 0 |
 | `ipcRequest` | 277 | 0 | 3 | 0 | 275 |
 | `ipcPush` | 7 | 0 | 3 | 0 | 545 |
-| `persistence` | 24 | 29 | 0 | 0 | 502 |
+| `persistence` | 25 | 29 | 0 | 0 | 501 |
 | `lifetime` | 5 | 61 | 0 | 0 | 489 |
 | `packaging` | 224 | 0 | 0 | 105 | 226 |
 | `ownership` | 20 | 0 | 0 | 350 | 185 |
@@ -485,7 +487,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 577
 - `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 531
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 396
-- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 852
+- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 854
 
 ### Exact task delivery
 
@@ -494,7 +496,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/execute.ts** — UPDATE task at line 121
 - **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 644
 - **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 1015
-- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 761
+- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 763
 - `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 85
 
 ### Research review / publication
@@ -503,7 +505,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 971
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1330
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 890
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 892
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 228
@@ -517,7 +519,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 904
 - **packages/qf-kernel/src/strategy-outcome.ts** — INSERT INTO artifact at line 195
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentTrajectoryArtifact() at line 32
-- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 336
+- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 338
 - `packages/qf-kernel/src/resolve-artifact-root.ts` — exports resolveArtifactRoot() at line 25
 
 **`strong` is structural** — the file mutates the responsibility's table or owns its

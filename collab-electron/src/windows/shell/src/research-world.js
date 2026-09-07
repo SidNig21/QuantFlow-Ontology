@@ -797,7 +797,7 @@ function appendInspectFact(container, labelText, valueText) {
 	container.appendChild(row);
 }
 
-function renderDockObjectOverview(object, workflow, participantViewForId) {
+export function renderDockObjectOverview(object, workflow, participantViewForId) {
 	const presentation = researchTilePresentation(object, workflow, participantViewForId);
 	const overview = document.createElement("div");
 	overview.className = "dock-inspect-overview";
@@ -822,6 +822,9 @@ function renderDockObjectOverview(object, workflow, participantViewForId) {
 		const reportLink = evaluation && workflow.links.find((link) => link.kind === "gates" && link.from_id === evaluation.id && link.to_id === workflow?.currentReport?.id);
 		appendInspectFact(overview, "Evaluated by", evaluation ? objectHumanTitle(evaluation, null, workflow) : "Not recorded");
 		appendInspectFact(overview, "Current report", reportLink && workflow.currentReport ? objectHumanTitle(workflow.currentReport, null, workflow) : "Not recorded");
+		if (object.fields?.calculation_result?.contract === "qf.calculation.result.v1") {
+			for (const fact of presentation.facts) appendInspectFact(overview, fact.label, fact.value);
+		}
 	} else if (object.type === "evaluation") {
 		const criticId = object.fields?.critic_session_id || workflow.links.find((link) => link.kind === "performed_by" && link.from_id === object.id)?.to_id;
 		const critic = workflow.byId.get(criticId);

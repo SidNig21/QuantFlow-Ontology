@@ -2,6 +2,7 @@ import { afterAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { Database } from "bun:sqlite";
 
 const root = mkdtempSync(join(tmpdir(), "qf-app-lifecycle-"));
 const appRoot = join(root, "app-root");
@@ -25,6 +26,16 @@ process.env.QF_KERNEL_DB = kernelPath;
 delete process.env.QF_PEER_BUS_DB;
 
 const kernel = await import("./kernel");
+
+function replaceWithAcceptedLegacyPublicationShape(path: string): void {
+  const legacy = new Database(path);
+  try {
+    legacy.exec("DROP TABLE IF EXISTS qf_review_publication");
+    legacy.exec("CREATE TABLE qf_review_publication (source_work_key TEXT PRIMARY KEY NOT NULL, report_artifact_id TEXT NOT NULL, publication_evaluation_id TEXT NOT NULL, created_at TEXT NOT NULL)");
+  } finally {
+    legacy.close();
+  }
+}
 
 function restoreEnvironment(): void {
   for (const [key, value] of Object.entries(previousEnvironment)) {
@@ -87,6 +98,27 @@ describe("app Kernel handle lifecycle", () => {
     expect(shutdown.indexOf("await disposeAgentHost()" )).toBeGreaterThan(-1);
     expect(shutdown.indexOf("stopJsonRpcServer()" )).toBeGreaterThan(shutdown.indexOf("await disposeAgentHost()"));
     expect(shutdown.indexOf("closeAppKernel()" )).toBeGreaterThan(shutdown.indexOf("stopJsonRpcServer()"));
+  });
+
+  test("migrates the accepted legacy publication shape before a projection can read it", () => {
+    kernel.openAppKernel();
+    kernel.kernelExecute("create_mission", {
+      mission_id: "mission-legacy-review-shape",
+      name: "Legacy review compatibility",
+      objective: "Project founder state only after its accepted review schema is current.",
+    }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+    kernel.closeAppKernel();
+
+    replaceWithAcceptedLegacyPublicationShape(kernelPath);
+
+    const reopened = kernel.openAppKernel();
+    expect(reopened.query("SELECT name FROM pragma_table_info('qf_review_publication') WHERE name = 'authority_key'").get()).toEqual({ name: "authority_key" });
+    const projection = kernel.kernelGetResearchWorldProjection({
+      root_type: "mission",
+      root_id: "mission-legacy-review-shape",
+    });
+    expect(projection.ok).toBe(true);
+    kernel.closeAppKernel();
   });
 
   test("task surface carries the exact configured runtime profile for a closed seat", () => {

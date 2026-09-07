@@ -27,6 +27,7 @@ import {
   type GovernedToolReceiptInput,
   freezeSourceWork,
   governedReviewProjection,
+  ensureGovernedReviewSchema,
   readGovernedPublicationForEvaluation,
   resolveGovernedWorkerEvidence,
   type SourceWork,
@@ -264,6 +265,7 @@ function attachAppKernelAtPath(path: string, provenance: KernelPathProvenance): 
       path,
       provenance,
     });
+    ensureGovernedReviewSchema(attached);
     kernelRaw = raw;
     kernelAdapter = adapter;
     kernelDb = attached;
