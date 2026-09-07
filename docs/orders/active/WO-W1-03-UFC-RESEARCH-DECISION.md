@@ -1,20 +1,22 @@
 # WO-W1-03 — Meaningful UFC research, independent criticism, and a governed decision
 
-status: DRAFT — no Builder authority until one fresh semantic Reader returns YES / YES
+status: DRAFT — READER REVISION REQUIRED; no Builder authority until one fresh semantic Reader returns YES / YES
 assignee: one fresh low-reasoning Astra Builder after Reader acceptance
 depends: WO-W1-02 accepted at repaired product candidate `f9b11bd1d6df38d2e109456c2f1f2c2969a7de19`
 
 ## Objective
 
-Turn one real current Bovada UFC investigation into a useful, evidence-rich, price-sensitive
+Turn Ryan's exact lean—`Alexa Grasso wins by submission`—into a falsifiable Hypothesis over the real
+current Bovada Fiorot–Grasso market menu, then produce a useful, evidence-rich, price-sensitive
 `CANDIDATE`, `WATCH`, or `PASS` decision that an independent production Critic has evaluated against
 the exact research Artifact.
 
 ## In plain terms
 
-Ryan opens a real fight, asks QuantFlow to analyze it, sees the actual evidence and reasoning, sees a
-separate Critic challenge that exact work, and receives one honest decision tied to the price he can
-actually bet—without QuantFlow placing the bet.
+Ryan opens Fiorot–Grasso, records his Grasso-by-submission lean, and asks QuantFlow to test it. QuantFlow
+reads every currently offered Bovada market for that fight, tries to disprove the mechanism, compares the
+listed ways to express any surviving view, and either identifies the best defensible offered expression or
+says exactly why the right answer is WATCH/PASS—without inventing a prop or placing a bet.
 
 ## Binding product meaning
 
@@ -24,9 +26,10 @@ market probabilities do not establish an edge. W1-03 may not disguise that subst
 The product path is:
 
 ```text
-real current Bovada Quote
-→ richer official UFC evidence from the already-admitted source bytes
-→ transparent calculation
+Ryan's exact Hypothesis
+→ complete current Bovada fight menu
+→ mechanism-relevant pre-cutoff UFC evidence
+→ transparent, versioned calculation or explicit probability unavailable
 → exact worker Task and hash-bound research Artifact
 → different admitted Critic evaluates that exact Artifact
 → Evaluation-gated current Decision Set
@@ -40,10 +43,43 @@ No named Technique is required. A selected Technique remains valid when one exis
 technique-free market investigation must be able to reach governed publication without synthesizing a
 fake Strategy or Technique.
 
+### Frozen authoring fact, not a promised future menu
+
+On 2026-09-06 the existing Bovada UFC source returned provider event `29195963` for Manon Fiorot vs
+Alexa Grasso with exactly two visible markets: Fight Winner (`Fiorot -225`, `Grasso +185`) and Main Total
+Rounds 2.5 (`Over -450`, `Under +300`). It returned no Grasso-by-submission selection. Those prices may
+move and the menu may expand; acceptance uses a fresh observation. This starting fact is a required
+honesty case: absence of the desired prop is product truth, not permission to fabricate it.
+
+## Deliverable 0 — exact Hypothesis and complete fight menu
+
+Use the existing Hypothesis object to record `Alexa Grasso wins by submission`, bound to the selected
+Mission, exact provider event, pre-event cutoff, author, and creation time. It remains a proposition to
+falsify, not a recommendation or a Technique. Record explicit invalidation and refresh conditions.
+
+Extend the existing Bovada acquisition only far enough to preserve every open pre-event market and
+selection actually returned for the exact Fiorot–Grasso provider event—not only Fight Winner. Preserve:
+
+- provider event, display group, market id/key/description/type/period/status, outcome/selection id and
+  label, handicap where present, decimal price, source URL/hash, and observation time;
+- one content-addressed market-menu Artifact and the exact Quote identities derived from that observation;
+- an explicit `selection_unavailable` result with observation time and reason for any requested expression
+  not offered, including Grasso by submission in the frozen authoring observation.
+
+The existing public event-list response is the first source. At most one same-origin event-detail request
+may be added when the list response advertises more markets than it returns. No login, wager account,
+browser session, alternate book, hidden RPC, or fabricated selection may fill an absent market. Reject a
+mixed-event menu, duplicate selection identity, closed/suspended market presented as open, stale mixed-time
+quotes, non-finite price/handicap, source drift, timeout, redirect, or byte-limit breach.
+
 ## Deliverable 1 — meaningful UFC evidence, same bounded acquisition
 
-Extend `qf-ufc-history` using the same two exact official UFC athlete page responses already acquired by
-W1-02. Do not add a third source, search crawl, browser scrape, new service, or new top-level HTTPS request.
+Extend `qf-ufc-history` from the same two exact official UFC athlete identities already acquired by W1-02.
+The implementation may add one bounded official-source seam for the exact fighters and eligible pre-cutoff
+bouts when the existing athlete pages do not carry the mechanism evidence below. Any added request must be
+deterministically discovered from an admitted official profile/bout link, bounded by eligible bout rows,
+hashed, timed out, size-limited, and recorded. Do not add a commercial data vendor, open web search, broad
+crawl, browser scrape, or unrelated fighter/source.
 
 For each exact fighter identity, preserve the W1-02 bout history and add the pre-event fields actually
 present in those captured bytes that materially help compare a matchup. The minimum accepted family is:
@@ -52,6 +88,9 @@ present in those captured bytes that materially help compare a matchup. The mini
 - significant strikes landed/absorbed per minute, accuracy, and defense;
 - takedown average, accuracy, and defense;
 - submission average;
+- submission wins/losses and finish method for eligible bouts when the official source states them;
+- submission-attempt, takedown, control, positional, or opponent-adjusted facts actually available and
+  relevant to Grasso's submission path and Fiorot's defense, with source-level limitations;
 - the existing eligible pre-cutoff bout rows, sample counts, exclusions, observation time, source URL,
   source hash, parser version, and event cutoff.
 
@@ -64,6 +103,10 @@ The Dataset remains one immutable `qf.dataset.v1` evidence Artifact and one regi
 Re-running against identical source bytes and context must reproduce identical canonical evidence bytes;
 changed source bytes or observation context must produce a different identity.
 
+Career aggregates or sparse official pages may support `WATCH` or `PASS`; they do not by themselves justify
+a probability estimate. If admitted evidence cannot support a defensible probability-producing method,
+record probability as unavailable and block `CANDIDATE` rather than allowing a participant to invent one.
+
 ## Deliverable 2 — exact participant research Artifact
 
 Add one normal rendered action on the current investigation, worded in product language such as
@@ -71,21 +114,25 @@ Add one normal rendered action on the current investigation, worded in product l
 
 1. admit or reuse exactly one eligible `hermes-worker` Market Researcher;
 2. create and assign one exact Task belonging to the selected Mission;
-3. give the worker only the exact current Quote, Dataset, deterministic Run/result, and their immutable
-   identities through governed reads;
+3. give the worker only the exact Hypothesis, current menu Artifact and Quotes, Dataset, deterministic
+   Run/result, and their immutable identities through governed reads;
 4. capture the worker's structured answer as its normal content-addressed trajectory Artifact;
 5. complete the Task only after the Artifact and complete read lineage are durable.
 
 The Artifact must contain one strict `qf.market.decision.v1` envelope with:
 
 - Mission, Task, worker session, Quote, selection/instrument, Dataset, Run, and input Artifact ids/hashes;
-- observed Bovada decimal prices, quote observation time, and event cutoff;
+- the exact Hypothesis and one ordered comparison row for every open offered selection in the captured
+  fight menu, including observed decimal price, quote observation time, and event cutoff;
 - the exact evidence facts relied on and explicit limitations;
-- for each assessed side, an estimated win-probability range (`low`, `central`, `high`) or an explicit
-  `unavailable` reason—never a fabricated point estimate;
-- the raw break-even probability at the offered price and the no-vig market probability;
+- for each offered expression, an estimated probability range (`low`, `central`, `high`) produced by an
+  identified versioned Run method, or an explicit `unavailable` reason—never free-form participant math;
+- raw break-even probability, no-vig probability only when computed from one complete mutually exclusive
+  exact market set, and conservative margin/threshold when probability is available;
 - one proposed classification: `CANDIDATE`, `WATCH`, or `PASS`;
 - a price threshold or exact missing/change condition that would alter the classification;
+- the selected expression as the greatest conservative supported margin, or an explicit tie,
+  incomparability, proxy-risk, or no-valid-expression result;
 - a short rationale and explicit invalidation/refresh conditions;
 - provider/model/runtime provenance already available from the admitted session, without credentials.
 
@@ -93,12 +140,22 @@ Kernel-owned validation rejects foreign ids/hashes, unordered ranges, probabilit
 price arithmetic disagreement, stale/superseded Quotes, post-cutoff work, missing evidence references, and
 classification contradictions. At minimum:
 
-- `CANDIDATE` requires an exact Bovada selection, a complete probability range, and a conservative lower
-  bound above the raw break-even probability at the offered price. It renders as an uncalibrated research
-  candidate until later measured history exists.
+- raw break-even probability is exactly `1 / decimal_price`;
+- no-vig normalization is allowed only inside a complete, mutually exclusive market set;
+- every range satisfies `0 <= low <= central <= high <= 1`; central estimates for a complete mutually
+  exclusive set sum to one within one named tolerance and the ranges admit a coherent total;
+- minimum acceptable decimal price is exactly `1 / low` when `low > 0`, otherwise unavailable;
+- `CANDIDATE` requires an exact currently offered Bovada selection, a complete probability range produced
+  by one identified, versioned, reproducible Run method, and a conservative lower bound above raw break-even.
+  It renders as an uncalibrated research candidate until later measured history exists;
 - `WATCH` names the precise price, evidence, or uncertainty change required before it could become a
-  candidate or pass.
+  candidate or pass, including a desired but currently unavailable market expression;
 - `PASS` names the evidence/price reason to abstain. An honest no-bet result is a successful product result.
+
+The Run records exact inputs, formula or algorithm identity/version/hash, assumptions, uncertainty method,
+and output. Arbitrary weights or a language model's unsupported confidence cannot satisfy this rule. If no
+defensible method exists in the admitted evidence, the ordered comparison remains useful with explicit
+probability unavailable and can resolve only to WATCH/PASS.
 
 The action never accepts or stores a stake and never places, queues, or automates a wager.
 
@@ -107,14 +164,17 @@ The action never accepts or stores a stake and never places, queues, or automate
 Continue through the existing governed-review path. Admit or reuse one eligible `hermes-critic` session
 that is not the worker, bind the exact source-work tuple once, and deliver one review Task.
 
-The Critic receives the hash-bound worker Artifact and the exact Hypothesis/Run context, not the worker's
-terminal chat or hidden reasoning. It must perform the established three exact broker reads before one
-`qf_record_evaluation` write. Its ordered findings identify at least one material check of evidence
-sufficiency, probability/price arithmetic, unsupported inference, missing context, or classification logic.
+The Critic receives the hash-bound worker Artifact and the exact Hypothesis/Run/menu context, not the
+worker's terminal chat or hidden reasoning. It must perform the established three exact broker reads before
+one `qf_record_evaluation` write. Its ordered findings check every offered selection was considered, Quote
+times/status were not mixed, no-vig was limited to complete mutually exclusive sets, submission inference
+is supported, the probability method has exact provenance, arithmetic is reconstructable, and the claimed
+best market expression actually has the greatest conservative supported margin.
 
-No Evaluation may be recorded from a self-review, wrong Artifact, wrong Run, wrong Task, foreign evidence
-reference, incomplete read set, untrusted session, or replayed/fabricated broker receipt. A rejected or
-inconclusive Evaluation blocks publication and remains visible with the next safe action.
+No Evaluation may be recorded from a self-review, wrong Artifact, wrong Run, wrong Task, omitted offered
+selection, foreign evidence reference, incomplete read set, untrusted session, or replayed/fabricated broker
+receipt. A rejected or inconclusive Evaluation blocks publication and remains visible with the next safe
+action.
 
 Real provider inference is required once for the final candidate through the packaged QuantFlow path:
 one Market Researcher turn and one independent Critic turn. Deterministic/synthetic responders may test
@@ -125,13 +185,17 @@ failure branches but cannot satisfy the positive product proof.
 Generalize the existing Report authority just enough to support this technique-free calculation while
 preserving every accepted Strategy/Technique publication invariant.
 
-One authority partition is derived only from existing Kernel truth: Mission; exact method identity and
-version (selected immutable Strategy when present, otherwise the calculation envelope/capability/formula
-identity); Dataset id/as-of; and exact research/Quote state needed to distinguish revisions. Do not create a
-Technique object for an unselected calculation. Migrate existing publication support rows losslessly and
-atomically; an invalid or ambiguous legacy row aborts without partial mutation.
+One authority partition is derived only from existing Kernel truth and contains this finite tuple: Mission;
+Hypothesis; exact method kind/id/version/hash (selected immutable Strategy when present, otherwise the
+calculation envelope/capability/formula identity); Dataset id/as-of/hash; market-menu observation id/hash;
+and provider event. Do not create a Technique object for an unselected calculation. A newer complete menu
+revision deterministically supersedes the prior current Decision only inside that tuple's investigation
+lineage; history remains explicit. Migrate the existing publication-support table losslessly and atomically;
+an invalid or ambiguous legacy row aborts without partial mutation. Existing Strategy rows retain the exact
+G9 authority key and behavior. Only the support table may change shape for this migration.
 
-Only a supporting independent Evaluation may publish a Report. The canonical current Report carries the
+Only a supporting independent Evaluation may publish a Report; the Kernel rule that only independently
+supported Evaluation lineage can publish remains unchanged. The canonical current Report carries the
 validated `qf.market.decision.v1` payload and publication Evaluation lineage. Revisions preserve explicit
 historical/superseded Reports, and the projection selects exactly one current authoritative Decision Set
 for the selected investigation state. Existing Strategy-backed Report behavior remains byte- and
@@ -169,12 +233,15 @@ raw JSON, process language, or credential material is required to understand the
 Builder adds focused tests for:
 
 1. richer official-UFC parsing, canonicalization, absence semantics, cutoff, identity, and bounded transport;
-2. strict decision-envelope validation and price arithmetic;
-3. CANDIDATE/WATCH/PASS positive controls plus contradictory/fabricated inputs going red;
-4. technique-free and Strategy-backed publication authority, atomic legacy migration, current/history,
+2. complete Bovada fight-menu ingestion, requested-selection absence, handicap, freshness, and menu hashing;
+3. strict ordered decision-envelope validation, probability-method provenance, coherent ranges, raw
+   break-even/no-vig/threshold arithmetic, best-expression selection, and unavailable probability;
+4. CANDIDATE/WATCH/PASS positive controls plus omitted prop, mixed/stale Quote, incomplete no-vig set,
+   unsupported submission inference, arbitrary probability, contradictory/fabricated inputs going red;
+5. technique-free and Strategy-backed publication authority, atomic legacy migration, current/history,
    exact source work, self-review refusal, and Evaluation gating;
-5. real rendered state transitions, Inspect content, overlap/tidy, and reopen truth;
-6. external failure and process/root cleanup.
+6. real rendered state transitions, Inspect content, overlap/tidy, and reopen truth;
+7. external failure and process/root cleanup.
 
 Every new or changed critical guard gets one failing bait and one restored control. Do not rerun unchanged
 historical matrices solely for ceremony.
@@ -190,9 +257,12 @@ bun qa/run.ts wave1-critic-decision
 It must launch the packaged current candidate on isolated app/Kernel/artifact/profile roots, drive the
 normal visible product action, prove exact live Quote → evidence → Run → worker Task/Artifact → Critic
 Task/Evaluation → current Decision Set lineage, close/reopen truth, rendered legibility, and zero cleanup.
-Its positive live path uses the real packaged app and real production Hermes/provider turns. Internal APIs
-may observe what the visible action caused but may not manufacture product-semantic rows or substitute a
-synthetic participant for the positive proof.
+Its positive live path uses the real packaged app and two distinct production broker invocations: one exact
+Market Researcher session/Task/Artifact receipt and one different Critic session/Task/Evaluation receipt,
+each with exact provider/model identity and nonzero usage. Internal APIs may observe what the visible action
+caused but may not manufacture product-semantic rows or substitute a synthetic participant for the positive
+proof. Synthetic provider output, replayed receipts, an omitted offered prop, a substituted Artifact, or the
+same session acting twice must each make the gate red.
 
 Reuse these unchanged regression gates:
 
@@ -203,6 +273,8 @@ bun qa/run.ts governed-review
 bun qa/run.ts governed-review-live
 bun qa/run.ts report-authority
 bun qa/run.ts kernel-market-lineage
+bun qa/run.ts golden-g9-report-authority
+bun qa/run.ts golden-g10-canvas-runtime
 bun qa/run.ts schema
 bun qa/run.ts typecheck
 bun qa/run.ts pre-r18-coherence
@@ -236,7 +308,8 @@ decision, Critic attack, lineage, any confusion/overlap, and zero-process result
 
 Stop rather than weaken the product if:
 
-- the official UFC bytes cannot supply the minimum evidence family honestly;
+- admitted official UFC evidence cannot be identified or bounded honestly (sparse evidence may still
+  resolve to an explicit WATCH/PASS with probability unavailable);
 - the positive live path requires fabricated probability/evidence or a hidden synthetic substitute;
 - technique-free Report authority cannot be expressed from existing Kernel truth without a parallel
   authority store;
