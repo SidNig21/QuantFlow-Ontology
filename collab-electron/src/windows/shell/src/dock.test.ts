@@ -4,6 +4,7 @@ import {
 	dockDefinitionDisplayName,
 	formatDockTeamSummary,
 	formatDockSessionState,
+	initDock,
 	launchableDockDefinitions,
 	researchDirectorRunningStatus,
 	runEvidenceAction,
@@ -32,6 +33,71 @@ test("evidence action refreshes exactly once after both success and named failur
 	const renderer = await Bun.file(new URL("./renderer.js", import.meta.url)).text();
 	expect(renderer).toContain("onEvidenceSettled:");
 	expect(renderer).not.toContain("onEvidenceCalculated:");
+	const thrownView = surface(); let thrownRefreshes = 0;
+	await expect(runEvidenceAction({ ...thrownView, missionId: "mission-1", quoteId: "quote-1", invoke: async () => { throw new Error("transport exploded"); }, onSettled: () => { thrownRefreshes += 1; } })).rejects.toThrow("transport exploded");
+	expect(thrownRefreshes).toBe(1);
+	expect(thrownView.stage.textContent).toBe("Stopped · transport exploded");
+});
+
+class DockElement {
+	id = ""; className = ""; textContent = ""; title = ""; hidden = false; tabIndex = -1; type = ""; value = ""; disabled = false;
+	dataset: Record<string, string> = {}; attributes = new Map<string, string>(); children: DockElement[] = []; parent: DockElement | null = null;
+	listeners = new Map<string, (event: any) => void>();
+	get classList() { return { contains: (name: string) => this.className.split(/\s+/).includes(name), add: (name: string) => { if (!this.className.split(/\s+/).includes(name)) this.className = `${this.className} ${name}`.trim(); }, remove: (name: string) => { this.className = this.className.split(/\s+/).filter((value) => value && value !== name).join(" "); } }; }
+	get options() { return this.children; }
+	appendChild(child: DockElement) { child.remove(); child.parent = this; this.children.push(child); return child; }
+	append(...children: DockElement[]) { for (const child of children) this.appendChild(child); }
+	replaceChildren(...children: DockElement[]) { for (const child of this.children) child.parent = null; this.children = []; this.append(...children); }
+	remove() { if (!this.parent) return; const index = this.parent.children.indexOf(this); if (index >= 0) this.parent.children.splice(index, 1); this.parent = null; }
+	setAttribute(name: string, value: string) { this.attributes.set(name, value); }
+	getAttribute(name: string) { return this.attributes.get(name) ?? null; }
+	removeAttribute(name: string) { this.attributes.delete(name); }
+	addEventListener(type: string, listener: (event: any) => void) { this.listeners.set(type, listener); }
+	querySelector(selector: string): DockElement | null { return this.querySelectorAll(selector)[0] ?? null; }
+	querySelectorAll(selector: string): DockElement[] {
+		const matches = (node: DockElement) => selector.startsWith("#") ? node.id === selector.slice(1)
+			: selector.startsWith(".") ? node.className.split(/\s+/).includes(selector.slice(1))
+			: selector === "[data-dock-mode]" ? node.dataset.dockMode !== undefined
+			: selector === "[data-dock-primary]" ? node.dataset.dockPrimary !== undefined
+			: node.type === selector || (selector === "em" && node.type === "em");
+		const found: DockElement[] = [];
+		const visit = (node: DockElement) => { for (const child of node.children) { if (matches(child)) found.push(child); visit(child); } };
+		visit(this); return found;
+	}
+}
+
+test("full initDock rebuild preserves settled evidence presentation", async () => {
+	const previousDocument = (globalThis as any).document; const previousWindow = (globalThis as any).window;
+	const documentListeners = new Map<string, (event: any) => void>();
+	const makePanel = () => { const panel = new DockElement(); for (const id of ["dock-species-list", "dock-sessions-list", "dock-history-list", "dock-inspect-pane"]) { const child = new DockElement(); child.id = id; panel.appendChild(child); } return panel; };
+	const world = { root: { id: "mission-1" }, links: [{ kind: "investigates", from_id: "mission-1", to_id: "quote-1" }] };
+	const flush = async () => { for (let index = 0; index < 8; index += 1) await new Promise((resolve) => setTimeout(resolve, 0)); };
+	try {
+		(globalThis as any).document = { createElement: (type: string) => { const node = new DockElement(); node.type = type; return node; }, createTextNode: (text: string) => { const node = new DockElement(); node.textContent = text; return node; }, addEventListener: (type: string, listener: (event: any) => void) => documentListeners.set(type, listener) };
+		for (const scenario of [
+			{ result: { ok: false, error: { message: "calculation rejected" } }, expectedStage: "Stopped · calculation rejected", counts: { dataset: 1, run: 0, result: 0 } },
+			{ result: { ok: true, receipt: { mission_id: "mission-1" } }, expectedStage: "Transparent calculation · complete", counts: { dataset: 1, run: 1, result: 1 } },
+		]) {
+			const panel = makePanel(); let refreshCallbacks = 0; let requests = 0;
+			(globalThis as any).window = { shellApi: { qf: {
+				listDefinitions: async () => ({ ok: true, definitions: [] }), listSessions: async () => ({ ok: true, sessions: [] }), listTaskSurface: async () => ({ ok: true, assignments: [], sessions: [] }),
+				getMarketCapability: async () => ({ ok: false, error: { message: "not needed" } }), getEvidenceCapabilities: async () => ({ ok: true, capabilities: [] }), listStrategyVersions: async () => ({ strategies: [] }), onDockInvalidate: () => {},
+				addEvidenceAndCalculate: async () => { requests += 1; return scenario.result; },
+			} } };
+			const controller = initDock(panel as any, { refreshRuntimeSnapshot: async () => [], onEvidenceSettled: async () => { refreshCallbacks += 1; expect(scenario.counts).toEqual(scenario.result.ok ? { dataset: 1, run: 1, result: 1 } : { dataset: 1, run: 0, result: 0 }); documentListeners.get("qf:research-world-active")?.({ detail: { missionId: "mission-1", world } }); } });
+			documentListeners.get("qf:research-world-active")?.({ detail: { missionId: "mission-1", world } });
+			await flush();
+			const first = panel.querySelector(".dock-evidence-action")!;
+			first.listeners.get("click")?.({}); first.listeners.get("click")?.({});
+			await flush();
+			const replacement = panel.querySelector(".dock-evidence-action")!;
+			expect(replacement).not.toBe(first);
+			expect(replacement.querySelector(".dock-capabilities")?.textContent).toBe(scenario.expectedStage);
+			expect(refreshCallbacks).toBe(1);
+			expect(requests).toBe(1);
+			expect(controller).toBeTruthy();
+		}
+	} finally { (globalThis as any).document = previousDocument; (globalThis as any).window = previousWindow; }
 });
 
 test("Task Inspect resolves only an exact latest assignment and exposes relationship meaning", async () => {

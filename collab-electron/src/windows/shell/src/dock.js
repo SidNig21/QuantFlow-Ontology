@@ -228,6 +228,12 @@ export function createCoalescedRefresh(runPass, { onError = (error) => console.e
 	};
 }
 
+export function evidenceActionPresentation(result) {
+	return result?.ok
+		? { stage: "Transparent calculation · complete", cue: "inspect on Canvas ⏎" }
+		: { stage: `Stopped · ${result?.error?.message ?? "Evidence or calculation failed"}`, cue: "retry ⏎" };
+}
+
 export async function runEvidenceAction({ action, stage, cue, missionId, quoteId, invoke, onSettled }) {
 	if (action.getAttribute("aria-disabled") === "true") return null;
 	action.setAttribute("aria-disabled", "true");
@@ -236,17 +242,15 @@ export async function runEvidenceAction({ action, stage, cue, missionId, quoteId
 	let result = null;
 	try {
 		result = await invoke({ mission_id: missionId, quote_id: quoteId });
-		if (!result?.ok) {
-			stage.textContent = `Stopped · ${result?.error?.message ?? "Evidence or calculation failed"}`;
-			cue.textContent = "retry ⏎";
-			return result;
-		}
-		stage.textContent = "Transparent calculation · complete";
-		cue.textContent = "inspect on Canvas ⏎";
+		const presentation = evidenceActionPresentation(result);
+		stage.textContent = presentation.stage;
+		cue.textContent = presentation.cue;
 		return result;
 	} catch (error) {
-		stage.textContent = `Stopped · ${error?.message ?? String(error)}`;
-		cue.textContent = "retry ⏎";
+		result = { ok: false, error: { message: error?.message ?? String(error) } };
+		const presentation = evidenceActionPresentation(result);
+		stage.textContent = presentation.stage;
+		cue.textContent = presentation.cue;
 		throw error;
 	} finally {
 		action.removeAttribute("aria-disabled");
@@ -280,6 +284,7 @@ export function initDock(panelEl, options = {}) {
 	let runtimeSnapshot = [];
 	let latestTaskAssignments = [];
 	let latestSessions = [];
+	let researchWorldRefresh = Promise.resolve();
 
 	function syncStartDiscovery() {
 		if (teamSummaryEl) teamSummaryEl.textContent = formatLaunchableTeamSummary(latestDefinitions);
@@ -305,7 +310,7 @@ export function initDock(panelEl, options = {}) {
       activeMissionId = String(event?.detail?.missionId ?? "") || null;
       missionWorld = event?.detail?.world ?? null;
       syncStartDiscovery();
-      void refresh();
+      researchWorldRefresh = Promise.resolve(refresh());
   });
 	setMode("START");
 
@@ -540,7 +545,16 @@ export function initDock(panelEl, options = {}) {
 				action.tabIndex = 0; action.setAttribute("role", "button"); action.dataset.missionId = activeMissionId; action.dataset.quoteId = String(investigation.to_id);
 				action.append(title, stage, cue);
 				const run = async () => {
-					await runEvidenceAction({ action, stage, cue, missionId: activeMissionId, quoteId: String(investigation.to_id), invoke: (input) => window.shellApi.qf.addEvidenceAndCalculate(input), onSettled: options.onEvidenceSettled });
+					await runEvidenceAction({ action, stage, cue, missionId: activeMissionId, quoteId: String(investigation.to_id), invoke: (input) => window.shellApi.qf.addEvidenceAndCalculate(input), onSettled: async (settled) => {
+						await options.onEvidenceSettled?.(settled);
+						await researchWorldRefresh;
+						const replacement = [...speciesList.querySelectorAll(".dock-evidence-action")].find((row) => row.dataset.missionId === String(settled.mission_id) && row.dataset.quoteId === String(settled.quote_id));
+						const replacementStage = replacement?.querySelector(".dock-capabilities");
+						const replacementCue = replacement?.querySelector("em");
+						const presentation = evidenceActionPresentation(settled.result);
+						if (replacementStage) replacementStage.textContent = presentation.stage;
+						if (replacementCue) replacementCue.textContent = presentation.cue;
+					} });
 				};
 				action.addEventListener("click", () => { void run(); });
 				action.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); void run(); } });
