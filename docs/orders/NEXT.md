@@ -1,21 +1,20 @@
-# NEXT — CLOSED
+# NEXT — W1-02 EVIDENCE AND CALCULATION
 
-status: CLOSED
-active-order: none
-builder-authority: CLOSED
-router-authority: CLOSED
+status: OPEN
+active-order: docs/orders/active/WO-W1-02-HISTORICAL-EVIDENCE-COMPUTATION.md
+builder-authority: OPEN
+router-authority: OPEN
 g11-status: CLOSED
 r18-status: FROZEN / SUPERSEDED
 foundation-status: ACCEPTED — candidate 58b444d858443debeac8b13e041b2bb65e4e370e; independent YES / YES
-reader-status: COMPLETE — W1-01 reader YES / YES; independent Verifier PASS on `b506cca0`
+reader-status: COMPLETE — W1-02 semantic Reader `01a079c3-c79e-7940-bbf6-7b6d21a71827` YES / YES on `0036c18b`
 
 Golden and the Post-Golden Foundation remain accepted and closed. The rejected FM-0 candidate remains
-unmerged. WO-W1-01 is accepted: the real UFC-first Bovada market desk and Technique-free investigation
-entry run in the packaged Windows app and survive reopen. No Builder is open. The Router may draft and
-send the next concise Wave-1 historical-evidence and transparent-calculation order to one semantic Reader;
-implementation remains closed until that result is recorded here.
+unmerged. WO-W1-01 is accepted. W1-02 alone may add exact UFC historical evidence and one transparent,
+technique-free calculation to the selected real Bovada investigation. It may not add Critic judgment,
+CANDIDATE/WATCH/PASS, close/outcome tracking, a second runtime, or any other Wave-1/2 behavior.
 
-- [Active order](active/WO-W1-01-LIVE-MARKET-DESK.md)
+- [Active order](active/WO-W1-02-HISTORICAL-EVIDENCE-COMPUTATION.md)
 - [W1-01 acceptance](evidence/w1-01/ACCEPTANCE.md)
 
 - [Official Roadmap](../plans/OFFICIAL-ROADMAP.md)

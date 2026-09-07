@@ -1,11 +1,11 @@
 # WO-W1-02 — UFC historical evidence and transparent calculation
 
-status: PROPOSED — amended after semantic Reader defects; no Builder authority
+status: OPEN — semantic Reader `YES/YES`; one Builder authorized through `NEXT.md`
 base: W1-01 closure `ecd420918e55eb1377eea627152d402246f8fa22`
 route: Wave 1 — First Useful Market Desk
 depends: WO-W1-01 accepted at product candidate `b506cca0d2c41fd1e15f7b03a86fa1a3ed29f4e2`
 reader: visible task `01a079c3-c79e-7940-bbf6-7b6d21a71827`; initial review returned four defects;
-  the same Reader reviews only this amendment and returns exactly `YES/YES` or numbered defects
+  amended commit `0036c18b64ce57ef80963c6aac91dce4a4ea22ae` returned `YES/YES`
 builder: one fresh visible Codex task only after Reader `YES/YES` and `NEXT.md` opens
 verifier: one different fresh visible Codex task against one immutable candidate
 
