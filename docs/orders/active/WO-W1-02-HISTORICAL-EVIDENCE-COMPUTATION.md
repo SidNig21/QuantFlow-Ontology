@@ -6,7 +6,9 @@ base: W1-01 closure `ecd420918e55eb1377eea627152d402246f8fa22`
 route: Wave 1 — First Useful Market Desk
 depends: WO-W1-01 accepted at product candidate `b506cca0d2c41fd1e15f7b03a86fa1a3ed29f4e2`
 reader: visible task `01a079c3-c79e-7940-bbf6-7b6d21a71827`; initial review returned four defects;
-  amended commit `0036c18b64ce57ef80963c6aac91dce4a4ea22ae` returned `YES/YES`
+  amended commit `0036c18b64ce57ef80963c6aac91dce4a4ea22ae` returned `YES/YES`;
+  closure-amendment task `01a07a59-3c0d-7000-8f6a-12633ee3af93` returned conditional `YES/YES`
+  after the factual TIDY narrowing recorded below
 builder: one fresh visible Codex task only after Reader `YES/YES` and `NEXT.md` opens
 verifier: one different fresh visible Codex task against one immutable candidate
 
@@ -258,13 +260,14 @@ acceptance meaning. W1-02 remains open until both are repaired and independently
    `no such column: authority_key`. Run the existing idempotent governed-review migration at the earliest safe
    Kernel-open boundary before any projection read. Do not invent another migration system, change Report
    authority, backfill false lineage, or modify founder data beyond that accepted migration.
-2. **Readable result projection.** After the successful calculation, automatic TIDY reports six arranged tiles
-   but compresses the actual Mission lineage into an extremely small vertical stack. Required labels and values
-   clip, multiple cables bunch together beside the stack, and Inspect identifies the raw result but omits the
-   fighter/price/probability/history/cutoff/limitation fields that Deliverable 3 requires a founder to read. Make
-   the smallest existing-layout/projection repair that keeps the current Mission legible at the walkthrough's
-   maximized 100% view and exposes those already-durable result fields in Inspect. Do not redesign the Canvas,
-   add a new view or truth store, hide lineage, remove required objects, or weaken the full-lineage path.
+2. **Readable result projection.** After all twelve completed-world objects exist, a founder-invoked TIDY
+   correctly arranges every tile and removes overlap, but its resulting fit compresses the core Mission lineage
+   below a comfortably readable scale at the walkthrough's maximized 100% view. Independently, Inspect
+   identifies the raw result but omits the fighter/price/probability/history/cutoff/limitation fields that
+   Deliverable 3 requires a founder to read. Make the smallest existing-layout/projection repair that preserves
+   TIDY's complete non-overlapping arrangement while keeping the core Mission lineage readable at 100%, and
+   expose those already-durable result fields in Inspect. Do not redesign the Canvas, add a new view or truth
+   store, hide lineage, remove required objects, or weaken the full-lineage path.
 
 Required closure proof is narrow:
 

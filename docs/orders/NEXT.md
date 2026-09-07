@@ -8,15 +8,15 @@ g11-status: CLOSED
 r18-status: FROZEN / SUPERSEDED
 foundation-status: ACCEPTED — candidate 58b444d858443debeac8b13e041b2bb65e4e370e; independent YES / YES
 reader-status: COMPLETE — original W1-02 semantic Reader `01a079c3-c79e-7940-bbf6-7b6d21a71827` YES / YES on `0036c18b`;
-  founder Computer Use closure amendment awaits one fresh semantic Reader
+  closure-amendment Reader `01a07a59-3c0d-7000-8f6a-12633ee3af93` conditional YES / YES after factual TIDY narrowing
 
 Golden and the Post-Golden Foundation remain accepted and closed. The rejected FM-0 candidate remains
 unmerged. WO-W1-01 is accepted. W1-02 alone may add exact UFC historical evidence and one transparent,
 technique-free calculation to the selected real Bovada investigation. Candidate `d3173371` passed its
 independent Verifier but remains open after Router-owned Computer Use found the order's bounded legacy-Kernel
-migration and TIDY/Inspect readability failures. No Builder may resume until one fresh Reader accepts that
-closure amendment. W1-02 may not add Critic judgment, CANDIDATE/WATCH/PASS, close/outcome tracking, a second
-runtime, or any other Wave-1/2 behavior.
+migration and completed-world TIDY/Inspect readability failures. The fresh closure-amendment Reader accepted
+the narrowed repair, so the same Builder may resume. W1-02 may not add Critic judgment,
+CANDIDATE/WATCH/PASS, close/outcome tracking, a second runtime, or any other Wave-1/2 behavior.
 
 - [Active order](active/WO-W1-02-HISTORICAL-EVIDENCE-COMPUTATION.md)
 - [W1-01 acceptance](evidence/w1-01/ACCEPTANCE.md)
