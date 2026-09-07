@@ -1,6 +1,6 @@
 # WO-W1-03 — Meaningful UFC research, independent criticism, and a governed decision
 
-status: DRAFT — READER REVISION REQUIRED; no Builder authority until one fresh semantic Reader returns YES / YES
+status: OPEN / BUILDING — semantic Reader `01a07a8a-adf8-7381-843b-5401a189b490` returned YES / YES on amended order `1775c92c`
 assignee: one fresh low-reasoning Astra Builder after Reader acceptance
 depends: WO-W1-02 accepted at repaired product candidate `f9b11bd1d6df38d2e109456c2f1f2c2969a7de19`
 
