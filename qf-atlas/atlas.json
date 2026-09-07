@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-wave1-evidence-computation",
-    "commit": "966d77ff",
+    "commit": "989d7cf1",
     "generatedAt": "2026-09-07",
     "filesScanned": 421,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "90e08e59057f65b4"
+    "fingerprint": "f66fa3ccff74b13a"
   },
   "stats": {
     "live": 115,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 119,
-      "indexed": 1210,
+      "indexed": 1211,
       "downgradedFromCheats": 25,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 19,
@@ -5182,7 +5182,7 @@
       "id": "0:tools/qf-ufc-history/src::index",
       "layer": 0,
       "name": "src/index.ts",
-      "kb": 14.6,
+      "kb": 14.7,
       "x": 2.03,
       "z": -1.69,
       "status": "ok",
@@ -5193,7 +5193,7 @@
       "files": [
         {
           "path": "tools/qf-ufc-history/src/index.ts",
-          "kb": 14.6,
+          "kb": 14.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -9620,7 +9620,7 @@
     {
       "path": "tools/qf-ufc-history/src/index.ts",
       "status": "indexed",
-      "indexedFns": 11,
+      "indexedFns": 12,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -27933,9 +27933,9 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts"
+        "collab-electron/src/main/kernel.ts"
       ],
-      "importerCount": 9,
+      "importerCount": 8,
       "imports": [
         "packages/qf-kernel/src/db.ts",
         "packages/qf-kernel/src/resolve-path.ts",
@@ -32685,11 +32685,11 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
-        "qa/gates/golden-g8-kernel-proof.ts"
+        "qa/gates/golden-g8-kernel-proof.ts",
+        "packages/qf-kernel/src/create.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32754,10 +32754,10 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
-        "collab-electron/src/main/evidence-computation.ts"
+        "collab-electron/src/main/evidence-computation.ts",
+        "qa/gates/golden-g8-kernel-proof.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32918,10 +32918,10 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
-        "collab-electron/src/main/evidence-computation.ts"
+        "collab-electron/src/main/evidence-computation.ts",
+        "qa/gates/golden-g8-kernel-proof.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33047,7 +33047,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts"
@@ -33101,11 +33100,12 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
-        "qa/run.ts"
+        "qa/run.ts",
+        "packages/qf-kernel/src/create.ts",
+        "packages/qf-kernel/src/execute.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33215,11 +33215,11 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
-        "packages/qf-kernel/src/governed-review.ts"
+        "packages/qf-kernel/src/governed-review.ts",
+        "qa/gates/golden-g8-kernel-proof.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33282,7 +33282,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts"
@@ -33417,7 +33416,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts"
@@ -33474,10 +33472,10 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
-        "collab-electron/src/main/evidence-computation.ts"
+        "collab-electron/src/main/evidence-computation.ts",
+        "qa/gates/golden-g8-kernel-proof.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33535,7 +33533,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
@@ -33599,10 +33596,10 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
-        "collab-electron/src/main/evidence-computation.ts"
+        "collab-electron/src/main/evidence-computation.ts",
+        "qa/gates/golden-g8-kernel-proof.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33655,12 +33652,12 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
         "qa/gates/golden-g8-kernel-proof.ts",
-        "packages/qf-kernel/src/governed-review.ts"
+        "packages/qf-kernel/src/governed-review.ts",
+        "qa/run.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33684,7 +33681,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts"
@@ -33771,12 +33767,13 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
         "qa/run.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33829,7 +33826,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
@@ -33896,7 +33892,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
@@ -33957,7 +33952,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts"
@@ -34007,7 +34001,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
@@ -34068,7 +34061,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts"
@@ -34118,7 +34110,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
@@ -34181,7 +34172,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts"
@@ -34233,7 +34223,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
@@ -34326,7 +34315,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/live-markets.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "tools/qf-ufc-history/src/index.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-desk.ts",
         "collab-electron/src/main/evidence-computation.ts",
@@ -56142,13 +56130,13 @@
   ],
   "diffVsHead": {
     "from": {
-      "branch": "codex/wo-wave1-foundation",
-      "commit": "18c189c7",
-      "generatedAt": "2026-09-06"
+      "branch": "codex/wo-wave1-evidence-computation",
+      "commit": "966d77ff",
+      "generatedAt": "2026-09-07"
     },
     "to": {
       "branch": "codex/wo-wave1-evidence-computation",
-      "commit": "966d77ff",
+      "commit": "989d7cf1",
       "generatedAt": "2026-09-07"
     },
     "verdict": "better",
@@ -56244,14 +56232,14 @@
         "id": "unused-bridge:deleteConnectionsForTile() → qf:connections:deleteForTile",
         "kind": "unused-bridge",
         "what": "deleteConnectionsForTile() → qf:connections:deleteForTile",
-        "where": "collab-electron/src/preload/shell.ts:135",
+        "where": "collab-electron/src/preload/shell.ts:138",
         "note": "was undecided"
       },
       {
         "id": "unused-bridge:getGovernedReviewProjection() → qf:review:projection",
         "kind": "unused-bridge",
         "what": "getGovernedReviewProjection() → qf:review:projection",
-        "where": "collab-electron/src/preload/shell.ts:96",
+        "where": "collab-electron/src/preload/shell.ts:99",
         "note": "was undecided"
       },
       {
@@ -56265,7 +56253,7 @@
         "id": "unused-bridge:getRuntimeSnapshot() → qf:sessions:runtime-snapshot",
         "kind": "unused-bridge",
         "what": "getRuntimeSnapshot() → qf:sessions:runtime-snapshot",
-        "where": "collab-electron/src/preload/shell.ts:105",
+        "where": "collab-electron/src/preload/shell.ts:108",
         "note": "was undecided"
       },
       {
@@ -56293,7 +56281,7 @@
         "id": "push:shell:loading-status",
         "kind": "push-no-sender",
         "what": "shell:loading-status",
-        "where": "collab-electron/src/preload/shell.ts:185",
+        "where": "collab-electron/src/preload/shell.ts:188",
         "note": "was undecided"
       },
       {

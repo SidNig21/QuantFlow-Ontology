@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-wave1-evidence-computation @ 966d77ff` on 2026-09-07 by
+> Generated from `codex/wo-wave1-evidence-computation @ 989d7cf1` on 2026-09-07 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -374,9 +374,9 @@ Most-depended-on files — change these last:
 
 | File | Dependents | Imports | Wires |
 |---|---:|---:|---:|
-| `packages/qf-kernel/src/trace.ts` | 57+ | 1 | 0 |
-| `packages/qf-kernel/src/registry-drift.ts` | 55+ | 0 | 0 |
-| `packages/qf-kernel/src/upgrade.ts` | 55+ | 3 | 0 |
+| `packages/qf-kernel/src/trace.ts` | 56+ | 1 | 0 |
+| `packages/qf-kernel/src/registry-drift.ts` | 54+ | 0 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | 54+ | 3 | 0 |
 | `collab-electron/src/main/file-filter.ts` | 53+ | 2 | 0 |
 | `collab-electron/src/main/files.ts` | 50+ | 2 | 0 |
 

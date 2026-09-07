@@ -1,4 +1,4 @@
-import { contentHash } from "qf-kernel/portable";
+import { createHash } from "node:crypto";
 
 export const UFC_HISTORICAL_EVIDENCE_TOOL_ID = "ufc-historical-evidence";
 export const UFC_HISTORICAL_EVIDENCE_VERSION = "qf-ufc-history-v1";
@@ -33,6 +33,7 @@ export class UfcHistoryError extends Error { constructor(public readonly code: s
 const MONTHS: Record<string, number> = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
 const decode = (value: string) => value.replace(/<[^>]*>/g, " ").replace(/&nbsp;|&#160;/g, " ").replace(/&amp;/g, "&").replace(/&#039;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
 const normalized = (value: string) => value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/gi, " ").trim().toLowerCase();
+const contentHash = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
 
 export function athleteUrl(label: string): string {
   const slug = label.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
