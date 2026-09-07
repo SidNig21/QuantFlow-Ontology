@@ -1,10 +1,11 @@
 # WO-W1-02 — UFC historical evidence and transparent calculation
 
-status: PROPOSED — semantic Reader pending; no Builder authority
+status: PROPOSED — amended after semantic Reader defects; no Builder authority
 base: W1-01 closure `ecd420918e55eb1377eea627152d402246f8fa22`
 route: Wave 1 — First Useful Market Desk
 depends: WO-W1-01 accepted at product candidate `b506cca0d2c41fd1e15f7b03a86fa1a3ed29f4e2`
-reader: one fresh visible Codex task; return exactly `YES/YES` or numbered defects
+reader: visible task `01a079c3-c79e-7940-bbf6-7b6d21a71827`; initial review returned four defects;
+  the same Reader reviews only this amendment and returns exactly `YES/YES` or numbered defects
 builder: one fresh visible Codex task only after Reader `YES/YES` and `NEXT.md` opens
 verifier: one different fresh visible Codex task against one immutable candidate
 
@@ -22,7 +23,8 @@ Technique or recommendation.
 - The accepted live door proved official UFC athlete pages can resolve the same fighter identities and
   pre-event result rows. That receipt proves feasibility, not a product capability.
 - `register_dataset_version` already binds `qf.dataset.v1` bytes to an immutable Artifact, hash, as-of,
-  kind, and coverage.
+  kind, and coverage. Dataset purpose is not yet durable; this order adds one canonical property rather
+  than hiding C10 purpose in coverage, Artifact bytes, Run parameters, or renderer state.
 - `execute_deterministic_run` currently supports ranking a Dataset through `qf.strategy.v1`. Even when the
   caller supplies only an inline spec, it materializes a `strategy` object and Strategy Artifact. That is
   not an honest implementation of the accepted rule that exploration may run without a named Technique.
@@ -42,7 +44,7 @@ Technique or recommendation.
 
 Add one governed DATA capability named **UFC Historical Evidence**.
 
-1. Use bounded public official UFC athlete/event pages for the positive path. For each exact competitor in
+1. Use bounded public official UFC athlete pages for the positive path. For each exact competitor in
    the selected Bovada Quote, preserve canonical fighter identity, source URL, local observation time,
    source hash, parser version, every admitted completed-bout row, opponent, event date, outcome, and the
    investigated event cutoff.
@@ -51,17 +53,34 @@ Add one governed DATA capability named **UFC Historical Evidence**.
 3. Exclude every row at or after the investigated event start. Draws and no-contests remain explicit; they
    are never silently counted as wins or losses. Missing history produces an honest zero-coverage record,
    not invented evidence.
-4. Publish canonical `qf.dataset.v1` bytes and register one content-hashed Dataset version through
-   `execute()`. Declare its C10 purpose as `EVIDENCE`, kind as `results` or the narrowest honest existing
-   kind, as-of as the actual pre-event observation boundary, and coverage with row counts, range, excluded
-   rows, missing fields, and both source hashes.
-5. The Dataset bytes cite the exact starting Quote id and immutable observation/source hash already in the
-   Kernel. The app validates those values against Kernel readback before registration; caller prose cannot
-   bind the market.
-6. Reuse W1-01 request limits: a 20-second whole-request abort and 5 MiB streamed-response ceiling per
-   source request. Timeout, HTTP failure, malformed page, identity ambiguity, no history, and cutoff leak
-   remain distinct founder-readable outcomes.
-7. Register the capability through the existing `register_tool` action. Do not add a feed database,
+4. The eligible population is exact: every unique completed UFC bout row displayed on each selected
+   canonical athlete page at observation time whose parseable event date is strictly before the
+   investigated event cutoff. Exclude upcoming or scheduled rows, duplicates, rows at or after cutoff,
+   and rows with an unparseable date or outcome; preserve every exclusion and reason. `WIN` and `LOSS`
+   form the decisive denominator. `DRAW` and `NC` remain separately counted and never enter it. Use this
+   whole bounded source-listed population—there is no hidden lookback and no undefined “recent” window.
+5. Publish canonical `qf.dataset.v1` bytes and register one content-hashed Dataset version through
+   `execute()`. Extend Dataset with exactly one canonical lowercase property,
+   `purpose: "evidence" | "training" | "evaluation" | "context"`; this slice registers `"evidence"`.
+   The storage migration may keep the property nullable only so existing rows reopen honestly as
+   `Not recorded`; no existing row may be backfilled or used as a C10-compliant Dataset. Every new
+   `register_dataset_version` call must supply a valid non-null purpose. Kind remains `results` or the
+   narrowest honest existing kind; as-of is the actual pre-event observation boundary; coverage records
+   counts, range, exclusions, missing fields, and both source hashes. Dataset purpose is read from the
+   Dataset row in Kernel truth, never inferred from coverage, Artifact bytes, Run inputs, or renderer state.
+6. The canonical Dataset bytes contain a `market_context` block with the exact starting `quote_id`,
+   `quote_observed_at`, `quote_source_hash`, `market_event_id`, `event_cutoff`, and ordered competitor and
+   selection identities from the W1-01 Kernel lineage. Before registration, the app validates every value
+   against the Quote, its source Artifact, `quotes` Instrument, `offered_on` Market Event, and stored
+   instrument/Quote coverage. Caller prose cannot bind or replace the market.
+7. Acquisition is finite as a whole: exactly two top-level HTTPS requests per invocation, one deterministic
+   canonical UFC athlete URL for each Quote competitor; redirects, pagination, event-page fetching, search,
+   and link traversal are disabled. The complete operation has a 25-second deadline and 10 MiB aggregate
+   streamed-response ceiling in addition to the 20-second and 5 MiB ceiling on each request. Provider-label
+   normalization may construct the one candidate URL, but canonical page identity plus investigated matchup
+   context must still validate it. Timeout, HTTP failure or redirect, aggregate or per-source overflow,
+   malformed page, identity ambiguity, no history, and cutoff leak remain distinct founder-readable outcomes.
+8. Register the capability through the existing `register_tool` action. Do not add a feed database,
    scraper service, background poller, credential store, browser automation dependency, or second copy of
    durable evidence.
 
@@ -83,26 +102,40 @@ Extend the existing deterministic execution seam rather than building a second r
    **Research Lab** Tool, calculation-envelope Artifact, and starting Quote. Extend `belongs_to` from Task
    alone to Task or Run so the calculation Run belongs to the exact investigated Mission. Do not create a
    new link kind or object type.
-4. The trusted Mission context is required. Before mutation, verify that the Mission has exactly one
-   `investigates` edge to the supplied Quote. Direct founder invocation creates no fake participant or
-   fake Task. A later participant invocation records its real actor session in the unchanged trace path.
+4. The trusted Mission and market context are required. Calculation mode accepts the exact `mission_id`,
+   `quote_id`, and Dataset identity. Before any mutation, verify that the Mission has exactly one
+   `investigates` edge and that it ends at that Quote; load the Dataset Artifact and require its
+   `market_context` Quote id, observation time, source hash, event id, cutoff, ordered competitor ids, and
+   ordered selection ids to equal the live Quote → source Artifact → Instrument → Market Event lineage.
+   Any missing, crossed, or altered identity rejects atomically with no Run or output Artifact. `loadDataset`
+   must return and validate this context rather than reading observations and hash alone. Direct founder
+   invocation creates no fake participant or fake Task. A later participant invocation records its real
+   actor session in the unchanged trace path.
 5. Register **Research Lab** as one governed TOOL capability through `register_tool`. It is a capability,
    not a Participant, terminal, Technique, or separate truth store.
 6. Ship one bounded, sport-neutral operation: `two_way_market_history_baseline` version 1. For both sides
    of the exact moneyline Quote it computes and records:
    - decimal price and raw implied probability `1 / decimal_price`;
-   - two-way overround as the sum of raw implied probabilities;
-   - normalized market probability as raw implied probability divided by overround;
-   - source-listed wins, losses, draws, no-contests, decisive sample size, and recent decisive win fraction
+   - two-way overround as the sum of the two rounded raw implied probabilities;
+   - normalized market probability as the rounded raw implied probability divided by rounded overround;
+   - source-listed wins, losses, draws, no-contests, decisive sample size, and source-listed decisive win fraction
      `wins / (wins + losses)`, or explicit unavailable when the denominator is zero.
-7. Use deterministic fixed-point decimal arithmetic with one documented rounding rule. Preserve exact
+7. Use only deterministic integer fixed-point arithmetic. Parse each positive Bovada decimal price with at
+   most six fractional digits into millionths (`price_units`). Compute `raw_probability_units` as
+   round-half-up(`1_000_000_000_000 / price_units`), `overround_units` as the exact sum of both raw units,
+   `normalized_probability_units` as round-half-up(`raw_probability_units * 1_000_000 /
+   overround_units`), and `source_listed_decisive_fraction_units` as round-half-up(`wins * 1_000_000 /
+   (wins + losses)`). Emit every probability/fraction at exactly six decimal places and preserve the
+   underlying integer units plus numerator/denominator counts. A zero decisive denominator emits explicit
+   unavailable/null, never zero. Values outside this domain reject before mutation.
+8. Preserve exact
    formula version, implementation version, Dataset id/hash, Quote id/observation time/source hash,
    parameters, event cutoff, calculation-envelope hash, capability id/version, execution environment, and
    result hash in the Run envelope and output.
-8. The output presents market probability and descriptive recent results side by side. It must not
+9. The output presents market probability and descriptive source-listed results side by side. It must not
    subtract them into an `edge`, rank a bet, estimate a fighter's true win probability, recommend a wager,
    imply statistical sufficiency, or create `CANDIDATE`, `WATCH`, or `PASS`.
-9. Same exact envelope produces the same result bytes/hash. A changed input byte, Quote observation,
+10. Same exact envelope produces the same result bytes/hash. A changed input byte, Quote observation,
    formula version, or parameter produces a different manifest and cannot pass as an identical replay.
 
 ## Deliverable 3 — one founder-operable Dock and Canvas path
@@ -122,8 +155,8 @@ Starting from an existing W1-01 investigation in the normal packaged app:
    REVIEWED`. It separately says `Technique: none selected`. The calculation name must not occupy a
    Technique tile or imply independent judgment.
 6. The raw result surface shows both fighters, current observed prices, normalized market probabilities,
-   source-listed record counts/fractions, sample sizes, cutoff, and a concise limitation: descriptive
-   history is not an estimated win probability.
+   source-listed record counts/fractions, sample sizes, cutoff, and a concise limitation: source-listed
+   descriptive history is not an estimated win probability.
 7. Inspect reaches every source URL/hash/time, excluded-row count, Dataset id/hash/as-of/purpose,
    calculation formulas/version/hash, Run environment/status, Quote identity/time/hash, and result hash.
 8. TIDY and focus keep required controls on-screen and prevent overlap, unreadable scale, cable crossings
@@ -152,10 +185,11 @@ Starting from an existing W1-01 investigation in the normal packaged app:
 |---|---|---|
 | Exact history identity | live official UFC pages resolve both exact Bovada competitors and pre-cutoff rows | swap one competitor or admit an ambiguous page |
 | Point-in-time fence | every admitted row predates the event cutoff and coverage lists exclusions | insert one at/post-cutoff row |
-| Durable Dataset | canonical bytes, Artifact, Dataset, purpose, as-of and hash agree after reopen | forge a renderer-only Dataset or alter stored bytes |
+| Durable Dataset | canonical bytes, Artifact, Dataset `purpose: "evidence"`, as-of and hash agree after reopen | omit/change purpose, forge a renderer-only Dataset, or alter stored bytes |
 | No fake Technique | calculation creates Run + method Artifact + result, zero new Strategy rows/tiles | re-enable legacy inline-spec Strategy materialization on the calculation path |
-| Mission ownership | Run has exactly one `belongs_to` edge to the Mission that investigates its exact Quote | use a different Mission or Quote |
-| Transparent math | independent recomputation matches every displayed value and rounding rule | perturb price, record count, formula version, or result byte |
+| Mission ownership and market identity | Run belongs to the Mission that investigates its exact Quote; Dataset `market_context` equals that Quote/event/competitor/selection lineage byte-for-byte | cross a valid Dataset and Quote from two investigations or alter one identity |
+| Transparent math | independent integer recomputation over the complete source-listed eligible population matches every stored/displayed unit and six-place value | perturb population, exclusion, price, scale, count, formula version, or result byte |
+| Bounded acquisition | two no-redirect requests remain within per-request and whole-operation limits | attempt a third request, redirect/traversal, 25-second whole timeout, or 10 MiB aggregate overflow |
 | Governed capabilities | Dock rows, registered Tool objects, Run `uses` links and versions agree | render an unregistered constant or count a capability as a Participant |
 | No recommendation | result contains descriptive baseline only | inject edge/ranking/recommendation/CANDIDATE language |
 | Continuous desk | W1-01 market and unrelated tiles survive calculation, focus, TIDY and reopen | remove, overlap, or replace an existing tile/world |
