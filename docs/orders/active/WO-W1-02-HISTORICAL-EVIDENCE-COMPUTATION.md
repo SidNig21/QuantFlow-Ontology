@@ -1,6 +1,7 @@
 # WO-W1-02 — UFC historical evidence and transparent calculation
 
-status: OPEN — semantic Reader `YES/YES`; one Builder authorized through `NEXT.md`
+status: OPEN — product candidate `d3173371c4777cf33d748700ee01ea1e62e49681` passed its independent Verifier;
+  Router-owned packaged-app Computer Use found the bounded closure defects below
 base: W1-01 closure `ecd420918e55eb1377eea627152d402246f8fa22`
 route: Wave 1 — First Useful Market Desk
 depends: WO-W1-01 accepted at product candidate `b506cca0d2c41fd1e15f7b03a86fa1a3ed29f4e2`
@@ -243,6 +244,40 @@ Critic recruitment or Evaluation; CANDIDATE/WATCH/PASS; predictive probability o
 price capture/automation; outcome grading; backup control or regression-corpus closure; personal betting
 history ingestion; a named Technique; a second runtime; NFL completion; props/parlays; background scanning;
 stake/bankroll/placement controls; broad Canvas redesign; new UI framework; Golden reopening; rejected FM-0.
+
+## Founder Computer Use closure amendment — 2026-09-06
+
+The exact packaged candidate at `d3173371c4777cf33d748700ee01ea1e62e49681` completed the real clean-root
+Dock → Bovada market → Mission → **Add evidence and calculate** path and reconstructed the same work after a
+normal close/reopen. The same walkthrough also found two current-product defects inside this order's existing
+acceptance meaning. W1-02 remains open until both are repaired and independently verified.
+
+1. **Supported founder-state compatibility.** The normal founder Kernel can contain the accepted legacy
+   `qf_review_publication` side-table shape without `authority_key`. Projection currently reads the new column
+   before the existing governed-review migration has run, so **Research this market** visibly fails with
+   `no such column: authority_key`. Run the existing idempotent governed-review migration at the earliest safe
+   Kernel-open boundary before any projection read. Do not invent another migration system, change Report
+   authority, backfill false lineage, or modify founder data beyond that accepted migration.
+2. **Readable result projection.** After the successful calculation, automatic TIDY reports six arranged tiles
+   but compresses the actual Mission lineage into an extremely small vertical stack. Required labels and values
+   clip, multiple cables bunch together beside the stack, and Inspect identifies the raw result but omits the
+   fighter/price/probability/history/cutoff/limitation fields that Deliverable 3 requires a founder to read. Make
+   the smallest existing-layout/projection repair that keeps the current Mission legible at the walkthrough's
+   maximized 100% view and exposes those already-durable result fields in Inspect. Do not redesign the Canvas,
+   add a new view or truth store, hide lineage, remove required objects, or weaken the full-lineage path.
+
+Required closure proof is narrow:
+
+- reproduce the legacy founder-schema failure from an isolated copy or equivalent exact legacy schema, then
+  prove a normal app open migrates it before projection and preserves Report authority;
+- reproduce the current post-calculation TIDY/Inspect failure at `d3173371`, then prove the same real Mission is
+  readable, inspectable, and reopenable at 100% without synthetic replacement;
+- rerun only directly affected focused tests plus the complete W1-02 gate, package boundary if shipped bytes
+  change, Atlas check/ratchet, normal close/reopen, and zero-process/root cleanup;
+- freeze one new immutable candidate for one fresh independent Verifier and a final Router Computer Use pass.
+
+The visible updater failure, broader premium styling, richer decision presentation, Critic work, close/outcomes,
+and any Wave-2 behavior remain outside W1-02 and must not be absorbed by this repair.
 
 ## Stop conditions
 
