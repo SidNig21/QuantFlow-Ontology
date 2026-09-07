@@ -7,6 +7,7 @@ import { athleteUrl, type HistoryTransport } from "qf-ufc-history";
 import { closeAppKernel, getKernelDb, kernelExecute, kernelGetLinks, kernelGetObject, kernelGetResearchWorldProjection, openAppKernel } from "./kernel";
 import { addEvidenceAndCalculate, ensureEvidenceComputationCapabilities } from "./evidence-computation";
 import { createMarketDeskInvestigation } from "./market-desk";
+import { runEvidenceAction } from "../windows/shell/src/dock.js";
 
 const saved = { kernel: process.env.QF_KERNEL_DB, artifacts: process.env.QF_ARTIFACT_ROOT };
 const root = mkdtempSync(join(tmpdir(), "qf-evidence-main-")); const artifacts = join(root, "artifacts");
@@ -17,6 +18,14 @@ afterAll(() => { closeAppKernel(); if (saved.kernel === undefined) delete proces
 function athletePage(self: string, opponent: string, outcome: string, eventDate: string): string {
   const selfUrl = athleteUrl(self);
   return `<link rel="canonical" href="${selfUrl}"><meta property="og:title" content="${self} | UFC"><article class="c-card-event--athlete-fight"><h3>${self} vs ${opponent}</h3><div class="c-card-event--athlete-fight__date">${eventDate}</div></article><div id="athlete-record"><article class="c-card-event--athlete-results"><div class="c-card-event--athlete-results__image ${outcome.toLowerCase()}"><a href="${selfUrl}">${self}</a><div class="c-card-event--athlete-results__plaque ${outcome.toLowerCase()}">${outcome}</div></div><h3><a href="${selfUrl}">${self}</a><a href="https://www.ufc.com/athlete/old-rival">Old Rival</a></h3><div class="c-card-event--athlete-results__date">Aug. 1, 2026</div><a href="https://www.ufc.com/event/old">Fight Card</a></article></div><footer></footer>`;
+}
+
+function actionSurface() {
+  const attributes = new Map<string, string>();
+  return {
+    action: { getAttribute: (name: string) => attributes.get(name) ?? null, setAttribute: (name: string, value: string) => attributes.set(name, value), removeAttribute: (name: string) => attributes.delete(name) },
+    stage: { textContent: "" }, cue: { textContent: "" },
+  };
 }
 
 describe("founder evidence and calculation service", () => {
@@ -32,7 +41,12 @@ describe("founder evidence and calculation service", () => {
     const investigation = createMarketDeskInvestigation({ quote_id: "quote-main", name: "Exact fight", objective: "Describe official history." });
     const calls: string[] = []; const transport: HistoryTransport = async (url) => { calls.push(url); const text = url.includes("alpha") ? athletePage("Alpha Fighter", "Beta Fighter", "Win", eventDate) : athletePage("Beta Fighter", "Alpha Fighter", "Loss", eventDate); const bytes = new TextEncoder().encode(text); return { status: 200, url, redirected: false, body: new ReadableStream({ start(controller) { controller.enqueue(bytes); controller.close(); } }) }; };
     ensureEvidenceComputationCapabilities();
-    const receipt = await addEvidenceAndCalculate({ mission_id: investigation.mission_id, quote_id: "quote-main", transport, now: () => new Date(observed) });
+    const surface = actionSurface(); let refreshes = 0;
+    const settled = await runEvidenceAction({ ...surface, missionId: investigation.mission_id, quoteId: "quote-main", invoke: async () => ({ ok: true, receipt: await addEvidenceAndCalculate({ mission_id: investigation.mission_id, quote_id: "quote-main", transport, now: () => new Date(observed) }) }), onSettled: () => { refreshes += 1; } });
+    const receipt = settled.receipt;
+    expect(refreshes).toBe(1);
+    expect(surface.stage.textContent).toBe("Transparent calculation · complete");
+    expect(surface.cue.textContent).toBe("inspect on Canvas ⏎");
     expect(calls).toEqual([athleteUrl("Alpha Fighter"), athleteUrl("Beta Fighter")]);
     expect(kernelGetObject("dataset", receipt.dataset_id)).toMatchObject({ purpose: "evidence", content_hash: receipt.dataset_hash });
     expect(kernelGetObject("run", receipt.run_id)).toMatchObject({ kind: "analysis", status: "succeeded" });
@@ -74,8 +88,16 @@ describe("founder evidence and calculation service", () => {
       const bytes = new TextEncoder().encode(athletePage(self, opponent, url.includes("alpha") ? "Win" : "Loss", eventDate));
       return { status: 200, url, redirected: false, body: new ReadableStream({ start(controller) { controller.enqueue(bytes); controller.close(); } }) };
     };
-    await expect(addEvidenceAndCalculate({ mission_id: investigation.mission_id, quote_id: "quote-failure", transport, now: () => new Date(observed) })).rejects.toThrow(/decimal price/);
-    const projected = kernelGetResearchWorldProjection({ root_type: "mission", root_id: investigation.mission_id });
+    const surface = actionSurface(); let refreshes = 0; let projectedAtRefresh: ReturnType<typeof kernelGetResearchWorldProjection> | null = null;
+    const settled = await runEvidenceAction({ ...surface, missionId: investigation.mission_id, quoteId: "quote-failure", invoke: async () => {
+      try { return { ok: true, receipt: await addEvidenceAndCalculate({ mission_id: investigation.mission_id, quote_id: "quote-failure", transport, now: () => new Date(observed) }) }; }
+      catch (error) { return { ok: false, error: { message: error instanceof Error ? error.message : String(error) } }; }
+    }, onSettled: () => { refreshes += 1; projectedAtRefresh = kernelGetResearchWorldProjection({ root_type: "mission", root_id: investigation.mission_id }); } });
+    expect(settled).toMatchObject({ ok: false, error: { message: expect.stringMatching(/decimal price/) } });
+    expect(refreshes).toBe(1);
+    expect(surface.stage.textContent).toMatch(/^Stopped · .*decimal price/);
+    expect(surface.cue.textContent).toBe("retry ⏎");
+    const projected = projectedAtRefresh!;
     expect(projected.ok).toBe(true);
     if (projected.ok) {
       expect(projected.world.objects.filter((row) => row.type === "dataset")).toHaveLength(1);

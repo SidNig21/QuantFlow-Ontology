@@ -202,7 +202,7 @@ function sessionSpeciesLabel(row) {
 
 /**
  * @param {HTMLElement} panelEl
- * @param {{ onTidy?: () => void, onResearchSubmitted?: (result: object) => void, onEvidenceCalculated?: (result: object) => void, onOpenMarkets?: () => Promise<void> | void, qaMode?: boolean }} [options]
+ * @param {{ onTidy?: () => void, onResearchSubmitted?: (result: object) => void, onEvidenceSettled?: (result: object) => Promise<void> | void, onOpenMarkets?: () => Promise<void> | void, qaMode?: boolean }} [options]
  */
 export function createCoalescedRefresh(runPass, { onError = (error) => console.error("[dock] refresh failed", error) } = {}) {
 	let running = false;
@@ -226,6 +226,32 @@ export function createCoalescedRefresh(runPass, { onError = (error) => console.e
 			running = false;
 		}
 	};
+}
+
+export async function runEvidenceAction({ action, stage, cue, missionId, quoteId, invoke, onSettled }) {
+	if (action.getAttribute("aria-disabled") === "true") return null;
+	action.setAttribute("aria-disabled", "true");
+	stage.textContent = "Historical evidence · requesting two official UFC pages";
+	cue.textContent = "working…";
+	let result = null;
+	try {
+		result = await invoke({ mission_id: missionId, quote_id: quoteId });
+		if (!result?.ok) {
+			stage.textContent = `Stopped · ${result?.error?.message ?? "Evidence or calculation failed"}`;
+			cue.textContent = "retry ⏎";
+			return result;
+		}
+		stage.textContent = "Transparent calculation · complete";
+		cue.textContent = "inspect on Canvas ⏎";
+		return result;
+	} catch (error) {
+		stage.textContent = `Stopped · ${error?.message ?? String(error)}`;
+		cue.textContent = "retry ⏎";
+		throw error;
+	} finally {
+		action.removeAttribute("aria-disabled");
+		await onSettled?.({ mission_id: missionId, quote_id: quoteId, result });
+	}
 }
 
 export function initDock(panelEl, options = {}) {
@@ -514,11 +540,7 @@ export function initDock(panelEl, options = {}) {
 				action.tabIndex = 0; action.setAttribute("role", "button"); action.dataset.missionId = activeMissionId; action.dataset.quoteId = String(investigation.to_id);
 				action.append(title, stage, cue);
 				const run = async () => {
-					if (action.getAttribute("aria-disabled") === "true") return;
-					action.setAttribute("aria-disabled", "true"); stage.textContent = "Historical evidence · requesting two official UFC pages"; cue.textContent = "working…";
-					const result = await window.shellApi.qf.addEvidenceAndCalculate({ mission_id: activeMissionId, quote_id: String(investigation.to_id) });
-					if (!result?.ok) { stage.textContent = `Stopped · ${result?.error?.message ?? "Evidence or calculation failed"}`; cue.textContent = "retry ⏎"; action.removeAttribute("aria-disabled"); return; }
-					stage.textContent = "Transparent calculation · complete"; cue.textContent = "inspect on Canvas ⏎"; action.removeAttribute("aria-disabled"); options.onEvidenceCalculated?.(result.receipt);
+					await runEvidenceAction({ action, stage, cue, missionId: activeMissionId, quoteId: String(investigation.to_id), invoke: (input) => window.shellApi.qf.addEvidenceAndCalculate(input), onSettled: options.onEvidenceSettled });
 				};
 				action.addEventListener("click", () => { void run(); });
 				action.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); void run(); } });

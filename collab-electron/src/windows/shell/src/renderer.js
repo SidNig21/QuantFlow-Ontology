@@ -313,8 +313,8 @@ async function init() {
 			planningDirectorSubmission = { sessionId: String(result.sessionId), missionId: String(result.missionId) };
 			void researchWorldController?.reveal("mission", String(result.missionId));
 		},
-		onEvidenceCalculated: (result) => {
-			void researchWorldController?.reveal("mission", String(result.mission_id));
+		onEvidenceSettled: (result) => {
+			return researchWorldController?.reveal("mission", String(result.mission_id));
 		},
 		onOpenMarkets: () => marketDeskController?.open(),
 	});

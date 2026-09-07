@@ -6,10 +6,33 @@ import {
 	formatDockSessionState,
 	launchableDockDefinitions,
 	researchDirectorRunningStatus,
+	runEvidenceAction,
 	taskInspectProjection,
   visibleDockDefinitions,
   visibleDockSessions,
 } from "./dock.js";
+
+test("evidence action refreshes exactly once after both success and named failure", async () => {
+	const surface = () => {
+		const attributes = new Map<string, string>();
+		return { action: { getAttribute: (name: string) => attributes.get(name) ?? null, setAttribute: (name: string, value: string) => attributes.set(name, value), removeAttribute: (name: string) => attributes.delete(name) }, stage: { textContent: "" }, cue: { textContent: "" } };
+	};
+	for (const result of [
+		{ ok: true, receipt: { mission_id: "mission-1" }, counts: { dataset: 1, run: 1, result: 1 } },
+		{ ok: false, error: { message: "calculation rejected" }, counts: { dataset: 1, run: 0, result: 0 } },
+	]) {
+		const view = surface(); let refreshes = 0; let counts = null;
+		const settled = await runEvidenceAction({ ...view, missionId: "mission-1", quoteId: "quote-1", invoke: async () => result, onSettled: ({ result: completed }) => { refreshes += 1; counts = completed.counts; } });
+		expect(settled).toBe(result);
+		expect(refreshes).toBe(1);
+		expect(counts).toEqual(result.counts);
+		expect(view.stage.textContent).toBe(result.ok ? "Transparent calculation · complete" : "Stopped · calculation rejected");
+		expect(view.cue.textContent).toBe(result.ok ? "inspect on Canvas ⏎" : "retry ⏎");
+	}
+	const renderer = await Bun.file(new URL("./renderer.js", import.meta.url)).text();
+	expect(renderer).toContain("onEvidenceSettled:");
+	expect(renderer).not.toContain("onEvidenceCalculated:");
+});
 
 test("Task Inspect resolves only an exact latest assignment and exposes relationship meaning", async () => {
 	const assignments = [{
