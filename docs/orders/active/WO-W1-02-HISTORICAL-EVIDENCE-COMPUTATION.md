@@ -1,7 +1,7 @@
 # WO-W1-02 — UFC historical evidence and transparent calculation
 
-status: OPEN — product candidate `d3173371c4777cf33d748700ee01ea1e62e49681` passed its independent Verifier;
-  Router-owned packaged-app Computer Use found the bounded closure defects below
+status: CLOSED — repaired product candidate `f9b11bd1d6df38d2e109456c2f1f2c2969a7de19`
+  passed its fresh independent Verifier, Router-owned packaged-app Computer Use, and exact-root cleanup
 base: W1-01 closure `ecd420918e55eb1377eea627152d402246f8fa22`
 route: Wave 1 — First Useful Market Desk
 depends: WO-W1-01 accepted at product candidate `b506cca0d2c41fd1e15f7b03a86fa1a3ed29f4e2`
@@ -9,8 +9,8 @@ reader: visible task `01a079c3-c79e-7940-bbf6-7b6d21a71827`; initial review retu
   amended commit `0036c18b64ce57ef80963c6aac91dce4a4ea22ae` returned `YES/YES`;
   closure-amendment task `01a07a59-3c0d-7000-8f6a-12633ee3af93` returned conditional `YES/YES`
   after the factual TIDY narrowing recorded below
-builder: one fresh visible Codex task only after Reader `YES/YES` and `NEXT.md` opens
-verifier: one different fresh visible Codex task against one immutable candidate
+builder: complete — visible task `01a079d0-da3e-7d32-ab99-c8588f7d1cca`
+verifier: complete — fresh visible task `01a07a70-b286-7d00-a187-abf39900ea9f`; `YES/YES` on `f9b11bd1`
 
 ## In plain terms
 

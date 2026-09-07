@@ -1,9 +1,9 @@
-# NEXT — W1-02 EVIDENCE AND CALCULATION
+# NEXT — CLOSED
 
-status: OPEN
-active-order: docs/orders/active/WO-W1-02-HISTORICAL-EVIDENCE-COMPUTATION.md
-builder-authority: OPEN
-router-authority: OPEN
+status: CLOSED
+active-order: none
+builder-authority: CLOSED
+router-authority: CLOSED
 g11-status: CLOSED
 r18-status: FROZEN / SUPERSEDED
 foundation-status: ACCEPTED — candidate 58b444d858443debeac8b13e041b2bb65e4e370e; independent YES / YES
@@ -11,14 +11,12 @@ reader-status: COMPLETE — original W1-02 semantic Reader `01a079c3-c79e-7940-b
   closure-amendment Reader `01a07a59-3c0d-7000-8f6a-12633ee3af93` conditional YES / YES after factual TIDY narrowing
 
 Golden and the Post-Golden Foundation remain accepted and closed. The rejected FM-0 candidate remains
-unmerged. WO-W1-01 is accepted. W1-02 alone may add exact UFC historical evidence and one transparent,
-technique-free calculation to the selected real Bovada investigation. Candidate `d3173371` passed its
-independent Verifier but remains open after Router-owned Computer Use found the order's bounded legacy-Kernel
-migration and completed-world TIDY/Inspect readability failures. The fresh closure-amendment Reader accepted
-the narrowed repair, so the same Builder may resume. W1-02 may not add Critic judgment,
-CANDIDATE/WATCH/PASS, close/outcome tracking, a second runtime, or any other Wave-1/2 behavior.
+unmerged. WO-W1-01 and WO-W1-02 are accepted. W1-02 repaired candidate `f9b11bd1` passed its fresh
+independent Verifier, Router-owned packaged-app Computer Use, and exact-root cleanup. No Builder or Router
+product authority is open. W1-03 is not open.
 
 - [Active order](active/WO-W1-02-HISTORICAL-EVIDENCE-COMPUTATION.md)
+- [W1-02 acceptance](evidence/w1-02/ACCEPTANCE.md)
 - [W1-01 acceptance](evidence/w1-01/ACCEPTANCE.md)
 
 - [Official Roadmap](../plans/OFFICIAL-ROADMAP.md)
