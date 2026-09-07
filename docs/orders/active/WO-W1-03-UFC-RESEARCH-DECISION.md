@@ -1,7 +1,7 @@
 # WO-W1-03 — Meaningful UFC research, independent criticism, and a governed decision
 
-status: OPEN / BUILDING — semantic Reader `01a07a8a-adf8-7381-843b-5401a189b490` returned YES / YES on amended order `1775c92c`
-assignee: one fresh low-reasoning Astra Builder after Reader acceptance
+status: OPEN / BUILDING — semantic Reader `01a07a8a-adf8-7381-843b-5401a189b490` returned YES / YES on amended order `1775c92c`; founder consumer-surface correction added 2026-09-07 from the approved Product Surface authority
+assignee: existing low-reasoning 5.6 Sol Builder; preserve the current W1-03 implementation and repair only the accepted consumer workbench
 depends: WO-W1-02 accepted at repaired product candidate `f9b11bd1d6df38d2e109456c2f1f2c2969a7de19`
 
 ## Objective
@@ -235,6 +235,47 @@ raw JSON, process language, or credential material is required to understand the
 - Normal application close reaches zero QuantFlow-owned processes. Every disposable proof root is deleted
   by exact literal path after reference checks; no wildcard or parent deletion.
 
+## Deliverable 6 — founder-readable current-investigation workbench
+
+The founder-observed packaged result is a W1-03 RED even though its Kernel lineage is correct. The current
+surface lets the Bovada catalog cover much of the Canvas, mixes unrelated and superseded objects into the
+active investigation, exposes raw implementation records, lets cables and orchestration callouts cross tile
+bodies, and visually loses the governed WATCH decision. Correct this against the already-approved Product
+Surface companion; do not create another layout truth or change Kernel semantics.
+
+The accepted working-mode behavior is:
+
+- `Bovada Live Markets` is a Dock/catalog surface, not a persistent Canvas inventory tile. Selecting or
+  opening an investigation dismisses/collapses that catalog and enters one clean Current Mission/FOCUS
+  viewport. Current observations are primary; historical and superseded observations are collapsed into
+  History and never repeat down the normal working surface.
+- Current Mission frames only the selected investigation's essential semantic path at a readable scale:
+  question/Hypothesis; current market menu; official evidence summary; transparent Run; exact Task and
+  compact participant state; Critic/Evaluation; and current Decision. Unrelated workspace objects remain
+  durably reachable but outside or visually subordinate to focus and may not obstruct the investigation.
+- Raw Artifact JSON, storage paths, trajectory receipts, registry/tool internals, process/session ids, and
+  free-floating `ORCHESTRATOR -> WORKER/CRITIC` connection cards are Inspect or Full Lineage detail, never
+  default working tiles. Compact tiles use plain product language and reveal exact identity/provenance in
+  Inspect.
+- The current Decision is the single dominant accented tile. For the accepted live result it must plainly
+  read `WATCH`, `Grasso by submission is not currently offered`, a short reason, and the exact condition for
+  rechecking. The Critic/Evaluation is a concise independent judgment immediately upstream, not a raw blob.
+- Participant and Task tiles remain compact and agree with Kernel/Dock truth (`DONE`, `CLOSED`, and
+  `RESULT RECORDED` where applicable). A capability or Research Lab tile may appear only when exact used
+  Run/tool lineage exists; it may not claim `NOT RECORDED` for work the Kernel says occurred.
+- Relationships are quiet by default, brighten on selection, and do not cross tile bodies. Link names and
+  orchestration detail appear on selection/Inspect rather than as large floating cards.
+- Current Mission/FOCUS and TIDY are deterministic, region-aware, collision-free, and fully on-canvas with
+  the Dock open at both 1280x720 and 2560x1392. Essential text is readable without manual pan/zoom. Repeating
+  TIDY on unchanged truth yields the same composition.
+- History deliberately shows revisions and superseded observations without contaminating the current
+  workbench. Full Lineage may be dense as a deliberate forensic view; leaving it returns to the same focused
+  investigation and selection.
+
+The Glacier visual language remains. This authorization permits substantial layout, hierarchy, projection,
+tile-grammar, cable, and Dock interaction changes needed to meet this behavior. It does not authorize a new
+truth store, schema/object/link type, runtime architecture, second product world, or wager action.
+
 ## Acceptance
 
 ### Changed-surface tests
@@ -249,7 +290,9 @@ Builder adds focused tests for:
    unsupported submission inference, arbitrary probability, contradictory/fabricated inputs going red;
 5. technique-free and Strategy-backed publication authority, atomic legacy migration, current/history,
    exact source work, self-review refusal, and Evaluation gating;
-6. real rendered state transitions, Inspect content, overlap/tidy, and reopen truth;
+6. real rendered state transitions, Inspect content, overlap/tidy, current/history/full-lineage separation,
+   catalog dismissal, decision dominance, compact participant/task truth, and reopen truth at both required
+   viewport sizes;
 7. external failure and process/root cleanup.
 
 Every new or changed critical guard gets one failing bait and one restored control. Do not rerun unchanged
@@ -309,8 +352,9 @@ decision, Critic attack, lineage, any confusion/overlap, and zero-process result
 - a named predictive model, arbitrary weighted score, PFF, video transcription, another sportsbook,
   another sport, or another data vendor;
 - auto-betting, stake sizing, bankroll management, or any external account action;
-- broad Canvas redesign, new Ontology object types, a new truth store, a new runtime architecture, or Dock
-  inventory unrelated to this one vertical loop.
+- visual-system rebranding, a new Ontology object type, a new truth store, a new runtime architecture, or
+  Dock inventory unrelated to this one vertical loop. Substantial correction of the existing Canvas/Dock
+  workbench is in scope only as Deliverable 6 defines it.
 
 ## Stop conditions
 
