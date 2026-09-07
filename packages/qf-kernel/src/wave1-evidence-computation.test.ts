@@ -10,7 +10,9 @@ let db: KernelDb | null = null; let root = "";
 const trace = { trace_id: "w1-02", span_id: "w1-02-span" };
 afterEach(() => { if (db) closeKernel(db); db = null; if (root) { const target = resolve(root); if (!target.startsWith(resolve(tmpdir()) + "\\") || !target.includes("qf-w1-02-")) throw new Error(`unsafe cleanup ${target}`); rmSync(target, { recursive: true, force: true }); } root = ""; if (priorArtifactRoot === undefined) delete process.env.QF_ARTIFACT_ROOT; else process.env.QF_ARTIFACT_ROOT = priorArtifactRoot; });
 
-function setup() {
+type EvidenceFixture = { market_context: Record<string, unknown>; sources: Array<Record<string, unknown>>; observations: Array<Record<string, unknown>> };
+
+function setup(mutate?: (payload: EvidenceFixture, coverage: Record<string, unknown>) => void) {
   root = mkdtempSync(join(tmpdir(), "qf-w1-02-")); process.env.QF_ARTIFACT_ROOT = root; db = openKernel(":memory:");
   const sourceBytes = new TextEncoder().encode("real-quote-source-shape"); const sourcePath = join(root, "quote.json"); writeFileSync(sourcePath, sourceBytes);
   const source = execute(db, "publish_artifact", { kind: "result_set", bytes: sourceBytes, storage_ref: sourcePath }, trace);
@@ -24,19 +26,35 @@ function setup() {
   execute(db, "ingest_market_batch", { source_artifact_id: source.object_id, observed_at: observed, venue_id: "venue-bovada", instruments: [{ id: "instrument-1", market_event_id: "event-1", kind: "moneyline", params: { provider: "bovada", competitor_ids: ["c1", "c2"], selection_ids: ["s1", "s2"] }, sides: ["Alpha Fighter", "Beta Fighter"], correlation_group: "event-1:moneyline" }], quotes: [{ id: "quote-1", instrument_id: "instrument-1", book: "bovada", data_ref: source.object_id, coverage: { observed_at: observed, source_hash: source.object_id, selections } }] }, trace);
   const mission = execute(db, "create_market_investigation", { quote_id: "quote-1", name: "Exact fight", objective: "Describe the selected market with official history." }, trace);
   const market_context = { quote_id: "quote-1", quote_observed_at: observed, quote_source_hash: source.object_id, market_event_id: "event-1", event_cutoff: cutoff, competitors: [{ competitor_id: "c1", selection_id: "s1", label: "Alpha Fighter" }, { competitor_id: "c2", selection_id: "s2", label: "Beta Fighter" }], selection_ids: ["s1", "s2"] };
-  const payload = { contract: "qf.dataset.v1", market_context, observations: [
-    { observed_at: observed, competitor_id: "c1", selection_id: "s1", wins: 3, losses: 1, draws: 1, no_contests: 0, decisive_sample_size: 4 },
-    { observed_at: observed, competitor_id: "c2", selection_id: "s2", wins: 0, losses: 0, draws: 0, no_contests: 1, decisive_sample_size: 0 },
-  ] };
+  const sources = [
+    { competitor_id: "c1", url: "https://www.ufc.com/athlete/alpha-fighter", observed_at: observed, source_hash: "b".repeat(64), parser_version: "ufc-athlete-html-v1", bytes: 100 },
+    { competitor_id: "c2", url: "https://www.ufc.com/athlete/beta-fighter", observed_at: observed, source_hash: "c".repeat(64), parser_version: "ufc-athlete-html-v1", bytes: 100 },
+  ];
+  const row = (competitor_id: string, selection_id: string, competitor_name: string, event_date: string, outcome: string, suffix: string) => ({ observed_at: observed, competitor_id, selection_id, competitor_name, opponent_url: `https://www.ufc.com/athlete/opponent-${suffix}`, event_date, outcome, event_url: `https://www.ufc.com/event/${suffix}` });
+  const observations = [
+    { observed_at: observed, competitor_id: "c1", selection_id: "s1", competitor_name: "Alpha Fighter", source_url: sources[0]!.url, source_hash: sources[0]!.source_hash, parser_version: sources[0]!.parser_version, rows: [row("c1", "s1", "Alpha Fighter", "2026-01-01T00:00:00.000Z", "WIN", "a"), row("c1", "s1", "Alpha Fighter", "2026-02-01T00:00:00.000Z", "WIN", "b"), row("c1", "s1", "Alpha Fighter", "2026-03-01T00:00:00.000Z", "WIN", "c"), row("c1", "s1", "Alpha Fighter", "2026-04-01T00:00:00.000Z", "LOSS", "d"), row("c1", "s1", "Alpha Fighter", "2026-05-01T00:00:00.000Z", "DRAW", "e")], exclusions: [], wins: 3, losses: 1, draws: 1, no_contests: 0, decisive_sample_size: 4, coverage_status: "covered" },
+    { observed_at: observed, competitor_id: "c2", selection_id: "s2", competitor_name: "Beta Fighter", source_url: sources[1]!.url, source_hash: sources[1]!.source_hash, parser_version: sources[1]!.parser_version, rows: [row("c2", "s2", "Beta Fighter", "2026-06-01T00:00:00.000Z", "NC", "f")], exclusions: [], wins: 0, losses: 0, draws: 0, no_contests: 1, decisive_sample_size: 0, coverage_status: "covered" },
+  ];
+  const payload = { contract: "qf.dataset.v1", market_context, sources, observations } as EvidenceFixture & { contract: string };
+  const coverage: Record<string, unknown> = { eligible_rows: 6, excluded_rows: 0, date_range: { first: "2026-01-01T00:00:00.000Z", last: "2026-06-01T00:00:00.000Z" }, missing_fields: 0, sources, zero_coverage_competitors: [] };
+  mutate?.(payload, coverage);
   const datasetBytes = new TextEncoder().encode(`${JSON.stringify(payload)}\n`); const datasetPath = join(root, "dataset.json"); writeFileSync(datasetPath, datasetBytes);
   const datasetArtifact = execute(db, "publish_artifact", { kind: "result_set", bytes: datasetBytes, storage_ref: datasetPath }, trace);
-  const dataset = execute(db, "register_dataset_version", { kind: "results", purpose: "evidence", artifact_id: datasetArtifact.object_id, content_hash: datasetArtifact.object_id, as_of: observed, coverage: { eligible_rows: 4, excluded_rows: 0 } }, trace);
+  const dataset = execute(db, "register_dataset_version", { kind: "results", purpose: "evidence", artifact_id: datasetArtifact.object_id, content_hash: datasetArtifact.object_id, as_of: observed, coverage }, trace);
   execute(db, "register_tool", { tool_id: "research-lab", name: "Research Lab", summary: "Transparent fixed-point calculation.", capability_class: "tool", implementation_version: "qf-research-lab-v1" }, trace);
-  return { datasetId: dataset.object_id, datasetHash: datasetArtifact.object_id, missionId: mission.object_id };
+  return { datasetId: dataset.object_id, datasetHash: datasetArtifact.object_id, missionId: mission.object_id, cutoff };
 }
 
 const calculation = { contract: "qf.calculation.v1", operation: "two_way_market_history_baseline", version: 1, formula_version: 1, implementation_version: "qf-two-way-history-v1" };
 const round = (n: bigint, d: bigint) => (n + d / 2n) / d;
+
+function expectAtomicCalculationRejection(datasetId: string, missionId: string, runId: string, message: RegExp): void {
+  const beforeRuns = db!.query("SELECT COUNT(*) AS n FROM run").get();
+  const beforeArtifacts = db!.query("SELECT COUNT(*) AS n FROM artifact").get();
+  expect(() => execute(db!, "execute_deterministic_run", { run_id: runId, dataset_id: datasetId, mission_id: missionId, quote_id: "quote-1", tool_id: "research-lab", calculation, params: {} }, trace)).toThrow(message);
+  expect(db!.query("SELECT COUNT(*) AS n FROM run").get()).toEqual(beforeRuns);
+  expect(db!.query("SELECT COUNT(*) AS n FROM artifact").get()).toEqual(beforeArtifacts);
+}
 
 describe("W1-02 technique-free evidence calculation", () => {
   test("creates no Strategy and records exact fixed-point output plus complete Mission/Quote/Tool/method lineage", () => {
@@ -64,5 +82,43 @@ describe("W1-02 technique-free evidence calculation", () => {
     expect(() => execute(db!, "execute_deterministic_run", { run_id: "mixed", dataset_id: datasetId, mission_id: missionId, quote_id: "quote-1", tool_id: "research-lab", calculation, strategy_spec: { contract: "qf.strategy.v1" }, params: {} }, trace)).toThrow(/mutually exclusive/);
     expect(db!.query("SELECT COUNT(*) AS n FROM run").get()).toEqual(beforeRuns);
     expect(db!.query("SELECT COUNT(*) AS n FROM artifact").get()).toEqual(beforeArtifacts);
+  });
+
+  test("derives summaries from canonical rows and rejects forged counts and coverage atomically", () => {
+    const { datasetId, missionId } = setup((payload, coverage) => {
+      payload.observations[0]!.wins = 99;
+      coverage.excluded_rows = 1;
+    });
+    expectAtomicCalculationRejection(datasetId, missionId, "forged-summary", /summary differs from canonical eligible bout rows/);
+  });
+
+  test("rejects an empty eligible population even when its zero-coverage claims are internally consistent", () => {
+    const { datasetId, missionId } = setup((payload, coverage) => {
+      for (const observation of payload.observations) {
+        observation.rows = [];
+        observation.wins = 0; observation.losses = 0; observation.draws = 0; observation.no_contests = 0; observation.decisive_sample_size = 0;
+        observation.coverage_status = "zero_coverage";
+      }
+      coverage.eligible_rows = 0; coverage.date_range = null; coverage.zero_coverage_competitors = ["c1", "c2"];
+    });
+    expectAtomicCalculationRejection(datasetId, missionId, "empty-population", /no eligible pre-cutoff bout population/);
+  });
+
+  test("rejects any eligible row at the event cutoff before Run or result mutation", () => {
+    let cutoff = "";
+    const fixture = setup((payload, coverage) => {
+      cutoff = String(payload.market_context.event_cutoff);
+      (payload.observations[0]!.rows as Array<Record<string, unknown>>)[0]!.event_date = cutoff;
+      (coverage.date_range as Record<string, unknown>).last = cutoff;
+    });
+    expectAtomicCalculationRejection(fixture.datasetId, fixture.missionId, "cutoff-row", /at or after the event cutoff/);
+  });
+
+  test("rejects the concrete crossed c1-to-s2 Dataset observation while the ordered control passes", () => {
+    const { datasetId, missionId } = setup((payload) => {
+      payload.observations[0]!.selection_id = "s2";
+      for (const row of payload.observations[0]!.rows as Array<Record<string, unknown>>) row.selection_id = "s2";
+    });
+    expectAtomicCalculationRejection(datasetId, missionId, "crossed-dataset-selection", /exact ordered competitor\/selection identity/);
   });
 });

@@ -59,6 +59,13 @@ describe("official UFC historical evidence", () => {
     await expect(acquireUfcHistoricalEvidence({ market_context: context, transport: malformed, now: () => new Date("2026-09-06T00:00:00.000Z") })).rejects.toMatchObject({ code: "malformed_page" });
     const swapped: HistoryTransport = async (url) => response(url, page(url.includes("alpha") ? "Beta Fighter" : "Alpha Fighter", url.includes("alpha") ? "Alpha Fighter" : "Beta Fighter"));
     await expect(acquireUfcHistoricalEvidence({ market_context: context, transport: swapped, now: () => new Date("2026-09-06T00:00:00.000Z") })).rejects.toMatchObject({ code: "identity_ambiguous" });
+    const suffixIdentity: HistoryTransport = async (url) => {
+      const self = url.includes("alpha") ? "Alpha Fighter" : "Beta Fighter";
+      const opponent = url.includes("alpha") ? "Beta Fighter" : "Alpha Fighter";
+      const html = page(self, opponent).replace(`${self} | UFC`, `${self} Junior | UFC`);
+      return response(url, html);
+    };
+    await expect(acquireUfcHistoricalEvidence({ market_context: context, transport: suffixIdentity, now: () => new Date("2026-09-06T00:00:00.000Z") })).rejects.toMatchObject({ code: "identity_unresolved" });
   });
 
   test("distinguishes the per-source and whole-operation byte ceilings", async () => {

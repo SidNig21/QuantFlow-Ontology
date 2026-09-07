@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { contentHash } from "qf-kernel/portable";
 import { athleteUrl, type HistoryTransport } from "qf-ufc-history";
-import { closeAppKernel, kernelExecute, kernelGetLinks, kernelGetObject, kernelGetResearchWorldProjection, openAppKernel } from "./kernel";
+import { closeAppKernel, getKernelDb, kernelExecute, kernelGetLinks, kernelGetObject, kernelGetResearchWorldProjection, openAppKernel } from "./kernel";
 import { addEvidenceAndCalculate, ensureEvidenceComputationCapabilities } from "./evidence-computation";
 import { createMarketDeskInvestigation } from "./market-desk";
 
@@ -49,5 +49,40 @@ describe("founder evidence and calculation service", () => {
     closeAppKernel(); openAppKernel();
     expect(kernelGetObject("dataset", receipt.dataset_id)).toMatchObject({ purpose: "evidence" });
     expect(kernelGetObject("run", receipt.run_id)).toMatchObject({ status: "succeeded" });
+  });
+
+  test("keeps a registered Dataset visible on its exact Mission when calculation fails", async () => {
+    const sourceBytes = new TextEncoder().encode("quote-source-failure"); const sourcePath = join(artifacts, "quote-source-failure.json"); writeFileSync(sourcePath, sourceBytes); const sourceHash = contentHash(sourceBytes);
+    kernelExecute("publish_artifact", { kind: "result_set", bytes: sourceBytes, storage_ref: sourcePath }, trace);
+    const observed = new Date().toISOString(), cutoff = new Date(Date.now() + 6 * 86_400_000).toISOString();
+    const eventDate = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(new Date(cutoff)).replace(/^([A-Z][a-z]{2}) /, "$1. ");
+    kernelExecute("register_venue", { venue_id: "venue-bovada-failure", kind: "sportsbook", name: "Bovada failure control", source_artifact_id: sourceHash, observed_at: observed }, trace);
+    kernelExecute("schedule_market_event", { market_event_id: "event-failure", sport: "ufc", starts_at: cutoff, competition: "UFC", source_artifact_id: sourceHash, observed_at: observed }, trace);
+    const selections = [{ competitor_id: "fc1", selection_id: "fs1", price_id: "fp1", label: "Alpha Fighter", american: "-220", decimal: "1.454545" }, { competitor_id: "fc2", selection_id: "fs2", price_id: "fp2", label: "Beta Fighter", american: "+185", decimal: "2.850" }];
+    kernelExecute("ingest_market_batch", { source_artifact_id: sourceHash, observed_at: observed, venue_id: "venue-bovada-failure", instruments: [{ id: "instrument-failure", market_event_id: "event-failure", kind: "moneyline", params: { provider: "bovada", provider_event_id: "fe", provider_market_id: "fm", event_label: "Alpha Fighter vs Beta Fighter", market_label: "Fight Winner", period: "Bout", competitor_ids: ["fc1", "fc2"], selection_ids: ["fs1", "fs2"] }, sides: ["Alpha Fighter", "Beta Fighter"], correlation_group: "event-failure:moneyline" }], quotes: [{ id: "quote-failure", instrument_id: "instrument-failure", book: "bovada", data_ref: sourceHash, coverage: { observed_at: observed, source_hash: sourceHash, provider_event_id: "fe", provider_market_id: "fm", selections } }] }, trace);
+    const investigation = createMarketDeskInvestigation({ quote_id: "quote-failure", name: "Failure preserves evidence", objective: "Keep acquired evidence visible if calculation rejects." });
+    let calls = 0;
+    const transport: HistoryTransport = async (url) => {
+      calls += 1;
+      const self = url.includes("alpha") ? "Alpha Fighter" : "Beta Fighter"; const opponent = url.includes("alpha") ? "Beta Fighter" : "Alpha Fighter";
+      if (calls === 2) {
+        const row = getKernelDb().query("SELECT coverage FROM quote WHERE id = ?").get("quote-failure") as { coverage: string };
+        const changed = JSON.parse(row.coverage) as { selections: Array<Record<string, unknown>> };
+        changed.selections[0]!.decimal = "invalid";
+        getKernelDb().query("UPDATE quote SET coverage = ? WHERE id = ?").run(JSON.stringify(changed), "quote-failure");
+      }
+      const bytes = new TextEncoder().encode(athletePage(self, opponent, url.includes("alpha") ? "Win" : "Loss", eventDate));
+      return { status: 200, url, redirected: false, body: new ReadableStream({ start(controller) { controller.enqueue(bytes); controller.close(); } }) };
+    };
+    await expect(addEvidenceAndCalculate({ mission_id: investigation.mission_id, quote_id: "quote-failure", transport, now: () => new Date(observed) })).rejects.toThrow(/decimal price/);
+    const projected = kernelGetResearchWorldProjection({ root_type: "mission", root_id: investigation.mission_id });
+    expect(projected.ok).toBe(true);
+    if (projected.ok) {
+      expect(projected.world.objects.filter((row) => row.type === "dataset")).toHaveLength(1);
+      expect(projected.world.objects.find((row) => row.type === "dataset")?.fields.purpose).toBe("evidence");
+      expect(projected.world.objects.some((row) => row.type === "run")).toBe(false);
+      expect(projected.world.objects.some((row) => row.type === "artifact" && row.fields.calculation_result)).toBe(false);
+      expect(projected.world.missing_lineage).toContainEqual({ owning_type: "mission", owning_id: investigation.mission_id, kind: "produces", message: "Evidence is registered; calculation did not produce a Run." });
+    }
   });
 });

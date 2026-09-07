@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-wave1-evidence-computation",
-    "commit": "82081dc4",
+    "commit": "6f4ff3d6",
     "generatedAt": "2026-09-07",
     "filesScanned": 421,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "f66fa3ccff74b13a"
+    "fingerprint": "aa7fae8c34895dad"
   },
   "stats": {
     "live": 115,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 119,
-      "indexed": 1211,
+      "indexed": 1215,
       "downgradedFromCheats": 25,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 19,
@@ -1977,8 +1977,8 @@
       "layer": 2,
       "name": "pty*",
       "kb": 36.9,
-      "x": 0.23,
-      "z": -1.3,
+      "x": 1.24,
+      "z": -0.45,
       "status": "ok",
       "spawns": 2,
       "writes": 4,
@@ -2014,9 +2014,9 @@
       "id": "2:collab-electron/src/main::research",
       "layer": 2,
       "name": "research*",
-      "kb": 35.7,
-      "x": 1.24,
-      "z": -0.45,
+      "kb": 40.3,
+      "x": 0.23,
+      "z": -1.3,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2025,7 +2025,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/research-world-projection.ts",
-          "kb": 34.6,
+          "kb": 39.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2992,9 +2992,9 @@
       "id": "0:packages/qf-kernel/src::deterministic",
       "layer": 0,
       "name": "deterministic-execution.ts",
-      "kb": 45,
-      "x": -1.01,
-      "z": -0.85,
+      "kb": 52.7,
+      "x": -1.24,
+      "z": 0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
@@ -3003,18 +3003,18 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/deterministic-execution.ts",
-          "kb": 45,
+          "kb": 52.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
           "dml": 6,
           "dmlLines": [
-            535,
-            667,
-            670,
-            838,
-            876,
-            911
+            541,
+            771,
+            774,
+            942,
+            980,
+            1015
           ],
           "executes": 0
         }
@@ -3027,12 +3027,12 @@
           "what": "6 SQL statements outside execute()",
           "where": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            535,
-            667,
-            670,
-            838,
-            876,
-            911
+            541,
+            771,
+            774,
+            942,
+            980,
+            1015
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -3308,8 +3308,8 @@
       "layer": 0,
       "name": "upgrade.ts",
       "kb": 50,
-      "x": -1.24,
-      "z": 0.45,
+      "x": -1.01,
+      "z": -0.85,
       "status": "gray",
       "spawns": 0,
       "writes": 0,
@@ -9108,7 +9108,7 @@
     {
       "path": "collab-electron/src/main/research-world-projection.ts",
       "status": "indexed",
-      "indexedFns": 26,
+      "indexedFns": 28,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9316,7 +9316,7 @@
     {
       "path": "packages/qf-kernel/src/deterministic-execution.ts",
       "status": "indexed",
-      "indexedFns": 27,
+      "indexedFns": 29,
       "sqlInText": 6,
       "sqlIndexed": 6,
       "sqlUnrecognised": 0
@@ -11003,7 +11003,7 @@
       },
       "executeDeterministicRun": {
         "file": "packages/qf-kernel/src/deterministic-execution.ts",
-        "line": 679,
+        "line": 783,
         "kind": "function"
       },
       "registerVenue": {
@@ -11424,7 +11424,7 @@
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "weak": [],
           "strong": [
-            "INSERT INTO artifact at line 535"
+            "INSERT INTO artifact at line 541"
           ],
           "weight": "strong"
         },
@@ -14585,14 +14585,13 @@
       },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
+      "persistence": "indexed",
       "lifetime": "not-applicable",
       "packaging": "not-applicable",
       "ownership": "unsupported",
       "reasons": {
         "reach": "no reach row was produced for this path",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
         "packaging": "test or QA code does not ship",
         "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
@@ -16319,7 +16318,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 144 in relationalSnapshot) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 155 in relationalSnapshot) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -24933,9 +24932,9 @@
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 503,
+      "not-applicable": 502,
       "partial": 29,
-      "indexed": 23
+      "indexed": 24
     },
     "lifetime": {
       "not-applicable": 489,
@@ -43260,6 +43259,41 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "get",
+            "from": "collab-electron/src/main/research-world-projection.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "collab-electron/src/main/research-world-projection.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "decode",
+            "from": "collab-electron/src/main/research-world-projection.ts",
+            "candidates": [
+              "tools/qf-ufc-history/src/index.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "push",
+            "from": "collab-electron/src/main/research-world-projection.ts",
+            "candidates": [
+              "collab-electron/src/main/launcher-readiness.ts",
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "parse",
             "from": "collab-electron/src/main/research-world-projection.ts",
             "candidates": [
@@ -43467,6 +43501,22 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "decode",
+            "from": "collab-electron/src/main/research-world-projection.ts",
+            "candidates": [
+              "tools/qf-ufc-history/src/index.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "collab-electron/src/main/research-world-projection.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "collab-electron/src/main/research-world-projection.ts",
             "candidates": [
@@ -43482,22 +43532,6 @@
               "collab-electron/src/main/launcher-readiness.ts",
               "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
               "tools/qf-proof-agent/src/qf-proof-agent.mjs"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "decode",
-            "from": "collab-electron/src/main/research-world-projection.ts",
-            "candidates": [
-              "tools/qf-ufc-history/src/index.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "parse",
-            "from": "collab-electron/src/main/research-world-projection.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -54480,7 +54514,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            876
+            980
           ]
         }
       ]
@@ -54505,7 +54539,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            911
+            1015
           ]
         }
       ]
@@ -54530,7 +54564,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            838
+            942
           ]
         }
       ]
@@ -54555,7 +54589,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            667
+            771
           ]
         }
       ]
@@ -54580,7 +54614,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            670
+            774
           ]
         }
       ]
@@ -54605,7 +54639,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            535
+            541
           ]
         }
       ]
@@ -55921,12 +55955,12 @@
       "what": "6 SQL statements outside execute()",
       "where": "packages/qf-kernel/src/deterministic-execution.ts",
       "lines": [
-        535,
-        667,
-        670,
-        838,
-        876,
-        911
+        541,
+        771,
+        774,
+        942,
+        980,
+        1015
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -56131,12 +56165,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-wave1-evidence-computation",
-      "commit": "989d7cf1",
+      "commit": "82081dc4",
       "generatedAt": "2026-09-07"
     },
     "to": {
       "branch": "codex/wo-wave1-evidence-computation",
-      "commit": "82081dc4",
+      "commit": "6f4ff3d6",
       "generatedAt": "2026-09-07"
     },
     "verdict": "better",

@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-wave1-evidence-computation @ 82081dc4` on 2026-09-07 by
+> Generated from `codex/wo-wave1-evidence-computation @ 6f4ff3d6` on 2026-09-07 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -426,7 +426,7 @@ mechanism behind the invariant below, not a promise about it.
 | `imports` | 551 | 0 | 4 | 0 | 0 |
 | `ipcRequest` | 277 | 0 | 3 | 0 | 275 |
 | `ipcPush` | 7 | 0 | 3 | 0 | 545 |
-| `persistence` | 23 | 29 | 0 | 0 | 503 |
+| `persistence` | 24 | 29 | 0 | 0 | 502 |
 | `lifetime` | 5 | 61 | 0 | 0 | 489 |
 | `packaging` | 224 | 0 | 0 | 105 | 226 |
 | `ownership` | 20 | 0 | 0 | 350 | 185 |
@@ -513,7 +513,7 @@ discovered from the AST.
 4 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
 - **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 363
-- **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 535
+- **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 541
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 904
 - **packages/qf-kernel/src/strategy-outcome.ts** — INSERT INTO artifact at line 195
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentTrajectoryArtifact() at line 32

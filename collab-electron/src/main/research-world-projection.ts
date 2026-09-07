@@ -67,6 +67,17 @@ function parseJson(value: unknown): unknown {
   try { return JSON.parse(value); } catch { return value; }
 }
 
+function canonicalJson(value: unknown): string {
+  if (value === null || typeof value === "string" || typeof value === "boolean") return JSON.stringify(value);
+  if (typeof value === "number" && Number.isFinite(value)) return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  if (value && typeof value === "object") {
+    const row = value as Record<string, unknown>;
+    return `{${Object.keys(row).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(row[key])}`).join(",")}}`;
+  }
+  throw new Error("Canonical projection JSON accepts JSON values only");
+}
+
 function decodeUtf8Hex(value: unknown, field: string): string {
   if (typeof value !== "string" || value.length % 2 !== 0 || !/^[0-9a-f]*$/i.test(value)) {
     throw new Error(`Invalid UTF-8 hex in ${field}`);
@@ -231,6 +242,54 @@ export function artifactReceipt(row: Record<string, unknown>): ArtifactReceipt {
   } catch {
     return { artifact_id: id, kind, content_hash: hash, durable_bytes_available: true, message: "Preview unavailable: artifact is not UTF-8" };
   }
+}
+
+function evidenceDatasetsForMission(snapshot: RelationalSnapshot, missionId: string): Array<{ datasetId: string; artifactId: string }> {
+  const investigation = snapshot.links.filter((link) => link.kind === "investigates" && link.from_id === missionId);
+  if (investigation.length !== 1) return [];
+  const quoteId = investigation[0]!.to_id;
+  const quote = snapshot.rows.get("quote")?.get(quoteId);
+  if (!quote) return [];
+  const quoted = snapshot.links.filter((link) => link.kind === "quotes" && link.from_id === quoteId);
+  if (quoted.length !== 1) return [];
+  const instrument = snapshot.rows.get("instrument")?.get(quoted[0]!.to_id);
+  if (!instrument) return [];
+  const offered = snapshot.links.filter((link) => link.kind === "offered_on" && link.from_id === quoted[0]!.to_id);
+  if (offered.length !== 1) return [];
+  const event = snapshot.rows.get("market_event")?.get(offered[0]!.to_id);
+  const source = typeof quote.data_ref === "string" ? snapshot.rows.get("artifact")?.get(quote.data_ref) : undefined;
+  const coverage = parseJson(quote.coverage) as Record<string, unknown> | null;
+  const params = parseJson(instrument.params) as Record<string, unknown> | null;
+  const sides = parseJson(instrument.sides);
+  if (!event || !source || !coverage || !params || !Array.isArray(coverage.selections) || !Array.isArray(params.competitor_ids) || !Array.isArray(params.selection_ids) || !Array.isArray(sides)) return [];
+  if (coverage.selections.length !== 2 || params.competitor_ids.length !== 2 || params.selection_ids.length !== 2 || sides.length !== 2) return [];
+  const selections = coverage.selections as Array<Record<string, unknown>>;
+  for (const [index, selection] of selections.entries()) {
+    if (selection.competitor_id !== params.competitor_ids[index] || selection.selection_id !== params.selection_ids[index] || selection.label !== sides[index]) return [];
+  }
+  const liveContext = {
+    quote_id: quoteId,
+    quote_observed_at: coverage.observed_at,
+    quote_source_hash: source.content_hash,
+    market_event_id: event.id,
+    event_cutoff: event.starts_at,
+    competitors: selections.map((selection, index) => ({ competitor_id: params.competitor_ids[index], selection_id: params.selection_ids[index], label: sides[index] })),
+    selection_ids: params.selection_ids,
+  };
+  const found: Array<{ datasetId: string; artifactId: string }> = [];
+  for (const dataset of snapshot.rows.get("dataset")?.values() ?? []) {
+    if (dataset.purpose !== "evidence" || typeof dataset.id !== "string") continue;
+    const lineage = snapshot.derivedLinks.filter((link) => link.from_id === dataset.id);
+    if (lineage.length !== 1) continue;
+    const artifact = snapshot.rows.get("artifact")?.get(lineage[0]!.to_id);
+    if (!artifact || artifactReceipt(artifact).durable_bytes_available !== true || typeof artifact.storage_ref !== "string") continue;
+    try {
+      const bytes = readFileSync(artifact.storage_ref.startsWith("file:") ? new URL(artifact.storage_ref) : artifact.storage_ref);
+      const payload = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) as Record<string, unknown>;
+      if (payload.contract === "qf.dataset.v1" && canonicalJson(payload.market_context) === canonicalJson(liveContext)) found.push({ datasetId: dataset.id, artifactId: String(artifact.id) });
+    } catch { /* unavailable or non-canonical evidence is not projected */ }
+  }
+  return found.sort((a, b) => a.datasetId.localeCompare(b.datasetId));
 }
 
 function rowFields(row: Record<string, unknown>): Record<string, unknown> {
@@ -491,8 +550,14 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
     selectedTaskId = tasks[0];
     if (!selectedTaskId) {
       const directRuns = allLinks.filter((link) => link.kind === "belongs_to" && link.to_id === request.root_id && objectType(snapshot, link.from_id) === "run").map((link) => link.from_id).sort();
-      if (directRuns.length > 0) {
+      const evidenceDatasets = evidenceDatasetsForMission(snapshot, request.root_id);
+      if (directRuns.length > 0 || evidenceDatasets.length > 0) {
         const selectedKeys = new Set(marketLinks.map((link) => `${link.kind}\u0000${link.from_id}\u0000${link.to_id}`));
+        for (const evidence of evidenceDatasets) {
+          addId(ids, "dataset", evidence.datasetId);
+          addId(ids, "artifact", evidence.artifactId);
+          selectedKeys.add(`derived_from\u0000${evidence.datasetId}\u0000${evidence.artifactId}`);
+        }
         for (const runId of directRuns) {
           addId(ids, "run", runId);
           for (const link of allLinks.filter((candidate) => candidate.from_id === runId && ["belongs_to", "uses", "executes_in", "produces"].includes(candidate.kind))) {
@@ -509,8 +574,11 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
         const objects: ResearchWorldObject[] = [];
         for (const type of OBJECT_TYPES) for (const id of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, id));
         objects.sort((a, b) => a.type.localeCompare(b.type) || a.id.localeCompare(b.id));
-        const links = allLinks.filter((link) => selectedKeys.has(`${link.kind}\u0000${link.from_id}\u0000${link.to_id}`));
-        return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects, links, missing_lineage: [], current_report_id: null, report_ids: [] }) };
+        const links = [...allLinks, ...snapshot.derivedLinks].filter((link) => selectedKeys.has(`${link.kind}\u0000${link.from_id}\u0000${link.to_id}`));
+        const missingLineage = directRuns.length === 0
+          ? [{ owning_type: "mission", owning_id: request.root_id, kind: "produces", message: "Evidence is registered; calculation did not produce a Run." }]
+          : [];
+        return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects, links, missing_lineage: missingLineage, current_report_id: null, report_ids: [] }) };
       }
       const objects: ResearchWorldObject[] = [];
       for (const type of OBJECT_TYPES) for (const id of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, id));

@@ -69,7 +69,7 @@ function exactCanonical(html: string, expectedUrl: string, expectedLabel: string
   const canonicals = [...html.matchAll(/<link\s+[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["'][^>]*>/gi)].map((row) => row[1]);
   if (canonicals.length !== 1 || canonicals[0] !== expectedUrl) throw new UfcHistoryError("identity_ambiguous", `Official UFC page did not preserve exact canonical identity for ${expectedLabel}`);
   const title = /<meta\s+[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["'][^>]*>/i.exec(html)?.[1] ?? "";
-  if (!normalized(decode(title).replace(/\|\s*UFC$/i, "")).includes(normalized(expectedLabel))) throw new UfcHistoryError("identity_unresolved", `Official UFC title did not resolve ${expectedLabel}`);
+  if (normalized(decode(title).replace(/\|\s*UFC$/i, "")) !== normalized(expectedLabel) || !normalized(expectedLabel)) throw new UfcHistoryError("identity_unresolved", `Official UFC title did not resolve exact identity ${expectedLabel}`);
   const cards = [...html.matchAll(/<article\s+class=["'][^"']*c-card-event--athlete-fight[^"']*["'][\s\S]*?<\/article>/gi)].map((row) => row[0]);
   const cutoffDay = cutoff.slice(0, 10);
   const exactMatchup = cards.some((card) => {

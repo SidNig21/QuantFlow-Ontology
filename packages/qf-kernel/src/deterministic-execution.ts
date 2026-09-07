@@ -201,12 +201,14 @@ function loadDataset(db: KernelDb, datasetId: string): {
   contentHash: string;
   artifactId: string;
   observations: JsonRecord[];
+  sources: JsonRecord[];
+  coverage: JsonRecord;
   marketContext: JsonRecord | null;
   purpose: string | null;
 } {
   const dataset = db
-    .query(`SELECT content_hash, purpose FROM dataset WHERE id = ?`)
-    .get(datasetId) as { content_hash: string; purpose: string | null } | null;
+    .query(`SELECT content_hash, purpose, coverage FROM dataset WHERE id = ?`)
+    .get(datasetId) as { content_hash: string; purpose: string | null; coverage: string } | null;
   if (!dataset) {
     throw new KernelError(`deterministic execution Dataset not found: ${datasetId}`);
   }
@@ -252,6 +254,10 @@ function loadDataset(db: KernelDb, datasetId: string): {
     artifactId: lineage[0]!.id,
     observations: payload.observations.map((observation, index) =>
       objectValue(observation, `Dataset observation ${index}`)),
+    sources: Array.isArray(payload.sources)
+      ? payload.sources.map((source, index) => objectValue(source, `Dataset source ${index}`))
+      : [],
+    coverage: parseStoredObject(dataset.coverage, "Dataset coverage"),
     marketContext: payload.market_context === undefined ? null : objectValue(payload.market_context, "Dataset market_context"),
     purpose: dataset.purpose,
   };
@@ -620,8 +626,106 @@ function validateMarketCalculationContext(db: KernelDb, missionId: string, quote
   return { context: live, selections, toolVersion: tool.implementation_version };
 }
 
+function normalizedIdentity(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/gi, " ").trim().toLowerCase();
+}
+
+function deriveEvidenceSummaries(dataset: ReturnType<typeof loadDataset>, context: JsonRecord): Map<string, JsonRecord> {
+  const competitors = Array.isArray(context.competitors)
+    ? context.competitors.map((row, index) => objectValue(row, `market_context competitor ${index}`))
+    : [];
+  if (competitors.length !== 2 || dataset.observations.length !== 2 || dataset.sources.length !== 2) {
+    throw new KernelError("calculation Dataset requires exactly two competitor observations and sources");
+  }
+  const cutoff = Date.parse(String(context.event_cutoff));
+  if (!Number.isFinite(cutoff)) throw new KernelError("calculation Dataset event cutoff is invalid");
+  const summaries = new Map<string, JsonRecord>();
+  const sourceByCompetitor = new Map<string, JsonRecord>();
+  for (const [index, source] of dataset.sources.entries()) {
+    const expected = competitors[index]!;
+    if (source.competitor_id !== expected.competitor_id || typeof source.source_hash !== "string" || !/^[0-9a-f]{64}$/.test(source.source_hash)) {
+      throw new KernelError(`Dataset source ${index} differs from ordered competitor identity`);
+    }
+    if (sourceByCompetitor.has(String(source.competitor_id))) throw new KernelError("Dataset source competitor identity is duplicated");
+    sourceByCompetitor.set(String(source.competitor_id), source);
+  }
+  let eligibleRows = 0;
+  let excludedRows = 0;
+  let missingFields = 0;
+  const eligibleDates: string[] = [];
+  const zeroCoverageCompetitors: string[] = [];
+  for (const [index, observation] of dataset.observations.entries()) {
+    exactKeys(observation, ["observed_at", "competitor_id", "selection_id", "competitor_name", "source_url", "source_hash", "parser_version", "rows", "exclusions", "wins", "losses", "draws", "no_contests", "decisive_sample_size", "coverage_status"], `Dataset observation ${index}`);
+    const expected = competitors[index]!;
+    if (observation.competitor_id !== expected.competitor_id || observation.selection_id !== expected.selection_id) {
+      throw new KernelError(`Dataset observation ${index} differs from exact ordered competitor/selection identity`);
+    }
+    if (normalizedIdentity(observation.competitor_name) !== normalizedIdentity(expected.label) || !normalizedIdentity(expected.label)) {
+      throw new KernelError(`Dataset observation ${index} competitor name differs from exact market identity`);
+    }
+    const source = sourceByCompetitor.get(String(expected.competitor_id))!;
+    if (observation.source_hash !== source.source_hash || observation.source_url !== source.url || observation.parser_version !== source.parser_version) {
+      throw new KernelError(`Dataset observation ${index} differs from its source receipt`);
+    }
+    const observedAt = Date.parse(String(observation.observed_at));
+    if (!Number.isFinite(observedAt) || observedAt >= cutoff || observation.observed_at !== source.observed_at) {
+      throw new KernelError(`Dataset observation ${index} is not strictly before the event cutoff`);
+    }
+    if (!Array.isArray(observation.rows) || !Array.isArray(observation.exclusions)) throw new KernelError(`Dataset observation ${index} rows and exclusions must be arrays`);
+    const counts = { WIN: 0, LOSS: 0, DRAW: 0, NC: 0 };
+    const seen = new Set<string>();
+    for (const [rowIndex, value] of observation.rows.entries()) {
+      const row = objectValue(value, `Dataset observation ${index} row ${rowIndex}`);
+      exactKeys(row, ["observed_at", "competitor_id", "selection_id", "competitor_name", "opponent_url", "event_date", "outcome", "event_url"], `Dataset observation ${index} row ${rowIndex}`);
+      if (row.competitor_id !== expected.competitor_id || row.selection_id !== expected.selection_id || normalizedIdentity(row.competitor_name) !== normalizedIdentity(expected.label) || row.observed_at !== observation.observed_at) {
+        throw new KernelError(`Dataset observation ${index} row ${rowIndex} differs from its ordered competitor identity`);
+      }
+      if (row.outcome !== "WIN" && row.outcome !== "LOSS" && row.outcome !== "DRAW" && row.outcome !== "NC") throw new KernelError(`Dataset observation ${index} row ${rowIndex} outcome is invalid`);
+      const eventAt = Date.parse(String(row.event_date));
+      if (!Number.isFinite(eventAt) || eventAt >= cutoff) throw new KernelError(`Dataset observation ${index} row ${rowIndex} is at or after the event cutoff`);
+      const key = canonicalJson({ event_date: row.event_date, opponent_url: row.opponent_url, event_url: row.event_url });
+      if (seen.has(key)) throw new KernelError(`Dataset observation ${index} contains a duplicate eligible bout row`);
+      seen.add(key);
+      counts[row.outcome] += 1;
+      eligibleRows += 1;
+      eligibleDates.push(String(row.event_date));
+    }
+    for (const [exclusionIndex, value] of observation.exclusions.entries()) {
+      const exclusion = objectValue(value, `Dataset observation ${index} exclusion ${exclusionIndex}`);
+      if (typeof exclusion.reason !== "string" || !exclusion.reason) throw new KernelError(`Dataset observation ${index} exclusion ${exclusionIndex} requires a reason`);
+      if (String(exclusion.reason).startsWith("unparseable") || exclusion.reason === "unresolved_opponent") missingFields += 1;
+      excludedRows += 1;
+    }
+    const claimed = [observation.wins, observation.losses, observation.draws, observation.no_contests, observation.decisive_sample_size];
+    if (claimed.some((value) => !Number.isSafeInteger(value) || (value as number) < 0)) throw new KernelError(`Dataset observation ${index} summary is outside the integer domain`);
+    if (observation.wins !== counts.WIN || observation.losses !== counts.LOSS || observation.draws !== counts.DRAW || observation.no_contests !== counts.NC || observation.decisive_sample_size !== counts.WIN + counts.LOSS) {
+      throw new KernelError(`Dataset observation ${index} summary differs from canonical eligible bout rows`);
+    }
+    const expectedStatus = observation.rows.length === 0 ? "zero_coverage" : "covered";
+    if (observation.coverage_status !== expectedStatus) throw new KernelError(`Dataset observation ${index} coverage status differs from canonical eligible bout rows`);
+    if (expectedStatus === "zero_coverage") zeroCoverageCompetitors.push(String(expected.competitor_id));
+    if (summaries.has(String(expected.competitor_id))) throw new KernelError("Dataset observation competitor identity is duplicated");
+    summaries.set(String(expected.competitor_id), { ...observation, wins: counts.WIN, losses: counts.LOSS, draws: counts.DRAW, no_contests: counts.NC, decisive_sample_size: counts.WIN + counts.LOSS });
+  }
+  if (eligibleRows === 0) throw new KernelError("calculation Dataset has no eligible pre-cutoff bout population");
+  eligibleDates.sort();
+  const derivedCoverage = {
+    eligible_rows: eligibleRows,
+    excluded_rows: excludedRows,
+    date_range: { first: eligibleDates[0], last: eligibleDates.at(-1) },
+    missing_fields: missingFields,
+    sources: dataset.sources,
+    zero_coverage_competitors: zeroCoverageCompetitors,
+    record_count: dataset.observations.length,
+    max_observed_at: dataset.observations.map((row) => String(row.observed_at)).sort().at(-1) ?? null,
+  };
+  if (canonicalJson(dataset.coverage) !== canonicalJson(derivedCoverage)) throw new KernelError("Dataset coverage differs from canonical bout rows and exclusions");
+  return summaries;
+}
+
 function buildCalculationResult(dataset: ReturnType<typeof loadDataset>, selections: JsonRecord[], context: JsonRecord, calculationHash: string, toolId: string, toolVersion: string): { bytes: Uint8Array; hash: string; output: JsonRecord } {
-  const summaries = new Map(dataset.observations.map((row) => [String(row.competitor_id), row]));
+  const summaries = deriveEvidenceSummaries(dataset, context);
   const priced = selections.map((selection, index) => {
     const decimal = selection.decimal;
     const probability = fixedProbability(decimal, `Quote selection ${index} decimal price`);
@@ -635,7 +739,7 @@ function buildCalculationResult(dataset: ReturnType<typeof loadDataset>, selecti
     if (Number(decisive) !== history.decisive_sample_size) throw new KernelError("Dataset decisive sample size does not equal wins plus losses");
     const normalizedUnits = roundDivide(BigInt(probability.raw_probability_units) * METRIC_SCALE, overround);
     const fractionUnits = decisive === 0n ? null : roundDivide(wins * METRIC_SCALE, decisive);
-    return { competitor_id: history.competitor_id, selection_id: history.selection_id, label: selection.label, decimal_price: selection.decimal, price_units: probability.price_units, raw_implied_probability_units: probability.raw_probability_units, raw_implied_probability: probability.raw_probability, normalized_market_probability_units: Number(normalizedUnits), normalized_market_probability: formatFixed(normalizedUnits), source_listed_wins: Number(wins), source_listed_losses: Number(losses), source_listed_draws: history.draws, source_listed_no_contests: history.no_contests, decisive_sample_size: Number(decisive), source_listed_decisive_fraction_units: fractionUnits === null ? null : Number(fractionUnits), source_listed_decisive_fraction: fractionUnits === null ? null : formatFixed(fractionUnits) };
+    return { competitor_id: history.competitor_id, selection_id: selection.selection_id, label: selection.label, decimal_price: selection.decimal, price_units: probability.price_units, raw_implied_probability_units: probability.raw_probability_units, raw_implied_probability: probability.raw_probability, normalized_market_probability_units: Number(normalizedUnits), normalized_market_probability: formatFixed(normalizedUnits), source_listed_wins: Number(wins), source_listed_losses: Number(losses), source_listed_draws: history.draws, source_listed_no_contests: history.no_contests, decisive_sample_size: Number(decisive), source_listed_decisive_fraction_units: fractionUnits === null ? null : Number(fractionUnits), source_listed_decisive_fraction: fractionUnits === null ? null : formatFixed(fractionUnits) };
   });
   const output: JsonRecord = { contract: "qf.calculation.result.v1", operation: CALCULATION_OPERATION, formula_version: CALCULATION_FORMULA_VERSION, implementation_version: CALCULATION_IMPLEMENTATION_VERSION, scale: 6, formulas: { raw_implied_probability: "round_half_up(1000000000000 / price_units)", overround: "sum(raw_implied_probability_units)", normalized_market_probability: "round_half_up(raw_implied_probability_units * 1000000 / overround_units)", source_listed_decisive_fraction: "round_half_up(wins * 1000000 / (wins + losses)); unavailable when denominator is zero" }, market_context: context, dataset_id: `dataset:${dataset.contentHash}`, dataset_content_hash: dataset.contentHash, calculation_envelope_hash: calculationHash, capability_id: toolId, capability_version: toolVersion, execution_environment: EXECUTION_ENVIRONMENT_ID, overround_units: Number(overround), overround: formatFixed(overround), sides, limitation: "Source-listed descriptive history is not an estimated win probability." };
   const bytes = new TextEncoder().encode(`${canonicalJson(output)}\n`);
