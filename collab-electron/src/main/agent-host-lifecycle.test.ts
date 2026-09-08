@@ -242,7 +242,7 @@ describe("agent-host native-TUI lifecycle admission", () => {
     expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("closed");
   });
 
-  test("disposal blocks the native teardown and releases after acknowledgment", async () => {
+  test("application disposal closes the native runtime even with an undelivered result", async () => {
     pendingResults.clear();
     teardownCalls = 0;
     const id = "disposal-session";
@@ -251,17 +251,19 @@ describe("agent-host native-TUI lifecycle admission", () => {
     pendingResults.add(id);
 
     await disposeAgentHost();
-    expect(teardownCalls).toBe(0);
-    expect(hasLiveAgentSession(id)).toBe(true);
-    expect(roles.get("orchestrator")).toBe(`pty-${id}`);
-    expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("running");
-
-    pendingResults.delete(id);
-    await disposeAgentHost();
     expect(teardownCalls).toBe(1);
     expect(hasLiveAgentSession(id)).toBe(false);
     expect(roles.get("orchestrator")).toBeUndefined();
     expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("closed");
+    pendingResults.delete(id);
+  });
+
+  test("application disposal does not wait forever for a wedged runtime", async () => {
+    const { awaitRuntimeTeardownsForShutdown } = await import("./agent-host");
+    const never = new Promise<void>(() => {});
+    const startedAt = performance.now();
+    await awaitRuntimeTeardownsForShutdown([never], 5);
+    expect(performance.now() - startedAt).toBeLessThan(250);
   });
 
   test("cancel blocks its own teardown and releases after acknowledgment", async () => {

@@ -340,6 +340,11 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "wave1-critic-decision",
+    description: "W1-03: packaged real market research and independent Critic with Evaluation-gated Decision and reopen proof",
+    run: async () => (await (await import("./gates/wave1-critic-decision.ts")).runWave1CriticDecisionGate()).ok,
+  },
+  {
     name: "technique-outcome-loop",
     description: "R17: immutable named Technique selection and operator-settled outcome grade",
     run: async () => {

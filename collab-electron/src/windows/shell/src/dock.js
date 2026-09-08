@@ -13,11 +13,6 @@ import { participantFieldRows, participantViewForSession } from "./participant-p
  * not on agent_session — terminal rows show "exit n/a" rather than a fake 0.
  */
 
-function shortId(id) {
-	if (typeof id !== "string") return String(id ?? "");
-	return id.length <= 12 ? id : `${id.slice(0, 8)}…${id.slice(-4)}`;
-}
-
 function el(tag, className, text) {
 	const node = document.createElement(tag);
 	if (className) node.className = className;
@@ -176,28 +171,29 @@ export function formatDockSessionState(row) {
 	return { text: status || "unknown", kind: "terminal" };
 }
 
-/**
- * View filter for the Dock sessions rail. Does not mutate Kernel rows.
- * @param {unknown} sessions
- * @param {string | null | undefined} clearedThroughIso exclusive lower bound for
- *   terminal sessions (hide when created_at <= cursor). Live sessions always pass.
- */
-export function visibleDockSessions(sessions, clearedThroughIso) {
-	const rows = Array.isArray(sessions) ? sessions : [];
-	const cursor =
-		typeof clearedThroughIso === "string" && clearedThroughIso.length > 0
-			? clearedThroughIso
-			: null;
-	if (!cursor) return rows;
-	return rows.filter((row) => {
-		if (!isDockTerminalSessionStatus(row?.status)) return true;
-		const created = String(row?.created_at ?? "");
-		return created > cursor;
-	});
+function sentenceCase(value, fallback) {
+	const source = String(value ?? "").trim();
+	if (!source || source === "Not recorded") return fallback;
+	const spaced = source.replace(/_/g, " ").toLowerCase();
+	return `${spaced.charAt(0).toUpperCase()}${spaced.slice(1)}`;
 }
 
-function sessionSpeciesLabel(row) {
-	return String(row?.display_name ?? row?.label ?? row?.role ?? "session");
+export function activeParticipantPresentation(view, state) {
+	const name = String(view?.displayName ?? "").trim();
+	const task = String(view?.task ?? "").trim();
+	const work = task && task !== "Not recorded"
+		? task
+		: view?.work === "unassigned"
+			? "Ready for work"
+			: sentenceCase(view?.work, "No current work");
+	const runtime = view?.runtimeState && view.runtimeState !== "Not recorded"
+		? view.runtimeState
+		: state?.text;
+	return Object.freeze({
+		name: name && name !== "Not recorded" ? name : "Participant",
+		work,
+		state: sentenceCase(runtime, "Unknown"),
+	});
 }
 
 /**
@@ -261,20 +257,15 @@ export async function runEvidenceAction({ action, stage, cue, missionId, quoteId
 export function initDock(panelEl, options = {}) {
 	const speciesList = panelEl.querySelector("#dock-species-list");
 	const sessionsList = panelEl.querySelector("#dock-sessions-list");
-	const historyList = panelEl.querySelector("#dock-history-list");
 	const inspectPane = panelEl.querySelector("#dock-inspect-pane");
 	const tallyEl = panelEl.querySelector("#dock-tally");
 	const teamSummaryEl = panelEl.querySelector("#dock-team-summary");
 	const missionEmptyEl = panelEl.querySelector("#dock-mission-empty");
-	if (!speciesList || !sessionsList || !historyList || !inspectPane) {
+	if (!speciesList || !sessionsList || !inspectPane) {
 		console.error("[dock] missing required Dock projection surfaces");
 		return;
 	}
 
-	/** @type {string | null} ISO watermark — hide terminal sessions at-or-before. */
-	let sessionsClearedThroughIso = null;
-	/** @type {boolean} */
-	let closedCollapsed = true;
 	let selectedSessionId = null;
 	let selectedTaskId = null;
 	let planningDirector = null;
@@ -389,15 +380,13 @@ export function initDock(panelEl, options = {}) {
 		return Boolean(task);
 	}
 
-	function setTally({ live, closed, launchable }) {
+	function setTally({ live, launchable }) {
 		if (!tallyEl) return;
 		tallyEl.replaceChildren();
-		const liveEl = el("b", null, `${live} live`);
+		const liveEl = el("b", null, `${live} active`);
 		tallyEl.appendChild(liveEl);
 		tallyEl.appendChild(el("s", null, "·"));
-		tallyEl.appendChild(document.createTextNode(`${closed} closed`));
-		tallyEl.appendChild(el("s", null, "·"));
-		tallyEl.appendChild(document.createTextNode(`${launchable} launchable`));
+		tallyEl.appendChild(document.createTextNode(`${launchable} available`));
 	}
 
 	async function refreshPass() {
@@ -566,28 +555,18 @@ export function initDock(panelEl, options = {}) {
 			}) : [];
 			syncStartDiscovery();
 			sessionsList.replaceChildren();
-			historyList.replaceChildren();
 			let liveCount = 0;
-			let closedCount = 0;
 			if (!sessRes?.ok) {
 				sessionsList.appendChild(
 					el("div", "qf-empty", sessRes?.error?.message ?? "Failed to list sessions"),
 				);
-				historyList.appendChild(el("div", "qf-empty", sessRes?.error?.message ?? "Failed to list sessions"));
 			} else {
 				const allSessions = surfaceRes?.ok && Array.isArray(surfaceRes.sessions)
 					? surfaceRes.sessions
 					: (Array.isArray(sessRes.sessions) ? sessRes.sessions : []);
 				latestSessions = allSessions;
-				const sessions = visibleDockSessions(allSessions, sessionsClearedThroughIso);
-				const live = [];
-				const closed = [];
-				for (const row of sessions) {
-					if (isDockLiveSessionStatus(row?.status)) live.push(row);
-					else closed.push(row);
-				}
+				const live = allSessions.filter((row) => isDockLiveSessionStatus(row?.status));
 				liveCount = live.length;
-				closedCount = closed.length;
 
 				const appendSessionRow = (row, targetList) => {
 					const id = String(row.id ?? "");
@@ -610,14 +589,14 @@ export function initDock(panelEl, options = {}) {
 					card.dataset.qfParticipantRecovery = view.recovery;
 					card.tabIndex = 0;
 					card.setAttribute("role", "button");
-					card.setAttribute("aria-label", `${view.displayName} ${id} · ${view.historical ? "historical" : "current"} participant`);
+					const presentation = activeParticipantPresentation(view, state);
+					card.setAttribute("aria-label", `${presentation.name} · ${presentation.work} · ${presentation.state}`);
 					card.appendChild(el("i", null, null));
-					card.appendChild(el("span", "id", shortId(id)));
-					const who = el("span", "who", view.role === "Not recorded" ? sessionSpeciesLabel(row) : view.role);
-					who.title = `${view.displayName} · ${view.role}`;
+					const who = el("span", "who", presentation.name);
+					who.title = `${view.role} · ${view.runtime}`;
 					card.appendChild(who);
-					card.appendChild(el("span", "own", `${view.task} · ${view.work}`));
-					card.appendChild(el("span", "st", `${view.runtimeState} · ${state.text}`));
+					card.appendChild(el("span", "own", presentation.work));
+					card.appendChild(el("span", "st", presentation.state));
 					card.addEventListener("click", () => {
 						selectedTaskId = null;
 						selectedSessionId = id;
@@ -637,7 +616,7 @@ export function initDock(panelEl, options = {}) {
 					if (isDockLiveSessionStatus(status)) {
 						const cancel = el("button", "srow-action", "Cancel");
 						cancel.type = "button";
-						cancel.setAttribute("aria-label", `Cancel session ${id}`);
+						cancel.setAttribute("aria-label", `Cancel ${presentation.name}`);
 						cancel.addEventListener("click", (event) => { event.stopPropagation(); void window.shellApi.qf.cancelSession(id); });
 						actions.appendChild(cancel);
 					} else if (status === "cancelled" || status === "failed") {
@@ -653,8 +632,6 @@ export function initDock(panelEl, options = {}) {
 
 				if (live.length === 0) sessionsList.appendChild(el("div", "qf-empty", "No active participants"));
 				for (const row of live) appendSessionRow(row, sessionsList);
-				if (closed.length === 0) historyList.appendChild(el("div", "qf-empty", "No historical sessions"));
-				for (const row of closed) appendSessionRow(row, historyList);
 				if (selectedSessionId) {
 					const selected = allSessions.find((row) => String(row.id ?? "") === selectedSessionId);
 					if (selected) renderInspect(selected, participantFor(selected, taskAssignments, allSessions));
@@ -665,17 +642,12 @@ export function initDock(panelEl, options = {}) {
 				}
 			}
 
-			setTally({ live: liveCount, closed: closedCount, launchable });
+			setTally({ live: liveCount, launchable });
 	}
 	const refresh = createCoalescedRefresh(refreshPass);
 
 	panelEl.querySelector("#dock-tidy")?.addEventListener("click", () => {
 		options.onTidy?.();
-	});
-
-	panelEl.querySelector("#dock-sessions-clear")?.addEventListener("click", () => {
-		sessionsClearedThroughIso = new Date().toISOString();
-		void refresh();
 	});
 
 	const questionForm = panelEl.querySelector("#dock-question-form");
@@ -689,7 +661,7 @@ export function initDock(panelEl, options = {}) {
 	techniqueSelect.setAttribute("aria-label", "Technique version");
 	const techniquePlaceholder = document.createElement("option");
 	techniquePlaceholder.value = "";
-	techniquePlaceholder.textContent = "Technique version";
+	techniquePlaceholder.textContent = "No Technique selected";
 	techniqueSelect.appendChild(techniquePlaceholder);
 	(panelEl.querySelector("#dock-technique-host") || questionForm)?.appendChild(techniqueSelect);
 	const populateTechniqueSelect = () => window.shellApi.qf.listStrategyVersions().then((response) => {
@@ -699,8 +671,8 @@ export function initDock(panelEl, options = {}) {
 	void populateTechniqueSelect();
 	techniqueSelect.addEventListener("change", () => { selectedStrategyId = techniqueSelect.value || null; });
 	const questionSubmit = questionForm?.querySelector("button[type=submit]");
-	if (questionSubmit) questionSubmit.disabled = true;
-	techniqueSelect.addEventListener("change", () => { if (questionSubmit) questionSubmit.disabled = !selectedStrategyId; });
+	if (questionSubmit) questionSubmit.disabled = false;
+	techniqueSelect.addEventListener("change", () => { if (questionSubmit) questionSubmit.disabled = false; });
 	const setQuestionStatus = (message, tone = "") => {
 		if (!questionStatus) return;
 		questionStatus.textContent = message;

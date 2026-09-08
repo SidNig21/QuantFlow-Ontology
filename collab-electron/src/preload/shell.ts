@@ -54,6 +54,8 @@ contextBridge.exposeInMainWorld("shellApi", {
   openFileDialog: (): Promise<string | null> =>
     ipcRenderer.invoke("dialog:open-file"),
   qf: {
+    selectAgentSurface: (args: { tileId: string; sessionId: string } | null) =>
+      ipcRenderer.invoke("qf:canvas:select-agent", args),
     execute: (
       command: string,
       input: Record<string, unknown>,
@@ -66,8 +68,15 @@ contextBridge.exposeInMainWorld("shellApi", {
     listMarkets: () => ipcRenderer.invoke("qf:markets:list"),
     captureMarkets: (args: { sport: string; competition: string; market_class: string }) =>
       ipcRenderer.invoke("qf:markets:capture", args),
-    investigateMarket: (args: { quote_id: string; name: string; objective: string }) =>
+    investigateMarket: (args: {
+      quote_id: string;
+      name: string;
+      objective: string;
+      requested_expression: { expression: string; outcome_description: string; market_description?: string };
+    }) =>
       ipcRenderer.invoke("qf:markets:investigate", args),
+    analyzeMarketAndReview: (args: { mission_id: string; quote_id: string; retry_task_id?: string }) =>
+      ipcRenderer.invoke("qf:market:analyze-and-review", args),
     getEvidenceCapabilities: () => ipcRenderer.invoke("qf:evidence:capabilities"),
     addEvidenceAndCalculate: (args: { mission_id: string; quote_id: string }) =>
       ipcRenderer.invoke("qf:evidence:add-and-calculate", args),
@@ -261,10 +270,6 @@ contextBridge.exposeInMainWorld("shellApi", {
     ipcRenderer.on("update:status", handler);
     return () => ipcRenderer.removeListener("update:status", handler);
   },
-
-  canvasLoadState: () => ipcRenderer.invoke("canvas:load-state"),
-  canvasSaveState: (state: unknown) =>
-    ipcRenderer.invoke("canvas:save-state", state),
 
   getDragPaths: () => ipcRenderer.invoke("drag:get-paths"),
   getPathForFile: (file: File): string => webUtils.getPathForFile(file),

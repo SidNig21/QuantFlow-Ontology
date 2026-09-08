@@ -4,11 +4,11 @@ status: OPEN
 active-order: docs/orders/active/WO-W1-03-UFC-RESEARCH-DECISION.md
 builder-authority: OPEN
 router-authority: OPEN
-builder-condition: DO NOT RESUME until one fresh semantic Reader verifies the 2026-09-07 one-Canvas order against the preserved unaccepted implementation
+builder-condition: OPEN — fresh semantic Reader returned ORDER SEMANTIC YES and BUILDER DOOR YES on the corrected 2026-09-07 one-Canvas order
 g11-status: CLOSED
 r18-status: FROZEN / SUPERSEDED
 foundation-status: ACCEPTED — candidate 58b444d858443debeac8b13e041b2bb65e4e370e; independent YES / YES
-reader-status: REQUIRED — the prior YES / YES predates ADR-0005 and the repository-wide one-Canvas correction
+reader-status: YES / YES — corrected order removes the inherited alternate-Canvas gate contradiction; selective salvage may begin
 
 Golden and the Post-Golden Foundation remain accepted and closed. The rejected FM-0 candidate remains
 unmerged. WO-W1-01 and WO-W1-02 are accepted and archived under `docs/history/orders/`; their acceptance

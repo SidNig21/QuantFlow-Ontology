@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 export const UFC_HISTORICAL_EVIDENCE_TOOL_ID = "ufc-historical-evidence";
 export const UFC_HISTORICAL_EVIDENCE_VERSION = "qf-ufc-history-v1";
-export const UFC_HISTORY_PARSER_VERSION = "ufc-athlete-html-v1";
+export const UFC_HISTORY_PARSER_VERSION = "ufc-athlete-html-v2";
 export const UFC_HISTORY_REQUEST_TIMEOUT_MS = 20_000;
 export const UFC_HISTORY_OPERATION_TIMEOUT_MS = 25_000;
 export const UFC_HISTORY_SOURCE_LIMIT_BYTES = 5 * 1024 * 1024;
@@ -82,7 +82,50 @@ function exactCanonical(html: string, expectedUrl: string, expectedLabel: string
   if (!exactMatchup) throw new UfcHistoryError("matchup_mismatch", `Official UFC page for ${expectedLabel} does not contain the investigated opponent and event date`);
 }
 
-function parsePage(html: string, sourceUrl: string, competitor: MarketCompetitor, opponent: MarketCompetitor, observedAt: string, cutoff: string): { rows: Json[]; exclusions: Json[]; canonical_name: string } {
+export function parseMatchupFacts(html: string): Json {
+  const fields: Record<string, string[]> = {};
+  const collect = (label: string, value: string) => { (fields[normalized(decode(label))] ??= []).push(decode(value)); };
+  for (const match of html.matchAll(/class=["']c-bio__label["'][^>]*>([\s\S]*?)<\/div>\s*<div[^>]*class=["']c-bio__text["'][^>]*>([\s\S]*?)<\/div>/gi)) collect(match[1]!, match[2]!);
+  for (const match of html.matchAll(/class=["']c-stat-compare__number["'][^>]*>([\s\S]*?)<div class=["']c-stat-compare__label["'][^>]*>([\s\S]*?)<\/div>/gi)) collect(match[2]!, match[1]!);
+  for (const match of html.matchAll(/<title>(Striking accuracy|Takedown Accuracy)\s+([^<]+)<\/title>/gi)) collect(match[1]!, match[2]!);
+  for (const match of html.matchAll(/class=["'][^"']*athlete-stats__stat-numb["'][^>]*>([\s\S]*?)<\/p>\s*<p[^>]*class=["'][^"']*athlete-stats__stat-text["'][^>]*>([\s\S]*?)<\/p>/gi)) collect(match[2]!, match[1]!);
+  for (const match of html.matchAll(/class=["']c-overlap__stats-text["'][^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi)) collect(match[1]!, match[2]!);
+  for (const match of html.matchAll(/class=["']c-stat-3bar__label["'][^>]*>\s*(Standing|Clinch|Ground)\s*<\/div>\s*<div class=["']c-stat-3bar__value["'][^>]*>([\s\S]*?)<\/div>/gi)) collect(`${match[1]} significant strikes`, match[2]!);
+  const specs: Array<[string, string, string]> = [
+    ["height", "Height", "inches"], ["reach", "Reach", "inches"], ["stance", "Stance", "text"], ["date_of_birth", "Date of Birth", "text"],
+    ["significant_strikes_landed_per_minute", "Sig. Str. Landed", "per_minute"], ["significant_strikes_absorbed_per_minute", "Sig. Str. Absorbed", "per_minute"],
+    ["striking_accuracy", "Striking accuracy", "percent"], ["striking_defense", "Sig. Str. Defense", "percent"],
+    ["takedown_average", "Takedown avg", "per_15_minutes"], ["takedown_accuracy", "Takedown Accuracy", "percent"], ["takedown_defense", "Takedown Defense", "percent"],
+    ["submission_average", "Submission avg", "per_15_minutes"], ["submission_wins", "Wins by Submission", "count"], ["submission_losses", "Losses by Submission", "count"],
+    ["takedowns_landed", "Takedowns Landed", "count"], ["takedowns_attempted", "Takedowns Attempted", "count"],
+    ["submission_attempts", "Submission Attempts", "count"], ["control_time", "Control Time", "text"], ["opponent_adjusted_submission_rate", "Opponent Adjusted Submission Rate", "text"],
+    ["standing_significant_strikes", "Standing significant strikes", "count_and_percent"], ["clinch_significant_strikes", "Clinch significant strikes", "count_and_percent"], ["ground_significant_strikes", "Ground significant strikes", "count_and_percent"],
+  ];
+  const facts: Json = {};
+  for (const [key, label, unit] of specs) {
+    const values = fields[normalized(label)] ?? [];
+    if (values.length > 1) throw new UfcHistoryError("identity_ambiguous", `Duplicate official statistic: ${label}`);
+    const raw = values[0];
+    if (!raw) { facts[key] = { status: "unavailable", reason: "not_present_in_official_response", unit }; continue; }
+    if (unit === "text") { facts[key] = { status: "available", value: raw, unit, source_label: label }; continue; }
+    if (unit === "count_and_percent") {
+      const pair = /^(-?\d+)\s*\((-?\d+(?:\.\d+)?)%\)$/.exec(raw.trim());
+      if (!pair) { facts[key] = { status: "unavailable", reason: "unparseable_official_value", raw, unit }; continue; }
+      const count = Number(pair[1]), percent = Number(pair[2]);
+      if (!Number.isSafeInteger(count) || count < 0 || percent < 0 || percent > 100) throw new UfcHistoryError("malformed_page", `Impossible official statistic: ${label}`);
+      facts[key] = { status: "available", value: { count, percent }, unit, source_label: label }; continue;
+    }
+    const numeric = raw.replace(/\s*%$/, "").trim();
+    if (/^(?:NaN|[-+]?Infinity)$/i.test(numeric)) throw new UfcHistoryError("malformed_page", `Non-finite official statistic: ${label}`);
+    if (!/^-?\d+(?:\.\d+)?$/.test(numeric)) { facts[key] = { status: "unavailable", reason: "unparseable_official_value", raw, unit }; continue; }
+    const value = Number(numeric);
+    if (!Number.isFinite(value) || value < 0 || (unit === "percent" && value > 100) || (unit === "count" && !Number.isInteger(value))) throw new UfcHistoryError("malformed_page", `Impossible official statistic: ${label}`);
+    facts[key] = { status: "available", value, unit, source_label: label };
+  }
+  return { fields: facts, limitations: ["Career aggregates describe the source population, not matchup probabilities.", "Displayed bout history is incomplete; absent submission losses are not zero.", "No opponent-adjusted or positional submission model is established by these pages."] };
+}
+
+function parsePage(html: string, sourceUrl: string, competitor: MarketCompetitor, opponent: MarketCompetitor, observedAt: string, cutoff: string): { rows: Json[]; exclusions: Json[]; canonical_name: string; matchup_facts: Json } {
   exactCanonical(html, sourceUrl, competitor.label, opponent.label, cutoff);
   const canonicalName = decode(/<meta\s+[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["'][^>]*>/i.exec(html)?.[1] ?? "").replace(/\s*\|\s*UFC$/i, "");
   const section = /<div\s+id=["']athlete-record["'][\s\S]*?(?=<div\s+class=["']c-tabs|<footer|$)/i.exec(html)?.[0];
@@ -116,9 +159,10 @@ function parsePage(html: string, sourceUrl: string, competitor: MarketCompetitor
     const key = `${eventDate}\u0000${opponentUrl}\u0000${eventUrl ?? ""}`;
     if (seen.has(key)) { exclusions.push({ ...base, event_date: eventDate, outcome, reason: "duplicate" }); continue; }
     seen.add(key);
-    rows.push({ observed_at: observedAt, competitor_id: competitor.competitor_id, selection_id: competitor.selection_id, competitor_name: canonicalName, opponent_url: opponentUrl, event_date: eventDate, outcome, event_url: eventUrl });
+    const finish = /class=["']c-card-event--athlete-results__result-label["'][^>]*>\s*Method\s*<\/div>\s*<div class=["']c-card-event--athlete-results__result-text["'][^>]*>([\s\S]*?)<\/div>/i.exec(article)?.[1];
+    rows.push({ observed_at: observedAt, competitor_id: competitor.competitor_id, selection_id: competitor.selection_id, competitor_name: canonicalName, opponent_url: opponentUrl, event_date: eventDate, outcome, event_url: eventUrl, finish_method: finish && decode(finish) ? { status: "available", value: decode(finish) } : { status: "unavailable", reason: "not_present_in_official_response" } });
   }
-  return { rows, exclusions, canonical_name: canonicalName };
+  return { rows, exclusions, canonical_name: canonicalName, matchup_facts: parseMatchupFacts(html) };
 }
 
 async function nativeTransport(url: string, signal: AbortSignal): Promise<HistoryTransportResponse> {
@@ -151,6 +195,7 @@ async function readBounded(response: HistoryTransportResponse, aggregate: { byte
 export async function acquireUfcHistoricalEvidence(options: { market_context: HistoricalMarketContext; transport?: HistoryTransport; signal?: AbortSignal; now?: () => Date }): Promise<{ bytes: Uint8Array; payload: Json; coverage: Json }> {
   const context = options.market_context;
   if (context.competitors.length !== 2 || context.selection_ids.length !== 2) throw new UfcHistoryError("identity_unresolved", "UFC history requires exactly two ordered competitors and selections");
+  if (new Set(context.competitors.map((row) => row.competitor_id)).size !== 2 || new Set(context.selection_ids).size !== 2 || new Set(context.competitors.map((row) => athleteUrl(row.label))).size !== 2) throw new UfcHistoryError("identity_ambiguous", "UFC history requires distinct fighter and selection identities");
   if (context.selection_ids.some((id, index) => id !== context.competitors[index]!.selection_id)) throw new UfcHistoryError("identity_ambiguous", "Ordered selection identity does not match competitors");
   const observedAt = (options.now ?? (() => new Date()))().toISOString();
   if (!Number.isFinite(Date.parse(context.event_cutoff)) || Date.parse(observedAt) >= Date.parse(context.event_cutoff)) throw new UfcHistoryError("cutoff_leak", "Historical evidence observation must be strictly before the investigated event cutoff");
@@ -181,7 +226,7 @@ export async function acquireUfcHistoricalEvidence(options: { market_context: Hi
     const losses = page.rows.filter((row) => row.outcome === "LOSS").length;
     const draws = page.rows.filter((row) => row.outcome === "DRAW").length;
     const noContests = page.rows.filter((row) => row.outcome === "NC").length;
-    return { observed_at: observedAt, competitor_id: context.competitors[index]!.competitor_id, selection_id: context.competitors[index]!.selection_id, competitor_name: page.canonical_name, source_url: urls[index], source_hash: sources[index]!.source_hash, parser_version: UFC_HISTORY_PARSER_VERSION, rows: page.rows, exclusions: page.exclusions, wins, losses, draws, no_contests: noContests, decisive_sample_size: wins + losses, coverage_status: page.rows.length === 0 ? "zero_coverage" : "covered" };
+    return { observed_at: observedAt, competitor_id: context.competitors[index]!.competitor_id, selection_id: context.competitors[index]!.selection_id, competitor_name: page.canonical_name, source_url: urls[index], source_hash: sources[index]!.source_hash, parser_version: UFC_HISTORY_PARSER_VERSION, rows: page.rows, exclusions: page.exclusions, matchup_facts: page.matchup_facts, wins, losses, draws, no_contests: noContests, decisive_sample_size: wins + losses, coverage_status: page.rows.length === 0 ? "zero_coverage" : "covered" };
   });
   const allRows = parsed.flatMap((page) => page.rows);
   const allExclusions = parsed.flatMap((page) => page.exclusions);

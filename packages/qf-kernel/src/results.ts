@@ -10,13 +10,13 @@ export type ObjectExecuteResult = {
 
 export type ContextExecuteResult = {
   kind: "context";
-  command: "register_venue" | "schedule_market_event";
+  command: "register_venue" | "schedule_market_event" | "reschedule_market_event";
   object_type: "venue" | "market_event";
   object_id: string;
   source_artifact_id: string;
   trace_id: string;
   row_digest: string;
-  outcome: "created" | "replayed";
+  outcome: "created" | "replayed" | "revised";
   state: Record<string, unknown>;
 };
 
@@ -53,6 +53,6 @@ export type ExecuteResultFor<C extends string> = string extends C
   ? ExecuteResult
   : C extends "ingest_market_batch"
     ? PipelineExecuteResult
-    : C extends "register_venue" | "schedule_market_event"
+    : C extends "register_venue" | "schedule_market_event" | "reschedule_market_event"
       ? ContextExecuteResult
     : ObjectExecuteResult;

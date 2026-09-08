@@ -161,11 +161,12 @@ test("Dock and Canvas consume the same participant projection seam", async () =>
   expect(renderer).not.toContain("runtimeObservation: { live: Boolean(term?.ptySessionId)");
 });
 
-test("founder-path chrome exposes the existing south-east resize handle and no-Mission history copy", async () => {
+test("founder-path chrome exposes resizing and no alternate history or Mission world", async () => {
   const css = await Bun.file(new URL("./shell.css", import.meta.url)).text();
   const html = await Bun.file(new URL("../index.html", import.meta.url)).text();
   expect(css).toContain(".canvas-tile .tile-resize-handle.corner-se::after");
   expect(css).toContain("pointer-events: none");
-  expect(html).toContain("No research history yet.");
-  expect(html).not.toContain("No historical research for this Mission.");
+	expect(html).not.toContain('data-dock-mode="HISTORY"');
+	expect(html).not.toContain("research-world-projection");
+	expect(html).not.toContain("Full Lineage");
 });

@@ -95,9 +95,7 @@ describe("app Kernel handle lifecycle", () => {
     expect(start).toBeGreaterThanOrEqual(0);
     expect(end).toBeGreaterThan(start);
     const shutdown = source.slice(start, end + 3);
-    expect(shutdown.indexOf("await disposeAgentHost()" )).toBeGreaterThan(-1);
-    expect(shutdown.indexOf("stopJsonRpcServer()" )).toBeGreaterThan(shutdown.indexOf("await disposeAgentHost()"));
-    expect(shutdown.indexOf("closeAppKernel()" )).toBeGreaterThan(shutdown.indexOf("stopJsonRpcServer()"));
+    expect(shutdown).toContain("runShutdownLifecycle");
   });
 
   test("migrates the accepted legacy publication shape before a projection can read it", () => {

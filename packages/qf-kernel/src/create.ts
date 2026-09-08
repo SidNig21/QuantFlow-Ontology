@@ -26,7 +26,7 @@ import {
   type LinkSpec,
   writeLinks,
 } from "./links.ts";
-import { registerVenue, scheduleMarketEvent } from "./market-context.ts";
+import { registerVenue, rescheduleMarketEvent, scheduleMarketEvent } from "./market-context.ts";
 import type { TraceContext, TrustedExecutionContext } from "./trace.ts";
 import {
   assertDurableOntologyReadReceipt,
@@ -295,7 +295,7 @@ function publishArtifact(
   }
 
   const ontologyReadReceipt = trace.ontology_read_tool
-    ? validateOntologyReadPublication(bytes, trace.actor_session_id, trace.ontology_read_tool)
+    ? validateOntologyReadPublication(bytes, trace.actor_session_id, trace.ontology_read_tool, db)
     : undefined;
   if (ontologyReadReceipt) {
     const producerLinks = effectiveLinks.filter((link) => link.kind === "produces");
@@ -1686,6 +1686,7 @@ export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
   observe_ticket: observeTicket,
   register_venue: registerVenue,
   schedule_market_event: scheduleMarketEvent,
+  reschedule_market_event: rescheduleMarketEvent,
 };
 
 /** Every creationCommands entry must have a handler (D3 join). */

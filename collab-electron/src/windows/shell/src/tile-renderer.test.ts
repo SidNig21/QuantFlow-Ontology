@@ -6,6 +6,7 @@ import {
   positionTile,
   createTileDOM,
   armCloseHead,
+	updateTileTitle,
 } from "./tile-renderer.js";
 
 /** Minimal DOM for bun tests — no new dependency (one-skin / order forbid). */
@@ -377,7 +378,7 @@ describe("WO-g2 glacier spine DOM", () => {
       type: "term",
       id: "tile-director",
       definitionId: "hermes-research-director",
-      agentLabel: "Research Director",
+	  displayName: "Research Director",
       role: "orchestrator",
       sessionId: "session-director",
       ptySessionId: "pty-director",
@@ -385,7 +386,24 @@ describe("WO-g2 glacier spine DOM", () => {
     expect(dom.container.dataset.definitionId).toBe("hermes-research-director");
     expect(dom.container.dataset.sessionId).toBe("session-director");
     expect(dom.container.querySelector(".tile-title-name")?.textContent).toBe("Research Director");
+	expect(dom.container.querySelector(".gl-tile__id")?.children[0]?.textContent).toBe("PARTICIPANT");
+	expect(dom.container.querySelector(".tile-agent-badges")).toBeNull();
   });
+
+	test("keeps a participant spine semantic when a pending tile becomes a live TUI", () => {
+		const tile = {
+			type: "session",
+			id: "tile-internal-uuid",
+			definitionId: "hermes-market-researcher",
+			displayName: "Market Researcher",
+		};
+		const dom = createTileDOM(tile, { onClose: () => {} });
+		expect(dom.idSpan.textContent).toBe("PARTICIPANT");
+		Object.assign(tile, { type: "term", sessionId: "session-internal-uuid", ptySessionId: "pty-internal-uuid" });
+		updateTileTitle(dom, tile);
+		expect(dom.idSpan.textContent).toBe("PARTICIPANT");
+		expect(dom.container.querySelector(".tile-agent-badges")).toBeNull();
+	});
 
   test("createTileDOM builds spine/head/id/grip/body/screen and cable nodes", () => {
     const closes: string[] = [];

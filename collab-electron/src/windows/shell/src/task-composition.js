@@ -1,5 +1,3 @@
-import { participantFieldRows } from "./participant-projection.js";
-
 function node(tag, className, text) {
 	const value = document.createElement(tag);
 	if (className) value.className = className;
@@ -75,12 +73,12 @@ function renderHistory(foot, history) {
 	foot.appendChild(list);
 }
 
-function isSessionReceipt(child) {
-	return child?.classList?.length === 1 && child.classList.contains("qf-world-session-receipt");
-}
-
 function isSessionInspection(child) {
 	return child?.classList?.contains("qf-world-session-inspect") === true;
+}
+
+function isSessionReceipt(child) {
+	return child?.classList?.length === 1 && child.classList.contains("qf-world-session-receipt");
 }
 
 export function renderTaskFoot(dom, tile, {
@@ -110,26 +108,24 @@ export function renderTaskFoot(dom, tile, {
 	const retainedReceipt = [...foot.children].find(isSessionReceipt) ?? null;
 	const retainedInspection = [...foot.children].find(isSessionInspection) ?? null;
 	const retainedResearchProjection = [...foot.children].find((child) => child.classList?.contains("qf-world-participant-card")) ?? null;
-	const retainedChildren = [retainedReceipt, retainedInspection, retainedResearchProjection].filter(Boolean);
+	const retainedChildren = participantView
+		? []
+		: [retainedReceipt, retainedInspection, retainedResearchProjection].filter(Boolean);
 	if (retainedChildren.length > 0) foot.replaceChildren(...retainedChildren);
 	else foot.replaceChildren();
 	if (!tile?.sessionId) {
-		if (retainedReceipt) foot.appendChild(retainedReceipt);
+		if (retainedReceipt && !participantView) foot.appendChild(retainedReceipt);
 		return;
-	}
-	if (participantView) {
-		const receipt = retainedReceipt || node("div", "qf-world-session-receipt");
-		receipt.replaceChildren(...participantFieldRows(participantView).map(({ field, value }) => {
-			const row = node("div", "qf-world-context-field");
-			row.appendChild(node("span", "qf-world-field-label", field));
-			row.appendChild(node("span", "qf-world-field-value", value));
-			return row;
-		}));
-		if (!retainedReceipt) foot.appendChild(receipt);
 	}
 
 	const session = (Array.isArray(sessions) ? sessions : []).find((row) => row?.id === tile.sessionId);
 	const fact = taskFactForSession(assignments, tile.sessionId);
+	if (participantView) {
+		// A governed participant tile is its working surface. Assignment,
+		// lifecycle, identity, recovery, and controls belong in Dock Inspect;
+		// none of that machinery consumes the participant's Canvas tile.
+		return;
+	}
 	const factRow = node(
 		fact.task?.assignmentState === "assigned" ? "button" : "div",
 		`task-fact task-fact-${fact.state}`,

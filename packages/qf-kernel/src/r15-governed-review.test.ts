@@ -43,7 +43,7 @@ function fixture(deliver = true, admit = true) {
   db = openKernel(":memory:");
   session("director", "director-definition", "orchestrator", ["desk.orchestrate"]);
   session("executor", "executor-definition", "worker", ["desk.orchestrate"]);
-  session("critic", "hermes-critic", "critic", ["research.evaluate"]);
+  session("critic", "independent-critic", "critic", ["research.evaluate"]);
   const hypothesis = execute(db, "create_hypothesis", { claim: "Fixture evidence supports the claim.", success_criteria: "All four critic scores support." }, trace);
   const mission = execute(db, "create_mission", { mission_id: "r15-mission", name: "R15 fixture mission", objective: "Provide the bounded authority context." }, trace);
   const datasetBytes = new TextEncoder().encode(JSON.stringify({ contract: "qf.dataset.v1", observations: [{ id: "r15", observed_at: "2026-08-15T10:00:00.000Z", edge: 1, settlement: { outcome: "win", stake: "100.000000", decimal_odds: "2.000000", closing_decimal_odds: "1.500000" } }] }));
@@ -101,7 +101,7 @@ function completeWorkerTask(taskId: string, sourceWork: { result_artifact_id: st
 }
 
 function sessionFromExistingDefinition(id: string): void {
-  execute(db!, "create_agent_session", { session_id: id, agent_definition_id: "hermes-critic", label: id }, trace);
+  execute(db!, "create_agent_session", { session_id: id, agent_definition_id: "independent-critic", label: id }, trace);
   execute(db!, "start_agent_session", { session_id: id }, trace);
 }
 
@@ -220,6 +220,16 @@ describe("R15 governed review", () => {
     markGovernedDelivery(db!, failed.taskId, "failed", trace);
     expect((db!.query("SELECT COUNT(*) AS n FROM qf_review_receipt WHERE task_id = ? AND kind = 'delivery_receipt'").get(failed.taskId) as { n: number }).n).toBe(1);
     expect((db!.query("SELECT COUNT(*) AS n FROM events WHERE object_id = ? AND type = 'task.cancelled'").get(failed.taskId) as { n: number }).n).toBe(1);
+  });
+
+  test("critic admission is capability-based and rejects a critic without research.evaluate", () => {
+    const f = fixture(false, false);
+    session("ineligible-critic", "different-runtime-critic", "critic", ["market.read"]);
+    const result = requestGovernedReview(db!, "source-task", "ineligible-capability", "ineligible-critic", trace);
+    expect(result.kind).toBe("refused");
+    expect(result.receipt?.reason_code).toBe("CRITIC_ADMISSION_FAILED");
+    expect(db!.query("SELECT COUNT(*) AS n FROM task WHERE id LIKE 'review-task-%'").get()).toEqual({ n: 0 });
+    expect(f.work.executor_session_id).toBe("executor");
   });
 
   test("a critic that returns twice without an Evaluation fails only the review Task with a durable reason", () => {

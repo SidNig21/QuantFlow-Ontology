@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { acquireUfcHistoricalEvidence, athleteUrl, UfcHistoryError, UFC_HISTORY_SOURCE_LIMIT_BYTES, type HistoricalMarketContext, type HistoryTransport } from "./index.ts";
+import { acquireUfcHistoricalEvidence, athleteUrl, parseMatchupFacts, UfcHistoryError, UFC_HISTORY_SOURCE_LIMIT_BYTES, type HistoricalMarketContext, type HistoryTransport } from "./index.ts";
 
 const context: HistoricalMarketContext = {
   quote_id: "quote-1", quote_observed_at: "2026-09-01T00:00:00.000Z", quote_source_hash: "a".repeat(64),
@@ -22,6 +22,27 @@ function response(url: string, body: string, extras: Partial<{ status: number; u
 }
 
 describe("official UFC historical evidence", () => {
+  test("preserves stated statistics and field-level absence without inventing zero", () => {
+    const html = '<title>Striking accuracy 41%</title><div class="c-stat-compare__number">0.67</div><div class="c-stat-compare__label">Submission avg</div><div class="c-stat-compare__number">55<div class="c-stat-compare__percent">%</div></div><div class="c-stat-compare__label">Takedown Defense</div>';
+    expect(parseMatchupFacts(html).fields).toMatchObject({ striking_accuracy: { value: 41, unit: "percent" }, submission_average: { value: 0.67 }, takedown_defense: { value: 55 }, submission_losses: { status: "unavailable" } });
+    expect(() => parseMatchupFacts(html.replace('41%', '141%'))).toThrow("Impossible official statistic");
+    expect(() => parseMatchupFacts(html + '<title>Striking accuracy 41%</title>')).toThrow("Duplicate official statistic");
+    expect(() => parseMatchupFacts(html.replace('0.67', 'Infinity'))).toThrow("Non-finite official statistic");
+    expect(() => parseMatchupFacts(html.replace('0.67', '-1'))).toThrow("Impossible official statistic");
+    const positional = '<div class="c-stat-3bar__label">Standing </div><div class="c-stat-3bar__value">750 (81%)</div>';
+    expect(parseMatchupFacts(positional).fields).toMatchObject({ standing_significant_strikes: { status: "available", value: { count: 750, percent: 81 } } });
+    expect(() => parseMatchupFacts(positional.replace('81%', '181%'))).toThrow("Impossible official statistic");
+    expect(parseMatchupFacts(html.replace('0.67', 'N/A')).fields).toMatchObject({ submission_average: { status: "unavailable", reason: "unparseable_official_value" } });
+  });
+
+  test("identical captured bytes and context canonicalize identically; context changes identity", async () => {
+    const transport: HistoryTransport = async (url) => response(url, page(url.includes("alpha") ? "Alpha Fighter" : "Beta Fighter", url.includes("alpha") ? "Beta Fighter" : "Alpha Fighter"));
+    const acquire = (time: string) => acquireUfcHistoricalEvidence({ market_context: context, transport, now: () => new Date(time) });
+    expect((await acquire("2026-09-06T00:00:00Z")).bytes).toEqual((await acquire("2026-09-06T00:00:00Z")).bytes);
+    expect((await acquire("2026-09-06T00:00:00Z")).bytes).not.toEqual((await acquire("2026-09-06T00:00:01Z")).bytes);
+    const duplicate = structuredClone(context); duplicate.competitors[1] = duplicate.competitors[0]!;
+    await expect(acquireUfcHistoricalEvidence({ market_context: duplicate, transport })).rejects.toMatchObject({ code: "identity_ambiguous" });
+  });
   test("uses exactly two canonical requests and preserves the whole displayed pre-cutoff population", async () => {
     const calls: string[] = [];
     const transport: HistoryTransport = async (url) => {

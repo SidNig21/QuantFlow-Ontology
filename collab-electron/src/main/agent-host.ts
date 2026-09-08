@@ -114,15 +114,15 @@ function assertNativeTuiTeardownAllowed(sessionId: string): void {
 export function createNativeTuiTeardownRegistry(
   teardown: (entry: NativeTuiLive) => Promise<void> = tearDownNativeTui,
 ): {
-  begin: (sessionId: string, entry: NativeTuiLive, beforeTeardown?: () => void) => Promise<void>;
+  begin: (sessionId: string, entry: NativeTuiLive, beforeTeardown?: () => void, force?: boolean) => Promise<void>;
   awaitAll: () => Promise<void>;
 } {
   const inFlight = new Map<string, Promise<void>>();
 
-  const begin = (sessionId: string, entry: NativeTuiLive, beforeTeardown?: () => void): Promise<void> => {
+  const begin = (sessionId: string, entry: NativeTuiLive, beforeTeardown?: () => void, force = false): Promise<void> => {
     const existing = inFlight.get(sessionId);
     if (existing) return existing;
-    assertNativeTuiTeardownAllowed(sessionId);
+    if (!force) assertNativeTuiTeardownAllowed(sessionId);
     beforeTeardown?.();
     const promise = teardown(entry).finally(() => {
       if (inFlight.get(sessionId) === promise) inFlight.delete(sessionId);
@@ -141,6 +141,19 @@ export function createNativeTuiTeardownRegistry(
 }
 
 const nativeTuiTeardowns = createNativeTuiTeardownRegistry();
+
+const AGENT_HOST_SHUTDOWN_DEADLINE_MS = 2_000;
+
+export async function awaitRuntimeTeardownsForShutdown(
+  teardowns: readonly Promise<unknown>[],
+  deadlineMs = AGENT_HOST_SHUTDOWN_DEADLINE_MS,
+): Promise<void> {
+  if (teardowns.length === 0) return;
+  await Promise.race([
+    Promise.allSettled(teardowns).then(() => {}),
+    new Promise<void>((resolve) => setTimeout(resolve, deadlineMs)),
+  ]);
+}
 
 /** Process-local host boundary used by Kernel-captured Task delivery. */
 export function hasLiveAgentSession(sessionId: string): boolean {
@@ -853,10 +866,11 @@ export function closeAgentSessionRow(sessionId: string): void {
 }
 
 export async function disposeAgentHost(): Promise<void> {
+  const teardowns: Promise<unknown>[] = [];
   for (const [id, entry] of live) {
     if (entry.kind === "native_tui") {
-      try {
-        await nativeTuiTeardowns.begin(id, entry as NativeTuiLive, () => {
+      teardowns.push(
+        nativeTuiTeardowns.begin(id, entry as NativeTuiLive, () => {
           const status = String(kernelGetObject("agent_session", id)?.status ?? "");
           if (["closed", "cancelled", "failed"].includes(status)) return;
           kernelExecute(
@@ -864,17 +878,18 @@ export async function disposeAgentHost(): Promise<void> {
             { session_id: id },
             newTrace(),
           );
-        });
-      } catch (error) {
-        if (error instanceof Error && error.message === UNDELIVERED_RESULT_ERROR) continue;
-      }
+        }, true).catch(() => {}),
+      );
     } else if (entry.kind === "host_acp" && entry.hostAcp) {
-      await tearDownHostAcp(entry.hostAcp).catch(() => {});
+      teardowns.push(tearDownHostAcp(entry.hostAcp).catch(() => {}));
     }
     live.delete(id);
     if (entry.kind === "native_tui") nativeTuiPeerDeliveryBySession.delete(id);
   }
-  await nativeTuiTeardowns.awaitAll();
+  // Runtime owners get the first chance to close cleanly. A provider retry or
+  // wedged guest must not prevent the app-wide PTY kill and sidecar shutdown
+  // that follow this bounded wait.
+  await awaitRuntimeTeardownsForShutdown(teardowns);
 }
 installNativeTuiPtyExitHook((sessionId) => {
   closeAgentSessionRow(sessionId);

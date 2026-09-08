@@ -11,7 +11,10 @@ import {
 } from "./constants.ts";
 import {
   parseBovadaLiveMarketsResponse,
+  parseBovadaFightMenu,
+  type BovadaFightMenu,
   type BovadaMarketRequest,
+  type BovadaRequestedExpression,
   type SelectedBovadaMarket,
 } from "./parser.ts";
 import {
@@ -23,6 +26,7 @@ import {
 import type { BovadaKernelAccess, TraceContext } from "./runner.ts";
 
 export type BovadaLiveMarketRow = {
+  market_metadata?: Record<string, unknown>;
   quote_id: string;
   instrument_id: string;
   market_event_id: string;
@@ -46,10 +50,12 @@ export type BovadaLiveMarketRow = {
     label: string;
     american: string;
     decimal: string;
+    handicap?: number | null;
   }>;
 };
 
 export type BovadaLiveMarketsReceipt = {
+  menu?: BovadaFightMenu;
   capability: { id: string; name: "Bovada Live Markets"; capability_class: "data"; implementation_version: string };
   request: BovadaMarketRequest;
   bytes: number;
@@ -67,6 +73,8 @@ export type BovadaLiveMarketsProbeReceipt = {
 };
 
 export type BovadaLiveMarketsOptions = {
+  provider_event_id?: string;
+  requested_expression?: BovadaRequestedExpression;
   db: KernelDb;
   artifactRoot: string;
   request: BovadaMarketRequest;
@@ -174,6 +182,12 @@ export async function probeBovadaLiveMarketsAvailability(
 
 export async function runBovadaLiveMarketsCapture(options: BovadaLiveMarketsOptions): Promise<BovadaLiveMarketsReceipt> {
   const { bytes, observedAt, selected } = await readBovadaLiveMarkets(options);
+  if (options.provider_event_id && !options.requested_expression) {
+    throw new KernelClassificationError("an exact requested expression is required for a fight-menu investigation");
+  }
+  const menu = options.provider_event_id
+    ? parseBovadaFightMenu(bytes, observedAt, options.provider_event_id, options.requested_expression!)
+    : undefined;
   const artifactId = contentHash(bytes);
   const artifactPath = artifactPathForHash(options.artifactRoot, artifactId);
   const durable = ensureArtifactFile(options.artifactRoot, artifactId, bytes);
@@ -191,17 +205,17 @@ export async function runBovadaLiveMarketsCapture(options: BovadaLiveMarketsOpti
       venue_id: VENUE_ID, kind: VENUE_KIND, name: VENUE_NAME, source_artifact_id: artifactId, observed_at: observedAt,
     }, trace(artifactId, "register_venue"));
   }
-  const rows = selected.map((entry) => rowFor(entry, artifactId, observedAt));
+  const rows: BovadaLiveMarketRow[] = menu ? menu.markets.map(({ market, display_group_id, display_group }) => {
+    const base = selected.find((entry) => entry.event.id === menu.provider_event_id);
+    if (!base) throw new KernelClassificationError("Exact fight identity has no offered Fight Winner control");
+    const row = rowFor(base, artifactId, observedAt);
+    return { ...row, quote_id: `bovada:quote:${contentHash(new TextEncoder().encode(`${artifactId}\n${observedAt}\n${menu.provider_event_id}\n${market.id}`))}`, instrument_id: `bovada:instrument:${menu.provider_event_id}:${market.id}`, provider_market_id: market.id, market: market.description, period: market.period.description,
+      market_metadata: { display_group_id, display_group, key: market.key ?? null, description_key: market.descriptionKey, type: market.marketTypeId, status: market.status, period: market.period },
+      selections: market.outcomes.map((outcome) => ({ competitor_id: outcome.competitorId ?? "", selection_id: outcome.id, price_id: outcome.priceId, label: outcome.description, american: String(outcome.price.american), decimal: String(outcome.price.decimal), handicap: outcome.handicap ?? null })) };
+  }) : selected.map((entry) => rowFor(entry, artifactId, observedAt));
   const instruments: Array<Record<string, unknown>> = [];
   const quotes: Array<Record<string, unknown>> = [];
-  for (const row of rows) {
-    const eventExpected = { id: row.market_event_id, sport: row.sport, starts_at: row.starts_at, status: "scheduled", competition: row.competition };
-    if (!exactObject(options.kernel.getObject(options.db, "market_event", row.market_event_id), eventExpected, "market_event")) {
-      options.kernel.execute(options.db, "schedule_market_event", {
-        market_event_id: row.market_event_id, sport: row.sport, starts_at: row.starts_at,
-        competition: row.competition, source_artifact_id: artifactId, observed_at: observedAt,
-      }, trace(`${artifactId}:${row.provider_event_id}`, "schedule_market_event"));
-    }
+  const instrumentFor = (row: BovadaLiveMarketRow) => {
     const params = {
       provider: "bovada", competition_id: selected.find((entry) => entry.event.id === row.provider_event_id)!.competitionId,
       provider_event_id: row.provider_event_id, provider_market_id: row.provider_market_id,
@@ -209,10 +223,12 @@ export async function runBovadaLiveMarketsCapture(options: BovadaLiveMarketsOpti
       competitor_ids: row.selections.map((selection) => selection.competitor_id),
       selection_ids: row.selections.map((selection) => selection.selection_id),
     };
-    const instrument = { id: row.instrument_id, kind: "moneyline", params, sides: row.selections.map((selection) => selection.label), correlation_group: `${row.market_event_id}:moneyline` };
-    if (!exactObject(options.kernel.getObject(options.db, "instrument", row.instrument_id), instrument, "instrument")) {
-      instruments.push({ ...instrument, market_event_id: row.market_event_id });
-    } else {
+    const kind = row.market === "Fight Winner" || row.market === "Moneyline" ? "moneyline" : row.market_metadata?.key === "2W-OU" ? "total" : "prop";
+    return { id: row.instrument_id, kind, params, sides: row.selections.map((selection) => selection.label), correlation_group: `${row.market_event_id}:${kind}` };
+  };
+  for (const row of rows) {
+    const instrument = instrumentFor(row);
+    if (exactObject(options.kernel.getObject(options.db, "instrument", row.instrument_id), instrument, "instrument")) {
       const eventLinks = options.kernel.getLinks(options.db, row.instrument_id, { kind: "offered_on" })
         .filter((link) => link.from_id === row.instrument_id);
       const venueLinks = options.kernel.getLinks(options.db, row.instrument_id, { kind: "lists" })
@@ -224,9 +240,22 @@ export async function runBovadaLiveMarketsCapture(options: BovadaLiveMarketsOpti
         throw new KernelClassificationError(`instrument ${row.instrument_id} has conflicting venue lineage`);
       }
     }
+  }
+  for (const row of rows) {
+    const existingEvent = options.kernel.getObject(options.db, "market_event", row.market_event_id);
+    const stableEvent = { id: row.market_event_id, sport: row.sport, status: "scheduled", competition: row.competition };
+    if (!existingEvent) {
+      options.kernel.execute(options.db, "schedule_market_event", { market_event_id: row.market_event_id, sport: row.sport, starts_at: row.starts_at, competition: row.competition, source_artifact_id: artifactId, observed_at: observedAt }, trace(`${artifactId}:${row.provider_event_id}`, "schedule_market_event"));
+    } else {
+      exactObject(existingEvent, stableEvent, "market_event");
+      if (existingEvent.starts_at !== row.starts_at) options.kernel.execute(options.db, "reschedule_market_event", { market_event_id: row.market_event_id, sport: row.sport, competition: row.competition, starts_at: row.starts_at, source_artifact_id: artifactId, observed_at: observedAt }, trace(`${artifactId}:${row.provider_event_id}`, "reschedule_market_event"));
+    }
+    const instrument = instrumentFor(row);
+    if (!options.kernel.getObject(options.db, "instrument", row.instrument_id)) instruments.push({ ...instrument, market_event_id: row.market_event_id });
     quotes.push({
       id: row.quote_id, instrument_id: row.instrument_id, book: "bovada", data_ref: artifactId,
       coverage: {
+        ...(menu ? { market_menu: menu, market_metadata: row.market_metadata } : {}),
         observed_at: observedAt, provider_time: row.provider_time, source_hash: artifactId,
         provider_event_id: row.provider_event_id, provider_market_id: row.provider_market_id,
         selections: row.selections,
@@ -238,6 +267,6 @@ export async function runBovadaLiveMarketsCapture(options: BovadaLiveMarketsOpti
   }, trace(artifactId, "ingest_market_batch"));
   return {
     capability: { id: BOVADA_LIVE_MARKETS_TOOL_ID, name: "Bovada Live Markets", capability_class: "data", implementation_version: BOVADA_LIVE_MARKETS_VERSION },
-    request: options.request, bytes: bytes.byteLength, source_hash: artifactId, observed_at: observedAt, artifact_id: artifactId, rows,
+    request: options.request, bytes: bytes.byteLength, source_hash: artifactId, observed_at: observedAt, artifact_id: artifactId, rows, ...(menu ? { menu } : {}),
   };
 }

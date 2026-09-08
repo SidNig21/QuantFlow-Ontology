@@ -200,6 +200,7 @@ export const creationCommands: readonly CreationCommand[] = [
     object_type: "market_event",
     event: "market_event.scheduled",
   },
+  { action: "reschedule_market_event", object_type: "market_event", event: "market_event.rescheduled" },
   {
     action: "publish_artifact",
     object_type: "artifact",

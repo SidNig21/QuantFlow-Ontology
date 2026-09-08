@@ -290,6 +290,19 @@ describe("collaboration gateway", () => {
     }
   });
 
+  test("send_result permits one concise correction and then refuses an unbounded loop", () => {
+    const f = fixture();
+    f.deps.commitResult = () => { throw new Error("decision contains missing or foreign evidence references"); };
+    const service = createCollaborationService(f.deps);
+    const submit = () => service.sendResult(
+      { sessionId: "worker-1", role: "worker" },
+      { taskId: "task-1", result: "bounded assessment", citedMarketIds: ["venue-1"], readTrajectoryArtifactIds: ["read-1"] },
+    );
+    expect(submit).toThrow("missing or foreign evidence references");
+    expect(submit).toThrow("missing or foreign evidence references");
+    expect(submit).toThrow("correction limit reached");
+  });
+
   test("send_result can report no evidence only from empty market reads", () => {
     const f = fixture();
     f.deps.readMarketTrajectoryResult = () => [];

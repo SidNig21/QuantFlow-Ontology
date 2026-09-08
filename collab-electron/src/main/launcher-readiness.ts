@@ -7,7 +7,7 @@ export type LauncherReadinessWaiter = {
 };
 
 /** Remove terminal-emulator control frames without removing ordinary text. */
-function stripTerminalControls(line: string): string {
+export function stripTerminalControls(line: string): string {
   let plain = "";
   for (let index = 0; index < line.length;) {
     if (line[index] !== "\u001b") {

@@ -218,19 +218,6 @@ export function createTileDOM(tile, callbacks) {
   titleGroup.className = "tile-title-group";
   titleGroup.appendChild(titleText);
 
-  if (tile.type === "term" && (tile.role || tile.sessionId || tile.definitionId)) {
-    const badges = document.createElement("div");
-    badges.className = "tile-agent-badges";
-    if (tile.agentLabel) badges.appendChild(badge("tile-agent-label", tile.agentLabel));
-    if (tile.role) badges.appendChild(badge("tile-agent-role", tile.role));
-    if (agentModel) {
-      badges.appendChild(badge("tile-agent-runtime", "TUI"));
-      badges.appendChild(badge("tile-agent-status", agentModel.status));
-    }
-    if (tile.sessionId) badges.appendChild(badge("tile-agent-session", shortId(tile.sessionId)));
-    titleGroup.appendChild(badges);
-  }
-
   const copyablePath = tile.filePath || tile.folderPath;
   if (copyablePath) {
     const copySvg = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M5 11H3.5A1.5 1.5 0 0 1 2 9.5V3.5A1.5 1.5 0 0 1 3.5 2h6A1.5 1.5 0 0 1 11 3.5V5"/></svg>`;
@@ -371,6 +358,7 @@ export function createTileDOM(tile, callbacks) {
     spine,
     titleBar: spine,
     titleText,
+	idSpan,
     contentArea,
     contentOverlay,
     taskFoot,
@@ -392,23 +380,9 @@ function tileState(tile) {
 }
 
 function spineIdLabel(tile, agentModel) {
-  if (tile.displayName && tile.pendingSpawnId) return tile.displayName;
-  if (tile.sessionId) return shortId(tile.sessionId);
-  if (tile.definitionId) return tile.definitionId;
-  if (agentModel?.identity) return agentModel.identity;
+	if (agentModel || tile.pendingSpawnId || tile.definitionId || tile.sessionId) return "PARTICIPANT";
+	if (tile.type === "term") return "TERMINAL";
   return tile.id;
-}
-
-function badge(className, text) {
-	const node = document.createElement("span");
-	node.className = className;
-	node.textContent = text;
-	node.title = text;
-	return node;
-}
-
-function shortId(id) {
-	return id.length <= 12 ? id : `${id.slice(0, 8)}…${id.slice(-4)}`;
 }
 
 export function getTileLabel(tile) {
@@ -418,6 +392,7 @@ export function getTileLabel(tile) {
   if (tile.type === "term") {
     if (tile.userTitle) return { parent: "", name: tile.userTitle };
     if (tile.agentLabel) return { parent: "", name: tile.agentLabel };
+	if (tile.displayName) return { parent: "", name: tile.displayName };
     if (tile.definitionId) {
       return { parent: tile.role ? `${tile.role} / ` : "", name: tile.definitionId };
     }
@@ -467,6 +442,7 @@ export function updateTileTitle(dom, tile) {
   titleText.appendChild(parentSpan);
   titleText.appendChild(nameSpan);
   titleText.title = tile.filePath || tile.folderPath || tile.cwd || "";
+	if (dom.idSpan) dom.idSpan.textContent = spineIdLabel(tile, getAgentTileModel(tile));
 }
 
 export function updatePendingSpawnState(dom, tile) {

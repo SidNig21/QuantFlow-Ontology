@@ -209,6 +209,22 @@ export const schedule_market_event = defineAction({
     .strict(),
 });
 
+export const reschedule_market_event = defineAction({
+  name: "reschedule_market_event",
+  description:
+    "A reschedule_market_event records a newer trusted pre-event cutoff for an existing scheduled market event. It may change only starts_at after the observation that established the current fence; sport, competition, provider identity, and lineage remain exact, while live or terminal events reject revision.",
+  lifecycle: "experimental",
+  operatorOnly: true,
+  input: z.object({
+    market_event_id: z.string().min(1).describe("This field identifies the existing scheduled provider event. Reuse the exact stable identity and never substitute a new provider event."),
+    sport: market_event.properties.shape.sport,
+    competition: market_event.properties.shape.competition,
+    starts_at: market_event.properties.shape.starts_at,
+    source_artifact_id: z.string().min(1).describe("This field identifies the immutable Artifact containing the newer schedule observation. The Artifact must already exist in the Kernel."),
+    observed_at: z.iso.datetime().describe("This field records when the revised schedule was observed. It must be newer than the observation governing the current fence and earlier than the revised start."),
+  }).strict(),
+});
+
 export const participates_in = defineLink({
   name: "participates_in",
   description: "Roster edge from each competitor to the market_event it contests.",

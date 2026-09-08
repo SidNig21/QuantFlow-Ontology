@@ -59,6 +59,8 @@ let sidecarClient: SidecarClient | null = null;
 
 /** Map of sessionId -> data socket for sidecar sessions. */
 const dataSockets = new Map<string, net.Socket>();
+// App lifecycle observers belong to the session, not its replaceable viewer socket.
+const sessionDataObservers = new Map<string, (data: Buffer) => void>();
 
 /**
  * Track which sessions are sidecar-managed. Sidecar sessions never
@@ -310,6 +312,7 @@ async function doEnsureSidecar(): Promise<void> {
         clearPendingPtyData(sessionId);
         dataSockets.get(sessionId)?.destroy();
         dataSockets.delete(sessionId);
+        sessionDataObservers.delete(sessionId);
         sidecarSessionIds.delete(sessionId);
         sidecarPowerShellSessionIds.delete(sessionId);
         deleteSessionMeta(sessionId);
@@ -805,10 +808,11 @@ export async function createHostCommandSession(opts: {
   console.log(`[pty] createHostCommandSession ok sessionId=${sessionId}`);
 
   rememberPtyViewer(sessionId, opts.senderWebContentsId);
+  if (opts.onData) sessionDataObservers.set(sessionId, opts.onData);
   const dataSock = await client.attachDataSocket(
     socketPath,
     (data) => {
-      opts.onData?.(data);
+      sessionDataObservers.get(sessionId)?.(data);
       forwardPtyData(
         sessionId,
         getPtyViewer(sessionId) ?? opts.senderWebContentsId,
@@ -886,6 +890,7 @@ export async function reconnectSession(
     const dataSock = await client.attachDataSocket(
       socketPath,
       (data) => {
+        sessionDataObservers.get(sessionId)?.(data);
         forwardPtyData(
           sessionId,
           getPtyViewer(sessionId) ?? senderWebContentsId,
@@ -1035,6 +1040,7 @@ export async function resizeSession(
 export async function killSession(
   sessionId: string,
 ): Promise<void> {
+  sessionDataObservers.delete(sessionId);
   clearForegroundCache(sessionId);
   forgetPtyViewer(sessionId);
   const backend = sessionBackend(sessionId);
@@ -1085,6 +1091,7 @@ export function killAll(): void {
     sock.destroy();
   }
   dataSockets.clear();
+  sessionDataObservers.clear();
   sidecarSessionIds.clear();
   sidecarPowerShellSessionIds.clear();
   for (const sessionId of pendingPtyDataTimers.keys()) {

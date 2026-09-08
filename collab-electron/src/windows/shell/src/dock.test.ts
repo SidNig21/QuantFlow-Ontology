@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	createCoalescedRefresh,
+	activeParticipantPresentation,
 	dockDefinitionDisplayName,
 	formatDockTeamSummary,
 	formatDockSessionState,
@@ -10,7 +11,6 @@ import {
 	runEvidenceAction,
 	taskInspectProjection,
   visibleDockDefinitions,
-  visibleDockSessions,
 } from "./dock.js";
 
 test("evidence action refreshes exactly once after both success and named failure", async () => {
@@ -256,34 +256,6 @@ describe("production Dock inventory", () => {
   });
 });
 
-describe("Dock sessions Clear view filter", () => {
-  const sessions = [
-    { id: "old-closed", status: "closed", created_at: "2026-08-01T00:00:00.000Z" },
-    { id: "live", status: "running", created_at: "2026-08-01T00:00:00.000Z" },
-    { id: "new-closed", status: "closed", created_at: "2026-08-04T12:00:00.000Z" },
-  ];
-
-  test("without cursor shows every Kernel row", () => {
-    expect(visibleDockSessions(sessions, null).map((row) => row.id)).toEqual([
-      "old-closed",
-      "live",
-      "new-closed",
-    ]);
-  });
-
-  test("cursor hides terminal rows at-or-before without deleting them", () => {
-    const visible = visibleDockSessions(sessions, "2026-08-03T00:00:00.000Z");
-    expect(visible.map((row) => row.id)).toEqual(["live", "new-closed"]);
-    expect(sessions).toHaveLength(3);
-  });
-
-  test("live sessions stay visible even when older than the cursor", () => {
-    expect(
-      visibleDockSessions(sessions, "2099-01-01T00:00:00.000Z").map((row) => row.id),
-    ).toEqual(["live"]);
-  });
-});
-
 describe("Dock session state labels (WO-g3)", () => {
   test("live and blocked use Kernel status text", () => {
     expect(formatDockSessionState({ status: "running" })).toEqual({
@@ -306,4 +278,27 @@ describe("Dock session state labels (WO-g3)", () => {
       kind: "terminal",
     });
   });
+});
+
+test("Active Dock rows lead with participant purpose instead of machine identity", () => {
+	expect(activeParticipantPresentation({
+		displayName: "Research Director",
+		task: "Not recorded",
+		work: "unassigned",
+		runtimeState: "running",
+	}, { text: "running", kind: "live" })).toEqual({
+		name: "Research Director",
+		work: "Ready for work",
+		state: "Running",
+	});
+	expect(activeParticipantPresentation({
+		displayName: "Market Researcher",
+		task: "Compare the current Bovada menu",
+		work: "working",
+		runtimeState: "running",
+	}, { text: "running", kind: "live" })).toEqual({
+		name: "Market Researcher",
+		work: "Compare the current Bovada menu",
+		state: "Running",
+	});
 });

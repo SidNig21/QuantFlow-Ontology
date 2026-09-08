@@ -18,6 +18,7 @@ export const INDEPENDENT_CRITIC_UPGRADE = "independent-critic" as const;
 export const TASK_COMPOSITION_UPGRADE = "task-composition" as const;
 export const TASK_STEERING_UPGRADE = "task-steering" as const;
 export const GOVERNED_REVIEW_UPGRADE = "governed-review" as const;
+export const MARKET_RESCHEDULE_UPGRADE = "market-reschedule" as const;
 
 export type KernelShapeState =
   | "uninitialized"
@@ -35,6 +36,7 @@ export type KernelShapeState =
   | "pre_r17_current"
   | "pre_market_desk"
   | "pre_wave1_evidence"
+  | "pre_market_reschedule"
   | "current"
   | "partial";
 
@@ -184,6 +186,15 @@ let currentSnapshot: StructureSnapshot | null = null;
 let preR17CurrentSnapshot: StructureSnapshot | null = null;
 let preMarketDeskSnapshot: StructureSnapshot | null = null;
 let preWave1EvidenceSnapshot: StructureSnapshot | null = null;
+let preMarketRescheduleSnapshot: StructureSnapshot | null = null;
+
+function expectedPreMarketReschedule(): StructureSnapshot {
+  if (!preMarketRescheduleSnapshot) {
+    const current = expectedCurrent();
+    preMarketRescheduleSnapshot = { ...current, schemaMeta: current.schemaMeta.filter(([name]) => name !== "reschedule_market_event") };
+  }
+  return preMarketRescheduleSnapshot;
+}
 
 function snapshotFromMigrationFile(path: string): StructureSnapshot {
   const sql = readFileSync(path, "utf8");
@@ -238,7 +249,7 @@ const PRE_W1_EVIDENCE_DESCRIPTIONS = new Map<string, string>([
 
 function expectedPreWave1Evidence(): StructureSnapshot {
   if (!preWave1EvidenceSnapshot) {
-    const current = expectedCurrent();
+    const current = expectedPreMarketReschedule();
     const tables = new Map(current.tables);
     const dataset = tables.get("dataset")
       ?.replace(/,purpose TEXT/gi, "")
@@ -1084,6 +1095,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedPreR17Current())) return "pre_r17_current";
   if (snapshotsEqual(live, expectedPreMarketDesk())) return "pre_market_desk";
   if (snapshotsEqual(live, expectedPreWave1Evidence())) return "pre_wave1_evidence";
+  if (snapshotsEqual(live, expectedPreMarketReschedule())) return "pre_market_reschedule";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -1142,6 +1154,7 @@ export function applyKernelUpgradeChain(
     taskCompositionSql: string;
     taskSteeringSql: string;
     governedReviewSql: string;
+    marketRescheduleSql: string;
   },
 ): void {
   const state = assertWritableUpgradeShape(db);
@@ -1149,8 +1162,14 @@ export function applyKernelUpgradeChain(
   if (state === "uninitialized") return;
 
   const tx = db.transaction(() => {
+    if (state === "pre_market_reschedule") {
+      db.exec(upgrades.marketRescheduleSql);
+      if (classifyKernelShape(db) !== "current") throw new KernelUpgradeShapeError(MARKET_RESCHEDULE_UPGRADE, "0013 did not produce the exact current shape");
+      return;
+    }
     if (state === "pre_wave1_evidence") {
       applyCurrentWave1EvidenceAdditions(db);
+      db.exec(upgrades.marketRescheduleSql);
       if (classifyKernelShape(db) !== "current") {
         throw new KernelUpgradeShapeError(TASK_COMPOSITION_UPGRADE, "W1-02 additions did not produce the exact current shape");
       }
@@ -1159,6 +1178,7 @@ export function applyKernelUpgradeChain(
     if (state === "pre_market_desk") {
       applyCurrentR16SchemaAdditions(db);
       applyCurrentWave1EvidenceAdditions(db);
+      db.exec(upgrades.marketRescheduleSql);
       if (classifyKernelShape(db) !== "current") {
         throw new KernelUpgradeShapeError(TASK_COMPOSITION_UPGRADE, "market desk additions did not produce the exact current shape");
       }
@@ -1167,6 +1187,7 @@ export function applyKernelUpgradeChain(
     if (state === "pre_r17_current") {
       applyCurrentR16SchemaAdditions(db);
       applyCurrentWave1EvidenceAdditions(db);
+      db.exec(upgrades.marketRescheduleSql);
       if (classifyKernelShape(db) !== "current") {
         throw new KernelUpgradeShapeError(
           TASK_COMPOSITION_UPGRADE,
@@ -1291,6 +1312,7 @@ export function applyKernelUpgradeChain(
     db.exec(upgrades.taskSteeringSql);
     applyCurrentR16SchemaAdditions(db);
     applyCurrentWave1EvidenceAdditions(db);
+    db.exec(upgrades.marketRescheduleSql);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(
         TASK_COMPOSITION_UPGRADE,

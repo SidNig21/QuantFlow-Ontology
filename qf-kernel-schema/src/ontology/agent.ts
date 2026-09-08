@@ -479,7 +479,7 @@ export const request_second_opinion = defineAction({
   internalOnly: true,
   input: z.object({
     task_id: z.string().describe("Original open Task id to review."),
-    critic_session_id: z.string().describe("Running production hermes-critic session captured by the host."),
+    critic_session_id: z.string().describe("The running critic participant selected for this independent review. The session must be admitted with the critic role and research.evaluate capability."),
   }),
 });
 

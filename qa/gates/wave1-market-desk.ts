@@ -50,14 +50,14 @@ function verifyGovernedRenderedPath(): void {
   const preload = source("collab-electron/src/preload/shell.ts");
   const dock = source("collab-electron/src/windows/shell/src/dock.js");
   const desk = source("collab-electron/src/windows/shell/src/market-desk.js");
-  const research = source("collab-electron/src/windows/shell/src/research-world.js");
+  const research = source("collab-electron/src/windows/shell/src/one-canvas.js");
   const css = source("collab-electron/src/windows/shell/src/shell.css");
-  assert(main.includes('"qf:markets:capture"') && main.includes("captureBovadaMarketDesk(request)"), "normal IPC capture boundary missing");
+  assert(main.includes('"qf:markets:capture"') && main.includes("captureBovadaMarketDesk(request"), "normal IPC capture boundary missing");
   assert(preload.includes("captureMarkets:") && preload.includes('ipcRenderer.invoke("qf:markets:capture"'), "preload market boundary missing");
   assert(service.includes('kernelExecute("register_tool", CAPABILITY') && service.includes('kernelExecute("create_market_investigation"'), "governed Kernel actions missing");
   assert(dock.includes("marketCapabilityRes.capability") && dock.includes("capability.implementation_version") && dock.includes("options.onOpenMarkets"), "Dock DATA row is not backed by registered identity");
-  assert(desk.includes("Research this market") && desk.includes("source_hash") && desk.includes("Provider time unavailable") && desk.includes("is-historical"), "Canvas market surface is incomplete");
-  assert(!research.includes("removeProjectionTiles?.(staleProjectionIds)"), "research focus still removes unrelated tiles");
+  assert(desk.includes("Open investigation") && desk.includes("source_hash") && desk.includes("Provider time unavailable") && desk.includes("is-historical"), "Canvas market surface is incomplete");
+  assert(research.includes("oneCanvasSurfaceObjects") && !/CURRENT_MISSION|FULL_LINEAGE|savedOverview/.test(research), "one-Canvas deliberate surface boundary missing");
   assert(!css.includes('#panel-viewer[data-qf-research-projection-active="true"] #tile-layer > .canvas-tile:not([data-qf-world-type])'), "research focus still hides unrelated tiles");
   assert(!/stake|bankroll|place bet|place ticket/i.test(desk), "market surface exposes a prohibited execution control");
   console.log("governed rendered path: PASS Dock DATA → IPC → Kernel → Canvas → investigation");
@@ -76,10 +76,9 @@ export async function runWave1MarketDeskGate(): Promise<{ ok: boolean }> {
     await run("render/projection/reopen seams", join(REPO, "collab-electron"), [
       "src/main/market-desk-main.test.ts",
       "src/main/market-research-world.test.ts",
-      "src/windows/shell/src/back-to-world.test.ts",
       "src/windows/shell/src/glacier-feel.test.ts",
       "src/windows/shell/src/market-desk.test.ts",
-      "src/windows/shell/src/research-world.test.ts",
+      "src/windows/shell/src/one-canvas.test.ts",
       "src/windows/shell/src/tile-manager-layout.test.ts",
     ]);
     console.log("wave1-market-desk gate OK");

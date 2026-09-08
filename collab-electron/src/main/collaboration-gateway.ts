@@ -192,6 +192,7 @@ function bestEffortNotification(
 }
 
 export function createCollaborationService(deps: CollaborationDependencies) {
+  const resultAttempts = new Map<string, number>();
   return {
     sendTask(
       identity: CollaborationIdentity,
@@ -245,6 +246,10 @@ export function createCollaborationService(deps: CollaborationDependencies) {
       requireCapability(deps, identity, "market.read");
       const resultText = boundedString(input.result, "result", RESULT_MAX_BYTES);
       const taskId = boundedString(input.taskId, "task_id", ID_MAX_BYTES);
+      const attemptKey = `${identity.sessionId}:${taskId}`;
+      const attempt = (resultAttempts.get(attemptKey) ?? 0) + 1;
+      resultAttempts.set(attemptKey, attempt);
+      if (attempt > 2) throw new Error("send_result correction limit reached; stop this worker and surface the failure");
       const citedMarketIds = boundedIdList(
         input.citedMarketIds,
         "cited_market_ids",
@@ -307,6 +312,7 @@ export function createCollaborationService(deps: CollaborationDependencies) {
         taskId,
         artifactId: committed.artifactId,
       }));
+      resultAttempts.delete(attemptKey);
       return {
         taskId,
         artifactId: committed.artifactId,

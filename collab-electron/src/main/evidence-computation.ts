@@ -83,7 +83,7 @@ function durableJson(hash: string, bytes: Uint8Array): string {
 
 export type EvidenceCalculationReceipt = { mission_id: string; quote_id: string; dataset_id: string; dataset_hash: string; run_id: string; result_artifact_id: string; output: Record<string, unknown> };
 
-export async function addEvidenceAndCalculate(input: { mission_id: string; quote_id: string; transport?: HistoryTransport; signal?: AbortSignal; now?: () => Date }): Promise<EvidenceCalculationReceipt> {
+export async function addOfficialEvidence(input: { mission_id: string; quote_id: string; transport?: HistoryTransport; signal?: AbortSignal; now?: () => Date }): Promise<{ dataset_id: string; dataset_hash: string }> {
   ensureEvidenceComputationCapabilities();
   const context = exactMarketContext(input.mission_id, input.quote_id);
   const controller = new AbortController(); activeOperations.add(controller);
@@ -98,6 +98,11 @@ export async function addEvidenceAndCalculate(input: { mission_id: string; quote
   const dataset = kernelExecute("register_dataset_version", { kind: "results", purpose: "evidence", artifact_id: hash, content_hash: hash, as_of: acquired.payload.observations && Array.isArray(acquired.payload.observations) ? String((acquired.payload.observations[0] as Record<string, unknown>)?.observed_at ?? "") : "", coverage: acquired.coverage }, trace("register_dataset_version")) as { object_id?: unknown };
   const datasetId = String(dataset.object_id ?? "");
   if (!datasetId) throw new Error("Historical evidence Dataset registration returned no identity");
+  return { dataset_id: datasetId, dataset_hash: hash };
+}
+
+export async function addEvidenceAndCalculate(input: { mission_id: string; quote_id: string; transport?: HistoryTransport; signal?: AbortSignal; now?: () => Date }): Promise<EvidenceCalculationReceipt> {
+  const { dataset_id: datasetId, dataset_hash: hash } = await addOfficialEvidence(input);
   const runId = `analysis:${crypto.randomUUID()}`;
   const run = kernelExecute("execute_deterministic_run", {
     run_id: runId, dataset_id: datasetId, mission_id: input.mission_id, quote_id: input.quote_id, tool_id: RESEARCH_LAB_TOOL_ID,

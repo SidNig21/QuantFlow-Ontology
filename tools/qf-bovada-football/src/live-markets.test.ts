@@ -6,7 +6,7 @@ import { closeKernel, execute, getLinks, getObject, openKernel, queryObjects, ty
 import { BOVADA_LIVE_USER_AGENT, BOVADA_UFC_URL } from "./constants.ts";
 import { BovadaSelectionError, KernelClassificationError } from "./errors.ts";
 import { probeBovadaLiveMarketsAvailability, runBovadaLiveMarketsCapture } from "./live-markets.ts";
-import { parseBovadaLiveMarketsResponse } from "./parser.ts";
+import { parseBovadaFightMenu, parseBovadaLiveMarketsResponse } from "./parser.ts";
 import { createBovadaLiveMarketsTransport, type BovadaTransport } from "./transport.ts";
 
 const roots: string[] = [];
@@ -42,7 +42,7 @@ function market(id: string, first = FIRST_COMPETITOR_ID, second = SECOND_COMPETI
   };
 }
 
-function coupon({ league = "UFC Fight Night: Silva vs Delgado", eventId = "29195963", marketRows = [market("519394567")] } = {}) {
+function coupon({ league = "UFC Fight Night: Silva vs Delgado", eventId = "29195963", startTime = "2099-09-12T21:40:00.000Z", marketRows = [market("519394567")] } = {}) {
   return {
     path: [
       { type: "SPORT", id: "UFC", description: "UFC/MMA", sportCode: "UFC" },
@@ -52,7 +52,7 @@ function coupon({ league = "UFC Fight Night: Silva vs Delgado", eventId = "29195
     events: [{
       id: eventId,
       description: "Manon Fiorot vs Alexa Grasso",
-      startTime: Date.parse("2099-09-12T21:40:00.000Z"),
+      startTime: Date.parse(startTime),
       lastModified: Date.parse("2099-09-06T04:49:23.729Z"),
       live: false,
       status: "U",
@@ -82,6 +82,38 @@ function responseTransport(body: Uint8Array): BovadaTransport {
 }
 
 describe("Bovada Live Markets UFC path", () => {
+  test("complete fight menu preserves totals and unavailable submission; incomplete and corrupt controls refuse", () => {
+    const value = coupon() as any;
+    value.events[0].numMarkets = 2;
+    value.events[0].displayGroups[0].markets.push({ ...market("total"), key: "2W-OU", description: "Main Total Rounds Over/Under", outcomes: [
+      { id: "over", description: "Over", status: "O", type: "O", price: { american: "-450", decimal: "1.222222", fractional: "2/9", handicap: "2.5" } },
+      { id: "under", description: "Under", status: "O", type: "U", price: { american: "+300", decimal: "4", fractional: "3/1", handicap: "2.5" } },
+    ] });
+    const parse = (row: unknown) => parseBovadaFightMenu(
+      bytes([row]),
+      "2099-09-06T05:15:58.076Z",
+      "29195963",
+      {
+        expression: "Alexa Grasso wins by submission",
+        market_description: "Alexa Grasso Method of Victory",
+        outcome_description: "Submission",
+      },
+    );
+    expect(parse(value).markets).toHaveLength(2);
+    expect(parse(value).markets[1]!.market.outcomes[0]!.handicap).toBe(2.5);
+    expect(parse(value).requested_expression.status).toBe("selection_unavailable");
+    const incomplete = structuredClone(value); incomplete.events[0].numMarkets = 3;
+    expect(() => parse(incomplete)).toThrow("market_menu_incomplete");
+    for (const [field, bad] of [["decimal", "Infinity"], ["handicap", "NaN"]]) {
+      const corrupt = structuredClone(value); corrupt.events[0].displayGroups[0].markets[1].outcomes[0].price[field as string] = bad;
+      expect(() => parse(corrupt)).toThrow();
+    }
+    const duplicate = structuredClone(value); duplicate.events[0].displayGroups[0].markets[1].outcomes[0].id = FIRST_SELECTION_ID;
+    expect(() => parse(duplicate)).toThrow("duplicate selection");
+    const suspended = structuredClone(value); suspended.events[0].displayGroups[0].markets[1].status = "S";
+    expect(() => parse(suspended)).toThrow("closed or suspended");
+    expect(parse(value).markets).toHaveLength(2);
+  });
   test("enumerates exact current Fight Winner identity and excludes Potential Fights", () => {
     const selected = parseBovadaLiveMarketsResponse(bytes([coupon(), coupon({ league: "Potential Fights", eventId: "26624931" })]), "2099-09-06T05:15:58.076Z", { sport: "ufc", competition: "ufc", market_class: "moneyline" });
     expect(selected).toHaveLength(1);
@@ -171,5 +203,30 @@ describe("Bovada Live Markets UFC path", () => {
     expect(queryObjects(db, "artifact", undefined, null)).toHaveLength(1);
     expect(queryObjects(db, "quote", undefined, null)).toHaveLength(2);
     expect(queryObjects(db, "instrument", undefined, null)).toHaveLength(1);
+  });
+
+  test("same-event schedule revision preserves prior truth while terminal and identity conflicts refuse", async () => {
+    const db = openKernel(":memory:");
+    dbs.push(db);
+    const artifactRoot = mkdtempSync(join(tmpdir(), "qf-w1-markets-"));
+    roots.push(artifactRoot);
+    const kernel = { execute, getObject, getLinks };
+    const capture = (body: Uint8Array, observedAt: string) => runBovadaLiveMarketsCapture({
+      db, artifactRoot, request: { sport: "ufc", competition: "ufc", market_class: "moneyline" }, kernel,
+      transport: responseTransport(body), now: () => new Date(observedAt),
+    });
+    const first = await capture(bytes([coupon()]), "2099-09-06T05:15:58.076Z");
+    await expect(capture(bytes([coupon({ league: "Different competition" })]), "2099-09-06T05:16:58.076Z")).rejects.toThrow("conflicting identity");
+    expect(queryObjects(db, "artifact", undefined, null)).toHaveLength(2);
+    expect(queryObjects(db, "quote", undefined, null)).toHaveLength(1);
+    const revised = await capture(bytes([coupon({ startTime: "2099-09-12T22:00:00.000Z" })]), "2099-09-06T05:17:58.076Z");
+    expect(getObject(db, "market_event", "bovada:event:29195963")?.starts_at).toBe("2099-09-12T22:00:00.000Z");
+    expect(queryObjects(db, "artifact", undefined, null)).toHaveLength(3);
+    expect(queryObjects(db, "quote", undefined, null)).toHaveLength(2);
+    expect(revised.rows[0]?.quote_id).not.toBe(first.rows[0]?.quote_id);
+    const eventTypes = (db.query(`SELECT type FROM events WHERE object_type = 'market_event' AND object_id = ? ORDER BY id`).all("bovada:event:29195963") as Array<{type:string}>).map((row) => row.type);
+    expect(eventTypes.sort()).toEqual(["market_event.rescheduled", "market_event.scheduled"]);
+    execute(db, "start_event", { event_id: "bovada:event:29195963" }, { trace_id: "terminal", span_id: "terminal:start" });
+    await expect(capture(bytes([coupon({ startTime: "2099-09-12T22:20:00.000Z" })]), "2099-09-06T05:19:58.076Z")).rejects.toThrow("conflicting identity");
   });
 });

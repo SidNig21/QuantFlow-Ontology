@@ -31,6 +31,7 @@ import {
   readGovernedPublicationForEvaluation,
   resolveGovernedWorkerEvidence,
   type SourceWork,
+  isMarketExpressionComparison,
 } from "qf-kernel/portable";
 import { schema } from "qf-kernel-schema";
 import {
@@ -47,11 +48,13 @@ import {
   type TaskHistoryFact,
 } from "./task-delegation-projection";
 import { runAtomicResultCommit } from "./atomic-result-commit";
+import { createKernelAgentSession } from "./runtime-kernel-admission";
 import {
   getResearchWorldProjection,
   type ResearchWorldProjectionResult,
   type ResearchWorldRequest,
 } from "./research-world-projection";
+import { marketRuntimeReceiptForSession } from "./market-runtime-receipt";
 
 type DatabaseStatement = {
   run(...params: unknown[]): unknown;
@@ -709,7 +712,7 @@ export function commitCollaborationResult(input: {
   };
 }
 
-/** App cite validation over a Kernel-issued, worker-owned market.read receipt. */
+/** Cite validation over Kernel-issued worker reads, narrowed to an active decision's exact inputs. */
 export function kernelReadMarketTrajectoryResult(
   artifactId: string,
   workerSessionId: string,
@@ -731,13 +734,22 @@ export function kernelReadMarketTrajectoryResult(
   const payload = JSON.parse(readFileSync(String(artifact.storage_ref), "utf8")) as {
     contract?: unknown;
     tool?: unknown;
+    arguments?: unknown;
     result?: unknown;
   };
   if (
     payload.contract !== "qf.ontology.v1" ||
-    typeof payload.tool !== "string" ||
-    kernelCapabilityGroupForTool(payload.tool) !== "market.read"
+    typeof payload.tool !== "string"
   ) {
+    throw new Error("read trajectory is not a market.read ontology receipt");
+  }
+  const decisionScope = kernelDecisionReadScope(workerSessionId);
+  if (decisionScope) {
+    const args = jsonRecord(payload.arguments);
+    if (Object.keys(args).length !== 1 || !decisionScope.allowed.includes(`${payload.tool}:${args.id}`)) {
+      throw new Error("read trajectory is outside the exact decision context");
+    }
+  } else if (kernelCapabilityGroupForTool(payload.tool) !== "market.read") {
     throw new Error("read trajectory is not a market.read ontology receipt");
   }
   return payload.result;
@@ -883,6 +895,110 @@ export function kernelExecute<C extends string>(
 
 export function kernelBindSourceWork(work: SourceWork): SourceWork {
   return kernelExecute("governed_review_task", { operation: "bind_source_work", source_work: work }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) as unknown as SourceWork;
+}
+
+export function kernelDecisionRunForTask(taskId: string): Record<string, unknown> | null {
+  const assignees = kernelGetLinks(taskId, { kind: "assigned_to" }).filter((link) => link.from_id === taskId);
+  const matches = kernelQueryObjects("run", {}, null).filter((run) => {
+    const params = jsonRecord(run.params);
+    const context = jsonRecord(params.decision_context);
+    return isMarketExpressionComparison(params.operation, params.implementation_version) && context.task_id === taskId && assignees.length === 1 && context.worker_session_id === assignees[0]!.to_id;
+  });
+  if (matches.length > 1) throw new Error("Decision Task has ambiguous Run identity");
+  return matches[0] ?? null;
+}
+
+/** Only allowlisted diagnostics leave the event log for the product surface. */
+export function kernelSessionFailureReason(sessionId: string): string | null {
+  if (kernelGetObject("agent_session", sessionId)?.status !== "failed") return null;
+  const row = getKernelDb().query("SELECT payload FROM events WHERE object_type = 'agent_session' AND object_id = ? AND type = 'agent_session.failed' ORDER BY rowid DESC LIMIT 1").get(sessionId) as { payload: string } | null;
+  const reason = row ? jsonRecord(jsonRecord(row.payload).input).reason : null;
+  return reason === "provider_stream_interrupted" || reason === "provider_unavailable" ? reason : null;
+}
+
+export function kernelDecisionReadScope(sessionId: string): { run: Record<string, unknown>; allowed: string[] } | null {
+  const tasks = kernelGetLinks(sessionId, { kind: "assigned_to" }).filter((link) => link.to_id === sessionId).map((link) => kernelGetObject("task", link.from_id)).filter((task) => task?.status === "open");
+  const runs = tasks.map((task) => kernelDecisionRunForTask(String(task!.id))).filter((run): run is Record<string, unknown> => Boolean(run));
+  if (runs.length > 1) throw new Error("Worker has overlapping decision Tasks");
+  if (!runs.length) return null;
+  const run = runs[0]!; const params = jsonRecord(run.params); const context = jsonRecord(params.decision_context);
+  return { run, allowed: [...new Set([`qf_hypothesis_get:${context.hypothesis_id}`, `qf_run_get:${run.id}`, `qf_dataset_get:${context.dataset_id}`, ...((context.inputs as Array<{ id: string }>).map((row) => `qf_artifact_get:${row.id}`)), `qf_artifact_get:${params.result_artifact_id}`, ...((context.selections as Array<{ quote_id: string }>).map((row) => `qf_quote_get:${row.quote_id}`))])] };
+}
+
+export function kernelDecisionArtifactView(id: string, _run: Record<string, unknown>): unknown {
+  const artifact = kernelGetObject("artifact", id);
+  if (!artifact || artifact.content_hash !== id) throw new Error("Decision input Artifact missing");
+  const bytes = readFileSync(String(artifact.storage_ref));
+  if (bytes.length > 5 * 1024 * 1024 || createHash("sha256").update(bytes).digest("hex") !== id) throw new Error("Decision input Artifact bytes changed or exceed the bound");
+  return { id, content_hash: id, content: JSON.parse(bytes.toString("utf8")) };
+}
+
+const MODEL_DECISION_PACKET_MAX_BYTES = 16 * 1024;
+
+/** A bounded model-facing projection of exact decision truth; never durable state. */
+export function kernelDecisionModelReadView(toolName: string, id: string, run: Record<string, unknown>, original: unknown): unknown {
+  const params = jsonRecord(run.params);
+  const context = jsonRecord(params.decision_context);
+  if (toolName === "qf_artifact_get" && id === params.result_artifact_id) {
+    const result = jsonRecord(kernelDecisionArtifactView(id, run));
+    const content = jsonRecord(result.content);
+    const comparisons = Array.isArray(content.comparisons) ? content.comparisons : null;
+    const evidence = Array.isArray(context.evidence_facts) ? context.evidence_facts : null;
+    if (!comparisons || !evidence) throw new Error("Decision evidence packet requires every declared comparison and evidence fact");
+    const packet = {
+      contract: "qf.market.model-evidence.v1",
+      exact_ids: { mission_id: context.mission_id, task_id: context.task_id, worker_session_id: context.worker_session_id, hypothesis_id: context.hypothesis_id, dataset_id: context.dataset_id, run_id: run.id, result_artifact_id: id, inputs: context.inputs },
+      exact_counts: { comparisons: comparisons.length, evidence_facts: evidence.length, inputs: Array.isArray(context.inputs) ? context.inputs.length : 0 },
+      hypothesis: context.hypothesis,
+      method: context.method,
+      offered_market_comparisons: comparisons,
+      official_evidence: evidence,
+    };
+    const text = JSON.stringify(packet);
+    if (new TextEncoder().encode(text).byteLength > MODEL_DECISION_PACKET_MAX_BYTES) throw new Error("Bounded decision evidence exceeds the model-facing limit");
+    return packet;
+  }
+  if (toolName === "qf_run_get") return { id: run.id, status: run.status, result_artifact_id: params.result_artifact_id, model_evidence: "Read the exact result Artifact for the bounded evidence packet." };
+  if (toolName === "qf_artifact_get") return { id, content_hash: id, model_evidence: "Exact input identity is included in the bounded result packet." };
+  if (toolName === "qf_dataset_get") return { id, model_evidence: "Exact Dataset identity is included in the bounded result packet." };
+  if (toolName === "qf_quote_get") {
+    const row = jsonRecord(original);
+    const coverage = jsonRecord(row.coverage);
+    return { id, as_of: row.as_of, observed_at: coverage.observed_at, provider_event_id: coverage.provider_event_id, provider_market_id: coverage.provider_market_id, model_evidence: "Exact offered selections are included in the bounded result packet." };
+  }
+  return original;
+}
+
+/** Expand bounded participant judgment with identities and arithmetic owned by the product. */
+export function kernelCompleteMarketAssessment(taskId: string, workerSessionId: string, result: string): string {
+  const run = kernelDecisionRunForTask(taskId);
+  if (!run) return result;
+  const params = jsonRecord(run.params);
+  const context = jsonRecord(params.decision_context);
+  if (context.worker_session_id !== workerSessionId) throw new Error("market assessment worker identity disagrees with the exact Run");
+  const judgment = jsonRecord(result);
+  const allowed = ["contract", "research_assessment", "classification", "selection_id", "selection_reason", "change_condition", "rationale", "limitations", "invalidation"];
+  if (Object.keys(judgment).length !== allowed.length || Object.keys(judgment).some((key) => !allowed.includes(key)) || judgment.contract !== "qf.market.assessment.v1") throw new Error("market assessment must contain only the bounded judgment fields");
+  const receipt = marketRuntimeReceiptForSession(workerSessionId);
+  if (!receipt) throw new Error("market assessment publication requires the exact trusted runtime receipt");
+  const resultView = jsonRecord(kernelDecisionArtifactView(String(params.result_artifact_id), run));
+  const calculation = jsonRecord(resultView.content);
+  const stale = (context.selections as Array<{ observed_at?: unknown }>).some((selection) => Date.now() - Date.parse(String(selection.observed_at)) > 15 * 60_000);
+  const classification = stale ? "WATCH" : judgment.classification;
+  const selectionId = stale ? null : judgment.selection_id;
+  const selectionReason = stale ? "The observed Bovada quote aged while research was running." : judgment.selection_reason;
+  const changeCondition = stale ? "Refresh Bovada before treating this research as current market actionability." : judgment.change_condition;
+  return JSON.stringify({
+    contract: "qf.market.decision.v1",
+    mission_id: context.mission_id, task_id: context.task_id, worker_session_id: context.worker_session_id,
+    hypothesis_id: context.hypothesis_id, hypothesis: context.hypothesis, dataset_id: context.dataset_id,
+    run_id: run.id, inputs: context.inputs, method: context.method, comparisons: calculation.comparisons,
+    research_assessment: judgment.research_assessment, classification, selection_id: selectionId,
+    selection_reason: selectionReason, change_condition: changeCondition, rationale: judgment.rationale,
+    evidence_refs: (context.inputs as Array<{ id: string }>).map((input) => input.id), evidence_facts: context.evidence_facts,
+    limitations: judgment.limitations, invalidation: judgment.invalidation,
+    provenance: { provider: receipt.provider, model: receipt.model, runtime: receipt.runtime },
+  });
 }
 
 export function kernelFreezeSourceWork(sourceTaskId: string): SourceWork {
@@ -1608,9 +1724,11 @@ export function kernelFinalizeResearchEvaluation(evaluationId: string, database:
   )?.from_id;
   if (!hypothesisId || !runId) throw new Error("Evaluation lacks exact hypothesis and Run lineage");
   const verdict = String(evaluation.verdict);
-  const status = verdict === "supports" ? "supported" : verdict === "rejects" ? "rejected" : "inconclusive";
+  const decisionParams = jsonRecord(readObject("run", runId)?.params);
+  const decisionMode = isMarketExpressionComparison(decisionParams.operation, decisionParams.implementation_version);
+  const status = decisionMode ? "open" : verdict === "supports" ? "supported" : verdict === "rejects" ? "rejected" : "inconclusive";
   const existingHypothesis = readObject("hypothesis", hypothesisId);
-  if (existingHypothesis && String(existingHypothesis.status) === "open") {
+  if (!decisionMode && existingHypothesis && String(existingHypothesis.status) === "open") {
     execute(database, "resolve_hypothesis", {
       hypothesis_id: hypothesisId, evaluation_id: evaluationId, status,
     }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
@@ -1723,8 +1841,10 @@ export function kernelSeedVisibleResearchWorld(input: {
   const executorSessionId = String(persistedRunParams.executor_session_id ?? input.executorSessionId);
   for (const [sessionId, definitionId, label, actorSessionId] of [[input.directorSessionId, "hermes-research-director", "R17 fixture director", null], [executorSessionId, "hermes-worker", "R17 fixture executor", input.directorSessionId], [input.criticSessionId, "hermes-critic", "R17 fixture critic", input.directorSessionId]] as const) {
     if (!kernelGetObject("agent_session", sessionId)) {
-      const sessionTrace = actorSessionId ? { ...trace(), actor_session_id: actorSessionId } : trace();
-      kernelExecute("create_agent_session", { session_id: sessionId, agent_definition_id: definitionId, label }, sessionTrace);
+      createKernelAgentSession(
+        { sessionId, definitionId, label, ...(actorSessionId ? { actorSessionId } : {}) },
+        { execute: kernelExecute, newTrace: trace },
+      );
       kernelExecute("start_agent_session", { session_id: sessionId }, trace());
     }
   }
@@ -1814,7 +1934,7 @@ export function kernelSeedVisibleResearchWorld(input: {
       arguments: args,
       result: { id: args.id },
       broker_sequence: sequence,
-    }, trace());
+    });
   }
   const evaluation = kernelRecordGovernedEvaluation({
     review_task_id: admitted.review_task_id,

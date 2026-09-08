@@ -1,0 +1,4 @@
+name: quantflow-opencode-session
+kind: model-provider
+version: 1.0.0
+description: Route OpenCode requests with the current QuantFlow participant identity.

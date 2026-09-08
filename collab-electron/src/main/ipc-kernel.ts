@@ -48,10 +48,11 @@ import {
   getHermesDockDiagnostic,
 } from "./agent-host";
 import { QF_EXECUTE_ALLOWLIST } from "./qf-execute-allowlist";
+import { acquireEligibleParticipant, analyzeMarketAndReview } from "./market-analysis";
 import { isTrustedSender } from "./trusted-sender";
 import { parseDefinitionLaunchRequest } from "./definition-runtime";
 import { buildMissionActivationInstruction } from "./mission-activation";
-import { loadState as loadCanvasState } from "./canvas-persistence";
+import { clearSelectedAgentSurface, selectAgentSurface, selectedDirectorForTask } from "./selected-agent-surface";
 import { resolveSecondOpinionAdmission } from "./second-opinion-admission";
 import { bindMissionToDirectorSession } from "./mission-context";
 import { bindResearchHypothesis } from "./research-context";
@@ -189,34 +190,28 @@ async function deliverAccepted(
   return delivered;
 }
 
-async function trustedActorForTile(tileId: unknown): Promise<string> {
-  if (typeof tileId !== "string" || tileId.trim().length === 0) {
-    throw new Error("Create Task requires the selected delegator tile");
-  }
-  const state = await loadCanvasState();
-  const tile = state?.tiles.find((candidate) => candidate.id === tileId);
-  const sessionId = tile?.sessionId;
-  if (!sessionId) {
-    throw new Error("Create Task requires a selected agent seat tile");
-  }
-  const session = kernelListAgentSessions().find((row) => row.id === sessionId);
-  if (!session || session.status !== "running") {
-    throw new Error("Create Task requires a running delegator seat");
-  }
-  const surfaceSession = kernelListTaskSurface().sessions.find((row) => row.id === sessionId);
-  if (
-    String(surfaceSession?.role ?? "").toLowerCase() !== "orchestrator" &&
-    surfaceSession?.display_name !== "Orchestrator"
-  ) {
-    throw new Error("Create Task requires an Orchestrator seat");
-  }
-  return sessionId;
-}
+const selectedAgentAuthority = {
+  isLive: (sessionId: string) => hasLiveAgentSession(sessionId) && kernelListAgentSessions().some((row) => row.id === sessionId && row.status === "running"),
+  roleFor: (sessionId: string) => String(kernelListTaskSurface().sessions.find((row) => row.id === sessionId)?.role ?? "").toLowerCase() || null,
+};
+const selectionRendererIds = new Set<number>();
 
 export function registerKernelHandlers(): void {
   ensureBovadaLiveMarketsCapability();
   ensureEvidenceComputationCapabilities();
   registerHostAcpPermissionHandlers();
+  ipcMain.handle("qf:canvas:select-agent", (event, input?: unknown) => {
+    assertTrustedSender(event);
+    selectAgentSurface(event.sender.id, input, selectedAgentAuthority);
+    if (!selectionRendererIds.has(event.sender.id)) {
+      selectionRendererIds.add(event.sender.id);
+      event.sender.once("destroyed", () => {
+        clearSelectedAgentSurface(event.sender.id);
+        selectionRendererIds.delete(event.sender.id);
+      });
+    }
+    return { ok: true as const };
+  });
   onSessionChunk((sessionId, text) => {
     broadcast("qf:session:chunk", { sessionId, text });
   });
@@ -302,16 +297,34 @@ export function registerKernelHandlers(): void {
     }
   });
 
-  ipcMain.handle("qf:markets:investigate", (event, args?: unknown) => {
+  ipcMain.handle("qf:markets:investigate", async (event, args?: unknown) => {
     try {
       assertTrustedSender(event);
       if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Research this market requires an exact quote and question");
       const input = args as Record<string, unknown>;
-      if (typeof input.quote_id !== "string" || typeof input.name !== "string" || typeof input.objective !== "string") {
+      const requested = input.requested_expression;
+      if (typeof input.quote_id !== "string" || typeof input.name !== "string" || typeof input.objective !== "string" || !requested || typeof requested !== "object" || Array.isArray(requested)) {
         throw new Error("Research this market requires an exact quote and question");
       }
+      const expression = requested as Record<string, unknown>;
+      if (typeof expression.expression !== "string" || !expression.expression.trim() || typeof expression.outcome_description !== "string" || !expression.outcome_description.trim() || (expression.market_description !== undefined && (typeof expression.market_description !== "string" || !expression.market_description.trim()))) throw new Error("Research this market requires an exact requested market expression");
+      const selected = listBovadaMarketDeskRows().find((row) => row.quote_id === input.quote_id && row.current);
+      if (!selected || selected.sport !== "ufc") throw new Error("Research this market requires a current UFC Bovada observation");
+      const refreshed = await captureBovadaMarketDesk(
+        { sport: "ufc", competition: "ufc", market_class: "moneyline" },
+        {
+          provider_event_id: selected.provider_event_id,
+          requested_expression: {
+            expression: expression.expression.trim(),
+            outcome_description: expression.outcome_description.trim(),
+            ...(typeof expression.market_description === "string" ? { market_description: expression.market_description.trim() } : {}),
+          },
+        },
+      );
+      const exactQuote = refreshed.find((row) => row.current && row.provider_event_id === selected.provider_event_id && row.provider_market_id === selected.provider_market_id);
+      if (!exactQuote) throw new Error("The selected market changed during complete-menu capture; review the refreshed market before continuing");
       const result = createMarketDeskInvestigation({
-        quote_id: input.quote_id,
+        quote_id: exactQuote.quote_id,
         name: input.name,
         objective: input.objective,
       });
@@ -325,6 +338,24 @@ export function registerKernelHandlers(): void {
   ipcMain.handle("qf:evidence:capabilities", (event) => {
     try { assertTrustedSender(event); return { ok: true as const, capabilities: getEvidenceComputationCapabilities() }; }
     catch (err) { return { ok: false as const, error: serializeError(err) }; }
+  });
+  ipcMain.handle("qf:market:analyze-and-review", async (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Select the current investigation first.");
+      const input = args as Record<string, unknown>;
+      if (Object.keys(input).some((key) => !["mission_id", "quote_id", "retry_task_id"].includes(key)) || typeof input.mission_id !== "string" || typeof input.quote_id !== "string" || (input.retry_task_id !== undefined && (typeof input.retry_task_id !== "string" || !input.retry_task_id))) throw new Error("Analysis requires the selected Mission, Quote, and optional exact retry Task.");
+      const result = await analyzeMarketAndReview({ mission_id: input.mission_id, quote_id: input.quote_id, ...(typeof input.retry_task_id === "string" ? { retry_task_id: input.retry_task_id } : {}) }, (sessionId, definitionId, info) => {
+        invalidateDock();
+        sendToShell("shell:forward", "canvas", "sessions-changed");
+        if (info?.surface === "native_tui" && info.ptySessionId) {
+          sendToShell("shell:forward", "canvas", "create-term-tile", info.ptySessionId, sessionId, definitionId, info.role,
+            String(kernelGetObject("agent_definition", definitionId)?.display_name ?? definitionId));
+        }
+      });
+      invalidateDock();
+      return { ok: true as const, result };
+    } catch (error) { return { ok: false as const, error: serializeError(error) }; }
   });
 
   ipcMain.handle("qf:evidence:add-and-calculate", async (event, args?: unknown) => {
@@ -546,8 +577,7 @@ export function registerKernelHandlers(): void {
       try { kernelFreezeSourceWork(sourceTaskId); } catch { valid = false; }
       let criticSessionId: string | null = null;
       if (valid) {
-        const admitted = await admitAndStartSession("hermes-critic");
-        criticSessionId = admitted.sessionId;
+        criticSessionId = await acquireEligibleParticipant("critic", "research.evaluate");
       }
       const result = kernelRequestGovernedReview(sourceTaskId, attemptId, criticSessionId);
       if (result.kind === "admitted" && result.review_task_id && result.critic_session_id) {
@@ -593,8 +623,8 @@ export function registerKernelHandlers(): void {
       if (kernelGovernedAttemptExists("second_critic", sourceTaskId, attemptId)) {
         return { ok: true as const, result: kernelRequestSecondCritic(work, evaluationId, attemptId, null) };
       }
-      const admitted = await admitAndStartSession("hermes-critic");
-      const result = kernelRequestSecondCritic(work, evaluationId, attemptId, admitted.sessionId);
+      const criticSessionId = await acquireEligibleParticipant("critic", "research.evaluate");
+      const result = kernelRequestSecondCritic(work, evaluationId, attemptId, criticSessionId);
       if (result.kind === "admitted" && result.review_task_id && result.critic_session_id) {
         const delivered = deliverToAgentSession(result.critic_session_id, `${JSON.stringify({ contract: "qf.governed_review.v1", review_task_id: result.review_task_id, source_work: result.source_work })}\r`);
         kernelMarkGovernedDelivery(result.review_task_id, delivered ? "delivered" : "failed");
@@ -616,7 +646,7 @@ export function registerKernelHandlers(): void {
         throw new Error("Create Task requires title, description, and assignee");
       }
       const input = args as Record<string, unknown>;
-      const actorSessionId = await trustedActorForTile(input.tileId);
+      const actorSessionId = selectedDirectorForTask(event.sender.id, input.tileId, selectedAgentAuthority);
       if (typeof input.title !== "string" || input.title.trim().length === 0) {
         throw new Error("Create Task requires a non-empty title");
       }
@@ -766,20 +796,9 @@ export function registerKernelHandlers(): void {
       const admission = await resolveSecondOpinionAdmission(
         () => kernelFindOpenSecondOpinion(taskId),
         async () => {
-          const defs = kernelListAgentDefinitions().filter((definition) => String(definition.id ?? "") === "hermes-critic");
-          if (process.env.QF_DOCK_QA_MODE === "1" || defs.length !== 1) throw new Error("The production Critic is unavailable.");
-          const availability = getDockDefinitionAvailability(defs[0]!);
-          if (!availability.available) throw new Error("The production Critic is unavailable.");
-          const idle = kernelListAgentSessions().filter((session) => {
-            if (session.status !== "running" || !session.id) return false;
-            const spawned = kernelGetLinks(String(session.id), { kind: "spawned_from" }).filter((link) => link.from_id === session.id);
-            const openTasks = kernelGetLinks(String(session.id), { kind: "assigned_to" }).filter((link) => link.to_id === session.id);
-            return spawned.length === 1 && spawned[0]!.to_id === "hermes-critic" && openTasks.every((link) => kernelGetObject("task", link.from_id)?.status !== "open");
-          });
-          if (idle.length > 1) throw new Error("More than one idle production Critic is available.");
           return process.env.QF_FOUNDER_STEERING_FALSIFY === "second_opinion_wrong_definition"
-            ? String(kernelListAgentSessions().find((session) => session.status === "running" && session.id && kernelGetLinks(String(session.id), { kind: "spawned_from" }).some((link) => link.to_id === "hermes-worker"))?.id ?? "wrong-critic")
-            : idle.length === 1 ? String(idle[0]!.id) : (await admitAndStartSession("hermes-critic")).sessionId;
+            ? String(kernelListAgentSessions().find((session) => session.status === "running" && session.id && !kernelCapabilityGroupsForSession(String(session.id)).includes("research.evaluate"))?.id ?? "wrong-critic")
+            : await acquireEligibleParticipant("critic", "research.evaluate");
         },
       );
       if (admission.kind === "already_open") throw new Error("A second-opinion Task is already open.");

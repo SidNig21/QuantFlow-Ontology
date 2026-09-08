@@ -43,10 +43,13 @@ export {
 } from "./transport.ts";
 export {
   parseBovadaCoupons,
+  parseBovadaFightMenu,
+  type BovadaFightMenu,
   parseBovadaFootballResponse,
   parseBovadaLiveMarketsResponse,
   selectBovadaFootballMarket,
   type BovadaMarketRequest,
+  type BovadaRequestedExpression,
   type ProviderCompetitor,
   type ProviderCoupon,
   type ProviderDisplayGroup,

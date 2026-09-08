@@ -294,6 +294,18 @@ describe("Task footer projection", () => {
 		});
 	});
 
+	test("keeps participant chrome empty even while exact work is assigned", () => {
+		withDocument(() => {
+			const foot = new FakeElement();
+			const tile = { id: "tile-worker", sessionId: "worker-1" };
+			const participantView = { runtimeState: "running", work: "unassigned" };
+			renderTaskFoot({ taskFoot: foot }, tile, { participantView, assignments: [] });
+			expect(foot.children).toHaveLength(0);
+			renderTaskFoot({ taskFoot: foot }, tile, { participantView, assignments: [assigned] });
+			expect(foot.children).toHaveLength(0);
+		});
+	});
+
   test("renders four separate Kernel-backed facts for the exact specialist tile", () => {
     withDocument(() => {
       const foot = new FakeElement();
@@ -547,8 +559,9 @@ describe("Task footer projection", () => {
       expect(elementSnapshot(identicalNoReceiptFoot)).toEqual(firstNoReceiptSnapshot);
     });
 
-    const source = await Bun.file(new URL("./task-composition.js", import.meta.url)).text();
-	expect(source).toContain("participantFieldRows");
+	const source = await Bun.file(new URL("./task-composition.js", import.meta.url)).text();
+	expect(source).not.toContain("compactRows");
+	for (const rawField of ["role", "runtime", "recovery", "recruiterReason", "output", "missionId"]) expect(source).not.toMatch(new RegExp(`participantView\\.${rawField}(?![A-Za-z])`));
 	expect(source).not.toContain("function makeField");
     expect(source).not.toContain("makeField");
     expect(source).not.toContain("displayValue");

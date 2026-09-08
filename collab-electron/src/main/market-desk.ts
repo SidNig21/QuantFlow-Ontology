@@ -7,6 +7,7 @@ import {
   runBovadaLiveMarketsCapture,
   type BovadaKernelAccess,
   type BovadaMarketRequest,
+  type BovadaRequestedExpression,
 } from "qf-bovada-football";
 import { MARKET_QUOTE_FRESHNESS_MS } from "qf-kernel/portable";
 import {
@@ -179,7 +180,10 @@ export function listBovadaMarketDeskRows(now = Date.now()): MarketDeskRow[] {
   });
 }
 
-export async function captureBovadaMarketDesk(request: BovadaMarketRequest): Promise<MarketDeskRow[]> {
+export async function captureBovadaMarketDesk(
+  request: BovadaMarketRequest,
+  investigation?: { provider_event_id: string; requested_expression: BovadaRequestedExpression },
+): Promise<MarketDeskRow[]> {
   ensureBovadaLiveMarketsCapability();
   const controller = new AbortController();
   activeCaptures.add(controller);
@@ -193,6 +197,7 @@ export async function captureBovadaMarketDesk(request: BovadaMarketRequest): Pro
       db: getKernelDb(),
       artifactRoot: getArtifactRoot(),
       request,
+      ...(investigation ?? {}),
       kernel,
       signal: controller.signal,
     });

@@ -1,7 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import {
   buildGovernedCriticCompletionInstruction,
+  DECISION_CRITIC_FINDING_CODES,
   ensureGovernedCriticCompletion,
+  governedDecisionCriticContract,
   hermesTerminalStatus,
 } from "./governed-critic-completion.ts";
 
@@ -21,12 +23,21 @@ describe("governed critic completion", () => {
   });
 
   test("completion correction carries the exact frozen work and full rubric contract", () => {
-    const instruction = buildGovernedCriticCompletionInstruction("review-1", work);
+    const instruction = buildGovernedCriticCompletionInstruction("review-1", work, { decisionReview: true });
     expect(instruction.endsWith("\r")).toBe(true);
     expect(instruction).toContain('review_task_id=review-1');
     expect(instruction).toContain('"result_artifact_id":"artifact-1"');
     expect(instruction).toContain("faithfulness, answer_relevancy, context_precision, and context_recall");
     expect(instruction).toContain("do not repeat the reads");
+    expect(instruction).toContain(DECISION_CRITIC_FINDING_CODES.join(", "));
+    expect(instruction).toContain("The rubric judges whether the Artifact is faithful");
+  });
+
+  test("market decision contract gives the model the Kernel's exact repair target", () => {
+    const instruction = governedDecisionCriticContract();
+    for (const code of DECISION_CRITIC_FINDING_CODES) expect(instruction).toContain(code);
+    expect(instruction).toContain("supports only when all four scores are at least 0.8");
+    expect(instruction).toContain("rejects when any score is below 0.5");
   });
 
   test("nudges the same critic once after three reads and accepts the Evaluation", async () => {

@@ -76,6 +76,7 @@ describe("extra-resources parsing", () => {
       { from: "cli/qf-collaboration-mcp.mjs", to: "qf-collaboration-mcp.mjs" },
       { from: "cli/qf-ontology-mcp.mjs", to: "qf-ontology-mcp.mjs" },
       { from: "cli/qf-hermes-launch.sh", to: "qf-hermes-launch.sh" },
+      { from: "cli/qf-opencode-session", to: "qf-opencode-session" },
     ]));
   });
 });

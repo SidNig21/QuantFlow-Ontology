@@ -24,6 +24,7 @@ export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
 	layerEl?.appendChild(root);
 	const status = root.querySelector(".market-desk-status");
 	const rowsHost = root.querySelector(".market-desk-rows");
+	rowsHost.addEventListener("wheel", (event) => event.stopPropagation());
 	let rows = [];
 	let loading = false;
 
@@ -80,23 +81,66 @@ export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
 			}
 			inspect.appendChild(facts);
 			card.appendChild(inspect);
+			for (const investigation of Array.isArray(row.investigations) ? row.investigations : []) {
+				const missionId = String(investigation.investigates?.from_id ?? "");
+				if (!missionId) continue;
+				const reopen = element("button", "market-reopen-investigation", "Open saved investigation");
+				reopen.type = "button";
+				reopen.addEventListener("click", () => void onResearch?.(missionId));
+				card.appendChild(reopen);
+			}
 			if (row.current) {
-				const research = element("button", "market-research", "Research this market");
+				const researchDetails = element("details", "market-research-details");
+				researchDetails.appendChild(element("summary", null, "Research this market"));
+				researchDetails.addEventListener("toggle", () => {
+					if (!researchDetails.open) return;
+					for (const open of root.querySelectorAll(".market-research-details[open]")) {
+						if (open !== researchDetails) open.removeAttribute("open");
+					}
+				});
+				const inquiry = element("div", "market-inquiry");
+				const claim = document.createElement("input");
+				claim.className = "market-inquiry-input";
+				claim.placeholder = "Your claim, e.g. the underdog wins by submission";
+				claim.setAttribute("aria-label", "Research claim");
+				const market = document.createElement("input");
+				market.className = "market-inquiry-input";
+				market.placeholder = "Exact Bovada market, e.g. Method of Victory";
+				market.setAttribute("aria-label", "Exact Bovada market");
+				const outcome = document.createElement("input");
+				outcome.className = "market-inquiry-input";
+				outcome.placeholder = "Exact offered outcome, e.g. Fighter B by Submission";
+				outcome.setAttribute("aria-label", "Exact offered outcome");
+				inquiry.append(claim, market, outcome);
+				const research = element("button", "market-research", "Open investigation");
 				research.type = "button";
 				research.addEventListener("click", async () => {
+					const expression = claim.value.trim();
+					const marketDescription = market.value.trim();
+					const outcomeDescription = outcome.value.trim();
+					if (!expression || !outcomeDescription) {
+						setStatus("Enter your claim and the exact Bovada outcome you want tested.", "error");
+						return;
+					}
 					research.disabled = true;
-					setStatus("Opening a quote-linked investigation…");
+					setStatus("Checking the complete live fight menu for that exact expression…");
 					try {
 						const result = await window.shellApi.qf.investigateMarket({
 							quote_id: row.quote_id,
-							name: `Research ${row.event}`,
-							objective: `Investigate the current ${row.market} market for ${row.event} from the captured Bovada observation.`,
+							name: expression,
+							objective: `Support, challenge, or find insufficient evidence for: ${expression}`,
+							requested_expression: {
+								expression,
+								outcome_description: outcomeDescription,
+								...(marketDescription ? { market_description: marketDescription } : {}),
+							},
 						});
 						if (!result?.ok) throw new Error(result?.error?.message ?? "Investigation could not be opened");
 						rows = Array.isArray(result.rows) ? result.rows : rows;
 						render();
 						setStatus("Ready to staff · Method: not selected", "ok");
 						await onResearch?.(String(result.mission_id));
+						root.hidden = true;
 					} catch (error) {
 						setStatus(error?.message ?? String(error), "error");
 						showStatus?.(error?.message ?? String(error), { tone: "error" });
@@ -104,7 +148,8 @@ export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
 						research.disabled = false;
 					}
 				});
-				card.appendChild(research);
+				researchDetails.append(inquiry, research);
+				card.appendChild(researchDetails);
 			}
 			rowsHost.appendChild(card);
 		}
@@ -133,13 +178,5 @@ export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
 
 	root.querySelector("[data-market-refresh]")?.addEventListener("click", () => void load({ capture: true }));
 	root.querySelector("[data-market-close]")?.addEventListener("click", () => { root.hidden = true; });
-	void window.shellApi.qf.listMarkets().then((result) => {
-		if (result?.ok && Array.isArray(result.rows) && result.rows.length > 0) {
-			rows = result.rows;
-			root.hidden = false;
-			render();
-			setStatus(`${rows.filter((row) => row.current).length} current · ${rows.filter((row) => !row.current).length} historical`, "ok");
-		}
-	}).catch(() => {});
-	return { open: () => load({ capture: true }), refresh: () => load({ capture: false }), root };
+	return { open: () => load({ capture: false }), refresh: () => load({ capture: false }), root };
 }

@@ -2786,6 +2786,59 @@
     }
   },
   {
+    "name": "qf_reschedule_market_event",
+    "description": "A reschedule_market_event records a newer trusted pre-event cutoff for an existing scheduled market event. It may change only starts_at after the observation that established the current fence; sport, competition, provider identity, and lineage remain exact, while live or terminal events reject revision.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "market_event_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "This field identifies the existing scheduled provider event. Reuse the exact stable identity and never substitute a new provider event."
+        },
+        "sport": {
+          "type": "string",
+          "enum": [
+            "ufc",
+            "tennis",
+            "football"
+          ],
+          "description": "This field names the sport domain for the occurrence. Use it to interpret market vocabularies while keeping shared instrument structure in one type."
+        },
+        "competition": {
+          "type": "string",
+          "description": "This field stores the competition context such as league, card, or tournament round. Keep the value operator-legible so slips and reports can be reconciled without external decoding."
+        },
+        "starts_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "description": "This field records the scheduled start timestamp in ISO-8601 UTC. Do not use data timestamped after this moment for pre-event decisions."
+        },
+        "source_artifact_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "This field identifies the immutable Artifact containing the newer schedule observation. The Artifact must already exist in the Kernel."
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "description": "This field records when the revised schedule was observed. It must be newer than the observation governing the current fence and earlier than the revised start."
+        }
+      },
+      "required": [
+        "market_event_id",
+        "sport",
+        "competition",
+        "starts_at",
+        "source_artifact_id",
+        "observed_at"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
     "name": "qf_ingest_market_batch",
     "description": "Ingest one provenance-bound batch of instrument and quote rows through the trusted market pipeline. The Kernel must validate the whole batch and commit its rows, derived quote links, and evidence events atomically.",
     "inputSchema": {

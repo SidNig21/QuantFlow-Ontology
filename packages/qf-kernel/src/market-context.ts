@@ -9,6 +9,15 @@ import type { TraceContext } from "./trace.ts";
 
 type JsonRecord = Record<string, unknown>;
 
+export const MARKET_EXPRESSION_COMPARISON_OPERATION = "market_expression_comparison";
+export const MARKET_EXPRESSION_COMPARISON_IMPLEMENTATION = "qf-market-expression-comparison-v1";
+
+/** Temporary compatibility for earlier W1 artifacts; all new work uses the sport-neutral contract. */
+export function isMarketExpressionComparison(operation: unknown, implementation?: unknown): boolean {
+  if (operation === MARKET_EXPRESSION_COMPARISON_OPERATION) return implementation === undefined || implementation === MARKET_EXPRESSION_COMPARISON_IMPLEMENTATION;
+  return operation === "fight_menu_comparison" && (implementation === undefined || implementation === "qf-fight-menu-v1");
+}
+
 type ContextEventRow = {
   type: string;
   payload: string;
@@ -236,7 +245,7 @@ function executeContextCreation(opts: ContextCreation): ContextExecuteResult {
   const { state, outcome } = tx();
   return {
     kind: "context",
-    command: opts.cmd.action as "register_venue" | "schedule_market_event",
+    command: opts.cmd.action as "register_venue" | "schedule_market_event" | "reschedule_market_event",
     object_type: opts.object_type,
     object_id: opts.object_id,
     source_artifact_id: opts.source_artifact_id,
@@ -332,4 +341,38 @@ export function scheduleMarketEvent(
       );
     },
   });
+}
+
+export function rescheduleMarketEvent(db: KernelDb, cmd: CreationCommand, input: JsonRecord, trace: TraceContext, links: LinkSpec[], envelope?: CreationEnvelopePresence): ContextExecuteResult {
+  assertNoContextEnvelope(cmd.action, links, envelope);
+  const market_event_id = requiredString(input, "market_event_id");
+  const sport = requiredString(input, "sport");
+  const competition = requiredString(input, "competition");
+  const starts_at = requiredString(input, "starts_at");
+  const source_artifact_id = requiredString(input, "source_artifact_id");
+  const observed_at = requiredString(input, "observed_at");
+  let digest = "";
+  const tx = db.transaction(() => {
+    if (!db.query(`SELECT 1 AS ok FROM artifact WHERE id = ?`).get(source_artifact_id)) throw new KernelError(`Trusted market context source Artifact "${source_artifact_id}" does not exist`);
+    const row = db.query(`SELECT * FROM market_event WHERE id = ?`).get(market_event_id) as JsonRecord | null;
+    if (!row) throw new MarketContextConflictError("market_event", market_event_id, "event does not exist");
+    if (row.sport !== sport || row.competition !== competition) throw new MarketContextConflictError("market_event", market_event_id, "sport or competition identity differs");
+    if (row.status !== "scheduled") throw new MarketContextConflictError("market_event", market_event_id, "only a scheduled event may be rescheduled");
+    const events = contextEvents(db, "market_event", market_event_id);
+    const latest = events.at(-1);
+    if (!latest) throw new MarketContextConflictError("market_event", market_event_id, "governed schedule provenance is missing");
+    const latestPayload = parsePayload("market_event", market_event_id, latest.payload);
+    const latestObserved = requiredString(latestPayload, "observed_at");
+    digest = rowDigest({ id: market_event_id, sport, starts_at, status: "scheduled", competition });
+    if (row.starts_at === starts_at) {
+      if (latest.type === cmd.event && latest.trace_id === trace.trace_id && latestPayload.source_artifact_id === source_artifact_id && latestPayload.observed_at === observed_at && latestPayload.row_digest === digest) return { state: row, outcome: "replayed" as const };
+      throw new MarketContextConflictError("market_event", market_event_id, "unchanged cutoff is not an exact reschedule replay");
+    }
+    if (Date.parse(observed_at) <= Date.parse(latestObserved) || Date.parse(starts_at) <= Date.parse(observed_at)) throw new MarketContextConflictError("market_event", market_event_id, "revision timestamps do not advance a valid pre-event fence");
+    db.query(`UPDATE market_event SET starts_at = ? WHERE id = ?`).run(starts_at, market_event_id);
+    appendEvent(db, { type: cmd.event, object_type: "market_event", object_id: market_event_id, payload: { command: cmd.action, source_artifact_id, observed_at, previous_starts_at: row.starts_at, starts_at, row_digest: digest, span_id: trace.span_id }, trace_id: trace.trace_id });
+    return { state: { ...row, starts_at }, outcome: "revised" as const };
+  });
+  const result = tx();
+  return { kind: "context", command: "reschedule_market_event", object_type: "market_event", object_id: market_event_id, source_artifact_id, trace_id: trace.trace_id, row_digest: digest, outcome: result.outcome, state: result.state };
 }

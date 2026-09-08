@@ -16,6 +16,7 @@ import { generateUpgradeIndependentCritic } from "../src/generate/upgrade-indepe
 import { generateUpgradeTaskComposition } from "../src/generate/upgrade-task-composition.ts";
 import { generateUpgradeTaskSteering } from "../src/generate/upgrade-task-steering.ts";
 import { generateUpgradeGovernedReview } from "../src/generate/upgrade-governed-review.ts";
+import { generateUpgradeMarketReschedule } from "../src/generate/upgrade-market-reschedule.ts";
 import { schema } from "../src/schema.ts";
 
 const goldenDir = join(import.meta.dir, "..", "golden");
@@ -87,7 +88,8 @@ writeFileSync(
   generateUpgradeGovernedReview(),
   "utf8",
 );
+writeFileSync(join(upgradesDir, "0013-market-reschedule.sql"), generateUpgradeMarketReschedule(), "utf8");
 
 console.log(
-  "Wrote golden/migration.sql, golden/tools.json, golden/ONTOLOGY.md, golden/conformance.test.ts, and upgrades 0001 through 0012",
+  "Wrote golden/migration.sql, golden/tools.json, golden/ONTOLOGY.md, golden/conformance.test.ts, and upgrades 0001 through 0013",
 );

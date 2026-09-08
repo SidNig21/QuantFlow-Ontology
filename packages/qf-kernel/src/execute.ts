@@ -1,4 +1,5 @@
 import { schema } from "qf-kernel-schema";
+import { validateDecisionWorkerArtifact } from "./market-decision.ts";
 import {
   commands,
   creationCommands,
@@ -72,13 +73,19 @@ function requireOpen(row: TaskRow): void {
   if (row.status !== "open") throw new TaskRefusalError("TASK_NOT_OPEN");
 }
 
-function requireDirector(db: KernelDb, taskId: string, actor: string | undefined): { directorId: string; assigneeId: string } {
+function requireDirector(db: KernelDb, taskId: string, actor: string | undefined, allowInterruptedReassignment = false): { directorId: string; assigneeId: string } {
   if (!actor) throw new TaskRefusalError("ACTOR_NOT_DELEGATOR");
   const directorId = exactLink(db, taskId, "delegated_by").to_id;
   if (directorId !== actor) throw new TaskRefusalError("ACTOR_NOT_DELEGATOR");
   const assigneeId = exactLink(db, taskId, "assigned_to").to_id;
   const row = db.query("SELECT status FROM agent_session WHERE id = ?").get(assigneeId) as { status: string } | null;
-  if (!row || row.status !== "running") throw new TaskRefusalError("ASSIGNEE_NOT_RUNNING");
+  if (!row || row.status !== "running") {
+    const failure = allowInterruptedReassignment && row?.status === "failed"
+      ? db.query("SELECT payload FROM events WHERE object_type = 'agent_session' AND object_id = ? AND type = 'agent_session.failed' ORDER BY rowid DESC LIMIT 1").get(assigneeId) as { payload: string } | null : null;
+    const reason = failure ? (JSON.parse(failure.payload).input as Record<string, unknown> | undefined)?.reason : null;
+    const result = db.query("SELECT 1 FROM links WHERE kind = 'produces' AND from_id = ? LIMIT 1").get(taskId);
+    if (reason !== "provider_stream_interrupted" || result) throw new TaskRefusalError("ASSIGNEE_NOT_RUNNING");
+  }
   return { directorId, assigneeId };
 }
 
@@ -146,7 +153,7 @@ export function executeTaskGovernanceAction(db: KernelDb, command: "reassign_tas
   const tx = db.transaction(() => {
     const row = readTask(db, taskId);
     requireOpen(row);
-    const { assigneeId: currentAssigneeId } = requireDirector(db, taskId, trace.actor_session_id);
+    const { assigneeId: currentAssigneeId } = requireDirector(db, taskId, trace.actor_session_id, command === "reassign_task");
     const next = command === "reassign_task" ? String(input.assignee_session_id ?? "") : currentAssigneeId;
     if (command === "reassign_task") {
       if (!next || next === currentAssigneeId) throw new TaskRefusalError("REASSIGN_NOOP");
@@ -232,9 +239,10 @@ export function executeSecondOpinion(db: KernelDb, input: Record<string, unknown
     const source = readTask(db, taskId);
     requireOpen(source);
     const { directorId } = requireDirector(db, taskId, trace.actor_session_id);
-    const critic = db.query("SELECT status FROM agent_session WHERE id = ?").get(criticId) as { status: string } | null;
-    const criticLinks = db.query("SELECT to_id FROM links WHERE from_id = ? AND kind = 'spawned_from'").all(criticId) as Array<{ to_id: string }>;
-    if (!critic || critic.status !== "running" || criticLinks.length !== 1 || criticLinks[0]!.to_id !== "hermes-critic") throw new TaskRefusalError("CRITIC_DEFINITION_UNAVAILABLE");
+    const critic = db.query(`SELECT s.status, d.role, d.capability_groups FROM agent_session s JOIN links l ON l.from_id=s.id AND l.kind='spawned_from' JOIN agent_definition d ON d.id=l.to_id WHERE s.id=?`).get(criticId) as { status: string; role: string; capability_groups: string } | null;
+    let criticGroups: unknown = null;
+    try { criticGroups = critic ? JSON.parse(critic.capability_groups) : null; } catch {}
+    if (!critic || critic.status !== "running" || critic.role !== "critic" || !Array.isArray(criticGroups) || !criticGroups.includes("research.evaluate")) throw new TaskRefusalError("CRITIC_DEFINITION_UNAVAILABLE");
     const priorEvents = db.query("SELECT id, type, object_id, payload FROM events WHERE type = 'task.second_opinion_requested'").all() as EventRow[];
     for (const prior of priorEvents) {
       const priorPayload = payload(prior);
@@ -757,6 +765,7 @@ function assertTaskCompletionLineage(
   if (typeof runId !== "string" || runId.length === 0 || !db.query("SELECT 1 AS ok FROM run WHERE id = ?").get(runId)) {
     throw new KernelError("complete_task durable source-work binding lacks run_id");
   }
+  validateDecisionWorkerArtifact(db, runId, resultArtifactId);
   return runId;
 }
 

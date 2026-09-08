@@ -16,6 +16,7 @@ import { generateUpgradeTaskDelegation } from "./generate/upgrade-task-delegatio
 import { generateUpgradeDeterministicExecution } from "./generate/upgrade-deterministic-execution.ts";
 import { generateUpgradeIndependentCritic } from "./generate/upgrade-independent-critic.ts";
 import { generateUpgradeTaskSteering } from "./generate/upgrade-task-steering.ts";
+import { generateUpgradeMarketReschedule } from "./generate/upgrade-market-reschedule.ts";
 import { schema } from "./schema.ts";
 
 const goldenDir = join(import.meta.dir, "..", "golden");
@@ -141,6 +142,10 @@ describe("golden outputs", () => {
 
   test("task-steering upgrade matches golden byte-for-byte", () => {
     expect(generateUpgradeTaskSteering()).toBe(readFileSync(join(goldenDir, "upgrades", "0011-task-steering.sql"), "utf8"));
+  });
+
+  test("market-reschedule upgrade matches golden byte-for-byte", () => {
+    expect(generateUpgradeMarketReschedule()).toBe(readFileSync(join(goldenDir, "upgrades", "0013-market-reschedule.sql"), "utf8"));
   });
 });
 

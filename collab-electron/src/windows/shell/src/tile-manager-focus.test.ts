@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, mock, test } from "bun:test";
 
 type Tile = {
   id: string;
-  type: "term";
+  type: "term" | "session";
   x: number;
   y: number;
   width: number;
@@ -199,5 +199,21 @@ describe("focusAgentSession terminal tile seam", () => {
     expect(exactTermTileForSession([first], "wrong")).toBeNull();
     expect(exactTermTileForSession([first, second], "same")).toBeNull();
     expect(exactTermTileForSession([first], "same")).toBe(first);
+  });
+});
+
+describe("pending participant placement", () => {
+  test("replaces a ready participant at its visible Canvas position", () => {
+    const { manager } = makeManager();
+    const tile = manager.createPendingSpawnTile({
+      requestId: "request-1",
+      definitionId: "hermes-research-director",
+      displayName: "Research Director",
+      position: { x: 80, y: 80 },
+    }) as Tile;
+
+    expect(tile.type).toBe("session");
+    expect(tile.x).toBe(80);
+    expect(tile.y).toBe(80);
   });
 });

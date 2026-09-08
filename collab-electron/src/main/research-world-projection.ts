@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { isMarketExpressionComparison } from "qf-kernel/portable";
 type KernelDb = {
   query(sql: string): { get(...params: unknown[]): unknown; all(...params: unknown[]): unknown[] };
   transaction<T>(fn: () => T): () => T;
@@ -161,7 +162,17 @@ function relationalSnapshot(db: KernelDb): RelationalSnapshot {
       }
       rows.set(type, byId);
     }
+    for (const row of rows.get("agent_session")?.values() ?? []) {
+      if (row.status !== "failed") continue;
+      const event = db.query("SELECT payload FROM events WHERE object_type = 'agent_session' AND object_id = ? AND type = 'agent_session.failed' ORDER BY rowid DESC LIMIT 1").get(String(row.id)) as { payload: string } | null;
+      const reason = event && ((parseJson(event.payload) as Record<string, unknown>)?.input as Record<string, unknown>)?.reason;
+      if (reason === "provider_stream_interrupted" || reason === "provider_unavailable") row.failure_reason = reason;
+    }
     const sourceWork = new Map<string, Array<Record<string, unknown>>>();
+    if (tableExists(db, "qf_review_task")) for (const review of db.query("SELECT task_id, source_task_id, source_work FROM qf_review_task").all() as Array<{ task_id: string; source_task_id: string; source_work: string }>) {
+      const task = rows.get("task")?.get(review.task_id);
+      if (task) { task.review_source_task_id = review.source_task_id; task.review_source_work = parseJson(review.source_work); }
+    }
     if (tableExists(db, "qf_review_source_work")) {
       for (const row of db.query(
         "SELECT source_task_id, source_work, created_at FROM qf_review_source_work ORDER BY created_at ASC, source_task_id ASC",
@@ -233,7 +244,7 @@ export function artifactReceipt(row: Record<string, unknown>): ArtifactReceipt {
   try {
     const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
     let calculationResult = false;
-    try { calculationResult = (JSON.parse(text) as Record<string, unknown>)?.contract === "qf.calculation.result.v1"; } catch { /* ordinary preview */ }
+    try { const payload = JSON.parse(text) as Record<string, unknown>; calculationResult = payload.contract === "qf.calculation.result.v1" || payload.contract === "qf.market.comparison.v1" || Boolean(payload.decision) || (typeof payload.result === "string" && JSON.parse(payload.result)?.contract === "qf.market.decision.v1"); } catch { /* ordinary preview */ }
     const codePoints = Array.from(text);
     return {
       artifact_id: id, kind, content_hash: hash, durable_bytes_available: true,
@@ -358,7 +369,18 @@ type ReportContext = { currentReportId: string | null; reportIds: string[]; runI
 function reportContext(snapshot: RelationalSnapshot, source: Record<string, unknown>): ReportContext {
   const ids = new Set<string>();
   const sourceKey = sourceWorkKey(source);
-  const sourcePublication = snapshot.publications.find((row) => row.source_work_key === sourceKey);
+  let sourcePublication = snapshot.publications.find((row) => row.source_work_key === sourceKey);
+  if (!sourcePublication && typeof source.run_id === "string") {
+    const run = rowFields(objectRow(snapshot, "run", source.run_id));
+    const params = (typeof run.params === "string" ? JSON.parse(run.params) : run.params) as Record<string, any> | undefined;
+    if (isMarketExpressionComparison(params?.operation, params?.implementation_version) && params.decision_context) {
+      const context = params.decision_context;
+      sourcePublication = snapshot.publications.find((row) => {
+        const key = JSON.parse(row.authority_key);
+        return key[0] === "qf.market.authority.v1" && key[1] === context.mission_id && key[2] === context.hypothesis_id && key[4] === context.method.id && key[5] === context.method.version && key[6] === context.method.hash && key[7] === context.dataset_id;
+      });
+    }
+  }
   const authorityRows = sourcePublication
     ? snapshot.publications.filter((row) => row.authority_key === sourcePublication.authority_key)
     : [];
@@ -406,6 +428,7 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
       try {
         const payload = JSON.parse(String((fields.receipt as ArtifactReceipt).preview ?? "")) as Record<string, unknown>;
         if (payload.contract === "qf.calculation.result.v1") fields.calculation_result = payload;
+        if (row.kind === "report" && payload.decision && typeof payload.decision === "object" && (payload.decision as Record<string, unknown>).contract === "qf.market.decision.v1") fields.market_decision = payload.decision;
       } catch { /* non-JSON and truncated previews retain the ordinary receipt */ }
     }
     const producer = incoming.find((link) => link.kind === "produces");
@@ -439,7 +462,15 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
       const quote = snapshot.rows.get("quote")?.get(investigation.to_id);
       const coverage = parseJson(quote?.coverage);
       fields.quote_id = investigation.to_id;
-      fields.state = "ready to staff";
+      const tasks = snapshot.links.filter((link) => link.kind === "belongs_to" && link.to_id === id)
+        .map((link) => snapshot.rows.get("task")?.get(link.from_id)).filter(Boolean);
+      const openTasks = tasks.filter((task) => task?.status === "open");
+      const hasActiveAssignee = openTasks.some((task) => snapshot.links.some((link) =>
+        link.kind === "assigned_to" && link.from_id === task?.id &&
+        ["starting", "running", "blocked"].includes(String(snapshot.rows.get("agent_session")?.get(link.to_id)?.status))));
+      fields.state = openTasks.length ? hasActiveAssignee ? "research in progress" : "research needs attention"
+        : context?.currentReportId ? "independently reviewed decision"
+          : tasks.length > 0 ? "research recorded" : "ready to staff";
       fields.method = null;
       fields.observed_at = coverage && typeof coverage === "object" && !Array.isArray(coverage)
         ? (coverage as Record<string, unknown>).observed_at ?? quote?.created_at ?? null
@@ -511,6 +542,7 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
     fields.findings_artifact_id = row.findings_artifact_id ?? null;
     fields.review_task_id = row.review_task_id ?? null;
     fields.report_artifact_id = row.publication_report_id ?? null;
+    fields.source_work = parseJson(row.source_work);
   }
   if (type === "agent_session") {
     const definitionId = outgoing.find((link) => link.kind === "spawned_from")?.to_id;
@@ -520,6 +552,7 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
       fields.role = definition.role ?? null;
       fields.display_name = definition.display_name ?? null;
       fields.runtime_profile = definition.runtime_profile ?? null;
+      fields.species = /hermes/i.test(String(definition.package_ref ?? definition.name ?? "")) ? "Hermes" : null;
       fields.capability_groups = parseJson(definition.capability_groups);
     }
   }
@@ -594,6 +627,31 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
     return { ok: false, code: "WORLD_ROOT_INELIGIBLE", message: `Task has ${sourceRows.length} duplicate R15 source-work bindings.` };
   }
   if (sourceRows.length === 0) {
+    if (request.root_type === "mission" && ids.get("quote")?.size) {
+      // In-flight market work is already Kernel truth before the worker publishes.
+      // Keep its exact Task, participants and Run inputs visible without inventing review authority.
+      for (const link of allLinks.filter((link) => link.from_id === selectedTaskId && ["belongs_to", "assigned_to", "delegated_by"].includes(link.kind))) {
+        addId(ids, objectType(snapshot, link.to_id), link.to_id);
+      }
+      for (const link of allLinks.filter((link) => link.kind === "belongs_to" && link.to_id === request.root_id && objectType(snapshot, link.from_id) === "run")) {
+        const run = snapshot.rows.get("run")?.get(link.from_id);
+        const params = parseJson(run?.params) as Record<string, unknown> | null;
+        if ((params?.params as Record<string, unknown> | undefined)?.task_id !== selectedTaskId) continue;
+        addId(ids, "run", link.from_id);
+        for (const input of allLinks.filter((candidate) => candidate.from_id === link.from_id && ["uses", "tests", "produces", "executes_in"].includes(candidate.kind))) {
+          addId(ids, objectType(snapshot, input.to_id), input.to_id);
+        }
+      }
+      for (const datasetId of ids.get("dataset") ?? []) {
+        for (const link of allLinks.filter((link) => link.from_id === datasetId && link.kind === "derived_from")) addId(ids, "artifact", link.to_id);
+      }
+      const objects: ResearchWorldObject[] = [];
+      for (const type of OBJECT_TYPES) for (const objectId of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, objectId));
+      objects.sort((a, b) => a.type.localeCompare(b.type) || a.id.localeCompare(b.id));
+      return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects,
+        links: [...allLinks, ...snapshot.derivedLinks].filter((link) => idsContain(ids, link.from_id) && idsContain(ids, link.to_id)),
+        missing_lineage: [{ owning_type: "task", owning_id: selectedTaskId, kind: "source_work", message: "Research is in progress; no reviewed decision yet." }], current_report_id: null, report_ids: [] }) };
+    }
     return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects: [projectObject(snapshot, request.root_type, request.root_id)], links: allLinks.filter((link) => idsContain(ids, link.from_id) && idsContain(ids, link.to_id)), missing_lineage: [{ owning_type: "task", owning_id: selectedTaskId, kind: "source_work", message: "This Task has no completed research lineage yet." }], current_report_id: null, report_ids: [] }) };
   }
   const source = sourceRows[0]!;
@@ -634,6 +692,9 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
       .filter((link) => link.kind === "evaluated_by" && sourceIds.has(link.from_id))
       .map((link) => link.to_id),
   );
+  for (const task of snapshot.rows.get("task")?.values() ?? []) {
+    if (task.review_source_task_id === selectedTaskId && sourceWorkMatches({ source_work: task.review_source_work }, source)) addId(ids, "task", task.id);
+  }
   for (const evaluationId of evaluationIds) {
     const evaluation = objectRow(snapshot, "evaluation", evaluationId);
     if (!sourceWorkMatches(evaluation, source)) continue;
@@ -657,6 +718,9 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
     }
   }
   const selectedLinkKeys = new Set<string>();
+  for (const reviewId of ids.get("task") ?? []) if (reviewId !== selectedTaskId) {
+    for (const link of allLinks.filter((link) => link.from_id === reviewId && ["assigned_to", "delegated_by"].includes(link.kind))) selectedLinkKeys.add(`${link.kind}\u0000${link.from_id}\u0000${link.to_id}`);
+  }
   const addSelectedLink = (kind: string, fromId: unknown, toId: unknown) => {
     if (typeof fromId === "string" && fromId.length > 0 && typeof toId === "string" && toId.length > 0) {
       selectedLinkKeys.add(`${kind}\u0000${fromId}\u0000${toId}`);

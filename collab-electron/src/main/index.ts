@@ -46,6 +46,7 @@ import {
   kernelGetObject,
   kernelListAgentDefinitions,
   kernelListAgentSessions,
+  kernelDecisionRunForTask,
   kernelListTaskDelegations,
   kernelEnsureSampleResearchDataset,
   kernelEnsureR17TechniqueFixture,
@@ -65,6 +66,7 @@ import {
   kernelGovernedCriticProgress,
   kernelMarketObjectExists,
   kernelReadMarketTrajectoryResult,
+  kernelCompleteMarketAssessment,
   peerBusReadInbox,
   peerBusNotify,
   commitCollaborationResult,
@@ -73,6 +75,7 @@ import { registerOntologyGatewayRpc } from "./ontology-gateway";
 import {
   createCollaborationService,
   registerCollaborationGatewayRpc,
+  type CollaborationDependencies,
 } from "./collaboration-gateway";
 import { resolveLivePeerRecipient } from "./live-peer-recipient";
 import { livePtyIdsForRole } from "./peer-delivery";
@@ -80,6 +83,8 @@ import { kernelSessionIdForNativePty } from "./host-native-tui";
 import { requireLiveSeatCapability } from "./live-seat-capability";
 import * as agentActivity from "./agent-activity";
 import { buildMissionActivationInstruction } from "./mission-activation";
+import { isMarketExpressionComparison } from "qf-kernel/portable";
+import { eligibleDefinition } from "./market-analysis";
 import { registerIntegrationsIpc } from "./integrations";
 import {
   registerMethod,
@@ -114,6 +119,7 @@ import { readSessionMeta } from "./tmux";
 import { registerBrowserIpc } from "./ipc-browser";
 import { cancelBovadaMarketDeskCaptures } from "./market-desk";
 import { cancelEvidenceComputation } from "./evidence-computation";
+import { runShutdownLifecycle } from "./shutdown-lifecycle";
 
 import {
   bootstrapPackagedDockProfiles,
@@ -130,6 +136,7 @@ import {
 import {
   buildGovernedCriticCompletionInstruction,
   ensureGovernedCriticCompletion,
+  governedDecisionCriticContract,
 } from "./governed-critic-completion";
 import { createKernelAgentSession } from "./runtime-kernel-admission";
 import { bindMissionToDirectorSession, clearMissionForDirectorSession, missionForDirectorSession } from "./mission-context";
@@ -260,6 +267,7 @@ let mainWindow: BrowserWindow | null = null;
 let pendingFilePath: string | null = null;
 let config = loadConfig();
 let shuttingDown = false;
+let shutdownPromise: Promise<void> | null = null;
 let bovadaCaptureBinding: BovadaCaptureRpcBinding | null = null;
 
 // Apply saved theme preference (light/dark/system)
@@ -900,21 +908,28 @@ function sendLoadingDone(): void {
 }
 
 async function shutdownBackgroundServices(): Promise<void> {
-  if (shuttingDown) return;
+  if (shutdownPromise) return shutdownPromise;
   shuttingDown = true;
-  bovadaCaptureBinding?.cancelOnAppShutdown();
-  bovadaCaptureBinding = null;
-  cancelBovadaMarketDeskCaptures();
-  cancelEvidenceComputation();
-  pty.setShuttingDown(true);
-  await pty.killAllAndWait();
-  await pty.shutdownSidecarIfIdle();
-  await disposeAgentHost();
-  watcher.stopWorker();
-  if (!DISABLE_GIT_REPLAY) gitReplay.stopWorker();
-  stopJsonRpcServer();
-  stopImageWorker();
-  closeAppKernel();
+  shutdownPromise = (async () => {
+    bovadaCaptureBinding?.cancelOnAppShutdown();
+    bovadaCaptureBinding = null;
+    cancelBovadaMarketDeskCaptures();
+    cancelEvidenceComputation();
+    pty.setShuttingDown(true);
+    await runShutdownLifecycle({
+      disposeAgentHost,
+      killAllPtysAndWait: pty.killAllAndWait,
+      shutdownPtySidecarIfIdle: pty.shutdownSidecarIfIdle,
+      stopWatcher: watcher.stopWorker,
+      stopGitReplay: () => {
+        if (!DISABLE_GIT_REPLAY) gitReplay.stopWorker();
+      },
+      stopJsonRpcServer,
+      stopImageWorker,
+      closeKernel: closeAppKernel,
+    });
+  })();
+  return shutdownPromise;
 }
 
 app.on("open-file", (event, path) => {
@@ -995,6 +1010,7 @@ app.whenReady().then(async () => {
   });
 
   shuttingDown = false;
+  shutdownPromise = null;
 
   config = loadConfig();
   installCli();
@@ -1230,7 +1246,7 @@ app.whenReady().then(async () => {
   registerMethod("workspace.getConfig", () => config, {
     description: "Return the current app configuration",
   });
-  const collaborationDeps = {
+  const collaborationDeps: CollaborationDependencies = {
       authenticate: requireAuthenticatedPeerSessionRole,
       capabilityGroups: kernelCapabilityGroupsForSession,
       liveRecipientForRole: requireLivePeerSession,
@@ -1241,7 +1257,13 @@ app.whenReady().then(async () => {
       missionForSession: missionForDirectorSession,
       marketObjectExists: kernelMarketObjectExists,
       readMarketTrajectoryResult: kernelReadMarketTrajectoryResult,
-      commitResult: (input) => commitCollaborationResult(input, (artifactId) => {
+      commitResult: (input) => commitCollaborationResult({ ...input, result: kernelCompleteMarketAssessment(input.taskId, input.workerSessionId, input.result) }, (artifactId) => {
+        const decisionRun = kernelDecisionRunForTask(input.taskId);
+        if (decisionRun) {
+          const context = JSON.parse(String(decisionRun.params)).decision_context;
+          kernelBindSourceWork({ source_task_id: input.taskId, hypothesis_id: context.hypothesis_id, run_id: String(decisionRun.id), result_artifact_id: artifactId, executor_session_id: input.workerSessionId });
+          return;
+        }
         const hypothesisId = researchHypothesisForSession(input.delegatorSessionId);
         if (!hypothesisId) throw new Error(`research result has no exact Hypothesis binding for ${input.delegatorSessionId}`);
         const strategyId = researchStrategyForSession(input.delegatorSessionId);
@@ -1271,12 +1293,17 @@ app.whenReady().then(async () => {
       mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
       mainWindow?.webContents.send("qf:dock:invalidate");
       if (change.kind === "result") {
-        mainWindow?.webContents.send(
-          "shell:forward",
-          "canvas",
-          "create-artifact-tile",
-          change.artifactId,
-        );
+        const decisionRun = kernelDecisionRunForTask(change.taskId);
+        // A market result belongs to the investigation surface. Its exact raw
+        // Artifact remains available in Inspect instead of becoming a JSON tile.
+        if (!decisionRun) {
+          mainWindow?.webContents.send(
+            "shell:forward",
+            "canvas",
+            "create-artifact-tile",
+            change.artifactId,
+          );
+        }
         // Only evidence workers advance the research pipeline. A critic owns
         // Evaluation truth, not another worker-result cycle.
         if (peerIdentityForSession(change.workerSessionId).role !== "worker") {
@@ -1296,7 +1323,8 @@ app.whenReady().then(async () => {
               }
               const runRow = kernelGetObject("run", sourceWork.run_id);
               if (!runRow) throw new Error("research result has no exact deterministic Run");
-              const runParams = JSON.parse(String(runRow.params)) as { result_artifact_id?: unknown };
+              const runParams = JSON.parse(String(runRow.params)) as { result_artifact_id?: unknown; operation?: unknown; implementation_version?: unknown };
+              const decisionReview = isMarketExpressionComparison(runParams.operation, runParams.implementation_version);
               const runResultArtifactId = typeof runParams.result_artifact_id === "string" ? runParams.result_artifact_id : "";
               const runResultArtifact = runResultArtifactId ? kernelGetObject("artifact", runResultArtifactId) : null;
               if (!runResultArtifact) throw new Error("research result Run has no durable result Artifact");
@@ -1308,11 +1336,12 @@ app.whenReady().then(async () => {
                 metrics: runMetrics.metrics ?? {},
               };
               closeAdmittedSession(change.workerSessionId);
+              const criticDefinitionId = eligibleDefinition("critic", "research.evaluate");
               const criticSessionId = `critic-${crypto.randomUUID()}`;
               createKernelAgentSession(
                 {
                   sessionId: criticSessionId,
-                  definitionId: "hermes-critic",
+                  definitionId: criticDefinitionId,
                   label: "Independent research critic",
                   actorSessionId: change.delegatorSessionId,
                 },
@@ -1341,6 +1370,10 @@ app.whenReady().then(async () => {
                     reviewTaskId,
                     [
                       "Independently review this completed deterministic QuantFlow research run.",
+                      ...(decisionReview ? [
+                        "Review the complete market-expression comparison. Check market coverage, quote freshness, evidence limits, arithmetic, probability provenance, price sensitivity, and material counter-evidence. Preserve a useful honest WATCH, PASS, or UNAVAILABLE result when the evidence cannot support CANDIDATE.",
+                        governedDecisionCriticContract(),
+                      ] : []),
                       `review_task_id=${reviewTaskId}`,
                       `source_work=${JSON.stringify(sourceWork)}`,
                       `metrics=${JSON.stringify(run.metrics)}`,
@@ -1355,6 +1388,7 @@ app.whenReady().then(async () => {
               const completionInstruction = buildGovernedCriticCompletionInstruction(
                 continuation.review_task_id,
                 continuation.source_work,
+                { decisionReview },
               );
               void ensureGovernedCriticCompletion(completionInstruction, {
                 progress: () => kernelGovernedCriticProgress(
@@ -1426,9 +1460,13 @@ app.whenReady().then(async () => {
         mainWindow?.webContents.send("qf:events:invalidate");
         const persistedReportArtifactId = final.reportArtifactId;
         if (persistedReportArtifactId) {
-          mainWindow?.webContents.send(
-            "shell:forward", "canvas", "create-artifact-tile", persistedReportArtifactId,
-          );
+          if (final.status === "open") {
+            mainWindow?.webContents.send("shell:forward", "canvas", "market-decision-settled");
+          } else {
+            mainWindow?.webContents.send(
+              "shell:forward", "canvas", "create-artifact-tile", persistedReportArtifactId,
+            );
+          }
         }
       } finally {
         const criticId = change.identity.sessionId;
@@ -1781,6 +1819,10 @@ app.whenReady().then(async () => {
   } catch (err) {
     console.error("Failed to start JSON-RPC server:", err);
   }
+}).catch(async (error) => {
+  console.error("QuantFlow startup failed:", error);
+  await shutdownBackgroundServices().catch(() => {});
+  app.exit(1);
 });
 
 app.on("before-quit", (event) => {

@@ -690,9 +690,9 @@ export function createTileManager({
 		return tile;
 	}
 
-	function createPendingSpawnTile({ requestId, definitionId, displayName }) {
+	function createPendingSpawnTile({ requestId, definitionId, displayName, position }) {
 		const size = defaultSize("session");
-		const pos = findAutoPlacement(tiles, size.width, size.height);
+		const pos = position ?? findAutoPlacement(tiles, size.width, size.height);
 		return createCanvasTile("session", pos.x, pos.y, {
 			width: size.width,
 			height: size.height,
@@ -928,113 +928,6 @@ export function createTileManager({
 		saveCanvasImmediate();
 	}
 
-	// -- Canvas state restore --
-
-	function restoreCanvasState(savedTiles) {
-		for (const saved of savedTiles) {
-			let cx = saved.x;
-			let cy = saved.y;
-			if (!Number.isFinite(cx) || !Number.isFinite(cy)) {
-				const size = defaultSize(saved.type);
-				const pos = findAutoPlacement(
-					tiles, size.width, size.height,
-				);
-				cx = pos.x;
-				cy = pos.y;
-			}
-
-			if (saved.type === "term") {
-				const tile = createCanvasTile(
-					"term", cx, cy, {
-						id: saved.id,
-						width: saved.width,
-						height: saved.height,
-						zIndex: saved.zIndex,
-						ptySessionId: saved.ptySessionId,
-						sessionId: saved.sessionId,
-						definitionId: saved.definitionId,
-						role: saved.role,
-						agentLabel: saved.agentLabel,
-						userTitle: saved.userTitle,
-						autoTitle: saved.autoTitle,
-					},
-				);
-				if (tile.ptySessionId || !tile.sessionId) {
-					spawnTerminalWebview(tile);
-				} else {
-					const dom = tileDOMs.get(tile.id);
-					const stopped = document.createElement("div");
-					stopped.className = "agent-session-stopped";
-					stopped.textContent = "Session stopped";
-					dom?.contentArea.appendChild(stopped);
-				}
-			} else if (saved.type === "graph" && saved.folderPath) {
-				const tile = createCanvasTile(
-					"graph", cx, cy, {
-						id: saved.id,
-						width: saved.width,
-						height: saved.height,
-						zIndex: saved.zIndex,
-						folderPath: saved.folderPath,
-						workspacePath: saved.workspacePath,
-					},
-				);
-				spawnGraphWebview(tile);
-			} else if (saved.type === "artifact" && saved.artifactId) {
-				const tile = createCanvasTile(
-					"artifact", cx, cy, {
-						id: saved.id,
-						width: saved.width,
-						height: saved.height,
-						zIndex: saved.zIndex,
-						artifactId: saved.artifactId,
-					},
-				);
-				spawnArtifactWebview(tile);
-			} else if (saved.type === "session" && saved.sessionId) {
-				const tile = createCanvasTile(
-					"session", cx, cy, {
-						id: saved.id,
-						width: saved.width,
-						height: saved.height,
-						zIndex: saved.zIndex,
-						sessionId: saved.sessionId,
-					},
-				);
-				spawnSessionWebview(tile);
-			} else if (saved.type === "research" && saved.ontologyType && saved.ontologyId) {
-				createCanvasTile("research", cx, cy, {
-					id: saved.id || `ontology:${saved.ontologyType}:${saved.ontologyId}`,
-					width: saved.width,
-					height: saved.height,
-					zIndex: saved.zIndex,
-					ontologyType: saved.ontologyType,
-					ontologyId: saved.ontologyId,
-				});
-			} else if (saved.type === "browser") {
-				const tile = createCanvasTile(
-					"browser", cx, cy, {
-						id: saved.id,
-						width: saved.width,
-						height: saved.height,
-						zIndex: saved.zIndex,
-						url: saved.url,
-					},
-				);
-				spawnBrowserWebview(tile);
-			} else if (saved.filePath) {
-				createFileTile(
-					saved.type, cx, cy, saved.filePath, {
-						id: saved.id,
-						width: saved.width,
-						height: saved.height,
-						zIndex: saved.zIndex,
-					},
-				);
-			}
-		}
-	}
-
 	// -- Tile updates for external events --
 
 	function updateTileForRename(oldPath, newPath) {
@@ -1144,7 +1037,6 @@ export function createTileManager({
 		createResearchTile,
 		clearCanvas,
 		getCanvasStateForSave,
-		restoreCanvasState,
 		getTileDOMs: () => tileDOMs,
 		getFocusedTileId: () => focusedTileId,
 		getFocusedTile: () => getTile(focusedTileId),

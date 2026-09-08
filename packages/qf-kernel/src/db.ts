@@ -438,7 +438,8 @@ export function attachKernel(
       shape === "task_composition" ||
       shape === "task_steering" ||
       shape === "pre_r17_current" ||
-      shape === "pre_market_desk"
+      shape === "pre_market_desk" ||
+      shape === "pre_market_reschedule"
     ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",
@@ -476,6 +477,7 @@ export function attachKernel(
       const governedReviewSql = readFileSync(
         upgradeSqlPath("0012-governed-review.sql"), "utf8",
       );
+      const marketRescheduleSql = readFileSync(upgradeSqlPath("0013-market-reschedule.sql"), "utf8");
       applyKernelUpgradeChain(db, {
         profileIdentitySql,
         marketIngestSql,
@@ -489,6 +491,7 @@ export function attachKernel(
         taskCompositionSql,
         taskSteeringSql,
         governedReviewSql,
+        marketRescheduleSql,
       });
     }
   }

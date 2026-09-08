@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-wave1-evidence-computation @ 70a17914` on 2026-09-07 by
+> Generated from `codex/wo-w1-03-one-canvas @ f55a783a` on 2026-09-08 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**27 of 27 findings have not been looked at.**
+**37 of 37 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 27 |
+| `undecided` | 37 |
 | `repair` | 0 |
 | `remove` | 0 |
 | `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 27 findings still need a decision.
+**Not all clear.** 37 findings still need a decision.
 
 ## The four hops
 
@@ -32,19 +32,19 @@ and it can die or cheat at any one of them:
 ```mermaid
 flowchart TD
   R["<b>1 · renderer</b><br/>29 surface subsystems<br/>calls a bridge method"]
-  P["<b>2 · preload</b><br/>3 bridges · 123 methods<br/>117 of them called"]
-  M["<b>3 · main</b><br/>119 IPC channels<br/>115 live · 4 unused · 0 dead"]
+  P["<b>2 · preload</b><br/>3 bridges · 123 methods<br/>110 of them called"]
+  M["<b>3 · main</b><br/>119 IPC channels<br/>108 live · 11 unused · 0 dead"]
   H{"<b>4 · is it governed?</b>"}
   E["<b>execute&#40;&#41;</b><br/>the only sanctioned write"]
   DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]
 
   R --> P --> M --> H
-  H -->|"write-door 24"| E
+  H -->|"write-door 25"| E
   E --> DB
   A["<b>ungoverned SQL</b><br/>amber evidence only<br/>not a proven breach"]
   H -->|"reaches-sql 2"| A
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
-  H -->|"writes-disk 7"| FS
+  H -->|"writes-disk 6"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
   H -->|"read-only 86"| RO
 
@@ -81,14 +81,14 @@ handler that mutates state without `execute()` is cheating even when it works.
 
 | At hop 4 the handler… | | Count |
 |---|---|---:|
-| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 24 |
+| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 25 |
 | `cheats` | reaches SQL outside `execute()` **and** a function on that path carries a current hard red | 0 |
 | `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 2 |
-| `writes-disk` | writes a file; never reaches the Kernel at all | 7 |
+| `writes-disk` | writes a file; never reaches the Kernel at all | 6 |
 | `unknown` | handler or module resolution coverage is incomplete; not claimed read-only | 0 |
 | `read-only` | no mutation seen | 86 |
 
-#### Reaches ungoverned SQL, but not a hard red (7)
+#### Reaches ungoverned SQL, but not a hard red (6)
 
 The hop-4 walk is reachability only: it cannot tell a domain-truth bypass from
 review scaffolding. These wires reach SQL outside the write door where **every**
@@ -99,18 +99,17 @@ loop.
 
 | Channel | Reaches | Findings | Confidence · class |
 |---|---|---:|---|
-| `qf:research-world:projection` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
+| `qf:research-world:projection` | `ensureGovernedReviewSchema()` | 9 | medium · `non-domain-store` |
 | `qf:research-world:projection` | `migrateLegacyPublicationTable()` | 3 | medium · `non-domain-store` |
-| `qf:review:projection` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
+| `qf:review:projection` | `ensureGovernedReviewSchema()` | 9 | medium · `non-domain-store` |
 | `qf:review:projection` | `migrateLegacyPublicationTable()` | 3 | medium · `non-domain-store` |
-| `qf:review:request` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
+| `qf:review:request` | `ensureGovernedReviewSchema()` | 9 | medium · `non-domain-store` |
 | `qf:review:request` | `migrateLegacyPublicationTable()` | 3 | medium · `non-domain-store` |
-| `qf:review:revision` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
+| `qf:review:revision` | `ensureGovernedReviewSchema()` | 9 | medium · `non-domain-store` |
 | `qf:review:revision` | `migrateLegacyPublicationTable()` | 3 | medium · `non-domain-store` |
-| `qf:review:secondCritic` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
+| `qf:review:secondCritic` | `ensureGovernedReviewSchema()` | 9 | medium · `non-domain-store` |
 | `qf:review:secondCritic` | `migrateLegacyPublicationTable()` | 3 | medium · `non-domain-store` |
-| `qf:tasks:create` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
-| `qf:tasks:surface` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
+| `qf:tasks:surface` | `ensureGovernedReviewSchema()` | 9 | medium · `non-domain-store` |
 | `qf:tasks:surface` | `migrateLegacyPublicationTable()` | 3 | medium · `non-domain-store` |
 
 ### Broken at hop 1 (0)
@@ -160,7 +159,7 @@ listeners. That single mistake would have produced 12 false deletes.
 
 #### `no-sender` (1)
 
-- `shell:loading-status` — `collab-electron/src/preload/shell.ts:188` · **INVESTIGATE**
+- `shell:loading-status` — `collab-electron/src/preload/shell.ts:197` · **INVESTIGATE**
   - a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing
 
 **Confidence is `medium` on every row here, and the disposition is `INVESTIGATE`, never
@@ -183,7 +182,7 @@ badge is not a score:
 | `R` runtime | the loop was observed executing |
 | `F` founder | the founder has confirmed it does its job |
 
-**`S` alone is not `SGRF`.** 7 of 11 loops are statically connected; 0 carry all four tiers.
+**`S` alone is not `SGRF`.** 6 of 11 loops are statically connected; 0 carry all four tiers.
 
 | Loop | Badge | Static | Gate | Runtime | Founder |
 |---|---|---|---|---|---|
@@ -196,7 +195,7 @@ badge is not a score:
 | **PUBLISH** | `SG` | connected | covered | unproven | unproven |
 | **REVIEW** | `G` | degraded | covered | unproven | unproven |
 | **REOPEN** | `SG` | connected | covered | unproven | unproven |
-| **LEARN** | `SG` | connected | covered | unproven | unproven |
+| **LEARN** | `G` | degraded | covered | unproven | unproven |
 | **CLOSE** | `G` | broken | covered | unproven | unproven |
 
 Runtime and founder read `unproven` on every loop, and that is the honest state: no
@@ -222,6 +221,13 @@ The governed critic path. R15 shipped on this, and R16 renders it.
 
 - `qf:review:projection` — **unused**: breaks at renderer
 
+### LEARN — degraded
+
+Evaluations and events feed back so the next pass is better informed.
+
+- `qf:events:list` — **unused**: breaks at renderer
+- `qf:research:ledger` — **unused**: breaks at renderer
+
 ### CLOSE — broken
 
 Sessions and processes end cleanly, and nothing keeps running after the app closes.
@@ -241,7 +247,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 16 | the app starts here |
-| `reachable` | 206 | imported from an entrypoint |
+| `reachable` | 209 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -264,17 +270,24 @@ _registered in main, no static caller found; needs package + dynamic-caller proo
 
 None.
 
-### Maybe later — do NOT delete on sight (4)
+### Maybe later — do NOT delete on sight (11)
 
 _works end to end, but nothing calls it yet_
 
 > `qf:review:projection` is in this bucket and is exactly what R16 needs to render
 > the Evaluation tile. Deleting this bucket wholesale would remove the next rung.
 
-- `deleteConnectionsForTile() → qf:connections:deleteForTile` — collab-electron/src/preload/shell.ts:138
-- `getGovernedReviewProjection() → qf:review:projection` — collab-electron/src/preload/shell.ts:99
+- `selectAgentSurface() → qf:canvas:select-agent` — collab-electron/src/preload/shell.ts:58
+- `createConnection() → qf:connections:create` — collab-electron/src/preload/shell.ts:143
+- `deleteConnection() → qf:connections:delete` — collab-electron/src/preload/shell.ts:145
+- `deleteConnectionsForTile() → qf:connections:deleteForTile` — collab-electron/src/preload/shell.ts:147
+- `listConnections() → qf:connections:list` — collab-electron/src/preload/shell.ts:136
+- `listEvents() → qf:events:list` — collab-electron/src/preload/shell.ts:149
+- `listResearchLedger() → qf:research:ledger` — collab-electron/src/preload/shell.ts:65
+- `recordStrategyOutcome() → qf:research:recordStrategyOutcome` — collab-electron/src/preload/shell.ts:86
+- `getGovernedReviewProjection() → qf:review:projection` — collab-electron/src/preload/shell.ts:108
 - `permissionDecision() → qf:sessions:permissionDecision` — collab-electron/src/preload/universal.ts:157
-- `getRuntimeSnapshot() → qf:sessions:runtime-snapshot` — collab-electron/src/preload/shell.ts:108
+- `getRuntimeSnapshot() → qf:sessions:runtime-snapshot` — collab-electron/src/preload/shell.ts:117
 
 ## Write-door violations
 
@@ -286,8 +299,8 @@ the door. Generated schema SQL is included.
 | | |
 |---|---|
 | derivation state | `partial` |
-| dispatcher found at | `packages/qf-kernel/src/execute.ts:473` |
-| actions mapped | 19 of 45 |
+| dispatcher found at | `packages/qf-kernel/src/execute.ts:481` |
+| actions mapped | 20 of 46 |
 | door files | `create.ts`, `deterministic-execution.ts`, `execute.ts`, `market-context.ts`, `market-ingest.ts`, `pipeline.ts` |
 
 **The retired hand-written allowlist disagreed with the Kernel on 8 files.**
@@ -296,7 +309,7 @@ blanket pass: `insert.ts`, `events.ts`, `db.ts`, `upgrade.ts`.
 Implement a dispatched action but were never on the list, so their SQL was being
 adjudicated as a possible breach: `deterministic-execution.ts`, `market-context.ts`, `market-ingest.ts`, `pipeline.ts`.
 
-> The derivation is **partial**: 26 of 45 schema actions have no
+> The derivation is **partial**: 26 of 46 schema actions have no
 > dispatch-table entry, because the state transitions are dispatched by a mechanism
 > this reader does not follow. Verdicts on those paths rest on reachability rather
 > than on a mapped action, and that is a weaker claim.
@@ -308,7 +321,7 @@ The question is not "does this file contain INSERT". It is **can production doma
 state reach this SQL without first entering a governed action?** Domain tables come
 from the generated schema; reachability follows call sites and the Kernel command table.
 
-**0 confirmed at `high` confidence**, 10 more at `medium`,
+**0 confirmed at `high` confidence**, 13 more at `medium`,
 2 unknown (gray — not counted as debt).
 
 The split matters. A `high` row is a domain-truth write reached from outside a governed
@@ -325,7 +338,10 @@ weaker claim, and it should not be read as the same kind of defect.
 | `collab-electron/src/main/updater/update-manager.ts` | `check` | UPDATE | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_publication_legacy` | DROP TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_publication` | ALTER TABLE | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_publication` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_publication` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
@@ -336,8 +352,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 225 of
-226 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 228 of
+229 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/updater/update-manager.ts` — **2 files depend on it**, it imports 1
@@ -348,7 +364,7 @@ asked before the change, when nothing is red yet.
   collab-electron/src/main/index.ts
 ```
 
-`packages/qf-kernel/src/governed-review.ts` — **40 files depend on it**, it imports 8
+`packages/qf-kernel/src/governed-review.ts` — **40 files depend on it**, it imports 10
 
 ```
   packages/qf-kernel/src/index.ts
@@ -360,27 +376,27 @@ asked before the change, when nothing is red yet.
   qa/gates/bovada-football/run.ts
   qa/gates/dock-definition-launch/run.ts
   qa/gates/dock-profile-identity/run.ts
-  qa/gates/golden-g10-canvas-runtime.ts
+  qa/gates/kernel-drift/run.ts
   …30 more
 ```
 
 ### Blast-radius coverage
 
-**225 of 226 files that have a reachability verdict** carry a blast radius.
+**228 of 229 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**555 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**566 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 329 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 337 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
 | File | Dependents | Imports | Wires |
 |---|---:|---:|---:|
-| `packages/qf-kernel/src/trace.ts` | 56+ | 1 | 0 |
-| `packages/qf-kernel/src/registry-drift.ts` | 54+ | 0 | 0 |
-| `packages/qf-kernel/src/upgrade.ts` | 54+ | 3 | 0 |
-| `collab-electron/src/main/file-filter.ts` | 53+ | 2 | 0 |
+| `packages/qf-kernel/src/trace.ts` | 60+ | 1 | 0 |
+| `packages/qf-kernel/src/registry-drift.ts` | 57+ | 0 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | 57+ | 3 | 0 |
 | `collab-electron/src/main/files.ts` | 50+ | 2 | 0 |
+| `packages/qf-kernel/src/events.ts` | 49+ | 1 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
 learned the difference: transport bookkeeping (tables created by the peer-bus DDL,
@@ -396,7 +412,7 @@ prevent a clean architectural result.
 
 | File | Coverage | SQL in text | SQL resolved |
 |---|---|---:|---:|
-| `packages/qf-kernel/src/governed-review.ts` | partial | 33 | 32 |
+| `packages/qf-kernel/src/governed-review.ts` | partial | 36 | 35 |
 | `packages/qf-kernel/src/upgrade.ts` | partial | 15 | 14 |
 | `collab-electron/src/main/kernel.ts` | partial | 7 | 6 |
 | `packages/qf-kernel/src/db.ts` | partial | 1 | 0 |
@@ -417,7 +433,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (555 files)
+## Per-analyzer coverage (566 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -425,19 +441,19 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 551 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 277 | 0 | 3 | 0 | 275 |
-| `ipcPush` | 7 | 0 | 3 | 0 | 545 |
-| `persistence` | 25 | 29 | 0 | 0 | 501 |
-| `lifetime` | 5 | 61 | 0 | 0 | 489 |
-| `packaging` | 224 | 0 | 0 | 105 | 226 |
-| `ownership` | 20 | 0 | 0 | 350 | 185 |
-| `reach` | 223 | 3 | 0 | 329 | 0 |
+| `imports` | 562 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 283 | 0 | 3 | 0 | 280 |
+| `ipcPush` | 7 | 0 | 3 | 0 | 556 |
+| `persistence` | 25 | 30 | 0 | 0 | 511 |
+| `lifetime` | 5 | 63 | 0 | 0 | 498 |
+| `packaging` | 227 | 0 | 0 | 106 | 233 |
+| `ownership` | 21 | 0 | 0 | 357 | 188 |
+| `reach` | 226 | 3 | 0 | 337 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 329 files means those trees are
+failure — `reach: unsupported` on 337 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
-`packaging: unsupported` on 105 files means the packaging
+`packaging: unsupported` on 106 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
 
 ### The invariant
@@ -445,15 +461,15 @@ manifests are not parsed, so ship status is genuinely unproven rather than assum
 **Unexplained undecided: 0.** This is the contract's
 target, and it is *not* the coverage number above — coverage counts analyzer cells,
 this counts findings nobody has ruled on that also fail to say why. Of the
-27 undecided findings, each carries a blocker:
+37 undecided findings, each carries a blocker:
 
 | Blocker | Findings | Meaning |
 |---|---:|---|
-| `founder-decision` | 20 | the code cannot say which answer is right — this needs your intent |
+| `founder-decision` | 23 | the code cannot say which answer is right — this needs your intent |
 | `ast-coverage` | 2 | the analyzer could not resolve this statically |
-| `package-proof` | 5 | a packaged or dynamically-loaded caller must be ruled out first |
+| `package-proof` | 12 | a packaged or dynamically-loaded caller must be ruled out first |
 
-**20 of 27 are waiting on you, not on the tool.**
+**23 of 37 are waiting on you, not on the tool.**
 Zero unknowns is not the goal and never was: forcing that number down buys fake
 certainty. Zero *unexplained* is the goal, and it is met.
 
@@ -476,7 +492,7 @@ discovered from the AST.
 | Canvas domain projection | 2 | 1 | medium |
 | Layout / cache persistence | 0 | 0 | — *unclaimed* |
 | Process cleanup | 3 | 0 | medium |
-| Research review / publication | 6 | 2 | high |
+| Research review / publication | 7 | 2 | high |
 | Artifact storage | 7 | 4 | high |
 
 ### Session lifecycle
@@ -485,41 +501,42 @@ discovered from the AST.
 
 - **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 577
-- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 531
-- `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 396
-- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 854
+- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 544
+- `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 413
+- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 866
 
 ### Exact task delivery
 
 3 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
-- **packages/qf-kernel/src/execute.ts** — UPDATE task at line 121
+- **packages/qf-kernel/src/execute.ts** — UPDATE task at line 128
 - **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 644
-- **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 1015
-- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 763
+- **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 1075
+- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 775
 - `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 85
 
 ### Research review / publication
 
 2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 971
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 1016
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1330
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 892
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 1008
+- `collab-electron/src/main/market-analysis.ts` — exports analyzeMarketAndReview() at line 29
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
-- `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 228
+- `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 235
 
 ### Artifact storage
 
 4 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
 - **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 363
-- **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 541
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 904
+- **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 543
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 941
 - **packages/qf-kernel/src/strategy-outcome.ts** — INSERT INTO artifact at line 195
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentTrajectoryArtifact() at line 32
-- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 338
+- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 341
 - `packages/qf-kernel/src/resolve-artifact-root.ts` — exports resolveArtifactRoot() at line 25
 
 **`strong` is structural** — the file mutates the responsibility's table or owns its
@@ -538,13 +555,13 @@ not stopped by the quit path leaves that process running after the app closes.
 |---|---:|---|
 | `sidecar/server.ts` | 1 | **no** |
 | `tmux.ts` | 1 | **no** |
-| `pty.ts` | 2 | **partial** — pty.setShuttingDown(), pty.killAllAndWait(), pty.shutdownSidecarIfIdle() |
+| `watcher.ts` | 1 | **no** |
+| `pty.ts` | 2 | yes |
 | `git-replay.ts` | 1 | yes |
-| `watcher.ts` | 1 | yes |
 
 - `sidecar/server.ts` — This module starts 1 process and the quit path never stops it. A closed seat can outlive the app.
 - `tmux.ts` — This module starts 1 process and the quit path never stops it. A closed seat can outlive the app.
-- `pty.ts` — Stopped by setShuttingDown, killAllAndWait, but shutdownSidecarIfIdle is conditional — that resource survives a close while busy.
+- `watcher.ts` — This module starts 1 process and the quit path never stops it. A closed seat can outlive the app.
 
 ## Staying true
 

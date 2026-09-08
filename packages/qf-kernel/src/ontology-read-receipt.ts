@@ -3,6 +3,7 @@ import { schema } from "qf-kernel-schema";
 import type { KernelDb } from "./db.ts";
 import { KernelError } from "./errors.ts";
 import { contentHash } from "./hash.ts";
+import { isMarketExpressionComparison } from "./market-context.ts";
 
 export type OntologyReadReceipt = {
   contract: "qf.ontology.v1";
@@ -38,14 +39,25 @@ export function validateOntologyReadPublication(
   bytes: Uint8Array,
   actorSessionId: string | undefined,
   tool: string,
+  db?: KernelDb,
 ): OntologyReadReceipt {
   if (!actorSessionId) {
     throw new KernelError("ontology_read_tool requires trusted actor_session_id context");
   }
-  if (!GENERATED_READ_TOOLS.has(tool)) {
+  const payload = parsePayload(bytes);
+  const scopedDecisionRead = db && (db.query("SELECT params FROM run").all() as Array<{ params: string }>).some((run) => {
+    try {
+      const params = JSON.parse(run.params); const context = params.decision_context;
+      if (!isMarketExpressionComparison(params.operation, params.implementation_version) || context?.worker_session_id !== actorSessionId || !payload.arguments || typeof payload.arguments !== "object") return false;
+      const args = payload.arguments as Record<string, unknown>;
+      if (Object.keys(args).length !== 1) return false;
+      const allowed = [`qf_hypothesis_get:${context.hypothesis_id}`, `qf_run_get:${context.run_id}`, `qf_dataset_get:${context.dataset_id}`, `qf_artifact_get:${params.result_artifact_id}`, ...context.inputs.map((row: { id: string }) => `qf_artifact_get:${row.id}`), ...context.selections.map((row: { quote_id: string }) => `qf_quote_get:${row.quote_id}`)];
+      return allowed.includes(`${tool}:${args.id}`);
+    } catch { return false; }
+  });
+  if (!GENERATED_READ_TOOLS.has(tool) && !scopedDecisionRead) {
     throw new KernelError(`ontology_read_tool is not a generated market.read tool: ${tool}`);
   }
-  const payload = parsePayload(bytes);
   if (payload.contract !== "qf.ontology.v1") {
     throw new KernelError("ontology read receipt contract must be qf.ontology.v1");
   }
@@ -123,5 +135,5 @@ export function assertDurableOntologyReadReceipt(
   ) {
     throw new KernelError("ontology read publication receipt does not match assigned worker");
   }
-  validateOntologyReadPublication(bytes, actorSessionId, receipt.tool);
+  validateOntologyReadPublication(bytes, actorSessionId, receipt.tool, db);
 }

@@ -362,4 +362,38 @@ describe("G9 Report authority", () => {
     expect(db!.query("SELECT COUNT(*) AS n FROM qf_review_publication").get()).toEqual({ n: 2 });
     expect(db!.query("SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = 'qf_review_publication_legacy'").get()).toBeNull();
   });
+
+  test("legacy Task-only publication key migrates from exact Evaluation source work and duplicate closure stays atomic", () => {
+    const { missionId, datasetId } = base();
+    const world = supportWorld("g9-task-key", missionId, datasetId, "g9-technique", "worker-a", "critic-a");
+    const canonicalKey = Object.values(world.work).join("\0");
+    db!.exec("DROP TABLE qf_review_publication");
+    db!.exec("CREATE TABLE qf_review_publication (source_work_key TEXT PRIMARY KEY NOT NULL, report_artifact_id TEXT NOT NULL, publication_evaluation_id TEXT NOT NULL, created_at TEXT NOT NULL)");
+    db!.query("INSERT INTO qf_review_publication VALUES (?, ?, ?, ?)").run(world.sourceTaskId, world.reportId, world.evaluationId, "2026-08-28T00:00:00.000Z");
+    ensureGovernedReviewSchema(db!);
+    expect(db!.query("SELECT source_work_key,report_artifact_id,publication_evaluation_id,is_current FROM qf_review_publication").get()).toMatchObject({ source_work_key: canonicalKey, report_artifact_id: world.reportId, publication_evaluation_id: world.evaluationId, is_current: 1 });
+
+    db!.exec("DROP TABLE qf_review_publication");
+    db!.exec("CREATE TABLE qf_review_publication (source_work_key TEXT PRIMARY KEY NOT NULL, report_artifact_id TEXT NOT NULL, publication_evaluation_id TEXT NOT NULL, created_at TEXT NOT NULL)");
+    db!.query("INSERT INTO qf_review_publication VALUES (?, ?, ?, ?)").run(world.sourceTaskId, world.reportId, world.evaluationId, "2026-08-28T00:00:00.000Z");
+    db!.query("INSERT INTO qf_review_publication VALUES (?, ?, ?, ?)").run("alternate-legacy-key", world.reportId, world.evaluationId, "2026-08-28T00:00:01.000Z");
+    expect(() => ensureGovernedReviewSchema(db!)).toThrow(`legacy publication rows resolve ambiguously: ${world.sourceTaskId}`);
+    expect(db!.query("SELECT source_work_key FROM qf_review_publication ORDER BY source_work_key").all()).toEqual([{ source_work_key: "alternate-legacy-key" }, { source_work_key: world.sourceTaskId }]);
+    expect(db!.query("SELECT 1 AS ok FROM sqlite_master WHERE type='table' AND name='qf_review_publication_legacy'").get()).toBeNull();
+  });
+
+  test("W1 nullable method migration preserves G9 rows and refuses ambiguous authority atomically", () => {
+    const { missionId, datasetId } = base();
+    supportWorld("w1-legacy", missionId, datasetId, "g9-technique", "worker-a", "critic-a");
+    const rows = db!.query("SELECT * FROM qf_review_publication").all() as Array<{ authority_key: string }>;
+    const ddl = (db!.query("SELECT sql FROM sqlite_master WHERE name='qf_review_publication'").get() as { sql: string }).sql.replace("strategy_id TEXT,", "strategy_id TEXT NOT NULL,").replace("strategy_version INTEGER,", "strategy_version INTEGER NOT NULL,");
+    db!.exec("DROP INDEX qf_review_publication_current_authority"); db!.exec("ALTER TABLE qf_review_publication RENAME TO w1_fixture_publication"); db!.exec(ddl); db!.exec("INSERT INTO qf_review_publication SELECT * FROM w1_fixture_publication"); db!.exec("DROP TABLE w1_fixture_publication");
+    db!.exec("UPDATE qf_review_publication SET authority_key='foreign'");
+    expect(() => ensureGovernedReviewSchema(db!)).toThrow("invalid legacy publication authority");
+    expect((db!.query("PRAGMA table_info(qf_review_publication)").all() as Array<{ name: string; notnull: number }>).find((row) => row.name === "strategy_id")?.notnull).toBe(1);
+    db!.query("UPDATE qf_review_publication SET authority_key=?").run((rows[0] as { authority_key: string }).authority_key);
+    ensureGovernedReviewSchema(db!);
+    expect(db!.query("SELECT * FROM qf_review_publication").all()).toEqual(rows);
+    expect((db!.query("PRAGMA table_info(qf_review_publication)").all() as Array<{ name: string; notnull: number }>).find((row) => row.name === "strategy_id")?.notnull).toBe(0);
+  });
 });

@@ -89,6 +89,7 @@ export type {
 } from "./results.ts";
 export { contentHash } from "./hash.ts";
 export { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
+export { MARKET_EXPRESSION_COMPARISON_OPERATION, MARKET_EXPRESSION_COMPARISON_IMPLEMENTATION, isMarketExpressionComparison } from "./market-context.ts";
 export { replayArtifactAndAssert, replayRunAndAssert } from "./replay.ts";
 export {
   GOVERNED_CRITIC_TOOLS,

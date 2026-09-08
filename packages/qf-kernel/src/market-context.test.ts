@@ -41,6 +41,29 @@ function eventInput(source_artifact_id: string) {
 }
 
 describe("WO-107c trusted market context", () => {
+  test("reschedules only a trusted newer scheduled-event fence and exactly replays its receipt", () => {
+    db = openKernel(":memory:");
+    const first = publishSource("schedule-2140");
+    execute(db, "schedule_market_event", eventInput(first), TRACE);
+    const second = publishSource("schedule-2200");
+    const input = { ...eventInput(second), starts_at: "2026-08-02T22:00:00.000Z", observed_at: "2026-08-01T13:00:00.000Z" };
+    const revised = execute(db, "reschedule_market_event", input, { trace_id: "reschedule", span_id: "reschedule:1" });
+    expect(revised).toMatchObject({ outcome: "revised", state: { starts_at: "2026-08-02T22:00:00.000Z", status: "scheduled" } });
+    const receipt = db.query("SELECT type, payload FROM events WHERE object_type = 'market_event' AND type = 'market_event.rescheduled'").get() as { type: string; payload: string };
+    expect(receipt.type).toBe("market_event.rescheduled");
+    expect(JSON.parse(receipt.payload)).toMatchObject({ previous_starts_at: "2026-08-02T18:00:00.000Z", starts_at: "2026-08-02T22:00:00.000Z", source_artifact_id: second, observed_at: "2026-08-01T13:00:00.000Z" });
+    const before = (db.query("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n;
+    expect(execute(db, "reschedule_market_event", input, { trace_id: "reschedule", span_id: "retry" })).toMatchObject({ outcome: "replayed" });
+    expect((db.query("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n).toBe(before);
+    for (const bad of [
+      { ...input, sport: "ufc" },
+      { ...input, competition: "Other" },
+      { ...input, observed_at: "2026-08-01T12:30:00.000Z", starts_at: "2026-08-02T23:00:00.000Z" },
+      { ...input, source_artifact_id: "missing", starts_at: "2026-08-02T23:00:00.000Z" },
+    ]) expect(() => execute(db, "reschedule_market_event", bad, { trace_id: "bad", span_id: "bad" })).toThrow();
+    execute(db, "start_event", { event_id: "event-football-1" }, { trace_id: "start", span_id: "start" });
+    expect(() => execute(db, "reschedule_market_event", { ...input, starts_at: "2026-08-03T00:00:00.000Z", observed_at: "2026-08-01T14:00:00.000Z" }, { trace_id: "terminal", span_id: "terminal" })).toThrow(MarketContextConflictError);
+  });
   test("creates scheduled context with one provenance event and replays by trace identity", () => {
     db = openKernel(":memory:");
     const source = publishSource("context-source");

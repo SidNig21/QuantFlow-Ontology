@@ -17,19 +17,16 @@ import { createTileManager } from "./tile-manager.js";
 import { updateTileTitle, getTileLabel } from "./tile-renderer.js";
 import { initDock } from "./dock.js";
 import { formatTidyToast, repackTilesToGrid } from "./canvas-layout.js";
-import { createFlowCubeWatermark } from "../../shared/flow-cube/flow-cube-watermark.js";
 import { centerCanvasCoords } from "./canvas-place.js";
 import {
 	createHandoffLayer,
 	refreshTaskDelegationCanvas,
 } from "./handoff-layer.js";
 import { createCableOverlay } from "./cable-overlay.js";
-import { createCableController } from "./cable-controller.js";
 import { createCableInspector } from "./cable-inspector.js";
-import { createKernelLedger } from "./kernel-ledger.js";
 import { fitViewportToTiles } from "./glacier-feel.js";
 import { renderTaskFoot } from "./task-composition.js";
-import { createResearchWorldController } from "./research-world.js";
+import { createOneCanvasController } from "./one-canvas.js";
 import { participantViewForSession } from "./participant-projection.js";
 import { createMarketDesk } from "./market-desk.js";
 
@@ -104,25 +101,6 @@ window.shellApi.onPrefChanged((key, value) => {
 // -- Viewport --
 
 const viewport = createViewport(canvasEl, gridCanvas, tiles);
-
-createFlowCubeWatermark(document.getElementById("canvas-watermark"), {
-	getTileCount: () => tiles.length,
-});
-
-/** Convert in-memory panX/panY state to a center-point for persistence. */
-function toCenterPointState(state) {
-	const { panX, panY, zoom } = state.viewport;
-	const w = canvasEl.clientWidth;
-	const h = canvasEl.clientHeight;
-	return {
-		...state,
-		viewport: {
-			centerX: (w / 2 - panX) / zoom,
-			centerY: (h / 2 - panY) / zoom,
-			zoom,
-		},
-	};
-}
 
 // -- Init --
 
@@ -288,7 +266,9 @@ async function init() {
 			updateSegmentedControl(mode);
 		},
 	});
-	panelManager.initPrefs(prefNavWidth, prefSidebarMode);
+	// The Canvas is the primary product surface. Files and the diagnostic tile
+	// list remain one click away, but never consume half the desk on cold open.
+	panelManager.initPrefs(prefNavWidth, "closed");
 
 	let canvasToastTimer = null;
 	function showCanvasToast(message, { tone = "neutral" } = {}) {
@@ -504,8 +484,6 @@ async function init() {
 	let minimapRef = null;
 	/** @type {ReturnType<typeof createCableOverlay> | null} */
 	let cableOverlay = null;
-	/** @type {ReturnType<typeof createCableController> | null} */
-	let cableController = null;
 	/** @type {Array<{id:string,kind:string,from_ref:string,to_ref:string,created_at?:string}>} */
 	let liveConnections = [];
 	let researchWorldController = null;
@@ -520,15 +498,9 @@ async function init() {
 			cableOverlay?.redraw();
 		},
 		onSaveDebounced(state) {
-			window.shellApi.canvasSaveState(
-				toCenterPointState(state),
-			);
 			syncTileList();
 		},
 		onSaveImmediate(state) {
-			window.shellApi.canvasSaveState(
-				toCenterPointState(state),
-			);
 			syncTileList();
 		},
 		onNoteSurfaceFocus: noteSurfaceFocus,
@@ -552,9 +524,12 @@ async function init() {
 		onTerminalTileClosed() {
 			syncTileList();
 		},
-			 onTileFocused(tile) {
+		onTileFocused(tile) {
 			tileListWebview.send(
 				"tile-list:focus", tile?.id || null,
+			);
+			void window.shellApi.qf.selectAgentSurface?.(
+				tile?.sessionId ? { tileId: tile.id, sessionId: tile.sessionId } : null,
 			);
 			renderTaskFoots();
 		},
@@ -562,13 +537,13 @@ async function init() {
 			edgeIndicators.panToTile(tile);
 		},
 		onTileClosed() {
-			void cableController?.refresh();
+			void window.shellApi.qf.selectAgentSurface?.(null);
 		},
 		onResearchTile(dom, tile, object) {
 			researchWorldController?.renderTile(dom, tile, object);
 		},
 	});
-	researchWorldController = createResearchWorldController({
+	researchWorldController = createOneCanvasController({
 		tileManager,
 		getTileDOMs: () => tileManager.getTileDOMs(),
 		onCables: (cables) => {
@@ -581,14 +556,17 @@ async function init() {
 	});
 	marketDeskController = createMarketDesk({
 		layerEl: tileLayer,
-		onResearch: (missionId) => researchWorldController?.reveal("mission", missionId),
+		onResearch: async (missionId) => {
+			const result = await researchWorldController?.reveal("mission", missionId);
+			if (result?.ok) tidyTilesToGrid();
+			return result;
+		},
 		showStatus: (message, options) => showCanvasToast(message, options),
 	});
 	tileManager.onResearchWorldReady = (worldTiles) => {
 		edgeIndicators.update();
 		minimap.update();
 		cableOverlay?.redraw();
-		void animateViewportFit(worldTiles, 90);
 	};
 
 	// -- Edge indicators --
@@ -616,13 +594,21 @@ async function init() {
 	minimapRef = minimap;
 
 	function tidyTilesToGrid() {
-		const projected = tiles.map((tile) => ({ ...tile }));
+		const projected = tiles
+			.filter((tile) => {
+				const container = tileManager.getTileDOMs().get(tile.id)?.container;
+				return !container?.hidden && container?.style?.display !== "none";
+			})
+			.map((tile) => ({ ...tile }));
 		if (projected.length === 0) {
 			showCanvasToast("Nothing to tidy", { tone: "neutral" });
 			return { placed: 0 };
 		}
 		const tidyMargin = 40;
-		const zoom = Math.max(viewportState.zoom, 0.01);
+		// Plan the grid for the readable fit we are about to apply, not for a
+		// potentially zoomed-in camera. This lets compact windows form two rows
+		// instead of pushing live participants above or below the viewport.
+		const zoom = Math.max(Math.min(viewportState.zoom, 0.62), 0.01);
 		const result = repackTilesToGrid(projected, {
 			viewportWidth: panelViewer.clientWidth,
 			zoom,
@@ -644,7 +630,7 @@ async function init() {
 		const missionTile = missionTiles.find((tile) => tileManager.getTileDOMs().get(tile.id)?.container?.dataset?.qfProjectionVisibility === "normal")
 			?? missionTiles.at(-1);
 		const readableAnchor = expandedParticipant ?? missionTile;
-		void animateViewportFit(tiles, 48, readableAnchor ? { minZoom: 0.6, anchorTile: readableAnchor } : {});
+		void animateViewportFit(projected, 48, readableAnchor ? { minZoom: 0.6, anchorTile: readableAnchor } : {});
 		showCanvasToast(formatTidyToast(result), { tone: "ok" });
 		return result;
 	}
@@ -720,7 +706,7 @@ async function init() {
 		document.getElementById("cable-inspector"),
 	);
 
-	/** Cable overlay + Kernel-backed draw (WO-g5). */
+	/** Read-only overlay for exact active collaboration supplied by the one-Canvas projection. */
 	const cableSvg = document.getElementById("cable-overlay");
 	if (cableSvg) {
 		cableOverlay = createCableOverlay(cableSvg, {
@@ -748,39 +734,7 @@ async function init() {
 				});
 			},
 		});
-		cableController = createCableController({
-			canvasEl,
-			overlay: cableOverlay,
-			getTiles: () => tiles,
-			getTileDOMs: () => tileManager.getTileDOMs(),
-			loadConnections: async (tileIds) => {
-				const rows = await window.shellApi.qf.listConnections({ tileIds });
-				return Array.isArray(rows) ? rows : [];
-			},
-			createConnection: (args) => window.shellApi.qf.createConnection(args),
-			deleteConnection: (id) =>
-				window.shellApi.qf.deleteConnection({ id }),
-			onConnectionsChanged: (conns) => {
-				liveConnections = conns;
-			},
-			showToast: showCanvasToast,
-		});
-		void cableController.refresh();
 	}
-
-	const kernelLedger = createKernelLedger(document.getElementById("kernel-ledger"), {
-		listEvents: async () => {
-			const res = await window.shellApi.qf.listResearchLedger();
-			if (!res?.ok) return [];
-			const entries = Array.isArray(res.entries) ? res.entries : [];
-			const model = researchWorldController?.getProjectionModel?.();
-			const activeMissionId = model?.mission?.id;
-			return model ? entries.filter((entry) => model.historyIds.has(String(entry?.id ?? "")) || (entry?.stage === "question" && entry?.id === activeMissionId)) : entries;
-		},
-		onSubscribe: (cb) => window.shellApi.qf.onEventsInvalidate(cb),
-		onReveal: (type, id) => researchWorldController?.reveal(type, id),
-	});
-	document.addEventListener("qf:research-world-active", () => { void kernelLedger.refresh(); });
 
 	edgeIndicators.update();
 	minimap.update();
@@ -880,6 +834,8 @@ async function init() {
 			: { sessions: [], assignments: [] };
 		renderTaskFoots();
 		researchWorldController?.refreshParticipants?.();
+		const activeRoot = researchWorldController?.getLastRoot?.();
+		if (activeRoot) await researchWorldController?.reveal(activeRoot.type, activeRoot.id);
 	}
 
 	let taskProjectionReady = false;
@@ -1506,11 +1462,20 @@ async function init() {
 				if (channel === "spawn-pending") {
 					const requestId = String(args[0] ?? "");
 					if (requestId && !tiles.some((tile) => tile.pendingSpawnId === requestId)) {
+						const definitionId = String(args[1] ?? "");
+						const readyTile = tiles.find((tile) =>
+							tile.ontologyType === "ready_director" &&
+							tile.ontologyId === definitionId
+						);
 						tileManager.createPendingSpawnTile({
 							requestId,
-							definitionId: String(args[1] ?? ""),
+							definitionId,
 							displayName: String(args[2] ?? args[1] ?? "Agent"),
+							position: readyTile
+								? { x: readyTile.x, y: readyTile.y }
+								: undefined,
 						});
+						if (readyTile) tileManager.closeCanvasTile(readyTile.id);
 						minimap.update();
 					}
 				}
@@ -1604,6 +1569,14 @@ async function init() {
 					tileManager.createArtifactTile(cx, cy, args[0]);
 					minimap.update();
 				}
+				if (channel === "market-decision-settled") {
+					const root = researchWorldController?.getLastRoot?.();
+					if (root) {
+						void researchWorldController.reveal(root.type, root.id).then((result) => {
+							if (result?.ok) tidyTilesToGrid();
+						});
+					}
+				}
 				if (channel === "create-session-tile") {
 					const size = defaultSize("session");
 					const { cx, cy } = centerCanvasCoords(
@@ -1638,6 +1611,9 @@ async function init() {
 						tileManager.saveCanvasImmediate();
 						tileManager.spawnTerminalWebview(tile, true);
 						minimap.update();
+						if (sessionId && researchWorldController?.getLastRoot?.()) {
+							window.requestAnimationFrame(() => tidyTilesToGrid());
+						}
 						if (window.__QF_UI_PROOF__ === true) {
 							const dom = tileManager.getTileDOMs().get(tile.id);
 							const container = dom?.container;
@@ -2023,57 +1999,12 @@ async function init() {
 		});
 	}
 
-	// -- Restore canvas state --
-
-	const savedState = await window.shellApi.canvasLoadState();
-	if (savedState) {
-		const discovered = await window.shellApi.ptyDiscover?.() ?? [];
-		const livePtyIds = new Set(discovered.map((entry) => entry.sessionId));
-		const savedTiles = savedState.tiles.filter((tile) => !tile.pendingSpawnId).map((tile) => (
-			tile.type === "term" && tile.sessionId &&
-			tile.ptySessionId && !livePtyIds.has(tile.ptySessionId)
-				? { ...tile, ptySessionId: undefined }
-				: tile
-		));
-		const { centerX, centerY, zoom } = savedState.viewport;
-		const w = canvasEl.clientWidth;
-		const h = canvasEl.clientHeight;
-		viewportState.zoom = zoom ?? 1;
-		viewportState.panX = centerX != null
-			? w / 2 - centerX * viewportState.zoom
-			: 0;
-		viewportState.panY = centerY != null
-			? h / 2 - centerY * viewportState.zoom
-			: 0;
-		viewport.updateCanvas();
-		tileManager.restoreCanvasState(savedTiles);
-		viewport.redrawGrid();
-		minimap.update();
-
-		// Batch-sync metadata for restored terminal tiles
-		const restoredTermTiles = tiles.filter(
-			(t) => t.type === "term" && t.ptySessionId,
-		);
-		if (restoredTermTiles.length > 0) {
-			for (const tile of restoredTermTiles) {
-				const session = discovered.find(
-					(entry) => entry.sessionId === tile.ptySessionId,
-				);
-				syncTerminalTileMeta(tile, session?.meta);
-			}
-			tileManager.saveCanvasDebounced();
-		}
-	}
-	// Cold launches have no saved Canvas state, but they must still publish the
-	// same ordinary projection boundary as restores before any deliberate Mission
-	// navigation occurs.
+	// Cold open never restores prior tiles or processes. Durable work remains in
+	// the Kernel and returns only through deliberate retrieval.
 	await researchWorldController?.hydrateSaved();
 
 	taskProjectionReady = true;
 	void scheduleTaskProjectionRefresh();
-	setInterval(() => {
-		void scheduleTaskProjectionRefresh();
-	}, 1500);
 
 	// -- Initialize workspaces --
 
@@ -2083,11 +2014,6 @@ async function init() {
 
 	panelManager.applyVisibility();
 
-	// -- beforeunload save --
-
-	window.addEventListener("beforeunload", () => {
-		tileManager.saveCanvasImmediate();
-	});
 }
 
 init().catch((err) => {

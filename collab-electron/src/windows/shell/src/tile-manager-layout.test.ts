@@ -27,6 +27,7 @@ describe("Tidy authority boundary", () => {
 		expect(body).toContain('qfProjectionVisibility === "normal"');
 		expect(body).toContain("missionTiles.at(-1)");
 		expect(body).toContain("anchorTile: readableAnchor");
+		expect(body).toContain("Math.min(viewportState.zoom, 0.62)");
   });
 
 });

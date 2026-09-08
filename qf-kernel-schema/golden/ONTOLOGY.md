@@ -677,6 +677,20 @@ Schedule one trusted market event from an existing source Artifact. Operator-onl
 - `source_artifact_id` — This field identifies the existing Artifact that preserves the observed event source. The Kernel rejects a reference that is not already present.
 - `observed_at` — This field records when the event was observed in ISO-8601 UTC. Preserve it as provenance and never substitute ingest time.
 
+### `reschedule_market_event`
+
+A reschedule_market_event records a newer trusted pre-event cutoff for an existing scheduled market event. It may change only starts_at after the observation that established the current fence; sport, competition, provider identity, and lineage remain exact, while live or terminal events reject revision.
+
+- **lifecycle:** `experimental`
+- **operator-only:** `true`
+- **input:**
+- `market_event_id` — This field identifies the existing scheduled provider event. Reuse the exact stable identity and never substitute a new provider event.
+- `sport` — This field names the sport domain for the occurrence. Use it to interpret market vocabularies while keeping shared instrument structure in one type.
+- `competition` — This field stores the competition context such as league, card, or tournament round. Keep the value operator-legible so slips and reports can be reconciled without external decoding.
+- `starts_at` — This field records the scheduled start timestamp in ISO-8601 UTC. Do not use data timestamped after this moment for pre-event decisions.
+- `source_artifact_id` — This field identifies the immutable Artifact containing the newer schedule observation. The Artifact must already exist in the Kernel.
+- `observed_at` — This field records when the revised schedule was observed. It must be newer than the observation governing the current fence and earlier than the revised start.
+
 ### `ingest_market_batch`
 
 Ingest one provenance-bound batch of instrument and quote rows through the trusted market pipeline. The Kernel must validate the whole batch and commit its rows, derived quote links, and evidence events atomically.
@@ -881,7 +895,7 @@ Create exactly one open review Task assigned to a captured production Critic ses
 - **internal-only:** `true`
 - **input:**
 - `task_id` — Original open Task id to review.
-- `critic_session_id` — Running production hermes-critic session captured by the host.
+- `critic_session_id` — The running critic participant selected for this independent review. The session must be admitted with the critic role and research.evaluate capability.
 
 ### `governed_review_task`
 

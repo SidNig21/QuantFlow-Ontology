@@ -23,6 +23,27 @@ function wslPath(path: string): string {
 }
 
 describe("Hermes packaged launch wrapper", () => {
+  test("refuses missing or invalid participant identity before profile creation", () => {
+    const root = mkdtempSync(join(tmpdir(), "qf-hermes-identity-"));
+    try {
+      for (const identity of ["", "../seat"]) {
+        const environment = [
+          `HOME=${wslPath(root)}`,
+          `QF_AGENT_SESSION_ID=${identity}`,
+          `QF_QUANTFLOW_HERMES_PROFILE_ROOT=${wslPath(join(root, "isolated"))}`,
+        ];
+        const result = spawnSync("wsl.exe", ["-d", "Ubuntu", "--", "env", ...environment,
+          "bash", wslPath(resolve(import.meta.dir, "qf-hermes-launch.sh")),
+          "/tmp/bridge.mjs", "/tmp/ontology.mjs", "echo"], { encoding: "utf8" });
+        expect(result.status).toBe(2);
+        expect(result.stderr).toContain("valid participant session identity is required");
+        expect(readdirSync(root)).toEqual([]);
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   test("requires and uses an isolated profile root", () => {
     expect(wrapper).toContain("QF_QUANTFLOW_HERMES_PROFILE_ROOT");
     expect(wrapper).not.toContain("QF_HERMES_PROFILE_ROOT");
@@ -36,7 +57,7 @@ describe("Hermes packaged launch wrapper", () => {
     expect(wrapper).toContain("unset QF_LAUNCH_READY_NONCE");
     expect(wrapper).toContain("--quantflow-mission-oneshot");
     expect(wrapper).toContain("--quantflow-task-oneshot");
-    expect(wrapper).toContain('exec "$hermes_command" --tui');
+    expect(wrapper).toContain('exec "$hermes_command" --toolsets "$quantflow_toolsets" "$@"');
     expect(wrapper).toContain("HERMES_EPHEMERAL_SYSTEM_PROMPT");
     expect(wrapper).not.toContain('exec "$hermes_command" -z');
   });
@@ -197,13 +218,13 @@ describe("Hermes packaged launch wrapper", () => {
         ? [
             "-d", "Ubuntu", "--", "env",
             `HOME=${wslPath(founderHome)}`,
-            "QF_AGENT_SESSION_ID=seat/test",
+            "QF_AGENT_SESSION_ID=seat-test",
             "QF_LAUNCH_READY_NONCE=test-ready",
             `QF_HERMES_PROFILE_ROOT=${wslPath(join(founderHome, ".hermes", "redirect"))}`,
             `QF_QUANTFLOW_HERMES_PROFILE_ROOT=${wslPath(isolatedRoot)}`,
-            "bash", wslPath(wrapperPath), "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs", "sh", "-c", "exit 0",
+            "bash", wslPath(wrapperPath), "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs", "echo", "--tui",
           ]
-        : [wrapperPath, "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs", "sh", "-c", "exit 0"];
+        : [wrapperPath, "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs", "echo", "--tui"];
       const result = spawnSync(
         process.platform === "win32" ? "wsl.exe" : "bash",
         hermesArgs,
@@ -214,7 +235,7 @@ describe("Hermes packaged launch wrapper", () => {
               env: {
                 ...process.env,
                 HOME: founderHome,
-                QF_AGENT_SESSION_ID: "seat/test",
+                QF_AGENT_SESSION_ID: "seat-test",
                 QF_LAUNCH_READY_NONCE: "test-ready",
                 QF_HERMES_PROFILE_ROOT: join(founderHome, ".hermes", "redirect"),
                 QF_QUANTFLOW_HERMES_PROFILE_ROOT: isolatedRoot,
@@ -223,7 +244,12 @@ describe("Hermes packaged launch wrapper", () => {
             },
       );
       expect(result.status).toBe(0);
-      const profileHome = join(isolatedRoot, "profiles", "quantflow-runtime-seat_test");
+      const profileHome = join(isolatedRoot, "profiles", "quantflow-runtime-seat-test");
+      const pluginHome = join(profileHome, "plugins", "model-providers", "qf-opencode-session");
+      expect(readFileSync(join(pluginHome, "__init__.py"), "utf8")).toBe(
+        readFileSync(resolve(import.meta.dir, "qf-opencode-session/__init__.py"), "utf8"),
+      );
+      expect(readFileSync(join(pluginHome, "plugin.yaml"), "utf8")).toContain("kind: model-provider");
       if (process.platform === "win32") {
         const linkPath = wslPath(join(isolatedRoot, "auth.json"));
         const linkCheck = spawnSync("wsl.exe", ["-d", "Ubuntu", "--", "test", "-L", linkPath]);

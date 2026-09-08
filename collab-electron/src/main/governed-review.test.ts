@@ -117,7 +117,7 @@ describe("R15 production governed-review seams", () => {
     expect(preload).toContain('ipcRenderer.invoke("qf:review:request"');
     expect(main).toContain('ipcMain.handle("qf:review:request"');
     expect(main).toContain("kernelFreezeSourceWork");
-    expect(main).toContain("admitAndStartSession(\"hermes-critic\")");
+    expect(main).toContain('acquireEligibleParticipant("critic", "research.evaluate")');
     expect(gateway).toContain("kernelRecordGovernedToolReceipt");
     expect(renderer).toContain("window.shellApi.qf.requestReview");
     expect(gateway).toContain("qf_record_evaluation");

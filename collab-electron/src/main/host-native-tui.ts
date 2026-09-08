@@ -47,6 +47,8 @@ import {
   type NativeTuiOrchestrationDependencies,
 } from "./native-tui-orchestration";
 import * as agentActivity from "./agent-activity";
+import { createMarketRuntimeReceiver, recordMarketRuntimeFailure } from "./market-runtime-failure";
+import { clearMarketRuntimeReceipt, recordMarketRuntimeReceipt } from "./market-runtime-receipt";
 
 export type { NativeTuiLive } from "./native-tui-orchestration";
 
@@ -249,6 +251,19 @@ export async function admitNativeTuiDefinition(opts: {
   const commandCwdGuest = wslLaunch?.cwdGuestPath;
   const seatCapability = mintLiveSeatCapability(kernelSessionId, opts.role ?? "");
   let readinessWaiter: LauncherReadinessWaiter | null = null;
+  const failureNonce = crypto.randomUUID();
+  let runtimePtyId: string | null = null;
+  clearMarketRuntimeReceipt(kernelSessionId);
+  const receiveRuntime = createMarketRuntimeReceiver(failureNonce, (reason) => {
+    if (!usesHermesNativeTui || !runtimePtyId || !recordMarketRuntimeFailure(kernelSessionId, reason)) return;
+    revokeLiveSeatCapability(seatCapability);
+    ptyToKernel.delete(runtimePtyId);
+    ptyToCapability.delete(runtimePtyId);
+    if (opts.role) unregisterSeatPty(opts.role, runtimePtyId);
+    opts.liveDelete?.(kernelSessionId);
+    agentActivity.sessionEnd({ session_id: kernelSessionId });
+    void killSession(runtimePtyId).catch(() => {});
+  }, (receipt) => recordMarketRuntimeReceipt(kernelSessionId, receipt));
   const defaults: NativeTuiOrchestrationDependencies = {
     createPty: async ({ sessionId }) => {
       const waiter = createLauncherReadinessWaiter(
@@ -265,7 +280,7 @@ export async function admitNativeTuiDefinition(opts: {
           cwd: commandCwd,
           target: commandTarget,
           cwdGuestPath: commandCwdGuest,
-          onData: (data) => waiter.push(data),
+          onData: (data) => { waiter.push(data); receiveRuntime(data); },
           env: {
             HERMES_BIN: wslLaunch ? guestCommand : command,
             HOST_ACP_BIN: wslLaunch ? guestCommand : command,
@@ -296,6 +311,7 @@ export async function admitNativeTuiDefinition(opts: {
               ? { QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY: process.env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY }
               : {}),
             QF_AGENT_SESSION_ID: sessionId,
+            QF_RUNTIME_FAILURE_NONCE: failureNonce,
             QF_PEER_ROLE: opts.role ?? "",
             QF_LAUNCH_READY_NONCE: readinessNonce,
             QF_LIVE_SEAT_CAPABILITY: seatCapability,
@@ -310,6 +326,7 @@ export async function admitNativeTuiDefinition(opts: {
           },
           displayName,
         });
+        runtimePtyId = pty.sessionId;
         return pty;
       } catch (error) {
         waiter.cancel();

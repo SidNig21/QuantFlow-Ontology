@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { deriveResearchWorkflow } from "./research-world.js";
+import { deriveResearchWorkflow } from "./research-workflow.js";
 import { observationAge } from "./market-desk.js";
 
-describe("market desk renderer projection", () => {
-  test("frames quote lineage while keeping it in the current Mission group", () => {
+describe("market desk one-Canvas projection", () => {
+	test("resolves the selected market context without creating a second Canvas world", () => {
     const mission = { type: "mission", id: "mission-1", fields: { quote_id: "quote-1", state: "ready to staff", method: null } };
     const quote = { type: "quote", id: "quote-1", fields: { current: true } };
     const instrument = { type: "instrument", id: "instrument-1", fields: { params: { market_label: "Fight Winner" } } };
@@ -21,9 +21,11 @@ describe("market desk renderer projection", () => {
       missing_lineage: [],
     };
     const workflow = deriveResearchWorkflow(world);
-    expect([...workflow.primaryIds].sort()).toEqual(["event-1", "instrument-1", "mission-1", "quote-1", "venue-1"]);
-    expect(workflow.primaryLinkKeys.size).toBe(4);
-    expect([...workflow.currentMissionIds]).toHaveLength(5);
+		expect(workflow.mission?.id).toBe("mission-1");
+		expect(workflow.marketQuote?.id).toBe("quote-1");
+		expect(workflow.marketInstrument?.id).toBe("instrument-1");
+		expect(workflow.marketEvent?.id).toBe("event-1");
+		expect(workflow.marketVenue?.id).toBe("venue-1");
   });
 
   test("reports observation age without claiming provider freshness", () => {
@@ -32,9 +34,22 @@ describe("market desk renderer projection", () => {
   });
 
   test("continuous desk source contains no replacement removal or hide rule", async () => {
-    const controller = await Bun.file(new URL("./research-world.js", import.meta.url)).text();
-    const styles = await Bun.file(new URL("./shell.css", import.meta.url)).text();
-    expect(controller).not.toContain("removeProjectionTiles?.(staleProjectionIds)");
+		const controller = await Bun.file(new URL("./one-canvas.js", import.meta.url)).text();
+		const marketDesk = await Bun.file(new URL("./market-desk.js", import.meta.url)).text();
+		const handoff = await Bun.file(new URL("./handoff-layer.js", import.meta.url)).text();
+		const styles = await Bun.file(new URL("./shell.css", import.meta.url)).text();
+		expect(controller).not.toMatch(/CURRENT_MISSION|FULL_LINEAGE|savedOverview|Back to world/);
     expect(styles).not.toContain('#panel-viewer[data-qf-research-projection-active="true"] #tile-layer > .canvas-tile:not([data-qf-world-type])');
+		expect(marketDesk).toContain('rowsHost.addEventListener("wheel", (event) => event.stopPropagation())');
+		expect(marketDesk).toContain('element("details", "market-research-details")');
+		expect(marketDesk).toContain('open.removeAttribute("open")');
+		expect(marketDesk).toMatch(/await onResearch.*\n\s*root\.hidden = true/s);
+		expect(handoff).toContain('handoff?.status === "open"');
+		expect(handoff).not.toContain('className = "handoff-card"');
+		expect(styles).toMatch(/#handoff-layer[\s\S]*?z-index: 5/);
+		expect(styles).toMatch(/\.handoff-card[\s\S]*?display: none/);
+		expect(styles).toMatch(/\.market-desk-rows[^}]*overscroll-behavior: contain/);
+		expect(styles).toMatch(/\.market-desk-surface[\s\S]*?background: var\(--qf-gl-panel\)/);
+		expect(styles).toContain('.market-desk-surface[hidden] { display: none; }');
   });
 });

@@ -1,5 +1,4 @@
 import { ipcMain, type BrowserWindow } from "electron";
-import * as canvasPersistence from "./canvas-persistence";
 
 interface IpcContext {
   mainWindow: () => BrowserWindow | null;
@@ -14,17 +13,6 @@ export function registerCanvasHandlers(
   ctx: IpcContext,
 ): void {
   let pendingDragPaths: string[] = [];
-
-  // Canvas persistence
-  ipcMain.handle(
-    "canvas:load-state",
-    async () => canvasPersistence.loadState(),
-  );
-
-  ipcMain.handle(
-    "canvas:save-state",
-    async (_event, state) => canvasPersistence.saveState(state),
-  );
 
   // Canvas pinch forwarding
   ipcMain.on(

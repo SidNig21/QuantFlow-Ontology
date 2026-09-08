@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { Database } from "bun:sqlite";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { rm } from "node:fs/promises";
+import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import {
   bindSourceWork,
@@ -19,6 +20,21 @@ import { getResearchWorldProjection } from "./research-world-projection";
 import { kernelAssertVisibleResearchWorldLineage, wrapDatabaseSync } from "./kernel";
 
 const trace = { trace_id: "research-world-test", span_id: "research-world-test-span" };
+
+async function removeExactTestRoot(path: string, prefix: string): Promise<void> {
+  const target = resolve(path);
+  const temporaryRoot = `${resolve(tmpdir())}\\`;
+  if (!target.startsWith(temporaryRoot) || !target.includes(prefix)) throw new Error(`unsafe cleanup ${target}`);
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      await rm(target, { recursive: true, force: true, maxRetries: 2, retryDelay: 25 });
+      return;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "EBUSY" || attempt === 19) throw error;
+      await Bun.sleep(50);
+    }
+  }
+}
 
 function kernel(): KernelDb {
   return openKernel(":memory:");
@@ -107,8 +123,20 @@ function seedNulPublicationFixture(path: string): {
     db.query("INSERT INTO mission (id, created_at, name, objective) VALUES (?, ?, ?, ?)").run(missionId, createdAt, "Electron NUL publication", "Preserve exact publication identity.");
     db.query("INSERT INTO hypothesis (id, created_at, claim, success_criteria, sources, status) VALUES (?, ?, ?, ?, ?, ?)").run(hypothesisId, createdAt, "NUL keys survive projection", "The current report is exact", "[]", "open");
     db.query("INSERT INTO dataset (id, created_at, kind, content_hash, as_of, coverage) VALUES (?, ?, ?, ?, ?, ?)").run(datasetId, createdAt, "results", "dataset-electron-nul-hash", "2026-08-22T00:00:00.000Z", "{}");
-    db.query("INSERT INTO agent_definition (id, created_at, name, role, package_ref, system_prompt_ref, runtime_profile, capability_groups, display_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run("definition-electron-nul", createdAt, "definition-electron-nul", "worker", "species/hermes/packed/hermes.aospkg", null, "default", "[]", "Worker");
-    db.query("INSERT INTO agent_session (id, created_at, status, label) VALUES (?, ?, ?, ?)").run(workerId, createdAt, "closed", "Worker");
+    execute(db, "register_agent_definition", {
+      name: "definition-electron-nul",
+      role: "worker",
+      package_ref: "species/hermes/packed/hermes.aospkg",
+      runtime_profile: "default",
+      capability_groups: [],
+    }, trace);
+    execute(db, "create_agent_session", {
+      session_id: workerId,
+      agent_definition_id: "definition-electron-nul",
+      label: "Worker",
+    }, trace);
+    execute(db, "start_agent_session", { session_id: workerId }, trace);
+    execute(db, "close_agent_session", { session_id: workerId }, trace);
     db.query("INSERT INTO task (id, created_at, title, description, status) VALUES (?, ?, ?, ?, ?)").run(taskId, createdAt, "Electron NUL task", "Preserve exact publication identity.", "done");
     db.query("INSERT INTO run (id, created_at, kind, status, params, trace_id) VALUES (?, ?, ?, ?, ?, ?)").run(runId, createdAt, "backtest", "succeeded", JSON.stringify({ dataset_id: datasetId, result_artifact_id: sourceArtifactId }), "electron-nul-trace");
     db.query("INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref) VALUES (?, ?, ?, ?, ?)").run(sourceArtifactId, createdAt, "result_set", "source-electron-nul-hash", reportPath);
@@ -125,7 +153,7 @@ function seedNulPublicationFixture(path: string): {
   }
 }
 
-test("Electron DatabaseSync publication keys preserve NUL identity and currentness", () => {
+test("Electron DatabaseSync publication keys preserve NUL identity and currentness", async () => {
   const root = mkdtempSync(join(tmpdir(), "qf-electron-nul-projection-"));
   const dbPath = join(root, "kernel.sqlite");
   const fixture = seedNulPublicationFixture(dbPath);
@@ -171,7 +199,8 @@ test("Electron DatabaseSync publication keys preserve NUL identity and currentne
   } finally {
     db.closeStatements();
     raw.close(true);
-    rmSync(root, { recursive: true, force: true });
+    await removeExactTestRoot(fixture.root, "qf-electron-projection-artifacts-");
+    await removeExactTestRoot(root, "qf-electron-nul-projection-");
   }
 });
 
@@ -406,6 +435,7 @@ describe("Main research-world projection", () => {
          expect(projection.world.links).toHaveLength(16);
         expect(projection.world.current_report_id).toBe(String(evaluation.state.report_artifact_id));
         expect(projection.world.report_ids).toContain(String(evaluation.state.report_artifact_id));
+        expect(projection.world.objects.filter((object) => object.type === "agent_session").map((object) => object.fields.species)).toEqual(["Hermes", "Hermes", "Hermes"]);
         expect(projection.world.objects.find((object) => object.type === "evaluation")?.fields.semantic_markers).toEqual(["EVALUATION"]);
          expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === runResultArtifactId)?.fields.semantic_markers).toContain("RAW ARTIFACT");
          expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === workerResultArtifactId)?.fields.semantic_markers).toContain("RAW ARTIFACT");

@@ -20,12 +20,15 @@ import {
   kernelGetLinks,
   kernelGetObject,
   kernelListOntologyToolsForGroups,
+  kernelListOntologyReadTools,
   kernelParseOntologyActionTool,
   kernelParseOntologyReadTool,
   kernelQueryObjects,
   kernelGovernedReviewContextForSession,
   kernelGovernedReviewNextSequence,
   kernelRecordGovernedToolReceipt,
+  kernelDecisionReadScope,
+  kernelDecisionModelReadView,
 } from "./kernel";
 import { notifySessionCanvasProjection } from "./session-canvas-projector";
 import { invokePrecreatedStart } from "./precreated-start-ownership";
@@ -117,7 +120,9 @@ export function callOntologyReadTool(
   toolName: string,
   args: Record<string, unknown>,
 ): { result: unknown; artifactId: string } {
-  assertCapability(identity, toolName);
+  const decisionScope = kernelDecisionReadScope(identity.sessionId);
+  if (decisionScope && (Object.keys(args).length !== 1 || !decisionScope.allowed.includes(`${toolName}:${args.id}`))) throw new Error("This research Task permits only its exact Hypothesis, menu, Quotes, Dataset, Run, and method reads.");
+  if (!decisionScope) assertCapability(identity, toolName);
   const parsed = kernelParseOntologyReadTool(toolName);
   if (!parsed) {
     throw new Error(`Unknown ontology read tool: ${toolName}`);
@@ -156,6 +161,7 @@ export function callOntologyReadTool(
         : links;
   }
   const governed = kernelGovernedReviewContextForSession(identity.sessionId);
+  if (decisionScope && parsed.op === "get") result = kernelDecisionModelReadView(toolName, String(args.id), decisionScope.run, result);
   if (
     governed &&
     parsed.op === "get" &&
@@ -185,7 +191,7 @@ export function callOntologyReadTool(
     toolName,
     args,
     result,
-    ontologyReadReceiptEligible(toolName, kernelCapabilityGroupForTool(toolName)),
+    Boolean(decisionScope) || ontologyReadReceiptEligible(toolName, kernelCapabilityGroupForTool(toolName)),
   );
   return { result, artifactId };
 }
@@ -289,6 +295,8 @@ export function registerOntologyGatewayRpc(
       );
       requireAppOwnedKernelDb(input.kernel_db);
       const grants = kernelCapabilityGroupsForSession(String(input.session_id));
+      const scope = kernelDecisionReadScope(identity.sessionId);
+      if (scope) return { tools: kernelListOntologyReadTools().filter((tool) => scope.allowed.some((entry) => entry.startsWith(`${tool.name}:`))) };
       return {
         tools: ontologyToolsForRole(
           identity.role,

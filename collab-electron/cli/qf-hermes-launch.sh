@@ -47,9 +47,20 @@ fi
 
 # One app-owned launch home per live seat. Never fall back to the WSL user's
 # home: that would mutate founder Hermes state.
-seat_id="${QF_AGENT_SESSION_ID//[^a-zA-Z0-9_-]/_}"
+if [[ ! "${QF_AGENT_SESSION_ID:-}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+  echo "QuantFlow Hermes unavailable: a valid participant session identity is required." >&2
+  exit 2
+fi
+seat_id="$QF_AGENT_SESSION_ID"
 profile_home="$profile_root/profiles/quantflow-runtime-$seat_id"
 mkdir -p "$profile_home"
+# Hermes's supported user-provider registry reads this disposable seat-local
+# profile. It adds routing identity to the existing client, preserving auth,
+# provider selection, model selection, and the installed Hermes runtime.
+provider_plugin="${BASH_SOURCE[0]%/*}/qf-opencode-session"
+mkdir -p "$profile_home/plugins/model-providers/qf-opencode-session"
+cp "$provider_plugin/__init__.py" "$provider_plugin/plugin.yaml" \
+  "$profile_home/plugins/model-providers/qf-opencode-session/"
 # These product seats use explicit QuantFlow MCP workflows. Do not seed the
 # unrelated bundled skill catalog into their disposable prompt context.
 : > "$profile_home/.no-bundled-skills"

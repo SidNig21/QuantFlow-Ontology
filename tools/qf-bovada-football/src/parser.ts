@@ -21,6 +21,7 @@ export type ProviderCompetitor = {
 };
 
 export type ProviderOutcome = {
+  handicap?: number | null;
   id: string;
   description: string;
   status: string;
@@ -38,6 +39,7 @@ export type ProviderPeriod = {
 };
 
 export type ProviderMarket = {
+  key?: string | null;
   id: string;
   description: string;
   descriptionKey: string | null;
@@ -48,11 +50,13 @@ export type ProviderMarket = {
 };
 
 export type ProviderDisplayGroup = {
+  id?: string | null;
   description: string;
   markets: ProviderMarket[];
 };
 
 export type ProviderEvent = {
+  numMarkets?: number | null;
   id: string;
   description: string | null;
   startTime: number;
@@ -101,6 +105,79 @@ export type SelectedBovadaMarket = {
   competitors: [ProviderCompetitor, ProviderCompetitor];
   outcomes: [ProviderOutcome, ProviderOutcome];
 };
+
+function finiteHandicap(value: unknown, path: string): number {
+  if ((typeof value !== "string" && typeof value !== "number") || String(value).trim() === "" || !Number.isFinite(Number(value))) {
+    throw new BovadaSchemaError(`${path}.price.handicap must be finite`);
+  }
+  return Number(value);
+}
+
+export type BovadaFightMenu = {
+  contract: "qf.market.menu.v1";
+  provider_event_id: string;
+  observed_at: string;
+  event_cutoff: string;
+  event: ProviderEvent;
+  markets: Array<{ display_group_id: string | null; display_group: string; market: ProviderMarket }>;
+  requested_expression: { expression: string; status: "selection_unavailable" | "offered"; selection_ids: string[]; reason: string; observed_at: string };
+};
+
+export type BovadaRequestedExpression = {
+  expression: string;
+  outcome_description: string;
+  market_description?: string;
+};
+
+/** The event-list response is the entire completeness boundary; never fetch missing markets. */
+export function parseBovadaFightMenu(
+  body: Uint8Array | string,
+  observedAt: string,
+  providerEventId: string,
+  requestedExpression: BovadaRequestedExpression,
+): BovadaFightMenu {
+  if (!requestedExpression.expression.trim() || !requestedExpression.outcome_description.trim()) {
+    throw new BovadaSelectionError("requested expression and outcome description must be nonempty");
+  }
+  const now = parseObservedAt(observedAt);
+  const coupons = parseBovadaCoupons(body);
+  const matches = coupons.flatMap((coupon) => coupon.events.filter((event) => event.id === providerEventId).map((event) => ({ coupon, event })));
+  if (matches.length !== 1) throw new BovadaSelectionError("market_menu_incomplete: exact event must occur once");
+  const { coupon, event } = matches[0]!;
+  if (!coupon.path.some((node) => node.type === "SPORT" && node.description === "UFC/MMA") || !coupon.path.some((node) => node.type === "TOUR" && node.description === "UFC") || !coupon.path.some((node) => node.type === "LEAGUE" && node.id === event.competitionId && node.description !== "Potential Fights")) throw new BovadaSelectionError("fight menu source identity disagreement");
+  if (event.live || event.status !== "U" || event.startTime <= now) throw new BovadaSelectionError("fight menu must be open pre-event evidence");
+  if (event.competitors.length !== 2 || new Set(event.competitors.map((row) => row.id)).size !== 2 || new Set(event.competitors.map((row) => row.name)).size !== 2) throw new BovadaSelectionError("fight menu competitor identity disagreement");
+  const all = event.displayGroups.flatMap((group) => group.markets.map((market) => ({ display_group_id: group.id ?? null, display_group: group.description, market })));
+  const ids = new Set(all.map((row) => row.market.id));
+  if (event.numMarkets !== ids.size || ids.size !== all.length) throw new BovadaSelectionError("market_menu_incomplete: numMarkets must equal unique returned markets");
+  const selections = new Set<string>();
+  for (const { market } of all) {
+    if (market.status !== "O" || market.period.live || !market.outcomes.length || market.outcomes.some((outcome) => outcome.status !== "O")) throw new BovadaSelectionError("fight menu contains closed or suspended selections; refresh required");
+    for (const outcome of market.outcomes) {
+      if (selections.has(outcome.id)) throw new BovadaSelectionError("duplicate selection identity in fight menu");
+      selections.add(outcome.id);
+      if (!Number.isFinite(Number(outcome.price.decimal)) || Number(outcome.price.decimal) <= 1) throw new BovadaSelectionError("fight menu decimal price must be finite and greater than one");
+      if (outcome.competitorId !== null && !event.competitors.some((row) => row.id === outcome.competitorId)) throw new BovadaSelectionError("foreign competitor in fight menu");
+    }
+  }
+  const requested = all.flatMap(({ market }) => {
+    if (requestedExpression.market_description !== undefined && market.description !== requestedExpression.market_description) return [];
+    return market.outcomes
+      .filter((row) => row.description === requestedExpression.outcome_description)
+      .map((row) => row.id);
+  });
+  if (requested.length > 1) throw new BovadaSelectionError("ambiguous requested selection identity");
+  return { contract: "qf.market.menu.v1", provider_event_id: event.id, observed_at: observedAt, event_cutoff: new Date(event.startTime).toISOString(), event, markets: all,
+    requested_expression: {
+      expression: requestedExpression.expression,
+      status: requested.length ? "offered" : "selection_unavailable",
+      selection_ids: requested,
+      reason: requested.length
+        ? "The exact requested expression is offered in the complete returned fight menu."
+        : "The exact requested expression is absent from the complete returned fight menu.",
+      observed_at: observedAt,
+    } };
+}
 
 function record(value: unknown, path: string): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -184,6 +261,7 @@ function parseOutcome(value: unknown, path: string): ProviderOutcome {
   const row = record(value, path);
   const price = record(row.price, path + ".price");
   return {
+    handicap: price.handicap === undefined ? null : finiteHandicap(price.handicap, path),
     id: stringValue(row.id, path + ".id"),
     description: stringValue(row.description, path + ".description"),
     status: stringValue(row.status, path + ".status"),
@@ -207,6 +285,7 @@ function parsePeriod(value: unknown, path: string): ProviderPeriod {
 function parseMarket(value: unknown, path: string): ProviderMarket {
   const row = record(value, path);
   return {
+    key: typeof row.key === "string" ? row.key : null,
     id: stringValue(row.id, path + ".id"),
     description: stringValue(row.description, path + ".description"),
     descriptionKey: typeof row.descriptionKey === "string" ? row.descriptionKey : null,
@@ -222,6 +301,7 @@ function parseMarket(value: unknown, path: string): ProviderMarket {
 function parseDisplayGroup(value: unknown, path: string): ProviderDisplayGroup {
   const row = record(value, path);
   return {
+    id: typeof row.id === "string" ? row.id : null,
     description: stringValue(row.description, path + ".description"),
     markets: array(row.markets, path + ".markets").map((entry, index) =>
       parseMarket(entry, path + ".markets[" + index + "]"),
@@ -232,6 +312,7 @@ function parseDisplayGroup(value: unknown, path: string): ProviderDisplayGroup {
 function parseEvent(value: unknown, path: string): ProviderEvent {
   const row = record(value, path);
   return {
+    numMarkets: typeof row.numMarkets === "number" && Number.isInteger(row.numMarkets) && row.numMarkets >= 0 ? row.numMarkets : null,
     id: stringValue(row.id, path + ".id"),
     description: typeof row.description === "string" ? row.description : null,
     startTime: timestampValue(row.startTime, path + ".startTime"),

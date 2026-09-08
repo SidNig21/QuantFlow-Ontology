@@ -1,19 +1,21 @@
-function shortId(id) {
-	return typeof id === "string" ? id.slice(0, 8) : "";
-}
-
-function truncate(text, max = 96) {
-	const clean = String(text ?? "").replace(/\s+/g, " ").trim();
-	return clean.length <= max ? clean : `${clean.slice(0, max - 3)}...`;
-}
-
 const TERMINAL_SESSION_STATUSES = new Set([
 	"closed", "failed", "cancelled",
 ]);
 
+export function handoffEdgeEndpoints(from, to) {
+	const center = (rect) => ({ x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 });
+	const edge = (rect, target) => {
+		const own = center(rect); const dx = target.x - own.x; const dy = target.y - own.y;
+		const scale = 1 / Math.max(Math.abs(dx) / (rect.width / 2), Math.abs(dy) / (rect.height / 2), Number.EPSILON);
+		return { x: own.x + dx * scale, y: own.y + dy * scale };
+	};
+	const fromCenter = center(from); const toCenter = center(to);
+	return { from: edge(from, toCenter), to: edge(to, fromCenter) };
+}
+
 export function visibleTaskHandoffs(handoffs) {
 	return (Array.isArray(handoffs) ? handoffs : []).filter((handoff) =>
-		String(handoff?.fromSessionId ?? "") !== String(handoff?.toSessionId ?? ""),
+		String(handoff?.fromSessionId ?? "") !== String(handoff?.toSessionId ?? "") && handoff?.status === "open",
 	);
 }
 
@@ -69,10 +71,11 @@ export function createHandoffLayer({ layerEl, viewportState, getTiles }) {
 			const to = getTiles().find((tile) => tile.sessionId === handoff.toSessionId);
 			if (!from || !to) continue;
 
-			const x1 = (from.x + from.width / 2) * viewportState.zoom + viewportState.panX;
-			const y1 = (from.y + from.height / 2) * viewportState.zoom + viewportState.panY;
-			const x2 = (to.x + to.width / 2) * viewportState.zoom + viewportState.panX;
-			const y2 = (to.y + to.height / 2) * viewportState.zoom + viewportState.panY;
+			const endpoints = handoffEdgeEndpoints(from, to);
+			const x1 = endpoints.from.x * viewportState.zoom + viewportState.panX;
+			const y1 = endpoints.from.y * viewportState.zoom + viewportState.panY;
+			const x2 = endpoints.to.x * viewportState.zoom + viewportState.panX;
+			const y2 = endpoints.to.y * viewportState.zoom + viewportState.panY;
 
 			const item = document.createElement("div");
 			item.className = `handoff-projection ${handoff.status === "done" ? "completed" : "open"}`;
@@ -86,32 +89,7 @@ export function createHandoffLayer({ layerEl, viewportState, getTiles }) {
 			line.style.width = `${Math.hypot(dx, dy)}px`;
 			line.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
 
-			const card = document.createElement("div");
-			card.className = "handoff-card";
-			card.style.left = `${(x1 + x2) / 2}px`;
-			card.style.top = `${(y1 + y2) / 2}px`;
-			card.innerHTML = "";
-
-			const head = document.createElement("div");
-			head.className = "handoff-head";
-			const route = document.createElement("strong");
-			route.textContent = `${handoff.fromRole} -> ${handoff.toRole}`;
-			const status = document.createElement("span");
-			status.className = "handoff-status";
-			status.textContent = handoff.status;
-			head.append(route, status);
-
-			const task = document.createElement("div");
-			task.className = "handoff-copy";
-			task.textContent = `TASK - ${truncate(handoff.title)}`;
-			card.title = `Task ${handoff.taskId}\n${handoff.title}`;
-			card.append(head, task);
-			const receipt = document.createElement("div");
-			receipt.className = "handoff-receipt";
-			receipt.textContent = `Kernel ${shortId(handoff.taskId)}`;
-			card.appendChild(receipt);
-
-			item.append(line, card);
+			item.append(line);
 			layerEl.appendChild(item);
 		}
 	}

@@ -10,6 +10,7 @@ import type { KernelDb } from "./db.ts";
 import { KernelError } from "./errors.ts";
 import { appendEvent } from "./events.ts";
 import { contentHash } from "./hash.ts";
+import { isMarketExpressionComparison } from "./market-context.ts";
 import {
   type CreationEnvelopePresence,
   type LinkSpec,
@@ -19,6 +20,7 @@ import { resolveArtifactRoot } from "./resolve-artifact-root.ts";
 import type { ObjectExecuteResult } from "./results.ts";
 import type { TraceContext, TrustedExecutionContext } from "./trace.ts";
 import { readStrategySpec } from "./strategy-outcome.ts";
+import { buildDecisionContext, decisionComparisonRows } from "./market-decision.ts";
 
 export const DETERMINISTIC_EXECUTION_VERSION = "qf-deterministic-v1";
 const EXECUTION_ENVIRONMENT_ID =
@@ -570,7 +572,8 @@ function fixedProbability(price: unknown, label: string): { price_units: number;
 function parseCalculation(input: unknown): { value: JsonRecord; bytes: Uint8Array; hash: string } {
   const value = objectValue(input, "calculation");
   exactKeys(value, ["contract", "operation", "version", "formula_version", "implementation_version"], "calculation");
-  if (value.contract !== "qf.calculation.v1" || value.operation !== CALCULATION_OPERATION || value.version !== 1 || value.formula_version !== CALCULATION_FORMULA_VERSION || value.implementation_version !== CALCULATION_IMPLEMENTATION_VERSION) {
+  const decision = isMarketExpressionComparison(value.operation, value.implementation_version);
+  if (value.contract !== "qf.calculation.v1" || (!decision && (value.operation !== CALCULATION_OPERATION || value.implementation_version !== CALCULATION_IMPLEMENTATION_VERSION)) || value.version !== 1 || value.formula_version !== CALCULATION_FORMULA_VERSION) {
     throw new KernelError("calculation must name two_way_market_history_baseline version 1 with the exact formula and implementation version");
   }
   const bytes = new TextEncoder().encode(`${canonicalJson(value)}\n`);
@@ -631,7 +634,7 @@ function normalizedIdentity(value: unknown): string {
   return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/gi, " ").trim().toLowerCase();
 }
 
-function deriveEvidenceSummaries(dataset: ReturnType<typeof loadDataset>, context: JsonRecord): Map<string, JsonRecord> {
+function deriveEvidenceSummaries(dataset: ReturnType<typeof loadDataset>, context: JsonRecord, allowEmpty = false): Map<string, JsonRecord> {
   const competitors = Array.isArray(context.competitors)
     ? context.competitors.map((row, index) => objectValue(row, `market_context competitor ${index}`))
     : [];
@@ -656,7 +659,7 @@ function deriveEvidenceSummaries(dataset: ReturnType<typeof loadDataset>, contex
   const eligibleDates: string[] = [];
   const zeroCoverageCompetitors: string[] = [];
   for (const [index, observation] of dataset.observations.entries()) {
-    exactKeys(observation, ["observed_at", "competitor_id", "selection_id", "competitor_name", "source_url", "source_hash", "parser_version", "rows", "exclusions", "wins", "losses", "draws", "no_contests", "decisive_sample_size", "coverage_status"], `Dataset observation ${index}`);
+    exactKeys(observation, ["observed_at", "competitor_id", "selection_id", "competitor_name", "source_url", "source_hash", "parser_version", "rows", "exclusions", "wins", "losses", "draws", "no_contests", "decisive_sample_size", "coverage_status", ...(observation.parser_version === "ufc-athlete-html-v2" ? ["matchup_facts"] : [])], `Dataset observation ${index}`);
     const expected = competitors[index]!;
     if (observation.competitor_id !== expected.competitor_id || observation.selection_id !== expected.selection_id) {
       throw new KernelError(`Dataset observation ${index} differs from exact ordered competitor/selection identity`);
@@ -677,7 +680,7 @@ function deriveEvidenceSummaries(dataset: ReturnType<typeof loadDataset>, contex
     const seen = new Set<string>();
     for (const [rowIndex, value] of observation.rows.entries()) {
       const row = objectValue(value, `Dataset observation ${index} row ${rowIndex}`);
-      exactKeys(row, ["observed_at", "competitor_id", "selection_id", "competitor_name", "opponent_url", "event_date", "outcome", "event_url"], `Dataset observation ${index} row ${rowIndex}`);
+      exactKeys(row, ["observed_at", "competitor_id", "selection_id", "competitor_name", "opponent_url", "event_date", "outcome", "event_url", ...(observation.parser_version === "ufc-athlete-html-v2" ? ["finish_method"] : [])], `Dataset observation ${index} row ${rowIndex}`);
       if (row.competitor_id !== expected.competitor_id || row.selection_id !== expected.selection_id || normalizedIdentity(row.competitor_name) !== normalizedIdentity(expected.label) || row.observed_at !== observation.observed_at) {
         throw new KernelError(`Dataset observation ${index} row ${rowIndex} differs from its ordered competitor identity`);
       }
@@ -708,12 +711,12 @@ function deriveEvidenceSummaries(dataset: ReturnType<typeof loadDataset>, contex
     if (summaries.has(String(expected.competitor_id))) throw new KernelError("Dataset observation competitor identity is duplicated");
     summaries.set(String(expected.competitor_id), { ...observation, wins: counts.WIN, losses: counts.LOSS, draws: counts.DRAW, no_contests: counts.NC, decisive_sample_size: counts.WIN + counts.LOSS });
   }
-  if (eligibleRows === 0) throw new KernelError("calculation Dataset has no eligible pre-cutoff bout population");
+  if (eligibleRows === 0 && !allowEmpty) throw new KernelError("calculation Dataset has no eligible pre-cutoff bout population");
   eligibleDates.sort();
   const derivedCoverage = {
     eligible_rows: eligibleRows,
     excluded_rows: excludedRows,
-    date_range: { first: eligibleDates[0], last: eligibleDates.at(-1) },
+    date_range: eligibleDates.length ? { first: eligibleDates[0], last: eligibleDates.at(-1) } : null,
     missing_fields: missingFields,
     sources: dataset.sources,
     zero_coverage_competitors: zeroCoverageCompetitors,
@@ -724,8 +727,8 @@ function deriveEvidenceSummaries(dataset: ReturnType<typeof loadDataset>, contex
   return summaries;
 }
 
-function buildCalculationResult(dataset: ReturnType<typeof loadDataset>, selections: JsonRecord[], context: JsonRecord, calculationHash: string, toolId: string, toolVersion: string): { bytes: Uint8Array; hash: string; output: JsonRecord } {
-  const summaries = deriveEvidenceSummaries(dataset, context);
+function buildCalculationResult(dataset: ReturnType<typeof loadDataset>, selections: JsonRecord[], context: JsonRecord, calculationHash: string, toolId: string, toolVersion: string, allowEmpty = false): { bytes: Uint8Array; hash: string; output: JsonRecord } {
+  const summaries = deriveEvidenceSummaries(dataset, context, allowEmpty);
   const priced = selections.map((selection, index) => {
     const decimal = selection.decimal;
     const probability = fixedProbability(decimal, `Quote selection ${index} decimal price`);
@@ -747,15 +750,22 @@ function buildCalculationResult(dataset: ReturnType<typeof loadDataset>, selecti
 }
 
 function executeTransparentCalculation(db: KernelDb, cmd: CreationCommand, input: Record<string, unknown>, trace: TrustedExecutionContext, runId: string, datasetId: string, repeatOfRunId: string | undefined): ObjectExecuteResult {
-  if (input.strategy_spec !== undefined || input.strategy_id !== undefined || input.hypothesis_id !== undefined) throw new KernelError("calculation mode is mutually exclusive with Strategy and Hypothesis inputs");
-  const params = objectValue(input.params, "params"); exactKeys(params, [], "calculation params");
+  const calculation = parseCalculation(input.calculation);
+  const decisionMode = isMarketExpressionComparison(calculation.value.operation, calculation.value.implementation_version);
+  if (input.strategy_spec !== undefined || input.strategy_id !== undefined || (!decisionMode && input.hypothesis_id !== undefined)) throw new KernelError("calculation mode is mutually exclusive with Strategy and Hypothesis inputs");
+  const params = objectValue(input.params, "params"); exactKeys(params, decisionMode ? ["task_id"] : [], "calculation params");
   const missionId = input.mission_id, quoteId = input.quote_id, toolId = input.tool_id;
   if (typeof missionId !== "string" || !missionId || typeof quoteId !== "string" || !quoteId || typeof toolId !== "string" || !toolId) throw new KernelError("calculation mode requires exact mission_id, quote_id, and tool_id");
-  const calculation = parseCalculation(input.calculation);
   const dataset = loadDataset(db, datasetId);
   const validated = validateMarketCalculationContext(db, missionId, quoteId, dataset, toolId);
-  const result = buildCalculationResult(dataset, validated.selections, validated.context, calculation.hash, toolId, validated.toolVersion);
-  const manifest = { contract: "qf.execution.manifest.v1", execution_version: DETERMINISTIC_EXECUTION_VERSION, mode: "calculation", operation: CALCULATION_OPERATION, formula_version: CALCULATION_FORMULA_VERSION, implementation_version: CALCULATION_IMPLEMENTATION_VERSION, dataset_id: datasetId, dataset_content_hash: dataset.contentHash, quote_id: quoteId, quote_observed_at: validated.context.quote_observed_at, quote_source_hash: validated.context.quote_source_hash, event_cutoff: validated.context.event_cutoff, mission_id: missionId, calculation_envelope_hash: calculation.hash, capability_id: toolId, capability_version: validated.toolVersion, execution_environment: EXECUTION_ENVIRONMENT_ID, params };
+  let result = buildCalculationResult(dataset, validated.selections, validated.context, calculation.hash, toolId, validated.toolVersion, decisionMode);
+  const decisionContext = decisionMode ? buildDecisionContext(db, { mission_id: missionId, quote_id: quoteId, task_id: String(params.task_id ?? ""), worker_session_id: String(trace.actor_session_id ?? ""), hypothesis_id: String(input.hypothesis_id ?? ""), dataset_id: datasetId, dataset_hash: dataset.contentHash, run_id: runId, method_hash: calculation.hash }) : null;
+  if (decisionContext) {
+    const output = { contract: "qf.market.comparison.v1", context: decisionContext, comparisons: decisionComparisonRows(decisionContext), evidence: dataset.observations, formulas: { raw_break_even: "1 / decimal_price", no_vig: "(1 / decimal_price) / sum(1 / decimal_price) within a complete mutually exclusive market only", minimum_decimal_price: "1 / low when low > 0; otherwise unavailable", conservative_margin: "low - 1 / decimal_price" }, assumptions: "Official athlete career aggregates and sparse bout rows are descriptive only.", uncertainty_method: "unavailable: no defensible matchup probability method admitted", probability: "unavailable" };
+    const bytes = new TextEncoder().encode(`${canonicalJson(output)}\n`);
+    result = { output, bytes, hash: contentHash(bytes) };
+  }
+  const manifest = { contract: "qf.execution.manifest.v1", execution_version: DETERMINISTIC_EXECUTION_VERSION, mode: "calculation", operation: calculation.value.operation, formula_version: CALCULATION_FORMULA_VERSION, implementation_version: calculation.value.implementation_version, dataset_id: datasetId, dataset_content_hash: dataset.contentHash, quote_id: quoteId, quote_observed_at: validated.context.quote_observed_at, quote_source_hash: validated.context.quote_source_hash, event_cutoff: validated.context.event_cutoff, mission_id: missionId, calculation_envelope_hash: calculation.hash, capability_id: toolId, capability_version: validated.toolVersion, execution_environment: EXECUTION_ENVIRONMENT_ID, params, ...(decisionContext ? { decision_context: decisionContext } : {}) };
   const manifestHash = contentHash(new TextEncoder().encode(`${canonicalJson(manifest)}\n`));
   assertRepeat(db, repeatOfRunId, manifestHash, result.hash);
   const root = resolveArtifactRoot().path;
@@ -773,6 +783,7 @@ function executeTransparentCalculation(db: KernelDb, cmd: CreationCommand, input
     if (!resultExisting.exists) insertArtifact(db, result.hash, "result_set", resultStorage, trace);
     db.query("INSERT INTO run (id, created_at, kind, status, params, trace_id) VALUES (?, ?, 'analysis', 'succeeded', ?, ?)").run(runId, new Date().toISOString(), JSON.stringify(runParams), trace.trace_id);
     writeLinks(db, "run", runId, [{ kind: "uses", to_id: datasetId }, { kind: "uses", to_id: toolId }, { kind: "uses", to_id: calculation.hash }, { kind: "uses", to_id: quoteId }, { kind: "executes_in", to_id: EXECUTION_ENVIRONMENT_ID }, { kind: "produces", to_id: result.hash }, { kind: "belongs_to", to_id: missionId }]);
+    if (decisionContext) writeLinks(db, "run", runId, [{ kind: "tests", to_id: decisionContext.hypothesis_id }, { kind: "uses", to_id: String(validated.context.quote_source_hash) }, ...[...new Set(decisionContext.selections.map((row) => row.quote_id))].filter((id) => id !== quoteId).map((id) => ({ kind: "uses", to_id: id }))]);
     for (const event of ["run.created", "run.started", "run.succeeded"]) appendEvent(db, { type: event, object_type: "run", object_id: runId, payload: { command: cmd.action, execution_manifest_hash: manifestHash, result_artifact_id: result.hash, span_id: trace.span_id }, trace_id: trace.trace_id });
     return db.query("SELECT * FROM run WHERE id = ?").get(runId) as JsonRecord;
   });

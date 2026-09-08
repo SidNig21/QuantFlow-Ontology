@@ -25,6 +25,7 @@ import {
   void_event,
   register_venue,
   schedule_market_event,
+  reschedule_market_event,
   ingest_market_batch,
 } from "./ontology/market.ts";
 import {
@@ -183,6 +184,7 @@ export const schema: Schema = {
     void_event,
     register_venue,
     schedule_market_event,
+    reschedule_market_event,
     ingest_market_batch,
     register_agent_definition,
     create_agent_session,

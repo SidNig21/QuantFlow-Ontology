@@ -1,7 +1,7 @@
 # WO-W1-03 — Meaningful UFC research, independent criticism, and a governed decision
 
-status: OPEN / REALIGNED — prior semantic Reader `01a07a8a-adf8-7381-843b-5401a189b490` returned YES / YES on amended order `1775c92c`; founder one-Canvas correction added 2026-09-07 and requires fresh implementation scoping before Builder resumes
-assignee: none while the repository-wide realignment is under founder review; preserve the current W1-03 implementation as an unaccepted candidate
+status: BUILDING — fresh Reader returned ORDER SEMANTIC YES and BUILDER DOOR YES after the bounded acceptance correction on 2026-09-07
+assignee: Builder — selectively salvage the preserved implementation under the corrected one-Canvas contract; never apply the stash wholesale
 depends: WO-W1-02 accepted at repaired product candidate `f9b11bd1d6df38d2e109456c2f1f2c2969a7de19`
 
 ## Objective
@@ -232,7 +232,8 @@ raw JSON, process language, or credential material is required to understand the
 - Participant tiles show role, exact Task, running/waiting/completed/failed state, and produced output.
 - Dock and Canvas agree on every participant identity and state.
 - Normal close reaches zero QuantFlow-owned participants, terminals, helpers, watchers, and background
-  processes. Cold open shows only the ready Director. The same Mission, evidence, Run, worker Artifact,
+  processes. Cold open shows only the ready Director surface and launches no participant runtime until Ryan
+  deliberately interacts with it. The same Mission, evidence, Run, worker Artifact,
   Critic Evaluation, current Decision Set, and superseded history remain in the Kernel and return only when
   Ryan or the Director deliberately retrieves that investigation; no prior process relaunches.
 - Provider failure, source drift, missing statistics, invalid probability envelope, Critic refusal,
@@ -323,7 +324,10 @@ bun qa/run.ts wave1-critic-decision
 It must launch the packaged current candidate on isolated app/Kernel/artifact/profile roots, drive the
 normal visible product action, prove exact live Quote → evidence → Run → worker Task/Artifact → Critic
 Task/Evaluation → research assessment → current market-actionability lineage, clean close/reopen plus
-deliberate retrieval, rendered legibility, and zero cleanup.
+deliberate retrieval through the rendered UI, rendered legibility, and zero cleanup. Reopen must first prove
+exactly one ready Director surface, zero restored worker/Critic/terminal/capability surfaces, and zero
+automatically relaunched participant sessions or helpers; only then may the gate deliberately retrieve the
+prior investigation onto that same Canvas.
 Its positive live path uses the real packaged app and two distinct production broker invocations: one exact
 Market Researcher session/Task/Artifact receipt and one different Critic session/Task/Evaluation receipt,
 each with exact provider/model identity and nonzero usage. Internal APIs may observe what the visible action
@@ -331,7 +335,13 @@ caused but may not manufacture product-semantic rows or substitute a synthetic p
 proof. Synthetic provider output, replayed receipts, an omitted offered prop, a substituted Artifact, or the
 same session acting twice must each make the gate red.
 
-Reuse these unchanged regression gates:
+Reuse these regression gates after one bounded semantic repair. Their Kernel identity, Dock/Canvas
+participant parity, contextual Inspect truth, browser isolation, terminal operability, lifecycle, and cleanup
+assertions remain binding. Assertions that require `ORDINARY_CANVAS`, `CURRENT_MISSION`, `FOCUS`,
+`HISTORY`, `FULL_LINEAGE`, saved-overview/back-to-world navigation, full Kernel-card materialization, or
+automatic Mission-world restoration are superseded by ADR-0005 and Deliverable 6; replace only those
+assertions with equivalent one-Canvas regressions. Do not weaken or delete the preserved invariants merely
+to make the new surface green.
 
 ```text
 bun qa/run.ts wave1-market-desk

@@ -297,7 +297,7 @@ describe("R12 independent critic and report gate", () => {
   test("refuses a non-critic before any governed write", () => {
     const f = fixture();
     const before = snapshot(f);
-    expect(() => execute(db!, "record_evaluation", evaluationInput(f, "supports", 0.9), { ...baseTrace, actor_session_id: "executor" })).toThrow(/admitted production hermes-critic session/);
+    expect(() => execute(db!, "record_evaluation", evaluationInput(f, "supports", 0.9), { ...baseTrace, actor_session_id: "executor" })).toThrow(/admitted running critic with research\.evaluate capability/);
     expect(snapshot(f)).toEqual(before);
   });
 
