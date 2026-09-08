@@ -61,6 +61,32 @@ describe("official UFC historical evidence", () => {
     expect(JSON.parse(new TextDecoder().decode(result.bytes)).market_context).toEqual(context);
   });
 
+  test("the frozen second current UFC fight resolves through two exact official identities", async () => {
+    const secondFight: HistoricalMarketContext = {
+      quote_id: "bovada:quote:frozen-second-fight",
+      quote_observed_at: "2026-09-08T13:06:12.116Z",
+      quote_source_hash: "d3ee443d196da9a6cdd24e3084bf141ed0eccd512b641cf212965a9cd0105b7e",
+      market_event_id: "bovada:event:30384187",
+      event_cutoff: "2026-09-12T23:00:00.000Z",
+      competitors: [
+        { competitor_id: "30384187-16507570", selection_id: "2396898778", label: "Brandon Moreno" },
+        { competitor_id: "30384187-16534014", selection_id: "2396898670", label: "Joseph Morales" },
+      ],
+      selection_ids: ["2396898778", "2396898670"],
+    };
+    const calls: string[] = [];
+    const transport: HistoryTransport = async (url) => {
+      calls.push(url);
+      const self = url.endsWith("brandon-moreno") ? "Brandon Moreno" : "Joseph Morales";
+      const opponent = self === "Brandon Moreno" ? "Joseph Morales" : "Brandon Moreno";
+      return response(url, page(self, opponent, [{ outcome: "Win", date: "Aug. 1, 2026", opponent: "Prior Opponent" }]));
+    };
+    const result = await acquireUfcHistoricalEvidence({ market_context: secondFight, transport, now: () => new Date(secondFight.quote_observed_at) });
+    expect(calls).toEqual([athleteUrl("Brandon Moreno"), athleteUrl("Joseph Morales")]);
+    expect((result.payload.observations as Array<Record<string, unknown>>).map((row) => row.competitor_name)).toEqual(["Brandon Moreno", "Joseph Morales"]);
+    expect(result.payload.market_context).toEqual(secondFight);
+  });
+
   test("keeps zero coverage honest and rejects identity, redirect, and cutoff failures distinctly", async () => {
     const empty: HistoryTransport = async (url) => response(url, page(url.includes("alpha") ? "Alpha Fighter" : "Beta Fighter", url.includes("alpha") ? "Beta Fighter" : "Alpha Fighter"));
     const result = await acquireUfcHistoricalEvidence({ market_context: context, transport: empty, now: () => new Date("2026-09-06T00:00:00.000Z") });

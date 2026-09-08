@@ -63,6 +63,57 @@ function coupon({ league = "UFC Fight Night: Silva vs Delgado", eventId = "29195
   };
 }
 
+// Minimal extraction from the public Bovada UFC response observed at
+// 2026-09-08T13:06:27.813Z (full response SHA-256
+// d3ee443d196da9a6cdd24e3084bf141ed0eccd512b641cf212965a9cd0105b7e).
+// Fields that the bounded parser does not consume are deliberately omitted.
+function frozenMorenoMoralesCoupon() {
+  const period = { id: "12122", description: "Bout", live: false, main: true };
+  return {
+    path: [
+      { type: "LEAGUE", id: "29388400", description: "UFC Fight Night: Silva vs Delgado", sportCode: "MMA" },
+      { type: "TOUR", id: "23491", description: "UFC", sportCode: "MMA" },
+      { type: "SPORT", id: "1201", description: "UFC/MMA", sportCode: "MMA" },
+    ],
+    events: [{
+      id: "30384187",
+      description: "Brandon Moreno vs Joseph Morales",
+      status: "U",
+      startTime: 1789254000000,
+      lastModified: 1788858321592,
+      live: false,
+      competitionId: "29388400",
+      numMarkets: 2,
+      competitors: [
+        { id: "30384187-16507570", name: "Brandon Moreno", home: true },
+        { id: "30384187-16534014", name: "Joseph Morales", home: false },
+      ],
+      displayGroups: [{
+        id: "100-262",
+        description: "Fight Odds",
+        markets: [
+          {
+            id: "523731500", descriptionKey: "Fight Winner", description: "Fight Winner", key: "2W-12",
+            marketTypeId: "120789", status: "O", period,
+            outcomes: [
+              { id: "2396898778", description: "Brandon Moreno", status: "O", type: "H", competitorId: "30384187-16507570", price: { id: "38557173731", american: "EVEN", decimal: "2.00", fractional: "1/1" } },
+              { id: "2396898670", description: "Joseph Morales", status: "O", type: "A", competitorId: "30384187-16534014", price: { id: "38557173732", american: "-120", decimal: "1.833333", fractional: "5/6" } },
+            ],
+          },
+          {
+            id: "525335904", descriptionKey: "Main Total Rounds Over/Under", description: "Main Total Rounds Over/Under", key: "2W-OU",
+            marketTypeId: "121440", status: "O", period,
+            outcomes: [
+              { id: "2403027948", description: "Over", status: "O", type: "O", price: { id: "38499532662", handicap: "2.5", american: "-350", decimal: "1.285714", fractional: "2/7" } },
+              { id: "2403027949", description: "Under", status: "O", type: "U", price: { id: "38499532663", handicap: "2.5", american: "+250", decimal: "3.500", fractional: "5/2" } },
+            ],
+          },
+        ],
+      }],
+    }],
+  };
+}
+
 function bytes(value: unknown): Uint8Array {
   return new TextEncoder().encode(JSON.stringify(value));
 }
@@ -129,6 +180,66 @@ describe("Bovada Live Markets UFC path", () => {
     });
   });
 
+  test("a frozen second real UFC fight follows the same menu and Kernel capture path", async () => {
+    const observedAt = "2026-09-08T13:06:27.813Z";
+    const frozen = frozenMorenoMoralesCoupon();
+    const body = bytes([frozen]);
+    const selected = parseBovadaLiveMarketsResponse(body, observedAt, { sport: "ufc", competition: "ufc", market_class: "moneyline" });
+    expect(selected).toHaveLength(1);
+    expect(selected[0]).toMatchObject({
+      event: { id: "30384187", description: "Brandon Moreno vs Joseph Morales" },
+      market: { id: "523731500" },
+      outcomes: [
+        { id: "2396898778", competitorId: "30384187-16507570", price: { american: "EVEN", decimal: "2.00" } },
+        { id: "2396898670", competitorId: "30384187-16534014", price: { american: "-120", decimal: "1.833333" } },
+      ],
+    });
+
+    const menu = parseBovadaFightMenu(body, observedAt, "30384187", {
+      expression: "Joseph Morales wins by submission",
+      market_description: "Method of Victory",
+      outcome_description: "Joseph Morales by Submission",
+    });
+    expect(menu.markets.map((row) => row.market.id)).toEqual(["523731500", "525335904"]);
+    expect(menu.requested_expression).toMatchObject({ status: "selection_unavailable", selection_ids: [] });
+
+    const db = openKernel(":memory:");
+    dbs.push(db);
+    const artifactRoot = mkdtempSync(join(tmpdir(), "qf-w1-markets-"));
+    roots.push(artifactRoot);
+    const receipt = await runBovadaLiveMarketsCapture({
+      db,
+      artifactRoot,
+      request: { sport: "ufc", competition: "ufc", market_class: "moneyline" },
+      provider_event_id: "30384187",
+      requested_expression: {
+        expression: "Joseph Morales wins by submission",
+        market_description: "Method of Victory",
+        outcome_description: "Joseph Morales by Submission",
+      },
+      kernel: { execute, getObject, getLinks },
+      transport: responseTransport(body),
+      now: () => new Date(observedAt),
+    });
+    expect(receipt.rows).toHaveLength(2);
+    expect(receipt.rows.map((row) => row.event)).toEqual(["Brandon Moreno vs Joseph Morales", "Brandon Moreno vs Joseph Morales"]);
+    expect(queryObjects(db, "quote", undefined, null)).toHaveLength(2);
+    expect(queryObjects(db, "instrument", undefined, null)).toHaveLength(2);
+
+    const suspended = structuredClone(frozen);
+    suspended.events[0]!.displayGroups[0]!.markets[1]!.status = "S";
+    await expect(runBovadaLiveMarketsCapture({
+      db,
+      artifactRoot,
+      request: { sport: "ufc", competition: "ufc", market_class: "moneyline" },
+      provider_event_id: "30384187",
+      requested_expression: { expression: "Joseph Morales wins by submission", outcome_description: "Joseph Morales by Submission" },
+      kernel: { execute, getObject, getLinks },
+      transport: responseTransport(bytes([suspended])),
+      now: () => new Date("2026-09-08T13:07:27.813Z"),
+    })).rejects.toThrow("closed or suspended");
+  });
+
   test("swapped provider competitor identity and ambiguous markets fail closed", () => {
     expect(() => parseBovadaLiveMarketsResponse(bytes([coupon({ marketRows: [market("swapped", SECOND_COMPETITOR_ID, FIRST_COMPETITOR_ID)] })]), "2099-09-06T05:15:58.076Z", { sport: "ufc", competition: "ufc", market_class: "moneyline" })).toThrow(BovadaSelectionError);
     expect(() => parseBovadaLiveMarketsResponse(bytes([coupon({ marketRows: [market("a"), market("b")] })]), "2099-09-06T05:15:58.076Z", { sport: "ufc", competition: "ufc", market_class: "moneyline" })).toThrow("ambiguous matching markets");
@@ -146,6 +257,7 @@ describe("Bovada Live Markets UFC path", () => {
     expect(seen[0]?.input).toBe(BOVADA_UFC_URL);
     expect(seen[0]?.init).toMatchObject({ method: "GET", credentials: "omit", redirect: "follow" });
     expect(new Headers(seen[0]?.init.headers).get("user-agent")).toBe(BOVADA_LIVE_USER_AGENT);
+    expect(() => createBovadaLiveMarketsTransport({ sport: "ufc", competition: "nfl", market_class: "moneyline" } as never)).toThrow("Unsupported explicit Bovada sport, competition, or market class");
   });
 
   test("bounded availability probe reads real-shaped rows without a Kernel write seam", async () => {
