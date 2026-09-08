@@ -46,10 +46,19 @@ class QuantFlowFailureHandler(logging.Handler):
             if status == 429:
                 self.control("PROVIDER_UNAVAILABLE", nonce)
             return
+        api_args = None
         if (record.name == "run_agent" and record.levelno == logging.INFO
-                and record.msg == "API call #%d: model=%s provider=%s in=%d out=%d total=%d latency=%.2fs"
-                and isinstance(record.args, tuple) and len(record.args) == 7 and safe_nonce):
-            ordinal, model, provider, input_tokens, output_tokens, total_tokens, latency = record.args
+                and isinstance(record.args, tuple) and safe_nonce):
+            if (record.msg == "API call #%d: model=%s provider=%s in=%d out=%d total=%d latency=%.1fs%s"
+                    and len(record.args) == 8
+                    and isinstance(record.args[7], str)
+                    and re.fullmatch(r"(?: cache=\d+/\d+ \(\d+%\))?", record.args[7])):
+                api_args = record.args[:7]
+            elif (record.msg == "API call #%d: model=%s provider=%s in=%d out=%d total=%d latency=%.2fs"
+                    and len(record.args) == 7):
+                api_args = record.args
+        if api_args:
+            ordinal, model, provider, input_tokens, output_tokens, total_tokens, latency = api_args
             if (isinstance(ordinal, int) and isinstance(model, str) and isinstance(provider, str)
                     and all(isinstance(value, int) and value > 0 for value in (input_tokens, output_tokens, total_tokens))
                     and total_tokens == input_tokens + output_tokens and isinstance(latency, (int, float)) and latency > 0):

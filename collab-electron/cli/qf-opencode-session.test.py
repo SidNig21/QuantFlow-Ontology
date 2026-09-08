@@ -73,7 +73,9 @@ class SessionHeaderTests(unittest.TestCase):
         self.load("worker-receipt-test")
         handler = self.module["QuantFlowFailureHandler"]()
         with patch.dict(os.environ, {"QF_RUNTIME_FAILURE_NONCE": "receipt-test"}), patch("os.write") as write:
-            handler.emit(logging.LogRecord("run_agent", logging.INFO, "run_agent.py", 1, "API call #%d: model=%s provider=%s in=%d out=%d total=%d latency=%.2fs", (1, "model-current", "opencode-go", 10, 4, 14, 1.25), None))
+            handler.emit(logging.LogRecord("run_agent", logging.INFO, "run_agent.py", 1, "API call #%d: model=%s provider=%s in=%d out=%d total=%d latency=%.1fs%s", (1, "model-current", "opencode-go", 10, 4, 14, 1.25, " cache=private"), None))
+            write.assert_not_called()
+            handler.emit(logging.LogRecord("run_agent", logging.INFO, "run_agent.py", 1, "API call #%d: model=%s provider=%s in=%d out=%d total=%d latency=%.1fs%s", (1, "model-current", "opencode-go", 10, 4, 14, 1.25, " cache=3/10 (30%)"), None))
             wire = write.call_args.args[1].decode()
             payload = wire.split(";", 4)[4][:-1]
             receipt = json.loads(base64.urlsafe_b64decode(payload))
