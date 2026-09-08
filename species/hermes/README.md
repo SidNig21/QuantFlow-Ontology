@@ -1,9 +1,18 @@
-# species/hermes — native TUI (default) + host ACP (substrate)
+# species/hermes — governed Hermes participant adapter
 
 **Default desk UX (WO-D2):** the normal Dock exposes `hermes-research-director`, `hermes-worker`, and
 `hermes-worker-2`, and `hermes-critic`. Clicking one opens a term tile running the shared Hermes package as
 `hermes -p <runtime-profile> --tui`. There is no separate Peer Seats catalogue or renderer-authored
 argv.
+
+Hermes is a governed Participant only when QuantFlow admits the exact definition/session, assigns exact
+Tasks, scopes its Ontology tools, and attributes its Artifacts. A Hermes process launched in an ordinary
+terminal is bench equipment, not a Participant. The TUI is the participant's working face; it does not own
+institutional truth.
+
+The Research Director is Ryan's primary colleague and default coordinator. Other participants retain
+separate private runtime contexts. Shared work moves through bounded Kernel reads, exact Tasks, and
+immutable Artifact handoffs; terminal prose and peer messages may notify but never become the handoff.
 
 **Host ACP remains** (`hermes acp`, allowlist, permission bridge from WO-008a/c)
 as substrate / secondary path. It is **not** the founder Hermes desk UX.
@@ -36,8 +45,9 @@ historical generic `hermes` definition remains operator data and uses the base `
 Matching Hermes runtime profiles must already exist in the founder's Hermes installation. D2 does
 not create profile homes, copy configuration, or handle credentials.
 
-## A2A 4-tile proof (WO-008e)
+## Historical A2A transport proof (WO-008e)
 
+This is compatibility/proof substrate, not the product collaboration contract and not a Canvas pattern.
 Shared core: `a2a-core.ts` (`createA2aBus`). Kernel hop = `publish_artifact`
 (no `create_task` yet). Electron IPC: `qf:a2a:spawnSeats` + `qf:a2a:dispatch`
 (default delivery channel: display). These are harness IPC, not a second Dock catalogue. Proof
@@ -51,10 +61,14 @@ Evidence: `docs/orders/evidence/wo-008e/`.
 
 ## Live peer delivery
 
-Hermes metadata opts the three ruled non-null runtime profiles into `pty_role` delivery. After a
+Hermes metadata opts governed runtime profiles into `pty_role` delivery. After a
 successful launch, the host binds the Kernel definition's role to that exact PTY; duplicate live
 roles reject instead of rerouting messages. Null, unlisted, and unflagged profiles do not bind.
 
 D2 proves admission and cleanup with credential-free fakes. It does not enforce caller-bound
 QuantFlow tool grants or claim an unscripted real-model collaboration; founder setup and live turns
 are documented by the app-owned notification transport in `collab-electron/src/main/peer-delivery.ts`.
+
+Current limit: Hermes is the only fully governed production species. Claude Code and Codex may run in
+ordinary terminals today but do not become QuantFlow Participants until Wave 2 admits them through the
+same Participant Contract.

@@ -490,6 +490,54 @@ Palantir Foundry is a doctrine source for the governed world. Omnigent is a
 design source for heterogeneous runtime adapters. Neither is a runtime
 dependency. AgentOS is predecessor history and is not QuantFlow architecture.
 
+### A11 · One-Canvas product and governed collaboration (founder-stated 2026-09-07)
+
+This amendment supersedes A6, A7, and A10 wherever they prescribe a user-facing Mission world,
+automatic workspace restoration, one-Kernel-object-per-tile projection, football-first sequencing, or
+Hermes-only collaboration semantics. The older text remains evidence of how the product reached this
+decision; it is not current direction.
+
+**1 · One Canvas, no alternate product worlds.** The Canvas is Ryan's only spatial workspace. Mission is
+an internal Kernel scope created from an inquiry, not a screen, tile, mode, or replacement world. History
+and lineage are selected detail inside Inspect. The UI may frame, arrange, or filter deliberately opened
+surfaces, but it may not move Ryan into `CURRENT_MISSION`, `FOCUS`, `HISTORY`, or `FULL_LINEAGE` as a
+separate operating environment.
+
+**2 · Deliberate surfaces, not ontology cardinality.** Kernel truth does not automatically become Canvas
+inventory. The Canvas contains the ready Director, participants Ryan or the Director recruits,
+capabilities they deliberately open, and useful working outputs they choose to surface. A tile may
+summarize a bounded set of Kernel records. Raw Tasks, Runs, hashes, storage paths, superseded records, and
+full link graphs belong behind Inspect unless a current job makes one a necessary working surface.
+
+**3 · Clean process lifecycle.** Cold open is visually empty except for the ready Director. Closing the app
+terminates every QuantFlow-owned participant, terminal, helper, and background process. Durable
+institutional work survives only in the Kernel and content-addressed artifacts; Ryan or the Director may
+retrieve it deliberately, but prior tiles and processes do not repopulate automatically.
+
+**4 · The Director coordinates; the Dock supplies.** The Director is Ryan's primary Hermes colleague and
+normal coordinator, not QuantFlow itself and not the only participant Ryan may address. The Dock is the
+governed supply of Participants, Data, Tools, Methods, and Compute. Catalog presence never means Canvas
+presence. Techniques are optional; every decision-bearing calculation still records an exact method
+envelope.
+
+**5 · Separate minds, shared institution.** Hermes, Claude Code, Codex, and future runtime species retain
+separate private contexts so disagreement remains meaningful. They share bounded institutional facts
+through the Kernel, never one merged conversation. The Director delegates by default. An authorized
+participant may delegate directly to another participant when useful, but the delegation is an exact
+Task naming predecessor work and remains visible and steerable by Ryan and the Director. Durable handoff
+is an immutable Artifact plus successor Task; terminal prose and peer messages are notifications only.
+
+**6 · Research truth and price truth are distinct.** QuantFlow may support, challenge, or remain
+inconclusive about a sports claim before Bovada offers its desired expression. CANDIDATE/WATCH/PASS is a
+separate market-actionability judgment that requires a current Bovada selection and price. Facts,
+simulations, and independently criticized analysis estimate the thesis; price decides whether an available
+bet is actionable. QuantFlow never places it.
+
+**7 · UFC is the first proving ground, not platform code.** The first useful loop is being proven against
+real UFC markets because they are current and personally useful to the founder; NFL follows as another
+market on the same architecture. Any named fight, fighter, provider event id, or proposition is acceptance
+evidence, never a production constant or product identity.
+
 ## Sources
 - [[00 - The Integration Question]] — verdict: borrow doctrine, don't build on platform
 - [[05 - DevX SuperRepo & Agent Development]] — local embedded ontology, ontology-as-code, schema-drift-as-lint, worktrees

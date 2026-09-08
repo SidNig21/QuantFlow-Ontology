@@ -8,7 +8,7 @@
 > gives them One-Rule weight and they are enforced by runnable gates.
 
 **Law A — Projection boundary.**
-Anything a human or agent must reopen next week is a Kernel object, link, or action. `canvas-state.json` and shell `tiles[]` are never authoritative. Cold reopen hydrates the UI from the Kernel, not the reverse.
+Anything a human or agent must retrieve next week is a Kernel object, link, or action. `canvas-state.json` and shell `tiles[]` are never authoritative. Cold open starts with a clean Canvas and the ready Director; prior institutional work is retrieved deliberately from the Kernel. Hydration may render selected truth, but it never resurrects old tiles or runtime processes automatically.
 
 **Law B — Write-path singularity.**
 All durable mutations go through Kernel actions. UI clicks and MCP/`qf_*` tool calls are two clients of the same actions. No tile shortcut writes. No durable domain state in React props, tile-local stores, or canvas JSON.
@@ -17,16 +17,17 @@ All durable mutations go through Kernel actions. UI clicks and MCP/`qf_*` tool c
 Only these may live outside the Kernel: scroll position, collapsed panels, caret, focus/selection, draft text not yet submitted as an action, and transient loading/error UI for the last dispatch. Anything else needs a schema type or it does not ship.
 
 **Law D — First vertical slice proves the seam.**
-The acceptance path must include: create an Artifact via a Kernel action → kill and relaunch the app → the tile shows the same Artifact from the Kernel. If the demo works from in-memory tile state alone, the order fails.
+The acceptance path must include: create an Artifact via a Kernel action → kill and relaunch the app with zero owned processes → deliberately retrieve that work → the rendered surface shows the same Artifact from the Kernel. If the demo depends on in-memory tile state, automatic tile resurrection, or a relaunched participant, the order fails.
 
 **Law E — Gates, not sermons.**
-These laws are enforced by runnable `qa/` checks: the Kernel package is the only SQLite owner; no new durable writes for QuantFlow domain types through `canvas-state` / `canvas-persistence`; cold-reopen restores layout and objects. A rule that exists only in prose is not adopted.
+These laws are enforced by runnable `qa/` checks: the Kernel package is the only SQLite owner; no new durable writes for QuantFlow domain types through `canvas-state` / `canvas-persistence`; cold-open does not recreate prior institutional tiles or owned processes; deliberate retrieval renders exact Kernel truth. A rule that exists only in prose is not adopted.
 
 **Law F — Two-level state boundary.**
 The Kernel models *operational* states with legal-transition tables (`run: queued → running → succeeded`); commands are rejectable intents, events are replayable facts, and the append-only event log is the receipt log. Actor-internal states (`THINKING → TOOL_CALLING`) stay in the runtime, visible only as trace spans — modeling agent internals in the ontology is the God Object path. Corollary: actor state is forkable up to the first side effect; ingestion and publication are walls forking never crosses. (Live state machines: `qf-kernel-schema/golden/ONTOLOGY.md`; enforced via the generated conformance tests.)
 
 **Tile contract (canonical).**
-`Tile = render(projection) + dispatch(action)`. Projection is derived from the Kernel. Action is a Kernel action (or a thin UI command that becomes one). No other write path.
+`Tile = deliberate working surface + render(projection) + dispatch(action)`. A tile may host one participant or capability, or summarize a bounded piece of institutional work; it does not mirror one Kernel row by default. Projection is derived from the Kernel. Action is a Kernel action (or a thin UI command that becomes one). No other write path.
 
 **QuantFlow adapters (not authorities).**
 `tile-manager` create/move/resize/close, `restoreCanvasState`, `canvas:save-state`, `canvas-rpc` mutations, and `syncTileList` are adapters over Kernel actions and projections. Persistence demotes to cache or dies; the Kernel commit is durability.
+On cold open, layout caches may not recreate institutional surfaces, relaunch processes, or decide what work is current. Only deliberate founder or Director action may place prior work back on the Canvas.

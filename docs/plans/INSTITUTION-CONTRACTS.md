@@ -1,7 +1,7 @@
 # INSTITUTION-CONTRACTS.md — the seams every participant and capability must honor
 
 status: APPROVED — INSTITUTION CONTRACTS; architecture authority, not build authority
-revised: 2026-09-05 (founder product-model correction; no build authority)
+revised: 2026-09-07 (one-Canvas and governed multi-runtime founder correction; no build authority)
 measured against: accepted local `main` @ `6340d78f` (product bytes retain the accepted Golden/Foundation baseline)
 build authority: none — `docs/orders/NEXT.md` remains the only order authority (DOCTRINE A9)
 owns: Participant Contract · Capability Contract · Agent Operating Contract · evidence and computation laws · role versus runtime · provenance · admission lifecycle · runtime-neutrality exit condition
@@ -50,24 +50,30 @@ behalf. Today exactly one species exists: Hermes (**PROVEN** — `dock-productio
 Replacement creates a new session with `spawned_from` lineage; it never rewrites the old one. (**PROVEN** as
 schema; **PARTIAL** as a written admission rule.)
 
-**P2 — Exact Tasks.** Every unit of institutional work is one `task` with Mission lineage. Chat that
-produces no `task`, `artifact`, or `evaluation` is permitted but is not institutional work and appears in no
-Report. (**PARTIAL** — Director route creates tasks; bare Dock spawn allows un-tasked chat.)
+**P2 — Exact Tasks.** Every unit of institutional work is one `task` with Mission lineage and exactly one
+current owner. The Director delegates by default. An authorized participant may create a downstream Task
+for another participant when it names the predecessor work and remains visible and steerable by the
+Director and Ryan. Chat that produces no `task`, `artifact`, or `evaluation` is permitted but is not
+institutional work and appears in no Report. (**PARTIAL** — Director route creates tasks; direct governed
+participant delegation and species-neutral admission are not yet complete.)
 
-**P3 — Bounded work context.** On assignment a participant receives, from the Kernel only: Mission/investigation
+**P3 — Bounded shared work context.** Each participant retains its own private conversation, reasoning, and
+scratch state. On assignment it receives, from the Kernel only: Mission/investigation
 id and question; selected Technique id/version/hash when one exists; otherwise the exact calculation/method
 envelope when the Task is decision-bearing; exact input `dataset` ids with as-of; its role's grants; and
 predecessor artifact ids. Exploration does not fabricate a Technique merely to populate the envelope.
-Nothing it did not need. (**PLANNED** — today carried as prose in
-`species/hermes/prompts/`.)
+Nothing it did not need. Participants do not share one transcript, merged context window, or hidden chain
+of thought. (**PLANNED** — today carried as prose in `species/hermes/prompts/`.)
 
 **P4 — Discover, read, publish.** A participant discovers authorized capabilities and reads shared truth
 only through generated ontology tools, and publishes only through `publish_artifact`. (**PROVEN for
 reads** — `tool-discovery`, `observe-door`; **PLANNED** as written obligation.)
 
 **P5 — Governed handoff.** Work passes between participants only via `publish_artifact` + `create_task`
-naming that artifact. Peer delivery (PTY role delivery, A2A bus) may carry notifications, never truth.
-(**PARTIAL** — `species/hermes/README.md` "Live peer delivery" is documented as transport.)
+naming that exact artifact. The Director normally creates the successor Task; an authorized participant
+may do so directly when its grant permits. Peer delivery (PTY role delivery, A2A bus) may notify the next
+seat that work exists, but never carries the authoritative handoff. (**PARTIAL** — Hermes peer delivery is
+transport; direct species-neutral Task handoff is not yet proven.)
 
 **P6 — Lifecycle truth.** Refusal, uncertain delivery, failure, stop, replacement, and reopen are recorded
 through Kernel actions (`record_task_steering_refusal`, `block_agent_session`, `fail_agent_session`,
@@ -92,6 +98,12 @@ foreign `kernel_db` refusal; **PLANNED** as species-agnostic rule.)
 participants, or become owner of private credentials. Opaque operator-owned inheritance or forwarding may
 occur when a runtime requires it, provided QuantFlow cannot read or retain the secret. (**PROVEN** —
 `hermes-founder-state`.)
+
+**P11 — Independent minds, comparable work.** Separate participant contexts are a product requirement, not
+an implementation inconvenience. Corroboration or criticism counts only when the exact producer,
+participant definition, runtime species, Task inputs, method/data fence, and reviewed Artifact remain
+attributable. Two seats repeating one supplied reasoning transcript are one opinion with two receipts, not
+independent work. (**PLANNED** for heterogeneous runtimes; same-species self-review refusal is **PROVEN**.)
 
 ### 1.3 Role semantics versus runtime provenance
 
@@ -248,23 +260,27 @@ naming the Hermes launcher (`collab-electron/package.json`). Already species-neu
 targeting role/session. **No claim survives that runtime two can be added today through one species
 directory, one registry row, or one manifest.**
 
-**PB-0 must make F1 green with Hermes alone**, then Proof B passes F1–F6 with two species. The eventual
-runtime-three target is: adapter/manifest/package declaration + bounded readiness/transport probes + the
-existing conformance suite, with no change to Kernel truth, role semantics, Dock semantics, Canvas identity,
-Task ownership, Artifact publication, Evaluation authority, collaboration truth, or History.
+**PB-0 must make F1 green with Hermes alone**, then Wave 2 admits Hermes, Claude Code, and Codex through the
+same Participant Contract. The smallest cross-species proof may use two species, but Wave-2 exit requires
+all three to be governed Dock participants and at least one real three-seat collaboration without changing
+Kernel truth, role semantics, Dock semantics, Canvas identity, Task ownership, Artifact publication,
+Evaluation authority, or collaboration truth.
 
 **F1 — Zero species branches in institutional code.** Species ids appear only under `species/<id>/`, the
 adapter registry, and provenance fields — never in Kernel, Canvas, Dock, Mission-activation, or grant
 paths. Bait: add one `if (species === "codex")` in Canvas code → red.
-**F2 — Same tool surface.** `tools/list` for species #2 is set-equal to species #1 for the same role.
-**F3 — Same Kernel deltas.** The same Task by either species yields rows differing only in session id,
+**F2 — Same role surface.** `tools/list` is set-equal across Hermes, Claude Code, and Codex for the same role
+and grants; species-specific transport helpers never become institutional privileges.
+**F3 — Same Kernel deltas.** The same Task by any admitted species yields rows differing only in session id,
 `spawned_from`, provenance, hashes, timestamps.
-**F4 — Cross-species evaluation.** Species #2 records the `evaluation` on species #1's artifact and the
+**F4 — Cross-species evaluation.** One species records the `evaluation` on another species' artifact and the
 Report cites it by role.
-**F5 — Replacement without truth loss.** Kill species #2 mid-task; `boot-reconcile` closes; reassign;
+**F5 — Replacement without truth loss.** Kill any non-Director species mid-task; lifecycle truth closes it;
+reassign;
 Mission completes; nothing orphaned.
-**F6 — Declaration-only admission.** The diff admitting species #2 touches only `species/<id>/`, one
-adapter-registry row, and declared package resources. Paste `git diff --stat`.
+**F6 — Declaration-led admission.** After PB-0, admitting each new species touches only its
+`species/<id>/` adapter/manifest/resources, the adapter registry, and bounded packaging declarations—not
+Kernel, role, Task, Artifact, Evaluation, Dock, or Canvas semantics. Paste `git diff --stat`.
 
 ---
 

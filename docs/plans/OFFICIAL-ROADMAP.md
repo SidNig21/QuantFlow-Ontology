@@ -1,7 +1,7 @@
 # OFFICIAL-ROADMAP.md — from Golden to a useful live-market research desk, real collaboration, and repeated founder use
 
 status: APPROVED — OFFICIAL PRODUCT PROGRAM; not build authority
-revised: 2026-09-05 (founder product-model correction; Golden remains closed)
+revised: 2026-09-07 (one-Canvas and governed collaboration correction; Golden remains closed)
 measured against: accepted local `main` @ `6340d78f`; Golden product candidate `7c26141f`; Golden evidence head `d3951366`; final founder product `a91b5dee`
 build authority: `docs/orders/NEXT.md` only (DOCTRINE A9). This file names the route; `NEXT.md` opens each door.
 owns: product sequence · dependencies · Proof A / Proof B · Founder Survival · Operator Season · maturity outcomes · open decisions by timing · stop conditions
@@ -27,8 +27,8 @@ Class key: **PROVEN** (gate or receipt on `main`) · **PARTIAL** · **PLANNED** 
 | Independent Critic gating Report publication, refusal, replay | PROVEN | R15, G9 |
 | Immutable named Technique (`strategy`) selection; coverage refusal creates nothing; operator-settled grading (calibration, CLV); no placement surface | PROVEN on a **fixture** Technique; named Technique selection is optional in the target product | R17 |
 | Bovada NFL public capture → Kernel market graph with replay | PROVEN as component; **not composed into any Mission** | WO-107 |
-| Close/reopen restores Canvas and Kernel world | PROVEN for **mechanical** work; **UNVERIFIED** for a complete real live-market investigation | G5, Act I |
-| Object inspection (Inspect pane, lineage views) | PROVEN for **tested objects**; **UNVERIFIED** as complete real-Mission inspection | G10 |
+| Close/reopen preserves Kernel truth and reconciles dead sessions | PROVEN for **mechanical** work; the newly accepted clean-Canvas cold-open policy is **PLANNED** | G5, Act I, ADR-0005 |
+| Object inspection (contextual Inspect detail) | PROVEN for **tested objects**; **UNVERIFIED** as complete real-investigation inspection | G10 |
 | Founder Hermes credentials never read or written by QuantFlow | PROVEN | R0 |
 | Mission entry form with Technique selection | PROVEN **mechanically**; Technique-free investigation entry is **PLANNED** | R17, WO-RD-1 |
 | Runtime-neutral institution | **UNVERIFIED — falsifier RED.** Source-observed Hermes coupling in Kernel and app seams (§9) | `execute.ts:237`, `ipc-kernel.ts`, `mission-activation.ts`, `dock-profiles.ts`, `agent-host.ts`, `host-native-tui.ts` |
@@ -38,14 +38,17 @@ Not claimed anywhere in this program: a betting edge; a validated Pressure Casca
 
 ## 2. Product definition
 
-QuantFlow Ontology is **Ryan's governed sports-betting research institution, rendered on one persistent infinite desk.** Ryan may work through the Research Director, another participant, or the evidence directly. The Dock supplies governed Participants, Data, Tools, optional Methods, and Compute; the Director is Ryan's primary AI colleague and may compose and coordinate them, but is neither the whole application nor its only front door. The Canvas keeps current investigations understandable and controllable without replacing the desk with a special graph world. The Kernel/Ontology preserves shared questions, Tasks, observations, calculations, Artifacts, criticism, decisions, revisions, and outcomes as one durable truth. Bovada is the primary live-market environment. QuantFlow produces price-sensitive **CANDIDATE, WATCH, or PASS** research; Ryan acts in the world. QuantFlow never places a bet, exposes no placement control, or claims profitability.
+QuantFlow Ontology is **Ryan's governed sports-betting research institution, operated through one Canvas workspace.** Ryan may work through the ready Research Director, another participant, or a deliberately opened capability. The Dock supplies governed Participants, Data, Tools, optional Methods, and Compute; the Director is Ryan's primary AI colleague and default coordinator, but is neither the whole application nor its only front door. The Canvas shows only the working surfaces Ryan or the Director brings into the job. A Mission is internal Kernel scope, not another screen. Inspect reveals selected evidence, calculation, Evaluation, history, and lineage without replacing the workspace. The Kernel/Ontology preserves shared questions, Tasks, observations, calculations, Artifacts, criticism, decisions, revisions, and outcomes as one durable truth. Cold open is clean except for the Director; close ends every owned process; prior work returns only when deliberately retrieved.
+
+Bovada is the primary live-market environment. QuantFlow first reports whether evidence supports, challenges, or cannot resolve the research claim. Separately, when Bovada offers a current expression and price, it reports **CANDIDATE, WATCH, or PASS** market actionability. Ryan acts in the world. QuantFlow never places a bet, exposes a placement control, or claims profitability.
 
 ## 3. System model
 
 ```
-FOUNDER INTENT → BOUNDED INVESTIGATION → OPTIONAL TECHNIQUE / EXACT METHOD → DOCK COMPOSITION → TASKS
-→ CURRENT + HISTORICAL EVIDENCE → DETERMINISTIC RUNS → ARTIFACTS → GOVERNED HANDOFFS
-→ INDEPENDENT EVALUATION → CANDIDATE / WATCH / PASS → REVISION → OUTCOME → REVALIDATION
+FOUNDER INQUIRY → INTERNAL MISSION SCOPE → DOCK COMPOSITION → EXACT TASKS
+→ CURRENT + HISTORICAL EVIDENCE → EXACT METHOD / OPTIONAL TECHNIQUE → RUNS → ARTIFACTS
+→ GOVERNED HANDOFFS → INDEPENDENT EVALUATION → RESEARCH ASSESSMENT
+→ CURRENT BOVADA EXPRESSION + PRICE → CANDIDATE / WATCH / PASS → OUTCOME → REVALIDATION
 ```
 
 | Component | Job | Not its job |
@@ -53,10 +56,9 @@ FOUNDER INTENT → BOUNDED INVESTIGATION → OPTIONAL TECHNIQUE / EXACT METHOD �
 | **Director** | serve as Ryan's primary AI colleague; interpret intent, operate the desk, compose participants/capabilities, supervise work, escalate founder decisions | become the whole product or the only way to work |
 | **Technique** | preserve a reusable, evaluated research method when one exists | block exploration, or replace the exact method/envelope every decision-bearing calculation must record |
 | **Dock** | govern what the institution may employ (Participants · Data · Tools · Methods · Compute) | package manager; agent launcher |
-| **Ontology / Kernel** | define and preserve shared truth | graph spectacle |
-| **Canvas** | keep the continuous working desk and its current investigations understandable and controllable | become a replacement Mission world, graph spectacle, or mirror of the Dock |
-| **Inspect** | exact detail and provenance | mutate |
-| **History** | what happened over time | chat log |
+| **Ontology / Kernel** | define and preserve shared institutional truth across separate participant contexts | shared chat or graph spectacle |
+| **Canvas** | provide the one spatial workspace for deliberately opened participants, capabilities, and useful outputs | mirror every Kernel object, restore an old desk automatically, or become a Mission world |
+| **Inspect** | exact selected detail, Evaluation, history, and lineage | mutate or rearrange the Canvas |
 | **Participants** | own Tasks, produce work and judgment | terminal logos |
 | **Capabilities** | provide Data, Tools, Methods, Compute | pose as Participants |
 
@@ -66,7 +68,8 @@ The Dock contains what the institution may employ. The Canvas displays only what
 
 | Term | Means | Kernel shape today |
 |---|---|---|
-| Mission / investigation | one bounded operator question or market investigation; it does not require a named Technique | `mission` + optional `hypothesis` |
+| Inquiry | the question Ryan gives a participant | operator input; becomes Kernel work only through governed action |
+| Mission / investigation | internal durable scope joining one inquiry to its work; never a screen, mode, or tile | `mission` + optional `hypothesis` |
 | Technique | optional versioned, hashed reusable research method promoted from evaluated work | `strategy` (spec artifact, family, version) |
 | Participant | a process holding a governed seat | `agent_definition` → `agent_session` |
 | Role | institutional identity of a seat | `agent_definition.role` |
@@ -76,7 +79,8 @@ The Dock contains what the institution may employ. The Canvas displays only what
 | Task | one exact unit of work | `task` |
 | Artifact / Report | immutable content-addressed output; Report is `artifact.kind` | `artifact` |
 | Evaluation | independent judgment on an artifact | `evaluation` |
-| Decision Set | current price-sensitive CANDIDATE/WATCH/PASS research projection over governed Artifact/Report authority | an existing governed Artifact/Report shape unless implementation proves a narrow schema need; never a parallel truth store |
+| Research assessment | supported / challenged / inconclusive judgment over exact evidence and analysis; may exist without a offered market expression | governed Artifact/Report + Evaluation lineage |
+| Decision Set | current price-sensitive CANDIDATE/WATCH/PASS actionability projection; requires an offered Bovada expression and price | an existing governed Artifact/Report shape unless implementation proves a narrow schema need; never a parallel truth store |
 | Bench | ordinary operator equipment (WSL terminal, files) on the canvas, outside institutional truth | none — not Kernel objects |
 
 ## 5. Product laws
@@ -98,10 +102,12 @@ GOLDEN + POST-GOLDEN FOUNDATION — COMPLETE (closed, untouched)
    ↓
 WAVE 1 — FIRST USEFUL MARKET DESK
   live-input door → one current Bovada market class → trustworthy history → transparent calculation
-  → independent criticism → CANDIDATE/WATCH/PASS → continuous Canvas → reopen/tracking
+  → independent criticism → research assessment → CANDIDATE/WATCH/PASS when offered
+  → one Canvas workspace → clean reopen + deliberate retrieval/tracking
    ↓
 WAVE 2 — REAL HETEROGENEOUS COLLABORATION
-  de-Hermes institutional seams → second production runtime → exact Artifact handoff/Evaluation
+  de-Hermes institutional seams → Hermes + Claude Code + Codex admitted through one contract
+  → exact Artifact handoff/Evaluation → direct authorized delegation + Director control
    ↓
 WAVE 3 — PROVE AND MATURE
   repeated live use → outcomes/CLV/calibration/baselines → multi-sport/Dock expansion
@@ -145,18 +151,18 @@ FM labels are **dependency units, not mandatory mini-rungs**; compose adjacent u
 | **FM-1 Evidence ingress** | Live Bovada evidence and one sport's trustworthy historical evidence enter as `quote`/`market_event` and `dataset` versions with source time/as-of + hash through real Dock capabilities | one real provider read + deterministic negative fixtures |
 | **FM-2 Transparent computation** | The Research Lab runs an exact versioned calculation envelope through `execute_deterministic_run`; a reusable named Technique is used only when one actually exists | independent recomputation; bait: perturb one input byte or formula version |
 | **FM-3 Director and direct composition** | Ryan or the Director can open an investigation, bind capabilities, and recruit roles without a Technique prerequisite; refusal is a founder-readable sentence | real Hermes Director turn plus direct UI path |
-| **FM-4 Governed conclusion + failure diagnosis** | Price-sensitive CANDIDATE/WATCH/PASS conclusion; failed or contradicted work remains visible without being published as support | rendered UI oracle + fixture failures |
+| **FM-4 Governed conclusion + failure diagnosis** | Evidence first resolves to supported/challenged/inconclusive; a separately offered current Bovada expression then resolves to CANDIDATE/WATCH/PASS. Failed or contradicted work remains visible without being published as support | rendered UI oracle + fixture failures |
 | **PS-0 floor** | [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md) §H behavioural floor | normal-app founder check |
 | **FM-5 Interpretation + attack** | Researcher interprets the deterministic artifact; Critic evaluation names ≥ 1 material attack | governed-review extension |
 | **FM-6 Lineage & Inspect** | From Decision Set to every input's bundle, as-of, hash | UI oracle |
-| **FM-7 Close/reopen + backup** | Real Mission survives relaunch; in-app backup/restore with receipt | packaged relaunch gate |
+| **FM-7 Close/reopen + backup** | Close reaches zero owned processes; cold open shows only the Director; deliberate retrieval returns the exact prior institutional work; in-app backup/restore has a receipt | packaged relaunch gate |
 | **FM-8 Golden Mission regression corpus** | One real Mission recorded as deterministic regression fixture; live path stays the claim | fixture + one live pass |
 
 Recommended composition (architect decision): FM-1+FM-2 "evidence + computation"; FM-3+FM-4 "Director + decision"; FM-5+FM-6 "attack + lineage"; FM-7+FM-8 "survive + regress".
 
 ### 6.5 Proof A — useful live Bovada investigation
 
-**Proves:** Ryan opens the normal Windows app, inspects a current Bovada market, opens one bounded investigation without first inventing a Technique, and uses real current and trustworthy historical evidence plus a transparent reproducible calculation. An independent Critic attacks the exact result. The desk ends in a price-sensitive CANDIDATE, WATCH, or PASS whose numbers trace to source, observation/as-of time, exact method envelope, and producer; previous observations and recommendation revisions survive close/reopen; no wager is invented or placed. All participants may be Hermes profiles; that does not satisfy Proof B.
+**Proves:** Ryan opens the normal Windows app, talks to the Director or opens a current Bovada market, and starts one bounded investigation without first inventing a Technique. Real current and trustworthy historical evidence plus a transparent reproducible calculation test the claim. An independent Critic attacks the exact result. QuantFlow gives a supported/challenged/inconclusive research assessment and, only for a currently offered Bovada expression and price, a CANDIDATE/WATCH/PASS actionability judgment. Exact work remains deliberately retrievable after a clean reopen; no wager is invented or placed. All participants may be Hermes profiles; that does not satisfy Proof B.
 
 **Minimum Proof-A Dock:** Participants — Research Director, one Evidence/Market Researcher, Independent Critic. Data — Bovada Live Markets and the selected sport's Historical Evidence. Tools/Compute — one Research Lab capable of the proved calculation. Method — optional; show a named Technique only if evaluated work has earned one. Literature/Browser Evidence remains optional when the investigation requires it.
 
@@ -176,11 +182,11 @@ Operator-visible fixes that keep the founder using the product while Proof A bui
 
 ### 6.8 Proof B — real heterogeneous collaboration
 
-**Proves:** one real Mission + two genuinely different certified Participant runtimes + exact durable Tasks + shared role-authorized capabilities + at least one non-chat Data/Tool/Compute capability + one hash-bound Artifact produced by runtime A + governed handoff + independent Evaluation or meaningful extension by runtime B + shared Kernel/Dock/Canvas/Inspect lineage + stop/replacement/reopen without durable truth loss. Peer messaging and terminal prose may notify; they never constitute the handoff. Proof B is not two terminals.
+**Proves:** Hermes, Claude Code, and Codex are all certified Participant species under one contract and appear through the same Dock/Canvas grammar. At least two genuinely different runtimes execute one real Mission using exact durable Tasks, shared role-authorized capabilities, one non-chat Data/Tool/Compute capability, one hash-bound Artifact, governed handoff, and independent Evaluation or meaningful extension. At least one bounded three-seat run proves all three can participate without merging their private contexts. Ryan can observe, redirect, stop, replace, compare, and request another opinion without durable truth loss. Peer messaging and terminal prose may notify; they never constitute the handoff. Proof B is not terminals sharing prose.
 
-**Sequence after PB-0:** select runtime two from the exact useful role and independence need Proof A revealed (open until then); implement only runtime-specific adapter/manifest/package/probe differences (PB-1); run the real cross-runtime Mission (PB-2); prove runtime-three admission requires only adapter/manifest/package declaration + bounded readiness/transport probes + the existing conformance suite, with no change to Kernel truth, role semantics, Dock semantics, Canvas identity, Task ownership, Artifact publication, Evaluation authority, collaboration truth, or History (PB-3, falsifier F1–F6).
+**Sequence after PB-0:** admit Claude Code and Codex through only their runtime-specific adapter/manifest/package/probe differences (PB-1); run the real cross-runtime Mission and a bounded three-seat collaboration (PB-2); prove any later runtime requires only adapter/manifest/package declaration + bounded readiness/transport probes + the existing conformance suite, with no change to Kernel truth, role semantics, Dock semantics, Canvas identity, Task ownership, Artifact publication, Evaluation authority, or collaboration truth (PB-3, falsifier F1–F6).
 
-**Outside Proof B:** a third runtime; runtime marketplaces; model routing; swarm framing.
+**Outside Proof B:** a fourth runtime; runtime marketplaces; model routing; swarm framing.
 
 ### 6.9 Operator Season
 
@@ -188,7 +194,7 @@ The accepted investigation loop runs repeatedly on real upcoming events by Ryan 
 
 ### 6.10 Product Surface Maturity / External Pilot Readiness
 
-After Operator Season, repeated evidence may authorize refined layout grammar, stranger-ready first use, Dock information architecture, typography and density, accessibility, performance, visual consistency, external-pilot presentation. This is the bridge from *usable and true* to *premium and show-ready*; before it, PS-0 is the only surface bar.
+Every slice must already be understandable and operable in the normal app. After Operator Season, repeated evidence may authorize deeper typography, density, accessibility, performance, visual consistency, onboarding, and external-pilot refinement. This is the bridge from a first-class personal research product to broader show-readiness; it is not permission to ship confusing or broken surfaces earlier.
 
 ### 6.11 Evidence-led institution maturity
 
@@ -216,7 +222,7 @@ Stop and return to the founder only if: the bounded input door proves UFC cannot
 
 **Already settled by the founder:** this corrected product model and continuous execution through the three delivery waves; Golden remains closed.
 **The Wave-1 input door decides from evidence:** the exact UFC market subset, trustworthy historical path, and smallest honest calculation described in §6.2. The first sport is no longer an open decision.
-**After Proof A:** second runtime; exact PB-0/PB-1 implementation plan informed by the real role; adapter shape; untrusted-CLI security; Operator Season threshold.
+**After Proof A:** exact PB-0/PB-1 implementation plan for the already named Hermes, Claude Code, and Codex species; adapter shape; untrusted-CLI security; Operator Season threshold.
 **After real history:** §6.11–6.13.
 Architect-settled (not founder questions): document ownership, contract wording, PB-0 placement, surface operating model, participant/capability distinction, compute/model placement, normalization shape, cadence. The Vault founder decision pack is non-authoritative research input; decisions that open or close work land in Git under the normal `NEXT.md`/order protocol.
 

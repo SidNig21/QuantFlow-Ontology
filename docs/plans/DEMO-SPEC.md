@@ -1,77 +1,88 @@
-# 04 — First-class demo specification (Demo A, Demo B)
+# First-class product demonstration contract
 
-status: APPROVED — product demonstration contract; canonical repository path `docs/plans/DEMO-SPEC.md`; not build authority
-date: 2026-09-02 (revised in the final post-Golden canonicalization)
-owns: Demo A and Demo B scripts · what must be real · what may be claimed · rejection conditions
-does not own: what Proof A/B prove → `docs/plans/OFFICIAL-ROADMAP.md` §6.5/§6.8; surface acceptance → `docs/plans/PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md` §H; seams → `docs/plans/INSTITUTION-CONTRACTS.md`
+status: APPROVED — product demonstration contract; not build authority
+revised: 2026-09-07 (one-Canvas founder correction)
+owns: what the first useful and collaborative demonstrations must prove
+does not own: build sequence → `OFFICIAL-ROADMAP.md`; surface grammar → `PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md`; seams → `INSTITUTION-CONTRACTS.md`
 
-"First-class demo" means: a stranger watches the normal packaged Windows app for five minutes and understands what QuantFlow is, sees one real thing happen end to end, and could not be misled about what was real. Not a video, not a fixture run, not a dev build. The presenter never explains SQLite, Kernel internals, repository structure, gates, WSL installation, or internal ids.
+A first-class demonstration uses the normal packaged Windows app. A stranger should understand what Ryan
+did and what QuantFlow concluded without an explanation of SQLite, gates, ids, repository structure, or
+runtime plumbing. A fixture, pre-seeded store, internal RPC path, scripted movie, or hidden synthetic
+participant cannot satisfy the live claim.
 
-## Demo A — Product proof
+## Demo A — one useful UFC investigation
 
-**What a stranger should understand within five minutes**
+### What a stranger should understand
 
-1. This is a research institution, not a betting picker.
-2. One real football Mission ran.
-3. Current and historical evidence are real and attributable — source, as-of time, hash.
-4. Deterministic computation occurred.
-5. An independent Critic attacked the result.
-6. The system produced a Decision Set or an honest No candidate.
-7. Every important conclusion can be traced.
-8. Close/reopen preserves truth; backup/restore protects the institution.
+1. QuantFlow is one spatial research workspace, not a Mission screen or terminal collection.
+2. Ryan asked a real question or chose a real current Bovada market.
+3. The Director composed real participants, data, and tools from the Dock.
+4. Evidence and calculations were point-in-time, attributable, and honest about missing coverage.
+5. A separate Critic attacked the exact produced work.
+6. QuantFlow distinguished research support from current market actionability.
+7. Exact proof, revisions, and lineage were available in Inspect without flooding the Canvas.
+8. Closing ended every process; the same institutional work was deliberately retrievable after a clean reopen.
 
-**Script (≤ 5 minutes, packaged app, fresh isolated store)**
+### Script
 
-| Step | Screen / object visible | Must be real |
+| Step | What is visible on the one Canvas | Must be real |
 |---|---|---|
-| 1 Open app | first-run desk: one sentence, one way to start a Mission | real |
-| 2 Start Mission | entry (form or sentence to the Director) resolves visibly into question + `<Technique> v0.1 · hash` | real Technique object |
-| 3 Director composes | Director tile in Team & Work; task title visible; Inspect shows bound bundles (NFL Historical Evidence, Live Market Evidence, Football Quant Lab) | live Hermes turn |
-| 4 Evidence enters | current-evidence and historical-evidence tiles with as-of and hash; or the sentence "Market provider unreachable — no evidence entered" | real provider contact **or** real refusal — never a fixture |
-| 5 Computation runs | Run tile: inputs by id, Technique hash, result hash, replay | deterministic |
-| 6 Interpretation + attack | Researcher artifact with one primary result and its uncertainty; Critic evaluation naming at least one material attack and whether it held | live turns |
-| 7 Decision Set / No candidate | the single accented tile; candidates show probability, uncertainty, source times, exclusions | real |
-| 8 Trace | from the Decision Set to any input's bundle → version, as-of, licence class | real |
-| 9 Close/reopen | same Mission, same tiles, same hashes, seats honestly `closed` | real |
-| 10 Backup | in-app backup → receipt with hash | real |
+| 1 Open | clean Canvas with one ready Research Director and a discoverable Dock | packaged app; no restored old tiles/processes |
+| 2 Ask or browse | Ryan speaks to the Director or opens Bovada Live Markets and selects a current UFC fight/market | real UI and provider observation |
+| 3 Compose | Director opens/recruits only the participants and capabilities needed; each surface states why it is present | real Hermes turn and governed Dock actions |
+| 4 Evidence | a compact current market/evidence surface; source, time, coverage and absence are readable; detail opens in Inspect | real provider and historical evidence or an honest refusal |
+| 5 Analyze | a useful calculation/analysis surface or result summary; Inspect exposes exact inputs, cutoff, method envelope, hash, and limitations | reproducible Run; no invented Technique |
+| 6 Challenge | independent Critic visibly evaluates the exact Artifact and names a material attack | separate admitted session and exact Evaluation lineage |
+| 7 Conclude | research assessment says supported/challenged/inconclusive; a separate actionability line says CANDIDATE/WATCH/PASS only for an offered current selection and price | governed current Report/Decision authority |
+| 8 Inspect | Ryan opens evidence, calculation, Evaluation, revisions, and lineage for the selected result without leaving or rearranging the Canvas | read-only Kernel projection |
+| 9 Close/reopen | close reaches zero owned processes; reopen shows only the Director; Ryan deliberately retrieves the same work | exact Kernel/Artifact identity preserved |
+| 10 Backup | in-app backup/restore returns an attributable receipt | real bytes and receipt |
 
-**May remain alpha:** visual polish beyond PS-0, animation, minimap; more than one Technique or bookmaker; the Literature bundle; performance beyond a stated budget.
+The named fight used by the acceptance run is evidence, not a production constant. The demo may honestly
+end in WATCH or PASS. It may never invent a desired prop, probability, or selection to make the story look
+better.
 
-**Claims boundary**
+### Claims boundary
 
 | May say | May never say |
 |---|---|
-| "One real football Mission ran end to end with live market evidence and pinned history." | "It finds edges" / "it is profitable" / "it beats the closing line" |
-| "Every number is traceable to a source and a time." | "The Technique is validated" (no season history) |
-| "An independent Critic attacked the result." | "AI agents collaborate" (Demo A is single-runtime) |
-| "It refused when coverage was missing." | "It works for any sport" / "PFF data" / "auto-updates" |
+| “One real UFC investigation ran with current Bovada and attributable evidence.” | “It finds profitable bets.” |
+| “The claim was independently challenged and every important input is inspectable.” | “The method is validated” before measured history exists. |
+| “QuantFlow separated what research suggests from whether the current price is actionable.” | “It works for every sport or sportsbook.” |
+| “It preserved the work and shut every process down cleanly.” | “AI agents collaborate heterogeneously” while all seats are Hermes. |
 
-## Demo B — Institution proof
+## Demo B — governed heterogeneous collaboration
 
-Demo A **plus**, in the same Mission:
+Demo A plus:
 
-| Addition | Visible as | Must be real |
+| Addition | What is visible | Must be real |
 |---|---|---|
-| PB-0 complete | no visible artifact; the F1 bait transcript is in the receipt | `INSTITUTION-CONTRACTS.md` §5 F1 green |
-| Two real runtime species | Dock lists both as PARTICIPANT rows under role names; tiles name role first, species second | certified per admission lifecycle |
-| One shared Mission | one Mission header, one Canvas | — |
-| One exact Artifact handoff | Hermes seat publishes a hash-bound artifact; a task naming it is owned by the other species | F3 durable diff clean |
-| Independent cross-runtime Evaluation or extension | the other species' Critic evaluation (or extension artifact) in Judgment & Conclusion, cited by the Report | F4 |
-| One non-chat capability | Football Quant Lab run invoked in the Mission, visibly not chat | deterministic |
-| Visible shared lineage | Full Lineage shows both seats, tasks, artifacts, evaluation on one graph | — |
-| Replacement/reopen without truth loss | presenter stops the second seat mid-task; reconcile; reassign; Mission completes; reopen shows `closed · task reassigned`, nothing orphaned | F5 |
-| No runtime-specific panel or parallel product | one Canvas, one Dock, one Inspect | — |
+| Three admitted species | Hermes, Claude Code, and Codex appear as governed Participant rows under institutional roles | same Participant Contract; species shown second |
+| Separate minds | each participant receives bounded Kernel context, not another participant's full transcript | distinct runtime contexts and receipts |
+| Exact handoff | one participant publishes an immutable Artifact; the successor Task names it | Kernel Task/Artifact lineage, not copied prose |
+| Independent extension or Evaluation | another species attacks or extends that exact Artifact | role-authorized tool use and attributable output |
+| Non-chat capability | a participant invokes real Data, Tool, or Compute needed by the inquiry | governed capability contract |
+| Director control | Ryan sees the Director coordinate; direct participant delegation is visible when authorized | exact Task ownership and steering |
+| Replacement | one participant is stopped and replaced without losing Task/Artifact truth | lifecycle reconciliation and reassignment |
+| Three-seat proof | one bounded collaboration includes all three admitted species without UI or truth-store divergence | one Dock, one Canvas, one Inspect, one Kernel |
 
-**What a stranger should understand:** two genuinely different systems did real, separately attributable work inside one governed institution, one checked the other, and swapping one out lost nothing. The institution, not the model, is the product.
+Two terminals exchanging text is not Demo B. The institution—not any runtime—owns Task meaning, Artifact
+identity, Evaluation authority, and history.
 
-## "Fundable enough to show"
+## Rejection conditions
 
-Demo A + Demo B produce a **first-class show-ready technical/product demonstration**: coherent, real, attributable, technically defensible, product-legible, honest about what is not proven.
+- another Canvas, Mission world, Focus mode, History mode, or Full Lineage world is required;
+- the Canvas mirrors every Kernel object or displays hidden mounted tile inventory;
+- a participant cannot be distinguished from an ordinary terminal;
+- raw ids, hashes, paths, process metadata, or cable clutter must be interpreted to use the product;
+- a synthetic responder or fixture is presented as live research judgment;
+- a pre-seeded Kernel is presented as work created through the visible path;
+- current and superseded evidence are visually confused;
+- an unavailable market expression is fabricated or silently substituted;
+- close leaves owned processes running or reopen automatically relaunches prior work;
+- a presenter must explain internals to make the result understandable;
+- any stake, bankroll, wager placement, or execution control appears.
 
-It does **not** mean profitable, market validated, commercially licensed, ready for broad release, or guaranteed fundable. A+B do not prove market demand or investor readiness. External demand, data economics, pricing and investor evidence remain later and separate.
-
-Permitted Demo B sentence: "Runtime-neutral institution proven with two runtimes; a third requires an adapter, a manifest and package declaration plus the existing conformance suite (evidence: F1–F6 receipt)." Never: "any agent plugs in", "marketplace", "swarm".
-
-## Rejection conditions (either demo)
-
-A synthetic responder in the path; a dev build; a pre-seeded Kernel presented as fresh; a Technique selected by a repo command; any stake, unit, or bankroll on screen; a presenter explaining internals to make a step legible; a screenshot-free receipt.
+Demo A and Demo B prove a real, attributable personal research product and a defensible technical product
+demonstration. They do not prove profitability, commercial demand, licensing, broad release readiness, or
+investor demand.

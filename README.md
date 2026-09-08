@@ -2,7 +2,7 @@
 
 **A Windows-first, single-user, ontology-centered environment for governed quantitative research.**
 
-QuantFlow is a persistent spatial desk where a founder works with AI participants over one shared world model. The default participant is a custom Hermes **Research Director**. The Canvas shows participants, work, evidence, judgment, and lineage; the Dock admits governed participants; the Kernel owns durable truth.
+QuantFlow has one spatial Canvas where Ryan works with governed participants and capabilities over one shared institutional truth. A custom Hermes **Research Director** is the primary colleague and default coordinator. The Dock supplies Participants, Data, Tools, Methods, and Compute; Inspect reveals selected proof; the Kernel/Ontology owns durable truth. A Mission is internal scope, never another Canvas world.
 
 QuantFlow is research and advisor software only. It never places a bet or executes a trade.
 
@@ -15,24 +15,25 @@ The Golden designation means the repository and current Windows product have a c
 | Surface | Verified state |
 | --- | --- |
 | Repository | Golden baseline on `main`; clean Phase 2/Phase 3 evidence and independent verification |
-| Windows app | Builds, packages, installs, cold-boots, reopens the same isolated state, and shuts down cleanly |
+| Windows app | Builds, packages, installs, cold-boots, reconciles durable state, and shuts down cleanly |
 | Kernel | Sole-writer SQLite truth with schema-generated objects, links, actions, tools, and conformance tests |
-| Canvas + Dock | Running Electron surfaces for participant tiles, governed work, Inspect, Mission/history/lineage views, cables, pan/zoom, and `TIDY` |
+| Canvas + Dock | Running Electron surfaces for participants, market/evidence work, Inspect, cables, pan/zoom, and `TIDY`; the accepted baseline's alternate Mission/History/Lineage modes are now explicitly rejected by ADR-0005 and remain an in-flight product correction |
 | Production Dock | Four Hermes profiles: Research Director, two Market Researchers, and Critic |
 | Real model path | One founder-operated Hermes → OpenCode Go → Kimi K3 turn proven through the rendered packaged app |
 | Real Ontology use | The Director used four governed Ontology tools to read one founder-created Task and its exact participant lineage |
-| Persistence | The same Task and participant history survived normal close/reopen; terminated runtime state was projected honestly |
+| Persistence | Kernel work survives normal close/reopen and terminated runtime state is reconciled honestly; the new target cold-opens to only the Director and requires deliberate retrieval |
 | Packaging | Unsigned Windows x64 NSIS installer; Authenticode reports `NotSigned` |
 | Update channel | Not available for the internal build; the app honestly renders `Update failed — retry` after HTTP 406 |
-| Current boundary | No normal Mission yet composes real point-in-time sports evidence into a complete useful research result |
+| Wave 1 accepted | W1-01 opens real Bovada UFC markets; W1-02 adds official pre-cutoff UFC history and one transparent descriptive calculation |
+| Current boundary | W1-03 is in flight: no independently accepted Critic-reviewed research assessment or CANDIDATE/WATCH/PASS result yet; no heterogeneous runtime collaboration yet |
 
-`docs/orders/NEXT.md` is the sole build-authority pointer. It currently keeps product work closed; a document describing future work is not permission to start it.
+`docs/orders/NEXT.md` is the sole build-authority pointer. It currently names W1-03; a roadmap or planning document is never permission to start different work.
 
 ## What works today
 
 ### Founder-operated Windows workflow
 
-The accepted real-product walkthrough proved this exact path without internal RPC substitution or a synthetic responder:
+The Golden real-product walkthrough proved this exact path without internal RPC substitution or a synthetic responder. Its automatic same-world reopen and mode-oriented surface were valid proof of the old baseline, not the newly accepted product target:
 
 ```text
 launch packaged QuantFlow
@@ -43,8 +44,8 @@ launch packaged QuantFlow
   → type into the real Hermes terminal and press Enter
   → Hermes calls governed Ontology tools through QuantFlow
   → OpenCode Go / Kimi K3 answers in the same tile
-  → close and reopen the same world
-  → see truthful Task and participant history
+  → close and reopen durable Kernel work
+  → see truthful Task and participant history after retrieval
   → shut down with zero owned processes
 ```
 
@@ -73,18 +74,18 @@ Artifact bytes are content-addressed. Dataset time fences, deterministic executi
 
 ### Canvas and Dock
 
-The Electron application provides:
+The currently accepted Electron baseline provides:
 
 - an infinite pan/zoom Canvas;
 - a file rail;
-- a Research Dock with `START`, `CATALOG`, `ACTIVE`, `INSPECT`, and `HISTORY` modes;
+- a Research Dock and contextual Inspect surfaces;
 - participant/terminal tiles with resize and focus behavior;
 - Kernel-projected Tasks, Runs, Artifacts, Evaluations, Reports, sessions, and relationships;
-- Workspace, Current Mission, History, and Full Lineage views;
+- legacy Workspace, Current Mission, History, and Full Lineage projection modes, now rejected as a target product model by ADR-0005;
 - semantic cables, selection emphasis, a minimap, and deterministic `TIDY` layout;
 - mouse-first controls with normal keyboard text and terminal input.
 
-These surfaces are functional and gated, but the interface remains early-stage. Golden proves truthful operation, not that every workflow is self-explanatory to a first-time user.
+These surfaces are functional and gated, but the interface remains early-stage. W1-03 owns the correction to one Canvas, deliberate working surfaces, clean cold-open, and no object-card flood. Golden proves truthful operation; it does not make the legacy projection grammar the product.
 
 ### Production participant inventory
 
@@ -111,22 +112,22 @@ The packaged app includes:
 - foreign-Kernel refusal;
 - tool-call trajectory Artifacts;
 - `qf-canvas`, the CLI control surface for inspecting and arranging Canvas tiles;
-- the fixed Bovada NFL capture CLI/RPC component.
+- governed Bovada capture used by the accepted live UFC market desk, with the earlier NFL path retained as regression coverage.
 
-The Bovada component has strict origin, response-size, schema, selection, cancellation, replay, Artifact, and Kernel-ingest tests. It is not yet composed into the normal founder Mission workflow.
+The Bovada component has strict origin, response-size, schema, selection, cancellation, replay, Artifact, and Kernel-ingest tests. W1-01 composes current UFC offers into the visible market desk; W1-02 composes official history and a transparent calculation. The independently reviewed conclusion remains W1-03 work.
 
 ## Honest product boundary
 
 The Golden product proves a real desktop, real governed state, a real Hermes runtime, and one real model/Ontology Task interaction. It does not yet prove:
 
-- a complete NFL or UFC research Mission using live point-in-time evidence;
+- a complete Critic-reviewed UFC inquiry using live point-in-time evidence;
 - a validated betting Technique or predictive edge;
-- automatic research composition from acquisition through independent Evaluation to a useful Decision Set;
+- accepted composition from acquisition through independent Evaluation to research assessment plus market actionability;
 - a heterogeneous multi-model Dock;
 - evaluated recall or learning;
 - PufferLib training or Policy promotion;
 - a signed public release, working update channel, backup/restore, or rollback;
-- stranger-ready onboarding or a polished consumer interface;
+- the accepted one-Canvas, clean-open, deliberate-surface consumer interface;
 - multi-user, SaaS, marketplace, or commercial launch readiness.
 
 Fixtures and synthetic responders are used to prove isolated mechanics. They are never reported as real research judgment. The real founder inference receipt is separately bound to trusted Hermes logs, exact Kernel state, immutable Ontology-call Artifacts, and rendered application behavior.
@@ -155,8 +156,8 @@ Atlas is a generated developer wiring map, not the running product or Kernel tru
 ## Architecture
 
 ```text
-CANVAS + DOCK (Electron)
-  rendered participants, work, evidence, judgment, lineage
+ONE CANVAS + DOCK + INSPECT (Electron)
+  deliberately opened participants, capabilities, and useful outputs
         ↓ projections / governed actions
 APPLICATION PLANE
   participant admission, PTY lifecycle, MCP bridges, peer delivery
@@ -211,7 +212,7 @@ Local state is deliberately separated:
 
 Application-local state may support rendering and runtime operation, but it may not become a second domain truth store.
 
-Agents entering this repository must read [`START_HERE.md`](START_HERE.md), [`AGENTS.md`](AGENTS.md), and the order named by [`docs/orders/NEXT.md`](docs/orders/NEXT.md) before editing.
+Agents entering this repository must read [`START_HERE.md`](START_HERE.md), [`CONTEXT.md`](CONTEXT.md), [`AGENTS.md`](AGENTS.md), and the order named by [`docs/orders/NEXT.md`](docs/orders/NEXT.md) before editing.
 
 ## Non-negotiable rules
 
@@ -221,6 +222,7 @@ Agents entering this repository must read [`START_HERE.md`](START_HERE.md), [`AG
 - Raw evidence remains inspectable after Evaluation and publication.
 - Independent Evaluation gates authoritative Report publication.
 - Runtime identity never replaces durable Task or Artifact identity.
+- Runtime participants keep separate private contexts and share bounded institutional truth through the Kernel.
 - Credentials remain operator-owned and absent from repository evidence.
 - Windows is the primary release and acceptance platform.
 - A mock, fixture, synthetic responder, or markdown file is never presented as live capability.

@@ -4,7 +4,7 @@
 >
 > **Do not re-sweep the library.** All 203 non-search URLs were fetched, evidence-quoted, and tiered on 2026-07-17; correlated to doctrine phases on 2026-07-22. Two indexes already exist — start from them, never from the raw list.
 >
-> Source of truth for *direction* is [`DOCTRINE.md`](DOCTRINE.md). This file is reference: it explains where the doctrine's ideas came from and what is on the shelf for later phases.
+> Source of truth for *direction* is [`DOCTRINE.md`](DOCTRINE.md), including its later amendments. This file is reference: it explains where ideas came from and what remains on the shelf. Its numbered doctrine phases, R-rungs, old Vault paths, and vendor conclusions are historical indexing—not current route or build authority. The current route is Waves 1–3 in `docs/plans/OFFICIAL-ROADMAP.md`; UFC is the first proving ground; a named tool enters work only when a current order has a real product consumer.
 
 ## Where the depth lives
 
@@ -30,7 +30,7 @@
 
 **From the ecosystem generally — the rule that stops the loop.** Four substrate re-evaluations (agentOS, Rivet/Temporal/DuckDB, Restate/RivetKit, and counting) each produced a defensible answer and none advanced the charter. Hence the triage in `START_HERE.md` §5.8: dock item / underlayer / neither, classified on sight.
 
-## The shelf, by phase
+## Historical shelf mapping (not the current execution route)
 
 Only tools serving a **named** doctrine phase gate or charter action appear here. Everything else is background.
 
@@ -52,7 +52,7 @@ Scope expanded 2026-07-24 (founder). The doctrine's own Phase 6 already seeds it
 
 **SPLIT 2026-08-12 (founder).** This shelf conflated two unrelated applications, which is why it read as one impossible topic. They share the ontology and almost nothing else.
 
-**A · RL on the market — the priority.** Learning a betting or selection policy. Environment is the market; reward is profit, CLV, and calibration. **This is research, not platform work.** It runs as a `run.kind: "training"` Run executed by an RL worker seat hired from the Dock like any other specialist — a CLI-backed participant, PufferLib if they ship one. The seat is the Dock item; PufferLib, gym environments, and OpenEnv are the *workload* it imports inside its sandbox. This closes the triage gap recorded at `DOCTRINE.md` §351: the library was never the Dock item, the seat is. Shelf for A: environment synthesis (Gym-Anything 2604.06126, RLAnything 2602.02488, Verifiable Environment Synthesis 2605.14392), QTNet 2312.15730 for quant-RL architecture, PufferLib. First environment will be **football**; not yet specified.
+**A · RL on the market — a later founder priority.** Learning a betting or selection policy. Environment is the market; reward may use profit, CLV, and calibration only after the measurement contracts and enough resolved history exist. **This is research, not platform work.** It runs as a `run.kind: "training"` Run executed by an admitted RL worker seat; the seat is the Dock participant while PufferLib, gym environments, and OpenEnv are implementation workloads. No first environment or library is selected by this reference file.
 
 **Reward signal, already built.** R11b computes `roi`, `hit_rate`, `net_profit`, and `average_clv` with push, void, and missing-settlement handled, proven against a hand-calculated fixture. Do not rebuild these for training.
 
@@ -126,7 +126,7 @@ These are inventory entries, not roadmap rungs, dependencies, or permission to b
 | Parent-span trace tree | Underlayer | A real multi-seat failure cannot be reconstructed from current Kernel trajectories and mission/task links |
 | Twelve-seat concurrency gate | Product gate | The supported consumer workflow intentionally rises above the current seat count and needs a measured finite bound |
 | Data refinery | Product/data pipeline | A named Dataset or Run is blocked by raw captured data that cannot be normalized with the existing ingest path |
-| Held-out evaluations | R22-R24 learning | R18-R21 have produced enough real, evaluated Missions to define a non-leaking holdout |
+| Held-out evaluations | Wave-3 learning candidate | Repeated real, evaluated investigations have produced enough history to define a non-leaking holdout |
 | Cloudflare Workflows | Underlayer candidate | The first long workflow dies mid-flight and cannot resume through existing Kernel state and app recovery |
 | Cloudflare Browser/Computer | Execution-environment candidate | A named data or research task requires a remote browser/computer boundary the native Windows desk cannot safely provide |
 | WebMCP | Dock/tool-surface candidate | A browser data source has a stable structured tool surface that is measurably better than the current generated-tool or capture path |
@@ -136,11 +136,11 @@ These are inventory entries, not roadmap rungs, dependencies, or permission to b
 | AC2 | Neither yet | A concrete product/repository and one unmet QuantFlow gate are identified |
 | Overeasy | Neither yet | A concrete product/repository and one unmet QuantFlow gate are identified |
 | ~~Modal~~ | **REJECTED 2026-08-12 (founder)** | Cloudflare is the execution-provider answer. This trigger is withdrawn — on capacity pressure the question is which Cloudflare surface, not whether to add a second vendor |
-| Voice operator | Dock/UI candidate | The founder requests hands-free operation after the keyboard/mouse R13 consumer workflow is accepted |
+| Voice operator | Dock/UI candidate | The founder requests hands-free operation after the current keyboard/mouse product loop is accepted |
 | Model routing | Product-policy candidate | Repeated measurements show a provider-specific latency, quality, availability, or cost failure across supported seats |
 
 RL remains a founder priority and stays on the shelf above, not deleted. It
-starts only through a fresh R22 authorization after grounded, composable, and
-supervised Missions produce trustworthy trajectories, Evaluations, and fenced Datasets.
+starts only through a fresh Wave-3 order after useful, collaborative, supervised
+investigations produce trustworthy trajectories, Evaluations, and fenced Datasets.
 
 The full external classification — current, candidate, reference, rejected — lives in [`proposals/CAPABILITY-REGISTRY.md`](proposals/CAPABILITY-REGISTRY.md), swept from 413 notes on 2026-08-12. That file is inventory and confers no authority.

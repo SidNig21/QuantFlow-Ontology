@@ -4,17 +4,19 @@ status: OPEN
 active-order: docs/orders/active/WO-W1-03-UFC-RESEARCH-DECISION.md
 builder-authority: OPEN
 router-authority: OPEN
+builder-condition: DO NOT RESUME until one fresh semantic Reader verifies the 2026-09-07 one-Canvas order against the preserved unaccepted implementation
 g11-status: CLOSED
 r18-status: FROZEN / SUPERSEDED
 foundation-status: ACCEPTED — candidate 58b444d858443debeac8b13e041b2bb65e4e370e; independent YES / YES
-reader-status: YES / YES — W1-03 semantic Reader `01a07a8a-adf8-7381-843b-5401a189b490` on amended order `1775c92c`
+reader-status: REQUIRED — the prior YES / YES predates ADR-0005 and the repository-wide one-Canvas correction
 
 Golden and the Post-Golden Foundation remain accepted and closed. The rejected FM-0 candidate remains
-unmerged. WO-W1-01 and WO-W1-02 are accepted. W1-02 repaired candidate `f9b11bd1` passed its fresh
-independent Verifier, Router-owned packaged-app Computer Use, and exact-root cleanup. Only W1-03 is open:
-test Ryan's exact Grasso-by-submission Hypothesis against the complete current Bovada fight menu, produce
-one independently reviewed governed Decision, and preserve honest WATCH/PASS when evidence or markets are
-insufficient.
+unmerged. WO-W1-01 and WO-W1-02 are accepted and archived under `docs/history/orders/`; their acceptance
+receipts remain linked below. W1-03 is open but its current working-tree implementation is unaccepted and
+preserved outside `main` until fresh Reader scoping. The corrected outcome is one real UFC inquiry on the
+single Canvas: separate research assessment and current-market actionability, real worker and Critic,
+contextual Inspect, no alternate Mission/History/Lineage worlds, clean cold-open, and deliberate retrieval.
+Fiorot–Grasso is the acceptance case, never production hard-coding.
 
 - [Active order](active/WO-W1-03-UFC-RESEARCH-DECISION.md)
 - [W1-02 acceptance](evidence/w1-02/ACCEPTANCE.md)

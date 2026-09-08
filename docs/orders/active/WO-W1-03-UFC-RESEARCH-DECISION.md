@@ -1,7 +1,7 @@
 # WO-W1-03 — Meaningful UFC research, independent criticism, and a governed decision
 
-status: OPEN / BUILDING — semantic Reader `01a07a8a-adf8-7381-843b-5401a189b490` returned YES / YES on amended order `1775c92c`; founder consumer-surface correction added 2026-09-07 from the approved Product Surface authority
-assignee: existing low-reasoning 5.6 Sol Builder; preserve the current W1-03 implementation and repair only the accepted consumer workbench
+status: OPEN / REALIGNED — prior semantic Reader `01a07a8a-adf8-7381-843b-5401a189b490` returned YES / YES on amended order `1775c92c`; founder one-Canvas correction added 2026-09-07 and requires fresh implementation scoping before Builder resumes
+assignee: none while the repository-wide realignment is under founder review; preserve the current W1-03 implementation as an unaccepted candidate
 depends: WO-W1-02 accepted at repaired product candidate `f9b11bd1d6df38d2e109456c2f1f2c2969a7de19`
 
 ## Objective
@@ -17,6 +17,10 @@ Ryan opens Fiorot–Grasso, records his Grasso-by-submission lean, and asks Quan
 reads every currently offered Bovada market for that fight, tries to disprove the mechanism, compares the
 listed ways to express any surviving view, and either identifies the best defensible offered expression or
 says exactly why the right answer is WATCH/PASS—without inventing a prop or placing a bet.
+
+Fiorot–Grasso is the exact acceptance case for this order, not the identity of the product. No fighter,
+claim, provider event id, market label, or expected WATCH result may be hard-coded into production paths.
+The same visible action and institutional contract must accept another valid UFC inquiry and current event.
 
 ## Binding product meaning
 
@@ -227,54 +231,64 @@ raw JSON, process language, or credential material is required to understand the
 
 - Participant tiles show role, exact Task, running/waiting/completed/failed state, and produced output.
 - Dock and Canvas agree on every participant identity and state.
-- Closing/reopening restores the same Mission, evidence, Run, worker Artifact, Critic Evaluation, current
-  Decision Set, and superseded history while live sessions reopen as honestly closed.
+- Normal close reaches zero QuantFlow-owned participants, terminals, helpers, watchers, and background
+  processes. Cold open shows only the ready Director. The same Mission, evidence, Run, worker Artifact,
+  Critic Evaluation, current Decision Set, and superseded history remain in the Kernel and return only when
+  Ryan or the Director deliberately retrieves that investigation; no prior process relaunches.
 - Provider failure, source drift, missing statistics, invalid probability envelope, Critic refusal,
   publication block, and stale Quote each leave durable work intact and explain whether retry/refresh is
   safe and what Ryan should do next.
 - Normal application close reaches zero QuantFlow-owned processes. Every disposable proof root is deleted
   by exact literal path after reference checks; no wildcard or parent deletion.
 
-## Deliverable 6 — founder-readable current-investigation workbench
+## Deliverable 6 — one founder-readable Canvas workspace
 
 The founder-observed packaged result is a W1-03 RED even though its Kernel lineage is correct. The current
-surface lets the Bovada catalog cover much of the Canvas, mixes unrelated and superseded objects into the
-active investigation, exposes raw implementation records, lets cables and orchestration callouts cross tile
-bodies, and visually loses the governed WATCH decision. Correct this against the already-approved Product
-Surface companion; do not create another layout truth or change Kernel semantics.
+surface lets the Bovada catalog cover much of the Canvas, creates tiles for nearly every projected Kernel
+object, retains hidden/stale tile inventory, exposes raw implementation records, crosses tile bodies with
+cables and orchestration callouts, and automatically moves the camera into a separate Mission projection.
+Correct the projection rule itself against the Product Surface companion; do not patch another screenshot,
+create another layout truth, or change Kernel semantics.
 
-The accepted working-mode behavior is:
+The accepted behavior is:
 
-- `Bovada Live Markets` is a Dock/catalog surface, not a persistent Canvas inventory tile. Selecting or
-  opening an investigation dismisses/collapses that catalog and enters one clean Current Mission/FOCUS
-  viewport. Current observations are primary; historical and superseded observations are collapsed into
-  History and never repeat down the normal working surface.
-- Current Mission frames only the selected investigation's essential semantic path at a readable scale:
-  question/Hypothesis; current market menu; official evidence summary; transparent Run; exact Task and
-  compact participant state; Critic/Evaluation; and current Decision. Unrelated workspace objects remain
-  durably reachable but outside or visually subordinate to focus and may not obstruct the investigation.
-- Raw Artifact JSON, storage paths, trajectory receipts, registry/tool internals, process/session ids, and
-  free-floating `ORCHESTRATOR -> WORKER/CRITIC` connection cards are Inspect or Full Lineage detail, never
-  default working tiles. Compact tiles use plain product language and reveal exact identity/provenance in
-  Inspect.
-- The current Decision is the single dominant accented tile. For the accepted live result it must plainly
-  read `WATCH`, `Grasso by submission is not currently offered`, a short reason, and the exact condition for
-  rechecking. The Critic/Evaluation is a concise independent judgment immediately upstream, not a raw blob.
-- Participant and Task tiles remain compact and agree with Kernel/Dock truth (`DONE`, `CLOSED`, and
-  `RESULT RECORDED` where applicable). A capability or Research Lab tile may appear only when exact used
-  Run/tool lineage exists; it may not claim `NOT RECORDED` for work the Kernel says occurred.
-- Relationships are quiet by default, brighten on selection, and do not cross tile bodies. Link names and
-  orchestration detail appear on selection/Inspect rather than as large floating cards.
-- Current Mission/FOCUS and TIDY are deterministic, region-aware, collision-free, and fully on-canvas with
-  the Dock open at both 1280x720 and 2560x1392. Essential text is readable without manual pan/zoom. Repeating
-  TIDY on unchanged truth yields the same composition.
-- History deliberately shows revisions and superseded observations without contaminating the current
-  workbench. Full Lineage may be dense as a deliberate forensic view; leaving it returns to the same focused
-  investigation and selection.
+- QuantFlow has one Canvas. Remove the user-facing `ORDINARY_CANVAS`, `CURRENT_MISSION`/`FOCUS`,
+  `HISTORY`, and `FULL_LINEAGE` projection system rather than renaming it. Mission remains internal Kernel
+  scope; selected history and lineage live inside contextual Inspect.
+- Cold open contains exactly one ready Director surface. Do not restore old Canvas tiles or relaunch their
+  processes. Prior institutional work is found through the Dock/Director and rendered only after deliberate
+  retrieval.
+- `Bovada Live Markets` is a collapsible Dock Data catalog. Selecting an exact event/market may open one
+  compact working surface; it never leaves a permanent scrolling inventory of current, historical, and
+  superseded quotes on the Canvas.
+- Canvas inventory is deliberate working inventory, not Kernel object cardinality. Keep the Director,
+  recruited worker and Critic participant surfaces, a deliberately opened market/evidence/capability
+  surface when useful, and one useful governed result. Raw Mission, Hypothesis, Task, Run, Artifact,
+  Evaluation, Report, Quote, session, registry, and link records remain in Inspect unless Ryan explicitly
+  opens a purpose-specific working view.
+- Participant tiles are working-sized, role-first, and have a readable TUI or one obvious expansion action.
+  They show current Task, state, and useful output—not raw session/process metadata. Ordinary terminal tiles
+  remain neutral bench equipment and never become participants by appearance.
+- Update the packaged Research Director prompt and Canvas-control skill so they teach this same one-Canvas,
+  deliberate-surface contract. They must distinguish an ordinary terminal from an admitted Participant and
+  must not instruct a runtime to enter a Mission world, restore old tiles, or materialize Kernel rows as tiles.
+- The result surface first states whether the evidence supports, challenges, or cannot resolve the Grasso
+  submission claim. It separately states `WATCH` because the desired Bovada selection is not currently
+  offered, plus the exact refresh condition. A future accepted run must derive those words from current
+  truth; the Grasso sentence is not production copy.
+- The Critic's material attack is summarized with the result; exact Evaluation and evidence are available
+  through Inspect. It does not require its own permanent database card.
+- Cables are absent by default. Selection may show eligible collaboration; active delegation, capability
+  invocation, and Artifact handoff may show one exact relationship. No connected visible surfaces means no
+  cable. Cables never cross tile bodies or use floating orchestration cards.
+- TIDY arranges only visible surfaces at readable scale, collision-free and on-canvas with the Dock open at
+  1280x720 and 2560x1392. Hidden, closed, historical, or distant records never influence the camera fit.
+  Repeating TIDY on unchanged visible inventory yields the same composition.
 
 The Glacier visual language remains. This authorization permits substantial layout, hierarchy, projection,
-tile-grammar, cable, and Dock interaction changes needed to meet this behavior. It does not authorize a new
-truth store, schema/object/link type, runtime architecture, second product world, or wager action.
+tile-grammar, cable, Dock interaction, cold-open, and non-authoritative Canvas-cache changes needed to meet
+this behavior. It does not authorize a new truth store, schema/object/link type, runtime architecture,
+second product world, or wager action.
 
 ## Acceptance
 
@@ -290,9 +304,9 @@ Builder adds focused tests for:
    unsupported submission inference, arbitrary probability, contradictory/fabricated inputs going red;
 5. technique-free and Strategy-backed publication authority, atomic legacy migration, current/history,
    exact source work, self-review refusal, and Evaluation gating;
-6. real rendered state transitions, Inspect content, overlap/tidy, current/history/full-lineage separation,
-   catalog dismissal, decision dominance, compact participant/task truth, and reopen truth at both required
-   viewport sizes;
+6. one-Canvas rendering, deliberate surface inventory, contextual Inspect, overlap/TIDY, catalog collapse,
+   readable participant TUIs, result comprehension, no alternate projection modes, clean cold-open, and
+   deliberate retrieval at both required viewport sizes;
 7. external failure and process/root cleanup.
 
 Every new or changed critical guard gets one failing bait and one restored control. Do not rerun unchanged
@@ -308,7 +322,8 @@ bun qa/run.ts wave1-critic-decision
 
 It must launch the packaged current candidate on isolated app/Kernel/artifact/profile roots, drive the
 normal visible product action, prove exact live Quote → evidence → Run → worker Task/Artifact → Critic
-Task/Evaluation → current Decision Set lineage, close/reopen truth, rendered legibility, and zero cleanup.
+Task/Evaluation → research assessment → current market-actionability lineage, clean close/reopen plus
+deliberate retrieval, rendered legibility, and zero cleanup.
 Its positive live path uses the real packaged app and two distinct production broker invocations: one exact
 Market Researcher session/Task/Artifact receipt and one different Critic session/Task/Evaluation receipt,
 each with exact provider/model identity and nonzero usage. Internal APIs may observe what the visible action
@@ -341,8 +356,10 @@ Freeze one immutable candidate. One fresh task that did not build it independent
 falsifiers/gates against that SHA and returns separate semantic and verification verdicts. After technical
 green, the Architect uses native Computer Use on the exact packaged candidate as Ryan would: open the real
 current UFC investigation, run `Analyze and review`, inspect the worker and Critic, read the Decision Set,
-exercise TIDY/Inspect/History/Full Lineage, close/reopen, and close normally. Preserve screenshots of the
-decision, Critic attack, lineage, any confusion/overlap, and zero-process result.
+exercise the one Canvas, Dock, TIDY, participant TUIs, and contextual Inspect, close normally, reopen to the
+clean Director-only desk, deliberately retrieve the prior work, and close again. Preserve screenshots of
+the research assessment, market actionability, Critic attack, Inspect lineage, any confusion/overlap, and
+zero-process result.
 
 ## Out of scope
 

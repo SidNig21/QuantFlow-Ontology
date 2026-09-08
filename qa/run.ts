@@ -421,6 +421,7 @@ const gates: Gate[] = [
       const mustExist = [
         "START_HERE.md",
         "AGENTS.md",
+        "CONTEXT.md",
         "docs/DOCTRINE.md",
         "docs/LAWS.md",
         "docs/DEBT.md",
@@ -487,6 +488,7 @@ const gates: Gate[] = [
         ".gitignore",
         ".mcp.json",
         "AGENTS.md",
+        "CONTEXT.md",
         "install.sh",
         "LICENSE.md",
         "NOTICE.md",

@@ -1,6 +1,6 @@
 # ADR-0003 — Experimental `connection` UI before schema promotion
 
-status: accepted
+status: superseded in its product-surface decision by ADR-0005; experimental schema decision retained
 date: 2026-08-04
 decision-maker: founder
 program: GLACIER · WO-g5 precondition
