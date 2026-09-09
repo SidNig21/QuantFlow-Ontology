@@ -380,12 +380,14 @@ function tileState(tile) {
 }
 
 function spineIdLabel(tile, agentModel) {
+	if (tile.type === "capability") return "CAPABILITY";
 	if (agentModel || tile.pendingSpawnId || tile.definitionId || tile.sessionId) return "PARTICIPANT";
 	if (tile.type === "term") return "TERMINAL";
   return tile.id;
 }
 
 export function getTileLabel(tile) {
+	if (tile.type === "capability") return { parent: "", name: tile.userTitle || "Capability" };
   if (tile.pendingSpawnId && tile.displayName) {
     return { parent: "", name: tile.displayName };
   }

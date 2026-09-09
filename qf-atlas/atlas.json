@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "9e639b93",
+    "commit": "d6b5b454",
     "generatedAt": "2026-09-09",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "57ec684c6b7fcc0a"
+    "fingerprint": "dc0ad3f8bec33e0b"
   },
   "stats": {
     "live": 108,
@@ -617,8 +617,8 @@
       "layer": 4,
       "name": "monaco-react-shim.d.ts",
       "kb": 10,
-      "x": 2,
-      "z": -3.42,
+      "x": -0.39,
+      "z": -3.94,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -673,8 +673,8 @@
       "layer": 4,
       "name": "ItemDetailView.tsx",
       "kb": 9.7,
-      "x": 3.63,
-      "z": -1.59,
+      "x": 2,
+      "z": -3.42,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -757,8 +757,8 @@
       "layer": 4,
       "name": "useWorkspaceFileTree.ts",
       "kb": 9,
-      "x": 3.87,
-      "z": 0.85,
+      "x": 3.63,
+      "z": -1.59,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2809,9 +2809,9 @@
       "id": "4:collab-electron/src/windows/shell/src::market",
       "layer": 4,
       "name": "market-desk.js",
-      "kb": 10.2,
-      "x": -0.39,
-      "z": -3.94,
+      "kb": 8.8,
+      "x": 3.87,
+      "z": 0.85,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2820,7 +2820,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/market-desk.js",
-          "kb": 10.2,
+          "kb": 8.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2893,7 +2893,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 59.2,
+      "kb": 59.3,
       "x": 1.01,
       "z": 0.85,
       "status": "ice",
@@ -2904,7 +2904,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 59.2,
+          "kb": 59.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2949,7 +2949,7 @@
       "id": "4:collab-electron/src/windows/shell/src::tile",
       "layer": 4,
       "name": "tile*",
-      "kb": 57.4,
+      "kb": 58.3,
       "x": -0.23,
       "z": 1.3,
       "status": "ok",
@@ -2960,7 +2960,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/tile-manager.js",
-          "kb": 27.4,
+          "kb": 28.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2970,7 +2970,7 @@
         },
         {
           "path": "collab-electron/src/windows/shell/src/tile-renderer.js",
-          "kb": 18.6,
+          "kb": 18.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -6607,7 +6607,7 @@
           "writes": 0,
           "dml": 1,
           "dmlLines": [
-            170
+            168
           ],
           "executes": 0
         },
@@ -6958,7 +6958,7 @@
           "what": "1 SQL statement outside execute()",
           "where": "packages/qf-kernel/src/links.ts",
           "lines": [
-            170
+            168
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -28456,10 +28456,11 @@
       "importerCount": 5,
       "imports": [
         "qf-kernel-schema/src/link-endpoints.ts",
+        "qf-kernel-schema/src/schema.ts",
         "packages/qf-kernel/src/db.ts",
         "packages/qf-kernel/src/errors.ts"
       ],
-      "importCount": 3
+      "importCount": 4
     },
     {
       "path": "packages/qf-kernel/src/market-context.ts",
@@ -34178,6 +34179,7 @@
       "transitiveTruncated": true,
       "directDependencies": [
         "qf-kernel-schema/src/link-endpoints.ts",
+        "qf-kernel-schema/src/schema.ts",
         "packages/qf-kernel/src/db.ts",
         "packages/qf-kernel/src/errors.ts"
       ],
@@ -57931,7 +57933,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/links.ts",
           "lines": [
-            170
+            168
           ]
         }
       ]
@@ -58686,7 +58688,7 @@
       "what": "1 SQL statement outside execute()",
       "where": "packages/qf-kernel/src/links.ts",
       "lines": [
-        170
+        168
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -58800,12 +58802,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "ae4f2ed9",
+      "commit": "9e639b93",
       "generatedAt": "2026-09-09"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "9e639b93",
+      "commit": "d6b5b454",
       "generatedAt": "2026-09-09"
     },
     "verdict": "better",

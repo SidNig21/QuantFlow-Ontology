@@ -690,6 +690,21 @@ export function createTileManager({
 		return tile;
 	}
 
+	// Dock capabilities supply content; the ordinary tile owns all window behavior.
+	// This is a renderer surface, not a participant or a new Kernel object type.
+	function openCapabilityTile({ id, title, content }) {
+		const tileId = `capability:${id}`;
+		let tile = getTile(tileId);
+		if (!tile) {
+			const size = defaultSize("capability");
+			const position = findAutoPlacement(tiles, size.width + 40, size.height + 40);
+			tile = createCanvasTile("capability", position.x, position.y, { id: tileId, userTitle: title });
+			tileDOMs.get(tileId).contentArea.appendChild(content);
+		}
+		focusCanvasTile(tileId);
+		return tile;
+	}
+
 	function createPendingSpawnTile({ requestId, definitionId, displayName, position }) {
 		const size = defaultSize("session");
 		const pos = position ?? findAutoPlacement(tiles, size.width, size.height);
@@ -1015,6 +1030,7 @@ export function createTileManager({
 
 	return {
 		createCanvasTile,
+		openCapabilityTile,
 		createPendingSpawnTile,
 		reconcilePendingSpawnTile,
 		closeCanvasTile,

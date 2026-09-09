@@ -1,8 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import { deriveResearchWorkflow } from "./research-workflow.js";
-import { observationAge } from "./market-desk.js";
+import { observationAge, selectionLabel } from "./market-desk.js";
 
 describe("market desk one-Canvas projection", () => {
+	test("total-round selections retain their actual line, including zero", () => {
+		expect(selectionLabel({ label: "Over", handicap: 2.5 })).toBe("Over 2.5");
+		expect(selectionLabel({ label: "Under", handicap: 1.5 })).toBe("Under 1.5");
+		expect(selectionLabel({ label: "Fighter", handicap: 0 })).toBe("Fighter 0");
+		expect(selectionLabel({ label: "Fighter", handicap: null })).toBe("Fighter");
+	});
 	test("resolves the selected market context without creating a second Canvas world", () => {
     const mission = { type: "mission", id: "mission-1", fields: { quote_id: "quote-1", state: "ready to staff", method: null } };
     const quote = { type: "quote", id: "quote-1", fields: { current: true } };
@@ -43,17 +49,15 @@ describe("market desk one-Canvas projection", () => {
 		expect(marketDesk).toContain('rowsHost.addEventListener("wheel", (event) => event.stopPropagation())');
 		expect(marketDesk).toContain('element("details", "market-research-details")');
 		expect(marketDesk).toContain('open.removeAttribute("open")');
-		expect(marketDesk).toMatch(/await onResearch.*\n\s*root\.hidden = true/s);
-		expect(marketDesk).toContain("data-market-drag-handle");
-		expect(marketDesk).toContain('dragHandle.setPointerCapture(event.pointerId)');
+		expect(marketDesk).toContain('tileManager.openCapabilityTile(');
+		expect(marketDesk).not.toMatch(/root\.hidden|setPointerCapture|root\.style\.(left|top)/);
 		expect(handoff).toContain('handoff?.status === "open"');
 		expect(handoff).not.toContain('className = "handoff-card"');
 		expect(styles).toMatch(/#handoff-layer[\s\S]*?z-index: 5/);
 		expect(styles).toMatch(/\.handoff-card[\s\S]*?display: none/);
 		expect(styles).toMatch(/\.market-desk-rows[^}]*overscroll-behavior: contain/);
 		expect(styles).toMatch(/\.market-desk-surface[\s\S]*?background: var\(--qf-gl-panel\)/);
-		expect(styles).toMatch(/\.market-desk-surface[\s\S]*?width: min\(480px,[\s\S]*?height: min\(720px,[\s\S]*?resize: both/);
-		expect(styles).not.toMatch(/\.market-desk-surface\s*\{[^}]*inset:/);
-		expect(styles).toContain('.market-desk-surface[hidden] { display: none; }');
+		expect(styles).toMatch(/\.market-desk-surface\s*\{[^}]*width: 100%;[^}]*height: 100%/);
+		expect(styles).not.toMatch(/\.market-desk-surface\s*\{[^}]*(?:position:|resize:|z-index:)/);
   });
 });

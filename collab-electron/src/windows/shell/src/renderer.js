@@ -555,7 +555,8 @@ async function init() {
 		getParticipantView: participantViewFor,
 	});
 	marketDeskController = createMarketDesk({
-		layerEl: tileLayer,
+		tileManager,
+		onOpen: (tile) => animateViewportFit([tile], 48, { minZoom: 0.6, anchorTile: tile }),
 		onResearch: async (missionId) => {
 			const result = await researchWorldController?.reveal("mission", missionId);
 			if (result?.ok) tidyTilesToGrid();

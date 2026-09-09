@@ -1,4 +1,5 @@
 import { linkDefinition, linkKindNames } from "qf-kernel-schema/link-endpoints";
+import { schema } from "qf-kernel-schema";
 import type { KernelDb } from "./db.ts";
 import { IllegalLinkError, KernelError } from "./errors.ts";
 
@@ -66,12 +67,9 @@ export function extractLinkSpecs(input: Record<string, unknown>): {
 }
 
 function objectTypeOf(db: KernelDb, id: string): string | null {
-  const tables = db
-    .query(
-      `SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ('events','links','schema_meta','sqlite_sequence')`,
-    )
-    .all() as Array<{ name: string }>;
-  for (const { name } of tables) {
+  // Only declared ontology objects are endpoints. Internal support tables have
+  // different primary keys, and migration can place them before object tables.
+  for (const { name } of schema.objects) {
     const row = db.query(`SELECT 1 AS ok FROM ${name} WHERE id = ?`).get(id) as
       | { ok: number }
       | null;

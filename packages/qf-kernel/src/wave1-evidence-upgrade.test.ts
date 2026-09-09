@@ -1,10 +1,13 @@
 import { afterEach, expect, test } from "bun:test";
 import { Database } from "bun:sqlite";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { closeKernel, openKernel } from "./db-bun.ts";
 import { classifyKernelShape } from "./upgrade.ts";
+import { ensureGovernedReviewSchema } from "./governed-review.ts";
+import { execute } from "./execute.ts";
+import { writeLinks } from "./links.ts";
 
 let root = "";
 
@@ -14,6 +17,8 @@ afterEach(() => {
   if (!target.startsWith(`${resolve(tmpdir())}\\`) || !target.includes("qf-w1-evidence-upgrade-")) {
     throw new Error(`unsafe cleanup ${target}`);
   }
+  // Release Bun's cached statements before removing the Windows database file.
+  Bun.gc(true);
   rmSync(target, { recursive: true, force: true });
   root = "";
 });
@@ -22,6 +27,7 @@ test("openKernel upgrades the exact pre-W1 evidence shape before a Dataset write
   root = mkdtempSync(join(tmpdir(), "qf-w1-evidence-upgrade-"));
   const path = join(root, "kernel.db");
   const created = openKernel(path, { create: true });
+  ensureGovernedReviewSchema(created);
   closeKernel(created);
 
   const predecessor = new Database(path);
@@ -52,5 +58,23 @@ test("openKernel upgrades the exact pre-W1 evidence shape before a Dataset write
   expect(upgraded.query("PRAGMA table_info(dataset)").all()).toEqual(
     expect.arrayContaining([expect.objectContaining({ name: "purpose" })]),
   );
-  closeKernel(upgraded);
+  try {
+    const observedAt = "2026-09-08T00:00:00.000Z";
+    const bytes = new TextEncoder().encode(JSON.stringify({ contract: "qf.dataset.v1", observations: [{ observed_at: observedAt }] }));
+    const storage = join(root, "fixture-evidence.json");
+    writeFileSync(storage, bytes);
+    const trace = { trace_id: "upgrade-regression", span_id: "evidence" };
+    const artifact = execute(upgraded, "publish_artifact", { kind: "result_set", bytes, storage_ref: storage }, trace);
+    const input = { kind: "results", purpose: "evidence", artifact_id: artifact.object_id, content_hash: artifact.object_id, as_of: observedAt, coverage: {} };
+    const dataset = execute(upgraded, "register_dataset_version", input, trace);
+    expect(upgraded.query("SELECT kind, to_id FROM links WHERE from_id = ?").all(dataset.object_id))
+      .toEqual([{ kind: "derived_from", to_id: artifact.object_id }]);
+    expect(execute(upgraded, "register_dataset_version", input, trace).object_id).toBe(dataset.object_id);
+    const beforeLinks = upgraded.query("SELECT COUNT(*) AS n FROM links").get();
+    expect(() => writeLinks(upgraded, "dataset", dataset.object_id, [{ kind: "derived_from", to_id: "missing-artifact" }]))
+      .toThrow('to_id "missing-artifact" not found');
+    expect(upgraded.query("SELECT COUNT(*) AS n FROM links").get()).toEqual(beforeLinks);
+  } finally {
+    closeKernel(upgraded);
+  }
 });

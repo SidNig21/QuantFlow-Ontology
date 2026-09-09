@@ -2773,40 +2773,24 @@ button.task-fact:focus-visible {
 }
 
 .market-desk-surface {
-	position: absolute;
-	top: 24px;
-	left: 24px;
-	z-index: 24;
 	display: flex;
 	flex-direction: column;
 	box-sizing: border-box;
-	width: min(480px, calc(100% - 48px));
-	height: min(720px, calc(100% - 48px));
-	min-width: min(360px, calc(100% - 48px));
-	min-height: min(320px, calc(100% - 48px));
-	max-width: calc(100% - 48px);
-	max-height: calc(100% - 48px);
+	width: 100%;
+	height: 100%;
+	min-width: 0;
+	min-height: 0;
 	overflow: hidden;
-	resize: both;
 	pointer-events: auto;
-	padding: 18px;
-	border: 1px solid color-mix(in srgb, var(--qf-accent) 52%, var(--qf-gl-rule));
-	border-radius: 12px;
+	padding: 12px;
 	background: var(--qf-gl-panel);
-	box-shadow: var(--qf-gl-shadow);
 	color: var(--qf-gl-ice);
 	font-family: var(--qf-mono);
 }
 
-.market-desk-surface[hidden] { display: none; }
-
 .market-desk-surface > header {
 	flex: 0 0 auto;
-	cursor: grab;
-	user-select: none;
 }
-
-.market-desk-surface.is-dragging > header { cursor: grabbing; }
 .market-desk-surface > header button { cursor: pointer; }
 
 .market-desk-surface > header,
@@ -2836,7 +2820,7 @@ button.task-fact:focus-visible {
 .market-row time,
 .market-row-kind,
 .market-row-meta { color: var(--qf-gl-dim); font-size: 11px; }
-.market-prices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+.market-prices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 8px; margin: 12px 0; }
 .market-price { padding: 9px 10px; border-radius: 6px; background: var(--qf-gl-panel-3); }
 .market-price b { color: var(--qf-accent); }
 .market-inspect { margin: 12px 0; font-size: 11px; }

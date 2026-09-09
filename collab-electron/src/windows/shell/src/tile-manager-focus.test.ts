@@ -21,6 +21,7 @@ type FakeElement = {
   dataset: Record<string, string>;
   parentElement: FakeElement | null;
   appendChild: (child: FakeElement) => FakeElement;
+  remove: () => void;
   addEventListener: () => void;
 };
 
@@ -54,6 +55,7 @@ function fakeElement(): FakeElement {
       children.push(child);
       return child;
     },
+    remove: () => { result.parentElement = null; },
     addEventListener: () => {},
   };
   return result;
@@ -106,9 +108,11 @@ mock.module("./tile-renderer.js", () => ({
   startInlineRename: () => {},
 }));
 
+const draggedTiles: string[] = [];
+const resizedTiles: string[] = [];
 mock.module("./tile-interactions.js", () => ({
-  attachDrag: () => {},
-  attachResize: () => {},
+  attachDrag: (_element: unknown, tile: Tile) => { draggedTiles.push(tile.id); },
+  attachResize: (_element: unknown, tile: Tile) => { resizedTiles.push(tile.id); },
 }));
 
 mock.module("./canvas-rpc.js", () => ({
@@ -152,7 +156,36 @@ function makeManager() {
 beforeEach(() => {
   tiles.splice(0, tiles.length);
   zIndex = 1;
+  draggedTiles.length = 0;
+  resizedTiles.length = 0;
   (globalThis as { window?: unknown }).window = { shellApi: { trackEvent: () => {} } };
+});
+
+describe("Dock capability shared Canvas lifecycle", () => {
+  test("Bovada and a future tool inherit the same tile lifecycle without duplicate surfaces", () => {
+    const { manager } = makeManager();
+    const content = fakeElement();
+    const bovada = manager.openCapabilityTile({ id: "bovada-live-markets", title: "Bovada Live Markets", content });
+    const other = manager.openCapabilityTile({ id: "test-calculator", title: "Test calculator", content: fakeElement() });
+    expect(tiles).toHaveLength(2);
+    expect(draggedTiles).toEqual([bovada.id, other.id]);
+    expect(resizedTiles).toEqual([bovada.id, other.id]);
+    expect(content.parentElement).toBe(manager.getTileDOMs().get(bovada.id)!.contentArea);
+    // Resize changes the tile itself; TIDY changes position without replacing its size.
+    Object.assign(bovada, { width: 520, height: 440 });
+    manager.applyTileLayout([{ ...bovada, x: 800, y: 100 }]);
+    expect(manager.openCapabilityTile({ id: "bovada-live-markets", title: "Bovada Live Markets", content })).toBe(bovada);
+    expect(tiles).toHaveLength(2);
+    expect(bovada).toMatchObject({ x: 800, y: 100, width: 520, height: 440 });
+    expect(manager.getFocusedTileId()).toBe(bovada.id);
+    manager.closeCanvasTile(bovada.id);
+    expect(tiles).toEqual([other]);
+    expect(manager.getTileDOMs().has(bovada.id)).toBe(false);
+    const reopened = manager.openCapabilityTile({ id: "bovada-live-markets", title: "Bovada Live Markets", content });
+    expect(reopened).not.toBe(bovada);
+    expect(content.parentElement).toBe(manager.getTileDOMs().get(reopened.id)!.contentArea);
+    expect(tiles).toHaveLength(2);
+  });
 });
 
 describe("focusAgentSession terminal tile seam", () => {

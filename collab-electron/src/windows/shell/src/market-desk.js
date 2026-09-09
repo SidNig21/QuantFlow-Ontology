@@ -16,41 +16,17 @@ export function observationAge(observedAt, now = Date.now()) {
 	return `${Math.floor(minutes / 60)}h ago`;
 }
 
-export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
+export function selectionLabel(selection) {
+	return selection.handicap == null ? selection.label : `${selection.label} ${selection.handicap}`;
+}
+
+export function createMarketDesk({ tileManager, onOpen, onResearch, showStatus } = {}) {
 	const root = element("section", "market-desk-surface");
-	root.hidden = true;
 	root.setAttribute("aria-label", "Bovada live markets");
-	root.innerHTML = `<header data-market-drag-handle><div><span class="market-desk-kicker">DATA · BOVADA</span><h2>Bovada Live Markets</h2></div><div class="market-desk-actions"><button type="button" data-market-refresh>Refresh</button><button type="button" data-market-close aria-label="Close markets">×</button></div></header><div class="market-desk-status" role="status" aria-live="polite"></div><div class="market-desk-rows"></div>`;
-	layerEl?.appendChild(root);
+	root.innerHTML = `<header><span class="market-desk-kicker">DATA · BOVADA</span><div class="market-desk-actions"><button type="button" data-market-refresh>Refresh</button></div></header><div class="market-desk-status" role="status" aria-live="polite"></div><div class="market-desk-rows"></div>`;
 	const status = root.querySelector(".market-desk-status");
 	const rowsHost = root.querySelector(".market-desk-rows");
 	rowsHost.addEventListener("wheel", (event) => event.stopPropagation());
-	const dragHandle = root.querySelector("[data-market-drag-handle]");
-	dragHandle?.addEventListener("pointerdown", (event) => {
-		if (event.button !== 0 || (event.target instanceof Element && event.target.closest("button"))) return;
-		const layerBounds = layerEl?.getBoundingClientRect();
-		const rootBounds = root.getBoundingClientRect();
-		if (!layerBounds) return;
-		const start = { x: event.clientX, y: event.clientY, left: rootBounds.left - layerBounds.left, top: rootBounds.top - layerBounds.top };
-		dragHandle.setPointerCapture(event.pointerId);
-		root.classList.add("is-dragging");
-		const move = (moveEvent) => {
-			const maxLeft = Math.max(0, layerBounds.width - root.offsetWidth);
-			const maxTop = Math.max(0, layerBounds.height - root.offsetHeight);
-			root.style.left = `${Math.min(maxLeft, Math.max(0, start.left + moveEvent.clientX - start.x))}px`;
-			root.style.top = `${Math.min(maxTop, Math.max(0, start.top + moveEvent.clientY - start.y))}px`;
-		};
-		const finish = () => {
-			root.classList.remove("is-dragging");
-			dragHandle.removeEventListener("pointermove", move);
-			dragHandle.removeEventListener("pointerup", finish);
-			dragHandle.removeEventListener("pointercancel", finish);
-		};
-		dragHandle.addEventListener("pointermove", move);
-		dragHandle.addEventListener("pointerup", finish);
-		dragHandle.addEventListener("pointercancel", finish);
-		event.preventDefault();
-	});
 	let rows = [];
 	let loading = false;
 
@@ -80,7 +56,7 @@ export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
 			const prices = element("div", "market-prices");
 			for (const selection of Array.isArray(row.selections) ? row.selections : []) {
 				const side = element("div", "market-price");
-				side.appendChild(element("span", null, selection.label));
+				side.appendChild(element("span", null, selectionLabel(selection)));
 				side.appendChild(element("b", null, selection.american));
 				prices.appendChild(side);
 			}
@@ -166,7 +142,6 @@ export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
 						render();
 						setStatus("Ready to staff · Method: not selected", "ok");
 						await onResearch?.(String(result.mission_id));
-						root.hidden = true;
 					} catch (error) {
 						setStatus(error?.message ?? String(error), "error");
 						showStatus?.(error?.message ?? String(error), { tone: "error" });
@@ -184,7 +159,6 @@ export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
 	async function load({ capture = false } = {}) {
 		if (loading) return;
 		loading = true;
-		root.hidden = false;
 		setStatus(capture ? "Capturing current UFC markets…" : "Restoring market evidence…");
 		try {
 			const result = capture
@@ -203,6 +177,13 @@ export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
 	}
 
 	root.querySelector("[data-market-refresh]")?.addEventListener("click", () => void load({ capture: true }));
-	root.querySelector("[data-market-close]")?.addEventListener("click", () => { root.hidden = true; });
-	return { open: () => load({ capture: false }), refresh: () => load({ capture: false }), root };
+	return {
+		open: () => {
+			const tile = tileManager.openCapabilityTile({ id: "bovada-live-markets", title: "Bovada Live Markets", content: root });
+			onOpen?.(tile);
+			return load();
+		},
+		refresh: () => load(),
+		root,
+	};
 }

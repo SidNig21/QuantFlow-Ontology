@@ -373,6 +373,17 @@ describe("WO-g2 glacier spine DOM", () => {
     restore?.();
   });
 
+  test("Dock capabilities use ordinary tile chrome without pretending to be participants", () => {
+    const dom = createTileDOM({ type: "capability", id: "capability:bovada-live-markets", userTitle: "Bovada Live Markets" }, { onClose: () => {} });
+    expect(dom.container.dataset.tileType).toBe("capability");
+    expect(dom.container.querySelector(".tile-title-name")?.textContent).toBe("Bovada Live Markets");
+    expect(dom.idSpan.textContent).toBe("CAPABILITY");
+    expect(dom.container.querySelector(".gl-tile__head")).toBeTruthy();
+    expect(dom.container.querySelector(".gl-tile__grip")).toBeTruthy();
+    expect(dom.container.dataset.sessionId).toBeUndefined();
+    expect(getAgentTileModel({ type: "capability" })).toBeNull();
+  });
+
   test("uses the Kernel-projected friendly label while retaining exact DOM identity", () => {
     const dom = createTileDOM({
       type: "term",

@@ -262,9 +262,10 @@ The accepted behavior is:
 - Cold open contains exactly one ready Director surface. Do not restore old Canvas tiles or relaunch their
   processes. Prior institutional work is found through the Dock/Director and rendered only after deliberate
   retrieval.
-- `Bovada Live Markets` is a collapsible Dock Data catalog. Selecting an exact event/market may open one
-  compact working surface; it never leaves a permanent scrolling inventory of current, historical, and
-  superseded quotes on the Canvas.
+- `Bovada Live Markets` opens from Dock Data into an ordinary Canvas tile (founder correction, 2026-09-08).
+  It inherits shared move/resize/focus/TIDY/expand/close behavior, as must future Dock surfaces. It is not
+  a fixed overlay or a separate windowing system. Reopening focuses its one existing tile; closing removes
+  the view, not recorded evidence. Selecting an investigation must not hide other deliberately opened tiles.
 - Canvas inventory is deliberate working inventory, not Kernel object cardinality. Keep the Director,
   recruited worker and Critic participant surfaces, a deliberately opened market/evidence/capability
   surface when useful, and one useful governed result. Raw Mission, Hypothesis, Task, Run, Artifact,

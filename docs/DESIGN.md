@@ -19,6 +19,13 @@ Participant identity selects and inspects; only an explicitly labelled action
 can stop a participant. Dock, Canvas, and Inspect consume the same derived facts.
 Species and process detail are secondary to role, current Task, state, and output.
 
+Every opened Dock surface uses the ordinary Canvas tile lifecycle: move, resize,
+focus, TIDY, expand, and close. A capability supplies its content inside that
+shared tile; it does not implement a separate fixed overlay or drag/resize system.
+Bovada Live Markets follows this same rule. Opening it again focuses its existing
+tile; closing the tile removes the view, not the recorded market evidence.
+Future Dock additions inherit these controls without becoming fake participants.
+
 Participant tiles are working-sized and may expose their full TUI on demand.
 Ordinary terminals are neutral bench equipment and never masquerade as governed
 participants. Cables are absent by default; selection may show eligible

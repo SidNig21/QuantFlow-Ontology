@@ -1,5 +1,5 @@
 /**
- * @typedef {'term' | 'note' | 'code' | 'image' | 'graph' | 'browser' | 'pdf' | 'artifact' | 'session'} TileType
+ * @typedef {'term' | 'note' | 'code' | 'image' | 'graph' | 'browser' | 'pdf' | 'artifact' | 'session' | 'research' | 'capability'} TileType
  *
  * @typedef {Object} Tile
  * @property {string} id
@@ -36,6 +36,7 @@ const DEFAULT_TILE_SIZES = {
 	artifact: { width: 420, height: 220 },
 	session: { width: 420, height: 280 },
 	research: { width: 420, height: 280 },
+	capability: { width: 480, height: 620 },
 };
 
 /** @param {TileType} type */
