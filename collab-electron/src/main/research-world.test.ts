@@ -233,6 +233,31 @@ function completeWorkerTask(db: KernelDb, root: string, taskId: string, workerId
   });
 }
 
+function linkedTaskFixture(db: KernelDb, suffix: string, taskIds: string[]): { missionId: string; directorId: string } {
+  const directorId = `director-${suffix}`;
+  const workerId = `worker-${suffix}`;
+  execute(db, "register_agent_definition", {
+    name: `director-definition-${suffix}`, role: "orchestrator",
+    package_ref: "species/hermes/packed/hermes.aospkg", runtime_profile: "default",
+    capability_groups: ["desk.orchestrate"], display_name: "Research Director",
+  }, trace);
+  execute(db, "create_agent_session", { session_id: directorId, agent_definition_id: `director-definition-${suffix}` }, trace);
+  execute(db, "start_agent_session", { session_id: directorId }, trace);
+  execute(db, "register_agent_definition", {
+    name: `worker-definition-${suffix}`, role: "worker",
+    package_ref: "species/hermes/packed/hermes.aospkg", runtime_profile: "default",
+    capability_groups: ["market.read"], display_name: "Market Researcher",
+  }, trace);
+  execute(db, "create_agent_session", { session_id: workerId, agent_definition_id: `worker-definition-${suffix}` }, { ...trace, actor_session_id: directorId });
+  execute(db, "start_agent_session", { session_id: workerId }, trace);
+  const missionId = `mission-${suffix}`;
+  execute(db, "create_mission", { mission_id: missionId, name: `Mission ${suffix}`, objective: "Exercise exact Task selection." }, trace);
+  for (const taskId of taskIds) execute(db, "create_task", {
+    task_id: taskId, title: `Task ${taskId}`, description: "Exact linked research Task.", assignee_session_id: workerId,
+  }, { ...trace, actor_session_id: directorId, mission_id: missionId });
+  return { missionId, directorId };
+}
+
 describe("Main research-world projection", () => {
   test("returns exact root errors and honest empty-world facts", () => {
     const db = kernel();
@@ -255,6 +280,56 @@ describe("Main research-world projection", () => {
       expect(Object.isFrozen(result.world)).toBe(true);
       expect(JSON.stringify(result.world)).not.toContain("storage_ref");
     }
+    closeKernel(db);
+  });
+
+  test("selects the exact sole noncancelled Task while preserving cancelled Mission history", () => {
+    const db = kernel();
+    const { missionId, directorId } = linkedTaskFixture(db, "cancelled-and-open", ["task-cancelled", "task-open"]);
+    execute(db, "cancel_task", { task_id: "task-cancelled" }, { ...trace, actor_session_id: directorId });
+
+    const result = getResearchWorldProjection(db, { root_type: "mission", root_id: missionId });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.world.missing_lineage).toEqual([{
+        owning_type: "task", owning_id: "task-open", kind: "source_work",
+        message: "This Task has no completed research lineage yet.",
+      }]);
+      expect(result.world.links).toEqual(expect.arrayContaining([
+        expect.objectContaining({ kind: "belongs_to", from_id: "task-open", to_id: missionId }),
+      ]));
+    }
+    closeKernel(db);
+  });
+
+  test("treats an all-cancelled Mission as unstaffed while exact Task history remains retrievable", () => {
+    const db = kernel();
+    const { missionId, directorId } = linkedTaskFixture(db, "all-cancelled", ["task-cancelled-only"]);
+    execute(db, "cancel_task", { task_id: "task-cancelled-only" }, { ...trace, actor_session_id: directorId });
+
+    const mission = getResearchWorldProjection(db, { root_type: "mission", root_id: missionId });
+    expect(mission.ok).toBe(true);
+    if (mission.ok) expect(mission.world.missing_lineage).toEqual([{
+      owning_type: "mission", owning_id: missionId, kind: "belongs_to", message: "No linked research Task yet.",
+    }]);
+    const history = getResearchWorldProjection(db, { root_type: "task", root_id: "task-cancelled-only" });
+    expect(history.ok).toBe(true);
+    if (history.ok) {
+      expect(history.world.root).toEqual({ type: "task", id: "task-cancelled-only" });
+      expect(history.world.objects).toEqual([expect.objectContaining({ type: "task", id: "task-cancelled-only", fields: expect.objectContaining({ status: "cancelled" }) })]);
+    }
+    closeKernel(db);
+  });
+
+  test("refuses multiple eligible Tasks without counting a cancelled decoy or choosing by sort order", () => {
+    const db = kernel();
+    const { missionId, directorId } = linkedTaskFixture(db, "ambiguous-live", ["task-z-live", "task-a-live", "task-cancelled-decoy"]);
+    execute(db, "cancel_task", { task_id: "task-cancelled-decoy" }, { ...trace, actor_session_id: directorId });
+
+    expect(getResearchWorldProjection(db, { root_type: "mission", root_id: missionId })).toEqual({
+      ok: false, code: "WORLD_ROOT_INELIGIBLE",
+      message: "Mission has 2 linked research Tasks; choose one before revealing the world.",
+    });
     closeKernel(db);
   });
 

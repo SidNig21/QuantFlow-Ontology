@@ -47,6 +47,9 @@ test("the ready Director is retired only when its real participant surface exist
 test("rendered shell has no alternate Canvas mode controls or persisted Canvas restoration", async () => {
   const html = await Bun.file(new URL("../index.html", import.meta.url)).text();
   const renderer = await Bun.file(new URL("./renderer.js", import.meta.url)).text();
+  expect(html).toContain('id="canvas-watermark"');
+  expect(html).toContain('aria-hidden="true" focusable="false"');
+  expect(renderer).not.toContain("createFlowCubeWatermark");
   expect(html).not.toMatch(/CURRENT_MISSION|FULL_LINEAGE|research-world-projection|data-dock-mode="HISTORY"/);
   expect(renderer).not.toMatch(/canvasLoadState|canvasSaveState|setInterval\(/);
   expect(renderer).not.toMatch(/createCableController|listConnections|createConnection|deleteConnection/);

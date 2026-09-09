@@ -874,12 +874,20 @@ export function closeAgentSessionRow(sessionId: string): void {
 
 export async function disposeAgentHost(): Promise<void> {
   const teardowns: Promise<unknown>[] = [];
+  const openTaskOwners = new Set(kernelListTaskAssignments()
+    .filter((task) => task.status === "open")
+    .map((task) => task.assignedToSessionId));
   for (const [id, entry] of live) {
     if (entry.kind === "native_tui") {
       teardowns.push(
         nativeTuiTeardowns.begin(id, entry as NativeTuiLive, () => {
           const status = String(kernelGetObject("agent_session", id)?.status ?? "");
           if (["closed", "cancelled", "failed"].includes(status)) return;
+          // Match cold reconciliation: stop the runtime, retain unfinished work and its exact owner.
+          if (openTaskOwners.has(id)) {
+            kernelExecute("fail_agent_session", { session_id: id, reason: "app_terminated" }, newTrace());
+            return;
+          }
           kernelExecute(
             "close_agent_session",
             { session_id: id },

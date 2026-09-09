@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, spyOn, test } from "bun:test";
 import { runShutdownLifecycle } from "./shutdown-lifecycle";
 
 test("runtime owner closes before PTY transport and shutdown reaches Kernel close", async () => {
@@ -33,4 +33,33 @@ test("runtime owner closes before PTY transport and shutdown reaches Kernel clos
   expect(calls).toEqual([
     "agents", "ptys", "sidecar", "watcher", "git-replay", "rpc", "image", "kernel",
   ]);
+});
+
+test("one cleanup failure cannot skip the remaining owned helpers or Kernel close", async () => {
+  const steps = ["disposeAgentHost", "killAllPtysAndWait", "shutdownPtySidecarIfIdle", "stopWatcher", "stopGitReplay", "stopJsonRpcServer", "stopImageWorker", "closeKernel"] as const;
+  const errors = spyOn(console, "error").mockImplementation(() => {});
+  try {
+    for (const failedStep of steps) {
+      const calls: string[] = [];
+      const cleanup = (step: string) => () => {
+        calls.push(step);
+        if (step === failedStep) throw new Error(`injected ${step} failure`);
+      };
+      await runShutdownLifecycle({
+        disposeAgentHost: async () => cleanup("disposeAgentHost")(),
+        killAllPtysAndWait: async () => cleanup("killAllPtysAndWait")(),
+        shutdownPtySidecarIfIdle: async () => cleanup("shutdownPtySidecarIfIdle")(),
+        stopWatcher: cleanup("stopWatcher"),
+        stopGitReplay: cleanup("stopGitReplay"),
+        stopJsonRpcServer: cleanup("stopJsonRpcServer"),
+        stopImageWorker: cleanup("stopImageWorker"),
+        closeKernel: cleanup("closeKernel"),
+      });
+      expect(calls).toEqual([...steps]);
+      expect(errors.mock.calls.at(-1)?.[0]).toContain(failedStep);
+    }
+    expect(errors).toHaveBeenCalledTimes(steps.length);
+  } finally {
+    errors.mockRestore();
+  }
 });

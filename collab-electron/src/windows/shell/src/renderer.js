@@ -174,6 +174,8 @@ async function init() {
 		layerEl: document.getElementById("handoff-layer"),
 		viewportState,
 		getTiles: () => tiles,
+		getTileElement: (tileId) => tileManager.getTileDOMs().get(tileId)?.container ?? null,
+		getFullscreenTileId: () => tileManager.getFullscreenTileId(),
 	});
 
 	// -- State --
@@ -494,6 +496,7 @@ async function init() {
 		onReposition: () => {
 			viewport.redrawGrid();
 			minimapRef?.update();
+			handoffLayer.update();
 			// D2: geometry-only redraw while dragging — do not re-fetch Kernel rows per frame.
 			cableOverlay?.redraw();
 		},

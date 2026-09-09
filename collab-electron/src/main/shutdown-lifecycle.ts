@@ -13,12 +13,16 @@ export type ShutdownLifecycleDependencies = {
 export async function runShutdownLifecycle(
   dependencies: ShutdownLifecycleDependencies,
 ): Promise<void> {
-  await dependencies.disposeAgentHost();
-  await dependencies.killAllPtysAndWait();
-  await dependencies.shutdownPtySidecarIfIdle();
-  dependencies.stopWatcher();
-  dependencies.stopGitReplay();
-  dependencies.stopJsonRpcServer();
-  dependencies.stopImageWorker();
-  dependencies.closeKernel();
+  // Cleanup is ordered, but one failed owner must not strand every later helper.
+  const steps = [
+    "disposeAgentHost", "killAllPtysAndWait", "shutdownPtySidecarIfIdle",
+    "stopWatcher", "stopGitReplay", "stopJsonRpcServer", "stopImageWorker", "closeKernel",
+  ] as const;
+  for (const step of steps) {
+    try {
+      await dependencies[step]();
+    } catch (error) {
+      console.error(`QuantFlow shutdown: ${step} failed; continuing remaining cleanup`, error);
+    }
+  }
 }

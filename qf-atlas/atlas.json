@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "5b7a55f3",
+    "commit": "99f37de0",
     "generatedAt": "2026-09-09",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "90681cdda059d81d"
+    "fingerprint": "6c4a74bf4de4ee1a"
   },
   "stats": {
     "live": 108,
@@ -409,9 +409,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 569
+      "files": 570
     },
-    "coverageFiles": 569,
+    "coverageFiles": 570,
     "ownership": {
       "responsibilities": 10,
       "contested": 7,
@@ -1076,7 +1076,7 @@
       "id": "2:collab-electron/src/main::agent",
       "layer": 2,
       "name": "agent*",
-      "kb": 32.8,
+      "kb": 33.2,
       "x": -0.91,
       "z": 2.48,
       "status": "ok",
@@ -1087,7 +1087,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/agent-host.ts",
-          "kb": 28.3,
+          "kb": 28.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1821,7 +1821,7 @@
       "id": "2:collab-electron/src/main::market",
       "layer": 2,
       "name": "main/market*",
-      "kb": 25.6,
+      "kb": 25.8,
       "x": -1.69,
       "z": -2.03,
       "status": "ok",
@@ -1842,7 +1842,7 @@
         },
         {
           "path": "collab-electron/src/main/market-analysis.ts",
-          "kb": 8.9,
+          "kb": 9.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2076,7 +2076,7 @@
       "id": "2:collab-electron/src/main::research",
       "layer": 2,
       "name": "research*",
-      "kb": 46.1,
+      "kb": 46.2,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -2087,7 +2087,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/research-world-projection.ts",
-          "kb": 45,
+          "kb": 45.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2893,7 +2893,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 59.3,
+      "kb": 59.5,
       "x": 1.01,
       "z": 0.85,
       "status": "ice",
@@ -2904,7 +2904,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 59.3,
+          "kb": 59.5,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5406,7 +5406,7 @@
       "id": "4:residue",
       "layer": 4,
       "name": "68 small modules*",
-      "kb": 147.7,
+      "kb": 149.1,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -5506,6 +5506,16 @@
           "executes": 0
         },
         {
+          "path": "collab-electron/src/windows/shell/src/handoff-layer.js",
+          "kb": 5,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "collab-electron/packages/components/src/Editor/WikiLink.tsx",
           "kb": 4.8,
           "spawns": 0,
@@ -5577,16 +5587,6 @@
         },
         {
           "path": "collab-electron/packages/components/src/TreeView/useFileTree.ts",
-          "kb": 3.6,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/shell/src/handoff-layer.js",
           "kb": 3.6,
           "spawns": 0,
           "spawnsLive": 0,
@@ -6104,7 +6104,7 @@
       "id": "2:residue",
       "layer": 2,
       "name": "44 small modules*",
-      "kb": 113.1,
+      "kb": 113.3,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6424,6 +6424,16 @@
           "executes": 0
         },
         {
+          "path": "collab-electron/src/main/shutdown-lifecycle.ts",
+          "kb": 1,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "collab-electron/scripts/fix-artifacts.cjs",
           "kb": 0.9,
           "spawns": 0,
@@ -6436,16 +6446,6 @@
         {
           "path": "collab-electron/scripts/local-bin.mjs",
           "kb": 0.9,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/main/shutdown-lifecycle.ts",
-          "kb": 0.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -11587,9 +11587,9 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelRequestGovernedReview() at line 1019",
-            "exports kernelGovernedReviewContextForSession() at line 1119",
-            "exports kernelGovernedReviewNextSequence() at line 1129"
+            "exports kernelRequestGovernedReview() at line 1020",
+            "exports kernelGovernedReviewContextForSession() at line 1120",
+            "exports kernelGovernedReviewNextSequence() at line 1130"
           ],
           "strong": [],
           "weight": "weak"
@@ -16973,17 +16973,19 @@
       "path": "collab-electron/src/main/shutdown-lifecycle.ts",
       "worst": "unsupported",
       "imports": "indexed",
-      "reach": "indexed",
+      "reach": "partial",
+      "blockers": {
+        "reach": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
       "reasons": {
+        "reach": "1 call(s) with a computed callee (line 23 in runShutdownLifecycle) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -18547,6 +18549,31 @@
     },
     {
       "path": "collab-electron/src/windows/shell/src/handoff-layer.test.js",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "unsupported",
+      "reasons": {
+        "reach": "no reach row was produced for this path",
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/handoff-layer.test.ts",
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
@@ -25489,43 +25516,43 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 565,
+      "indexed": 566,
       "dynamic": 4
     },
     "ipcRequest": {
       "not-applicable": 281,
-      "indexed": 285,
+      "indexed": 286,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 559,
+      "not-applicable": 560,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 513,
+      "not-applicable": 514,
       "partial": 31,
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 501,
+      "not-applicable": 502,
       "partial": 63,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 235,
+      "not-applicable": 236,
       "unsupported": 106,
       "indexed": 228
     },
     "ownership": {
       "not-applicable": 188,
-      "unsupported": 360,
+      "unsupported": 361,
       "indexed": 21
     },
     "reach": {
-      "unsupported": 339,
-      "indexed": 227,
-      "partial": 3
+      "unsupported": 340,
+      "indexed": 226,
+      "partial": 4
     }
   },
   "unexplainedCoverage": [],
@@ -58802,16 +58829,16 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "d6b5b454",
+      "commit": "5b7a55f3",
       "generatedAt": "2026-09-09"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "5b7a55f3",
+      "commit": "99f37de0",
       "generatedAt": "2026-09-09"
     },
-    "verdict": "better",
-    "why": "37 improvement(s), nothing added or hidden",
+    "verdict": "worse",
+    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -59078,7 +59105,16 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [],
+    "changedCoverage": [
+      {
+        "path": "collab-electron/src/main/shutdown-lifecycle.ts",
+        "analyzer": "reach",
+        "from": "indexed",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "1 call(s) with a computed callee (line 23 in runShutdownLifecycle) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced"
+      }
+    ],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -59086,7 +59122,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 0,
+      "coverageWorse": 1,
       "coverageBetter": 0,
       "undecidedFrom": 37,
       "undecidedTo": null

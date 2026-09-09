@@ -48,6 +48,9 @@ mock.module("./kernel", () => ({
         task.result_artifact_id = input.result_artifact_id;
       }
     } else if (command === "close_agent_session") {
+      if (taskAssignments.some((task) => task.status === "open" && task.assignedToSessionId === id)) {
+        throw new Error("Reassign or cancel this task before closing the seat.");
+      }
       const session = sessions.get(id);
       if (session) session.status = "closed";
     } else if (command === "cancel_agent_session") {
@@ -272,6 +275,26 @@ describe("agent-host native-TUI lifecycle admission", () => {
     expect(roles.get("orchestrator")).toBeUndefined();
     expect((kernelGetObject("agent_session", id) as { status: string }).status).toBe("closed");
     pendingResults.delete(id);
+  });
+
+  test("application disposal terminates an unfinished Task's runtime without erasing or completing its work", async () => {
+    const id = "disposal-open-owner";
+    const taskId = "disposal-unfinished-task";
+    await admitSession(id);
+    tasks.set(taskId, { id: taskId, status: "open", title: "Unpublished research" });
+    taskAssignments.push({ taskId, status: "open", assignedToSessionId: id, delegatedBySessionId: "director" });
+    const { disposeAgentHost, hasLiveAgentSession, closeAgentSessionRow } = await import("./agent-host");
+    expect(() => closeAgentSessionRow(id)).toThrow("Reassign or cancel");
+    kernelCommands.length = 0;
+    const before = teardownCalls;
+    await disposeAgentHost();
+    expect(teardownCalls).toBe(before + 1);
+    expect(hasLiveAgentSession(id)).toBe(false);
+    expect(sessions.get(id)?.status).toBe("failed");
+    expect(tasks.get(taskId)?.status).toBe("open");
+    expect(taskAssignments.find((task) => task.taskId === taskId)?.assignedToSessionId).toBe(id);
+    expect(kernelCommands).toEqual([{ command: "fail_agent_session", input: { session_id: id, reason: "app_terminated" } }]);
+    taskAssignments.splice(0, taskAssignments.length);
   });
 
   test("application disposal does not wait forever for a wedged runtime", async () => {

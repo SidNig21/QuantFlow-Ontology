@@ -25,3 +25,30 @@ Related surface correction in the same candidate: Bovada now opens through the s
 - Read-only measurement: the complete packet is 16,519 bytes against 16,384 allowed. Comparisons use 6,503 bytes; two complete official evidence entries use 8,725. Repeated per-selection cutoff, observation time and unavailable-probability explanation consume space without adding facts.
 - Repair retains the same limit and every fact/selection: factor only byte-equal shared comparison fields into explicit inherited context. Reconstruction must reproduce every full original comparison. No truncation, probability invention, changed acquisition or provider call is involved.
 - Provider/model, response and Critic acceptance are **not proved** by this failed attempt. No isolated roots or founder data were destroyed. Final process cleanup and successful loop remain pending.
+
+## Native replay — assessment publication RED, 2026-09-09 UTC
+
+- Package `99f37de0efcef294545868afeb17a19340fc8ec0`, reopened from the desktop shortcut. Same saved Mission `3f2ee28c-9797-469c-80ac-554472bd6d14`.
+- Task `task-d9d3504e-b3cf-4c2b-9c0b-a0182ccbed11`; worker `1d5fdff1-b25b-4002-9870-96dc6afeee40`; Run `analysis:e5011301-9d60-4ada-ac9c-47935bb41fab`; calculation Artifact `86c075b8a9d8879b8a7c543869ceca80414559509f629d11a893b2fadada742d`.
+- The repaired prompt preflight passed. Native Computer Use observed the real bounded prompt, 11 governed evidence reads, and two `send_result` calls. Safe runtime usage lines identify `openai-codex`, `gpt-5.6-luna`, API call 1 (2,459 input / 705 output tokens) and call 2 (9,191 input / 2,415 output tokens).
+- Both returns failed with `market decision has missing or foreign fields`. The worker stopped as instructed. Read-only Kernel observation found Task open, worker running, no frozen source-work row and no review Task. Real research occurred; publication, Critic, Evaluation and final answer did not.
+- Cause proved in code and regression: `kernelCompleteMarketAssessment` expanded the nine-field participant judgment but omitted required `market_availability` from the full decision. The validator correctly refused that product-generated omission. This was not a failure to understand the nine-field prompt.
+- Test gap repaired: the existing test assembled a separate full decision and never committed the actual expanded assessment. Committing the adapter output reproduced the exact live error; copying the exact existing context field made the composed publication/review/report test pass. Validator requirements remain unchanged.
+- Separate observed display defect: a previously cancelled Task was counted against the new open Task, returning `Mission has 2 linked research Tasks`. Current selection now excludes cancelled Tasks while preserving their exact history; multiple noncancelled Tasks still refuse ambiguity.
+- Ryan requested a first-hand diagnostic reply from Hermes. It reported clear judgment formatting, unhelpful generic rejection messages, limited descriptive evidence, and a contradictory instruction to copy numeric tables into bounded judgment fields. The duplication instruction is removed; required exact reads and Kernel-owned comparisons remain.
+- The Canvas logo is restored as a quiet, noninteractive cube and wordmark, without restoring the old continuous animation. Native validation of the updated package remains pending. No user data was deleted and no bet was placed.
+
+## Native close — unfinished-work owner RED
+
+- Closing the `99f37de0` window normally removed the window but left the same QuantFlow process family running. Main log at `2026-09-08 23:14:43.528` records `Unhandled rejection: KernelError: Reassign or cancel this task before closing the seat.`
+- `disposeAgentHost` called `close_agent_session` synchronously before runtime teardown. Its promise `.catch` could not catch the synchronous refusal, so app-wide PTY/sidecar cleanup never ran.
+- Repair matches existing cold reconciliation: an open Task's runtime becomes `failed` with `app_terminated`, while its Task, owner, evidence and assignment remain unchanged. Idle seats still close. The explicit single-seat close guard is unchanged and still refuses an open owner.
+- Regression strengthened the lifecycle mock to enforce the real open-owner guard, reproduced the exact failure, then passed normal disposal plus retention assertions. Lifecycle/shutdown focused suite: 9 pass, 47 assertions.
+- Recovery of the already-stuck old process used its existing `sidecar.shutdown`, then `app.shutdown` endpoints. Both acknowledged; subsequent native process inspection found zero QuantFlow processes. This API recovery is **not** a successful native UI-close proof; that remains required on the repaired package.
+- The shutdown sequence also continues remaining cleanup after any individual step rejects or throws, while logging that failure. An injected owner failure first reproduced the early exit; the repaired test injects failure into each of the eight cleanup steps and proves every remaining step is attempted in order. This is cleanup resilience, not proof that a failed helper terminated; native zero-process inspection is still required.
+
+## Delegation cable attachment repair
+
+- The native screenshot showed the green delegation line floating away from its two participant tiles after a drag. The separate handoff layer was not redrawn by the shared tile reposition callback.
+- Drag, resize and TIDY now redraw that layer through the existing callback. Endpoints use actual rendered connection-port centers; absent, hidden or fullscreen-suppressed endpoints produce no cable. No polling, new geometry store or Kernel change was added.
+- Focused cable/shared-tile checks: 10 tests, 47 assertions. Together with the assessment, saved-task projection and one-Canvas checks: 25 tests, 296 assertions. Native attachment replay remains pending on the new package.

@@ -143,7 +143,8 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   expect(() => commit(arbitrary)).toThrow("probability method provenance");
   expect(kernelGetObject("task", taskId)?.status).toBe("open");
   expect(() => commit(decision, receipts.slice(1))).toThrow("complete exact input set");
-  const completed = commit(decision);
+  // Exercise the real assessment adapter, not a separately assembled full-decision fixture.
+  const completed = commit(completedAssessment);
   expect(kernelGetObject("task", taskId)?.status).toBe("done");
   expect(kernelGetObject("artifact", completed.artifactId)?.kind).toBe("trajectory");
   kernelExecute("register_agent_definition", { name: "hermes-critic", role: "critic", package_ref: "species/hermes/packed/hermes.aospkg", runtime_profile: "default", capability_groups: ["research.evaluate"] }, trace());
@@ -166,7 +167,8 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   const publishedDecision = JSON.parse(readFileSync(String(report.storage_ref), "utf8")).decision;
   expect(publishedDecision.classification).toBe("WATCH");
   expect(publishedDecision.selection_id).toBeNull();
-  expect(publishedDecision.selection_reason).toContain("absent");
+  expect(publishedDecision.selection_reason).toBe(assessment.selection_reason);
+  expect(publishedDecision.market_availability).toEqual(identity.market_availability);
   const projection = kernelGetResearchWorldProjection({ root_type: "mission", root_id: mission.mission_id });
   expect(projection.ok && projection.world.objects.some((row) => row.fields.market_decision)).toBe(true);
   closeAppKernel(); openAppKernel();

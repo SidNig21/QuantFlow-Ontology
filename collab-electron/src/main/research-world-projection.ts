@@ -578,7 +578,9 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
       link.kind === "belongs_to" &&
       link.to_id === request.root_id &&
       objectType(snapshot, link.from_id) === "task"
-    ).map((link) => link.from_id);
+    ).map((link) => link.from_id).filter((taskId) =>
+      snapshot.rows.get("task")?.get(taskId)?.status !== "cancelled"
+    );
     if (tasks.length > 1) return { ok: false, code: "WORLD_ROOT_INELIGIBLE", message: `Mission has ${tasks.length} linked research Tasks; choose one before revealing the world.` };
     selectedTaskId = tasks[0];
     if (!selectedTaskId) {
