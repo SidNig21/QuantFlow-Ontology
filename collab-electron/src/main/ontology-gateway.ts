@@ -29,6 +29,7 @@ import {
   kernelRecordGovernedToolReceipt,
   kernelDecisionReadScope,
   kernelDecisionModelReadView,
+  kernelMarketReviewArtifactView,
 } from "./kernel";
 import { notifySessionCanvasProjection } from "./session-canvas-projector";
 import { invokePrecreatedStart } from "./precreated-start-ownership";
@@ -171,7 +172,7 @@ export function callOntologyReadTool(
     !Array.isArray(result)
   ) {
     const row = result as Record<string, unknown>;
-    result = {
+    result = kernelMarketReviewArtifactView(row, governed.sourceWork) ?? {
       id: row.id,
       created_at: row.created_at,
       kind: row.kind,

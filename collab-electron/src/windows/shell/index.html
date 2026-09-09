@@ -43,17 +43,7 @@
 				</svg>
 			</button>
 			<canvas id="grid-canvas"></canvas>
-			<svg id="canvas-watermark" viewBox="0 0 800 600" aria-hidden="true" focusable="false">
-				<g fill="none" stroke="currentColor" stroke-width="2">
-					<path d="M400 100 555 190 555 370 400 460 245 370 245 190Z M245 190 400 280 555 190 M400 280V460" />
-					<path d="M400 100V280 M245 370 400 280 555 370" stroke-dasharray="7 9" opacity=".4" />
-				</g>
-				<circle cx="400" cy="100" r="6" fill="#B7FF00" />
-				<circle cx="555" cy="370" r="6" fill="#2fe6cf" />
-				<circle cx="245" cy="370" r="6" fill="#c79bff" />
-				<text x="400" y="538" text-anchor="middle">QUANTFLOW</text>
-				<path d="M260 567H540" stroke="#B7FF00" stroke-width="3" />
-			</svg>
+			<div id="canvas-watermark" aria-hidden="true"></div>
 			<svg id="cable-overlay" aria-hidden="true"></svg>
 			<div id="tile-layer"></div>
 			<div id="handoff-layer" aria-live="polite"></div>

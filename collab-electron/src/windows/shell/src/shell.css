@@ -1020,27 +1020,15 @@ body.platform-win {
 	pointer-events: none;
 }
 
-/* Quiet brand mark, not a tile or connection. No continuous animation work. */
 #canvas-watermark {
 	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%);
-	width: min(76%, 680px);
-	max-height: 68%;
+	inset: 0;
 	z-index: 0;
-	color: var(--qf-gl-text);
-	opacity: .16;
 	pointer-events: none;
-	user-select: none;
-}
-
-#canvas-watermark text {
-	fill: currentColor;
-	font-family: var(--qf-sans, system-ui, sans-serif);
-	font-size: 40px;
-	font-weight: 600;
-	letter-spacing: .32em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
 }
 
 /* WO-g5 cable layer — beneath tiles (z6), above grid (z0) */

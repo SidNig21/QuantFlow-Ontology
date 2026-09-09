@@ -8,6 +8,7 @@ import { attachMarquee } from "./tile-interactions.js";
 import { initDarkMode, applyCanvasOpacity } from "./dark-mode.js";
 import { createWebview, isFocusSearchShortcut } from "./webview-factory.js";
 import { createViewport } from "./canvas-viewport.js";
+import { createFlowCubeWatermark } from "../../shared/flow-cube/flow-cube-watermark.js";
 import { createEdgeIndicators } from "./edge-indicators.js";
 import { createMinimap } from "./canvas-minimap.js";
 import { createPanel } from "./panel-manager.js";
@@ -101,6 +102,9 @@ window.shellApi.onPrefChanged((key, value) => {
 // -- Viewport --
 
 const viewport = createViewport(canvasEl, gridCanvas, tiles);
+createFlowCubeWatermark(document.getElementById("canvas-watermark"), {
+	getTileCount: () => tiles.length,
+});
 
 // -- Init --
 

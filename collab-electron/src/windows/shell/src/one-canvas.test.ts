@@ -48,8 +48,11 @@ test("rendered shell has no alternate Canvas mode controls or persisted Canvas r
   const html = await Bun.file(new URL("../index.html", import.meta.url)).text();
   const renderer = await Bun.file(new URL("./renderer.js", import.meta.url)).text();
   expect(html).toContain('id="canvas-watermark"');
-  expect(html).toContain('aria-hidden="true" focusable="false"');
-  expect(renderer).not.toContain("createFlowCubeWatermark");
+  expect(html).toContain('id="canvas-watermark" aria-hidden="true"');
+  expect(renderer).toContain("createFlowCubeWatermark");
+  const watermark = await Bun.file(new URL("../../shared/flow-cube/flow-cube-watermark.js", import.meta.url)).text();
+  expect(watermark).toContain('stage.setAttribute("focusable", "false")');
+  expect(watermark).toContain('prefers-reduced-motion: reduce');
   expect(html).not.toMatch(/CURRENT_MISSION|FULL_LINEAGE|research-world-projection|data-dock-mode="HISTORY"/);
   expect(renderer).not.toMatch(/canvasLoadState|canvasSaveState|setInterval\(/);
   expect(renderer).not.toMatch(/createCableController|listConnections|createConnection|deleteConnection/);

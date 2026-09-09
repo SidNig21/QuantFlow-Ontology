@@ -933,50 +933,95 @@ export function kernelDecisionArtifactView(id: string, _run: Record<string, unkn
   return { id, content_hash: id, content: JSON.parse(bytes.toString("utf8")) };
 }
 
+function sharedComparisonContext(comparisons: unknown[]): Record<string, unknown> {
+  const context: Record<string, unknown> = {};
+  const first = jsonRecord(comparisons[0]);
+  for (const key of ["event_cutoff", "observed_at", "probability", "minimum_decimal_price", "conservative_margin"]) {
+    if (Object.hasOwn(first, key) && comparisons.every((row) => Object.hasOwn(jsonRecord(row), key) && JSON.stringify(jsonRecord(row)[key]) === JSON.stringify(first[key]))) context[key] = first[key];
+  }
+  return context;
+}
+
+/** Agent evidence is complete structured content, not the Canvas preview. */
+export function kernelMarketReviewArtifactView(row: Record<string, unknown>, work: SourceWork): unknown | null {
+  if (row.id !== work.result_artifact_id) return null;
+  const run = kernelGetObject("run", work.run_id);
+  if (!run || jsonRecord(jsonRecord(run.params).decision_context).task_id !== work.source_task_id) return null;
+  const verified = jsonRecord(kernelDecisionArtifactView(work.result_artifact_id, run));
+  const trajectory = jsonRecord(verified.content);
+  const decision = jsonRecord(trajectory.result);
+  if (trajectory.contract !== "qf.collaboration.v1" || trajectory.task_id !== work.source_task_id || trajectory.from_session_id !== work.executor_session_id || decision.contract !== "qf.market.decision.v1") throw new Error("Review Artifact does not contain the exact market decision");
+  if (!Array.isArray(decision.comparisons)) throw new Error("Review Artifact is missing its comparison set");
+  const comparisonContext = sharedComparisonContext(decision.comparisons);
+  // Decode the nested JSON and factor identical row context. This reversible
+  // projection preserves every field/value without repeating it 77 times.
+  const result = {
+    id: row.id, created_at: row.created_at, kind: row.kind, content_hash: row.content_hash,
+    receipt: {
+      artifact_id: row.id, kind: row.kind, content_hash: row.content_hash, durable_bytes_available: true,
+      comparison_context: comparisonContext,
+      comparison_context_rule: "Each content.result.comparisons row inherits comparison_context. Merge these exact shared fields into every row to reconstruct the full stored decision. No rows or values are omitted.",
+      content: { ...trajectory, result: { ...decision, comparisons: decision.comparisons.map((row) => Object.fromEntries(Object.entries(jsonRecord(row)).filter(([key]) => !Object.hasOwn(comparisonContext, key)))) } },
+    },
+  };
+  if (new TextEncoder().encode(JSON.stringify(result)).byteLength > 65_536) throw new Error("Complete review evidence exceeds the model-facing limit");
+  return result;
+}
+
 const MODEL_DECISION_PACKET_MAX_BYTES = 16 * 1024;
+
+function boundedDecisionPacket<T>(packet: T): T {
+  if (new TextEncoder().encode(JSON.stringify(packet)).byteLength > MODEL_DECISION_PACKET_MAX_BYTES) throw new Error("Bounded decision evidence exceeds the model-facing limit");
+  return packet;
+}
 
 /** A bounded model-facing projection of exact decision truth; never durable state. */
 export function kernelDecisionModelReadView(toolName: string, id: string, run: Record<string, unknown>, original: unknown): unknown {
   const params = jsonRecord(run.params);
   const context = jsonRecord(params.decision_context);
-  if (toolName === "qf_artifact_get" && id === params.result_artifact_id) {
-    const result = jsonRecord(kernelDecisionArtifactView(id, run));
+  if ((toolName === "qf_artifact_get" && id === params.result_artifact_id) || toolName === "qf_quote_get") {
+    const result = jsonRecord(kernelDecisionArtifactView(String(params.result_artifact_id), run));
     const content = jsonRecord(result.content);
     const comparisons = Array.isArray(content.comparisons) ? content.comparisons : null;
     const evidence = Array.isArray(context.evidence_facts) ? context.evidence_facts : null;
     if (!comparisons || !evidence) throw new Error("Decision evidence packet requires every declared comparison and evidence fact");
     // Carry identical per-selection context once, without truncating facts or
     // widening the transport bound. Each row inherits these exact fields.
-    const comparisonContext: Record<string, unknown> = {};
-    const first = jsonRecord(comparisons[0]);
-    for (const key of ["event_cutoff", "observed_at", "probability", "minimum_decimal_price", "conservative_margin"]) {
-      if (Object.hasOwn(first, key) && comparisons.every((row) => Object.hasOwn(jsonRecord(row), key) && JSON.stringify(jsonRecord(row)[key]) === JSON.stringify(first[key]))) {
-        comparisonContext[key] = first[key];
-      }
+    const comparisonContext = sharedComparisonContext(comparisons);
+    // All rows for one Quote travel through its already-required governed read.
+    // The immutable calculation hash and global indices bind each partition;
+    // live/current Quote fields never replace this Run's observed inputs.
+    const quoteIds = [...new Set(comparisons.map((row) => String(jsonRecord(row).quote_id)))];
+    const manifest = quoteIds.map((quoteId) => ({
+      quote_id: quoteId,
+      comparison_indices: comparisons.flatMap((row, index) => jsonRecord(row).quote_id === quoteId ? [index] : []),
+    }));
+    if (toolName === "qf_quote_get") {
+      const entry = manifest.find((item) => item.quote_id === id);
+      if (!entry) throw new Error("Decision Quote is outside the exact comparison set");
+      return boundedDecisionPacket({
+        contract: "qf.market.model-quote.v1", id, run_id: run.id, result_artifact_id: params.result_artifact_id,
+        comparison_context: comparisonContext,
+        comparison_context_rule: "Each comparison row inherits comparison_context. comparison_indices give its position in the complete result Artifact comparison set.",
+        comparison_indices: entry.comparison_indices,
+        offered_market_comparisons: entry.comparison_indices.map((index) => Object.fromEntries(Object.entries(jsonRecord(comparisons[index])).filter(([key]) => !Object.hasOwn(comparisonContext, key)))),
+      });
     }
-    const packet = {
-      contract: "qf.market.model-evidence.v1",
+    return boundedDecisionPacket({
+      contract: "qf.market.model-evidence.v2",
       exact_ids: { mission_id: context.mission_id, task_id: context.task_id, worker_session_id: context.worker_session_id, hypothesis_id: context.hypothesis_id, dataset_id: context.dataset_id, run_id: run.id, result_artifact_id: id, inputs: context.inputs },
       exact_counts: { comparisons: comparisons.length, evidence_facts: evidence.length, inputs: Array.isArray(context.inputs) ? context.inputs.length : 0 },
       hypothesis: context.hypothesis,
       method: context.method,
-      comparison_context: comparisonContext,
-      comparison_context_rule: "Every offered_market_comparisons row inherits comparison_context; combine both to read the complete exact comparison.",
-      offered_market_comparisons: comparisons.map((row) => Object.fromEntries(Object.entries(jsonRecord(row)).filter(([key]) => !Object.hasOwn(comparisonContext, key)))),
+      market_availability: context.market_availability,
+      comparison_manifest: manifest,
+      comparison_read_rule: "Read every exact qf_quote_get in comparison_manifest. Each response contains all rows at its declared comparison_indices in this immutable result Artifact. No market or selection may be skipped.",
       official_evidence: evidence,
-    };
-    const text = JSON.stringify(packet);
-    if (new TextEncoder().encode(text).byteLength > MODEL_DECISION_PACKET_MAX_BYTES) throw new Error("Bounded decision evidence exceeds the model-facing limit");
-    return packet;
+    });
   }
   if (toolName === "qf_run_get") return { id: run.id, status: run.status, result_artifact_id: params.result_artifact_id, model_evidence: "Read the exact result Artifact for the bounded evidence packet." };
   if (toolName === "qf_artifact_get") return { id, content_hash: id, model_evidence: "Exact input identity is included in the bounded result packet." };
   if (toolName === "qf_dataset_get") return { id, model_evidence: "Exact Dataset identity is included in the bounded result packet." };
-  if (toolName === "qf_quote_get") {
-    const row = jsonRecord(original);
-    const coverage = jsonRecord(row.coverage);
-    return { id, as_of: row.as_of, observed_at: coverage.observed_at, provider_event_id: coverage.provider_event_id, provider_market_id: coverage.provider_market_id, model_evidence: "Exact offered selections are included in the bounded result packet." };
-  }
   return original;
 }
 

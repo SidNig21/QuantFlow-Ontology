@@ -20,15 +20,20 @@ export function selectionLabel(selection) {
 	return selection.handicap == null ? selection.label : `${selection.label} ${selection.handicap}`;
 }
 
+export function visibleMarketRows(rows, clearHistorical) {
+	return clearHistorical ? rows.filter((row) => row.current) : rows;
+}
+
 export function createMarketDesk({ tileManager, onOpen, onResearch, showStatus } = {}) {
 	const root = element("section", "market-desk-surface");
 	root.setAttribute("aria-label", "Bovada live markets");
-	root.innerHTML = `<header><span class="market-desk-kicker">DATA · BOVADA</span><div class="market-desk-actions"><button type="button" data-market-refresh>Refresh</button></div></header><div class="market-desk-status" role="status" aria-live="polite"></div><div class="market-desk-rows"></div>`;
+	root.innerHTML = `<header><span class="market-desk-kicker">DATA · BOVADA</span><div class="market-desk-actions"><button type="button" data-market-clear-history title="Clear historical and superseded rows from this board only">Clear historical</button><button type="button" data-market-refresh>Refresh</button></div></header><div class="market-desk-status" role="status" aria-live="polite"></div><div class="market-desk-rows"></div>`;
 	const status = root.querySelector(".market-desk-status");
 	const rowsHost = root.querySelector(".market-desk-rows");
 	rowsHost.addEventListener("wheel", (event) => event.stopPropagation());
 	let rows = [];
 	let loading = false;
+	let historicalCleared = false;
 
 	function setStatus(text, tone = "") {
 		status.textContent = text;
@@ -37,11 +42,12 @@ export function createMarketDesk({ tileManager, onOpen, onResearch, showStatus }
 
 	function render() {
 		rowsHost.replaceChildren();
-		if (rows.length === 0) {
+		const visibleRows = visibleMarketRows(rows, historicalCleared);
+		if (visibleRows.length === 0) {
 			rowsHost.appendChild(element("div", "market-desk-empty", "No captured current markets yet."));
 			return;
 		}
-		for (const row of rows) {
+		for (const row of visibleRows) {
 			const state = row.state === "superseded" ? "superseded" : row.current ? "current" : "historical";
 			const stateClass = state === "current" ? "is-current" : state === "superseded" ? "is-superseded" : "is-historical";
 			const card = element("article", `market-row ${stateClass}`);
@@ -177,6 +183,11 @@ export function createMarketDesk({ tileManager, onOpen, onResearch, showStatus }
 	}
 
 	root.querySelector("[data-market-refresh]")?.addEventListener("click", () => void load({ capture: true }));
+	root.querySelector("[data-market-clear-history]")?.addEventListener("click", () => {
+		historicalCleared = true;
+		render();
+		setStatus("Historical rows cleared from this board only. Saved evidence and research remain available.", "ok");
+	});
 	return {
 		open: () => {
 			const tile = tileManager.openCapabilityTile({ id: "bovada-live-markets", title: "Bovada Live Markets", content: root });

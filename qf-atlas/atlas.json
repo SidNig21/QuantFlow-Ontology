@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "99f37de0",
+    "commit": "e5296384",
     "generatedAt": "2026-09-09",
-    "filesScanned": 427,
+    "filesScanned": 428,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "6c4a74bf4de4ee1a"
+    "fingerprint": "fceaca2178dae76c"
   },
   "stats": {
     "live": 108,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 119,
-      "indexed": 1261,
+      "indexed": 1264,
       "downgradedFromCheats": 27,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 21,
@@ -409,9 +409,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 570
+      "files": 572
     },
-    "coverageFiles": 570,
+    "coverageFiles": 572,
     "ownership": {
       "responsibilities": 10,
       "contested": 7,
@@ -757,8 +757,8 @@
       "layer": 4,
       "name": "useWorkspaceFileTree.ts",
       "kb": 9,
-      "x": 3.63,
-      "z": -1.59,
+      "x": 3.87,
+      "z": 0.85,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1694,7 +1694,7 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 87.7,
+      "kb": 90.9,
       "x": 1.01,
       "z": 0.85,
       "status": "gray",
@@ -1705,7 +1705,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 87.7,
+          "kb": 90.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 8,
@@ -1821,7 +1821,7 @@
       "id": "2:collab-electron/src/main::market",
       "layer": 2,
       "name": "main/market*",
-      "kb": 25.8,
+      "kb": 26.2,
       "x": -1.69,
       "z": -2.03,
       "status": "ok",
@@ -1831,8 +1831,8 @@
       "executes": 0,
       "files": [
         {
-          "path": "collab-electron/src/main/market-desk.ts",
-          "kb": 9.3,
+          "path": "collab-electron/src/main/market-analysis.ts",
+          "kb": 9.5,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1841,8 +1841,8 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/src/main/market-analysis.ts",
-          "kb": 9.1,
+          "path": "collab-electron/src/main/market-desk.ts",
+          "kb": 9.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1917,7 +1917,7 @@
       "id": "2:collab-electron/src/main::ontology",
       "layer": 2,
       "name": "ontology*",
-      "kb": 13,
+      "kb": 13.1,
       "x": 1.69,
       "z": 2.03,
       "status": "ok",
@@ -1928,7 +1928,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/ontology-gateway.ts",
-          "kb": 11.6,
+          "kb": 11.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
@@ -2809,9 +2809,9 @@
       "id": "4:collab-electron/src/windows/shell/src::market",
       "layer": 4,
       "name": "market-desk.js",
-      "kb": 8.8,
-      "x": 3.87,
-      "z": 0.85,
+      "kb": 9.4,
+      "x": 3.63,
+      "z": -1.59,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2820,7 +2820,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/market-desk.js",
-          "kb": 8.8,
+          "kb": 9.4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2893,7 +2893,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 59.5,
+      "kb": 59.7,
       "x": 1.01,
       "z": 0.85,
       "status": "ice",
@@ -2904,7 +2904,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 59.5,
+          "kb": 59.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5405,8 +5405,8 @@
     {
       "id": "4:residue",
       "layer": 4,
-      "name": "68 small modules*",
-      "kb": 149.1,
+      "name": "69 small modules*",
+      "kb": 153.8,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -5521,6 +5521,16 @@
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.js",
+          "kb": 4.7,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -8585,11 +8595,11 @@
     {
       "path": "collab-electron/src/main/kernel.ts",
       "status": "partial",
-      "indexedFns": 102,
+      "indexedFns": 105,
       "sqlInText": 7,
       "sqlIndexed": 6,
-      "sqlUnrecognised": 0,
-      "why": "7 SQL site(s) in the text, 6 resolved into a function. The unresolved ones are invisible to governance analysis."
+      "sqlUnrecognised": 1,
+      "why": "8 SQL verb(s) present, 7 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
     },
     {
       "path": "packages/qf-kernel/src/db.ts",
@@ -10267,6 +10277,10 @@
       "status": "out-of-scope"
     },
     {
+      "path": "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.js",
+      "status": "out-of-scope"
+    },
+    {
       "path": "collab-electron/src/windows/shared/PostHogProvider.tsx",
       "status": "out-of-scope"
     },
@@ -11587,9 +11601,9 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelRequestGovernedReview() at line 1020",
-            "exports kernelGovernedReviewContextForSession() at line 1120",
-            "exports kernelGovernedReviewNextSequence() at line 1130"
+            "exports kernelMarketReviewArtifactView() at line 946",
+            "exports kernelRequestGovernedReview() at line 1065",
+            "exports kernelGovernedReviewContextForSession() at line 1165"
           ],
           "strong": [],
           "weight": "weak"
@@ -17962,6 +17976,53 @@
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.js",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "indexed",
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "indexed",
+      "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
+      "reasons": {
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "unsupported",
+      "reasons": {
+        "reach": "no reach row was produced for this path",
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
         "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
       },
       "unexplained": []
@@ -25516,42 +25577,42 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 566,
+      "indexed": 568,
       "dynamic": 4
     },
     "ipcRequest": {
       "not-applicable": 281,
-      "indexed": 286,
+      "indexed": 288,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 560,
+      "not-applicable": 562,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 514,
+      "not-applicable": 516,
       "partial": 31,
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 502,
+      "not-applicable": 504,
       "partial": 63,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 236,
+      "not-applicable": 237,
       "unsupported": 106,
-      "indexed": 228
+      "indexed": 229
     },
     "ownership": {
       "not-applicable": 188,
-      "unsupported": 361,
+      "unsupported": 363,
       "indexed": 21
     },
     "reach": {
-      "unsupported": 340,
-      "indexed": 226,
+      "unsupported": 341,
+      "indexed": 227,
       "partial": 4
     }
   },
@@ -27797,6 +27858,16 @@
       "importCount": 6
     },
     {
+      "path": "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.js",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/shell/src/renderer.js"
+      ],
+      "importerCount": 1,
+      "imports": [],
+      "importCount": 0
+    },
+    {
       "path": "collab-electron/src/windows/shared/PostHogProvider.tsx",
       "reach": "reachable",
       "importers": [
@@ -28026,15 +28097,15 @@
         "collab-electron/src/windows/shell/src/dark-mode.js",
         "collab-electron/src/windows/shell/src/webview-factory.js",
         "collab-electron/src/windows/shell/src/canvas-viewport.js",
+        "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.js",
         "collab-electron/src/windows/shell/src/edge-indicators.js",
         "collab-electron/src/windows/shell/src/canvas-minimap.js",
         "collab-electron/src/windows/shell/src/panel-manager.js",
         "collab-electron/src/windows/shell/src/workspace-manager.js",
         "collab-electron/src/windows/shell/src/canvas-rpc.js",
-        "collab-electron/src/windows/shell/src/tile-manager.js",
-        "collab-electron/src/windows/shell/src/tile-renderer.js"
+        "collab-electron/src/windows/shell/src/tile-manager.js"
       ],
-      "importCount": 25
+      "importCount": 26
     },
     {
       "path": "collab-electron/src/windows/shell/src/research-workflow.js",
@@ -32848,6 +32919,19 @@
       "affectedProcesses": [],
       "packaged": "build-declared"
     },
+    "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.js": {
+      "reach": "reachable",
+      "directDependents": [
+        "collab-electron/src/windows/shell/src/renderer.js"
+      ],
+      "transitiveDependents": [],
+      "transitiveTruncated": false,
+      "directDependencies": [],
+      "affectedWires": [],
+      "affectedLoops": [],
+      "affectedProcesses": [],
+      "packaged": "bundled-via-import"
+    },
     "collab-electron/src/windows/shared/PostHogProvider.tsx": {
       "reach": "reachable",
       "directDependents": [
@@ -33143,6 +33227,7 @@
         "collab-electron/src/windows/shell/src/dark-mode.js",
         "collab-electron/src/windows/shell/src/webview-factory.js",
         "collab-electron/src/windows/shell/src/canvas-viewport.js",
+        "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.js",
         "collab-electron/src/windows/shell/src/edge-indicators.js",
         "collab-electron/src/windows/shell/src/canvas-minimap.js",
         "collab-electron/src/windows/shell/src/panel-manager.js",
@@ -58829,16 +58914,16 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "5b7a55f3",
+      "commit": "99f37de0",
       "generatedAt": "2026-09-09"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "99f37de0",
+      "commit": "e5296384",
       "generatedAt": "2026-09-09"
     },
-    "verdict": "worse",
-    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
+    "verdict": "better",
+    "why": "37 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -59105,16 +59190,7 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [
-      {
-        "path": "collab-electron/src/main/shutdown-lifecycle.ts",
-        "analyzer": "reach",
-        "from": "indexed",
-        "to": "partial",
-        "direction": "worse",
-        "reason": "1 call(s) with a computed callee (line 23 in runShutdownLifecycle) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced"
-      }
-    ],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -59122,7 +59198,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 1,
+      "coverageWorse": 0,
       "coverageBetter": 0,
       "undecidedFrom": 37,
       "undecidedTo": null

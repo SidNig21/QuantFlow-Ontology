@@ -2,9 +2,10 @@ import { afterAll, expect, test, mock } from "bun:test";
 import { mkdtempSync, mkdirSync, rmSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { createHash } from "node:crypto";
 import { runBovadaLiveMarketsCapture, BOVADA_UFC_URL } from "qf-bovada-football";
 mock.module("electron", () => ({ BrowserWindow: { getAllWindows: () => [] } }));
-import { openAppKernel, closeAppKernel, getKernelDb, kernelExecute, kernelGetObject, kernelGetLinks, kernelDecisionReadScope, kernelDecisionArtifactView, kernelDecisionModelReadView, kernelCompleteMarketAssessment, kernelBindSourceWork, commitCollaborationResult, kernelRequestGovernedReview, kernelMarkGovernedDelivery, kernelFinalizeResearchEvaluation, kernelGetResearchWorldProjection, kernelReadMarketTrajectoryResult } from "./kernel";
+import { openAppKernel, closeAppKernel, getKernelDb, kernelExecute, kernelGetObject, kernelGetLinks, kernelDecisionReadScope, kernelDecisionArtifactView, kernelDecisionModelReadView, kernelMarketReviewArtifactView, kernelCompleteMarketAssessment, kernelBindSourceWork, commitCollaborationResult, kernelRequestGovernedReview, kernelMarkGovernedDelivery, kernelFinalizeResearchEvaluation, kernelGetResearchWorldProjection, kernelReadMarketTrajectoryResult } from "./kernel";
 import { addOfficialEvidence } from "./evidence-computation";
 import { createMarketDeskInvestigation } from "./market-desk";
 import { createMarketFailureReceiver, recordMarketRuntimeFailure, assertMarketRetryTask } from "./market-runtime-failure";
@@ -27,14 +28,27 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
     { id: "winner", description: "Fight Winner", key: "2W-12", status: "O", period, outcomes: competitors.map((row, index) => ({ id: `selection-${index}`, description: row.name, competitorId: row.id, status: "O", type: index ? "A" : "H", price: { american: index ? "+185" : "-225", decimal: index ? "2.85" : "1.444444", fractional: index ? "37/20" : "4/9" } })) },
     { id: "total", description: "Main Total Rounds Over/Under", key: "2W-OU", status: "O", period, outcomes: ["Over", "Under"].map((name, index) => ({ id: `total-${index}`, description: name, status: "O", type: index ? "U" : "O", price: { american: index ? "+300" : "-450", decimal: index ? "4" : "1.222222", fractional: index ? "3/1" : "2/9", handicap: "2.5" } })) },
   ] }] }] }];
+  // Match the expanded live menu shape: 18 markets and 77 selections, not only
+  // the original four-outcome entrance. Every outcome must reach the worker.
+  const event = source[0]!.events[0]!;
+  for (let market = 0; market < 16; market++) {
+    event.displayGroups[0]!.markets.push({
+      id: `finish-${market}`, description: `Synthetic finish market ${market}`, key: "MW-ML", status: "O", period,
+      outcomes: Array.from({ length: market === 15 ? 13 : 4 }, (_, outcome) => ({
+        id: `finish-${market}-${outcome}`, description: `Synthetic finish expression ${market}-${outcome}`, status: "O", type: "N",
+        price: { american: "+400", decimal: "5", fractional: "4/1" },
+      })),
+    });
+  }
+  event.numMarkets = 19;
   const capture = await runBovadaLiveMarketsCapture({ db: getKernelDb(), artifactRoot: process.env.QF_ARTIFACT_ROOT!, request: { sport: "ufc", competition: "ufc", market_class: "moneyline" }, provider_event_id: "29195963", requested_expression: { expression: "Alexa Grasso wins by submission", market_description: "Method of Victory", outcome_description: "Alexa Grasso by Submission" }, transport: async () => response(BOVADA_UFC_URL, JSON.stringify(source)), now: () => now, kernel: { execute: (_db, command, input, t) => kernelExecute(command, input, t), getObject: (_db, type, id) => kernelGetObject(type, id), getLinks: (_db, id, options) => kernelGetLinks(id, options) } });
-  expect(capture.rows).toHaveLength(2);
+  expect(capture.rows).toHaveLength(18);
   expect(capture.menu.requested_expression).toMatchObject({
     status: "availability_unknown",
     selection_ids: [],
     observed_at: now.toISOString(),
   });
-  expect(capture.menu.completeness).toMatchObject({ status: "provider_reports_additional_markets", provider_reported_market_count: 3, returned_unique_market_count: 2 });
+  expect(capture.menu.completeness).toMatchObject({ status: "provider_reports_additional_markets", provider_reported_market_count: 19, returned_unique_market_count: 18 });
   expect(capture.menu.requested_expression.reason).toContain("not confirmed");
   const quoteId = capture.rows[0]!.quote_id;
   const mission = createMarketDeskInvestigation({ quote_id: quoteId, name: "Synthetic decision control", objective: "Test exact lineage" });
@@ -82,15 +96,31 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   expect(kernelDecisionArtifactView(capture.artifact_id, scope.run)).toEqual({ id: capture.artifact_id, content_hash: capture.artifact_id, content: source });
   const boundedPacket = kernelDecisionModelReadView("qf_artifact_get", String(run.state.result_artifact_id), scope.run, null) as Record<string, unknown>;
   expect(new TextEncoder().encode(JSON.stringify(boundedPacket)).byteLength).toBeLessThanOrEqual(16 * 1024);
-  expect(boundedPacket.contract).toBe("qf.market.model-evidence.v1");
+  expect(boundedPacket.contract).toBe("qf.market.model-evidence.v2");
   const fullCalculation = (kernelDecisionArtifactView(String(run.state.result_artifact_id), scope.run) as { content: { comparisons: unknown[] } }).content;
-  const compactRows = boundedPacket.offered_market_comparisons as Record<string, unknown>[];
-  const comparisonContext = boundedPacket.comparison_context as Record<string, unknown>;
-  expect(compactRows.map((row) => ({ ...comparisonContext, ...row }))).toEqual(fullCalculation.comparisons);
-  expect(compactRows).toHaveLength(fullCalculation.comparisons.length);
-  expect(comparisonContext).toHaveProperty("event_cutoff");
-  expect(comparisonContext).not.toHaveProperty("raw_break_even");
-  expect(compactRows.every((row) => typeof row.selection_id === "string" && typeof row.quote_id === "string")).toBe(true);
+  expect(fullCalculation.comparisons).toHaveLength(77);
+  expect(boundedPacket.exact_counts).toMatchObject({ comparisons: 77 });
+  expect(boundedPacket.market_availability).toEqual(capture.menu.requested_expression && JSON.parse(String(scope.run.params)).decision_context.market_availability);
+  const manifest = boundedPacket.comparison_manifest as Array<{ quote_id: string; comparison_indices: number[] }>;
+  expect(manifest).toHaveLength(18);
+  const indices = manifest.flatMap((entry) => entry.comparison_indices);
+  expect([...indices].sort((a, b) => a - b)).toEqual(Array.from({ length: 77 }, (_, index) => index));
+  expect(new Set(indices).size).toBe(77);
+  const reconstructed: unknown[] = [];
+  for (const entry of manifest) {
+    // The immutable Run projection must ignore a different current Quote value.
+    const packet = kernelDecisionModelReadView("qf_quote_get", entry.quote_id, scope.run, { id: entry.quote_id, as_of: "foreign", coverage: { provider_event_id: "foreign" } }) as { contract: string; result_artifact_id: string; comparison_indices: number[]; comparison_context: Record<string, unknown>; offered_market_comparisons: Record<string, unknown>[] };
+    expect(Buffer.byteLength(JSON.stringify(packet))).toBeLessThanOrEqual(16 * 1024);
+    expect(packet.contract).toBe("qf.market.model-quote.v1");
+    expect(packet.result_artifact_id).toBe(run.state.result_artifact_id);
+    expect(packet.comparison_indices).toEqual(entry.comparison_indices);
+    expect(packet.offered_market_comparisons).toHaveLength(entry.comparison_indices.length);
+    expect(packet.comparison_context).toHaveProperty("event_cutoff");
+    expect(packet.comparison_context).not.toHaveProperty("raw_break_even");
+    packet.offered_market_comparisons.forEach((row, index) => { reconstructed[packet.comparison_indices[index]!] = { ...packet.comparison_context, ...row }; });
+  }
+  expect(reconstructed).toEqual(fullCalculation.comparisons);
+  expect(() => kernelDecisionModelReadView("qf_quote_get", "foreign", scope.run, null)).toThrow("outside the exact comparison set");
   expect(JSON.stringify(boundedPacket)).not.toContain(String(sourceArtifact.storage_ref));
   const manyFactsRun = structuredClone(scope.run);
   const manyFactsParams = JSON.parse(String(manyFactsRun.params));
@@ -102,6 +132,17 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   const oversizeRun = structuredClone(manyFactsRun); const oversizeParams = JSON.parse(String(oversizeRun.params));
   oversizeParams.decision_context.evidence_facts = Array.from({ length: 13 }, (_, index) => ({ fact: `declared-${index}-${"x".repeat(1400)}` })); oversizeRun.params = JSON.stringify(oversizeParams);
   expect(() => kernelDecisionModelReadView("qf_artifact_get", String(run.state.result_artifact_id), oversizeRun, null)).toThrow("exceeds the model-facing limit");
+  const largeComparison = structuredClone(fullCalculation);
+  (largeComparison.comparisons[0] as Record<string, unknown>).label = "x".repeat(20_000);
+  const largeBytes = JSON.stringify(largeComparison);
+  const largeHash = createHash("sha256").update(largeBytes).digest("hex");
+  const largePath = join(process.env.QF_ARTIFACT_ROOT!, "oversized-quote.json");
+  writeFileSync(largePath, largeBytes);
+  kernelExecute("publish_artifact", { kind: "trajectory", path: largePath, storage_ref: largePath, content_hash: largeHash }, trace());
+  const largeRun = { ...scope.run, params: JSON.stringify({ ...JSON.parse(String(scope.run.params)), result_artifact_id: largeHash }) };
+  // The shared packet can fit while one complete Quote cannot: both must be preflighted.
+  expect(() => kernelDecisionModelReadView("qf_artifact_get", largeHash, largeRun, null)).not.toThrow();
+  expect(() => kernelDecisionModelReadView("qf_quote_get", manifest[0]!.quote_id, largeRun, null)).toThrow("exceeds the model-facing limit");
   const sourceBytes = readFileSync(String(sourceArtifact.storage_ref));
   try {
     writeFileSync(String(sourceArtifact.storage_ref), JSON.stringify(capture.menu));
@@ -143,6 +184,7 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   expect(() => commit(arbitrary)).toThrow("probability method provenance");
   expect(kernelGetObject("task", taskId)?.status).toBe("open");
   expect(() => commit(decision, receipts.slice(1))).toThrow("complete exact input set");
+  expect(() => commit(decision, receipts.slice(0, -1))).toThrow("complete exact input set");
   // Exercise the real assessment adapter, not a separately assembled full-decision fixture.
   const completed = commit(completedAssessment);
   expect(kernelGetObject("task", taskId)?.status).toBe("done");
@@ -157,7 +199,34 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   expect(pendingReview.ok && pendingReview.world.objects.some((object) => object.id === "critic")).toBe(true);
   expect(pendingReview.ok && pendingReview.world.objects.some((object) => object.type === "evaluation")).toBe(false);
   const critic = { sessionId: "critic", role: "critic" };
-  for (const [tool, id] of [["qf_hypothesis_get", hypothesis.object_id], ["qf_run_get", "decision-run"], ["qf_artifact_get", completed.artifactId]]) callOntologyReadTool(critic, tool!, { id });
+  const reviewArtifact = kernelGetObject("artifact", completed.artifactId)!;
+  const reviewBytes = readFileSync(String(reviewArtifact.storage_ref));
+  expect(reviewBytes.byteLength).toBeGreaterThan(65_536);
+  const readsBefore = getKernelDb().query("SELECT count(*) AS n FROM events").get();
+  try {
+    writeFileSync(String(reviewArtifact.storage_ref), "{}");
+    expect(() => callOntologyReadTool(critic, "qf_artifact_get", { id: completed.artifactId })).toThrow("bytes changed");
+    expect(getKernelDb().query("SELECT count(*) AS n FROM events").get()).toEqual(readsBefore);
+  } finally { writeFileSync(String(reviewArtifact.storage_ref), reviewBytes); }
+  const oversizedTrajectory = JSON.parse(reviewBytes.toString("utf8"));
+  oversizedTrajectory.result = JSON.stringify({ ...completedAssessment, rationale: "x".repeat(65_536) });
+  const oversizedBytes = JSON.stringify(oversizedTrajectory);
+  const oversizedHash = createHash("sha256").update(oversizedBytes).digest("hex");
+  const oversizedPath = join(root, "oversized-review.json");
+  writeFileSync(oversizedPath, oversizedBytes);
+  kernelExecute("publish_artifact", { kind: "trajectory", storage_ref: oversizedPath, path: oversizedPath, content_hash: oversizedHash, links: [] }, trace());
+  expect(() => kernelMarketReviewArtifactView(kernelGetObject("artifact", oversizedHash)!, { source_task_id: taskId, hypothesis_id: hypothesis.object_id, run_id: "decision-run", result_artifact_id: oversizedHash, executor_session_id: "worker" })).toThrow("Complete review evidence exceeds");
+  for (const [tool, id] of [["qf_hypothesis_get", hypothesis.object_id], ["qf_run_get", "decision-run"], ["qf_artifact_get", completed.artifactId]]) {
+    const read = callOntologyReadTool(critic, tool!, { id });
+    if (tool === "qf_artifact_get") {
+      const result = read.result as { content_hash: string; receipt: { comparison_context: Record<string, unknown>; content: { result: { comparisons: Record<string, unknown>[] } } } };
+      expect(result.content_hash).toBe(completed.artifactId);
+      const reviewDecision = result.receipt.content.result;
+      expect({ ...reviewDecision, comparisons: reviewDecision.comparisons.map((row) => ({ ...result.receipt.comparison_context, ...row })) }).toEqual(completedAssessment);
+      expect(result.receipt.content.result.comparisons).toHaveLength(77);
+      expect(new TextEncoder().encode(JSON.stringify(result)).byteLength).toBeLessThanOrEqual(65_536);
+    }
+  }
   const grade = await callOntologyTool(critic, "qf_record_evaluation", { hypothesis_id: hypothesis.object_id, run_id: "decision-run", artifact_id: completed.artifactId, verdict: "supports", confidence: 0.9, rationale: "The explicit WATCH is faithful to unavailable probability, not a claim the Hypothesis is true.", rubric: { faithfulness: 1, answer_relevancy: 1, context_precision: 1, context_recall: 1 }, findings: ["menu_coverage", "quote_freshness", "no_vig_scope", "submission_mechanism", "probability_provenance", "arithmetic", "best_expression", "material_attack"].map((code) => ({ code, severity: "info", message: `${code}: checked the exact synthetic Run; attempted unsupported probability was refused.`, evidence_refs: ["decision-run"] })) }, async () => null);
   const evaluationId = String((grade.result as { object_id: string }).object_id);
   const finalized = kernelFinalizeResearchEvaluation(evaluationId);

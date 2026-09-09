@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-w1-03-one-canvas @ 99f37de0` on 2026-09-09 by
+> Generated from `codex/wo-w1-03-one-canvas @ e5296384` on 2026-09-09 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -247,7 +247,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 16 | the app starts here |
-| `reachable` | 210 | imported from an entrypoint |
+| `reachable` | 211 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -352,8 +352,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 229 of
-230 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 230 of
+231 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/updater/update-manager.ts` — **2 files depend on it**, it imports 1
@@ -382,11 +382,11 @@ asked before the change, when nothing is red yet.
 
 ### Blast-radius coverage
 
-**229 of 230 files that have a reachability verdict** carry a blast radius.
+**230 of 231 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**570 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**572 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 340 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 341 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -412,9 +412,9 @@ prevent a clean architectural result.
 
 | File | Coverage | SQL in text | SQL resolved |
 |---|---|---:|---:|
+| `collab-electron/src/main/kernel.ts` | partial | 7 | 6 |
 | `packages/qf-kernel/src/governed-review.ts` | partial | 36 | 35 |
 | `packages/qf-kernel/src/upgrade.ts` | partial | 15 | 14 |
-| `collab-electron/src/main/kernel.ts` | partial | 7 | 6 |
 | `packages/qf-kernel/src/db.ts` | partial | 1 | 0 |
 | `collab-electron/src/main/env.d.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/host-acp-bridge.ts` | unindexed | 0 | 0 |
@@ -433,7 +433,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (570 files)
+## Per-analyzer coverage (572 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -441,17 +441,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 566 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 286 | 0 | 3 | 0 | 281 |
-| `ipcPush` | 7 | 0 | 3 | 0 | 560 |
-| `persistence` | 25 | 31 | 0 | 0 | 514 |
-| `lifetime` | 5 | 63 | 0 | 0 | 502 |
-| `packaging` | 228 | 0 | 0 | 106 | 236 |
-| `ownership` | 21 | 0 | 0 | 361 | 188 |
-| `reach` | 226 | 4 | 0 | 340 | 0 |
+| `imports` | 568 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 288 | 0 | 3 | 0 | 281 |
+| `ipcPush` | 7 | 0 | 3 | 0 | 562 |
+| `persistence` | 25 | 31 | 0 | 0 | 516 |
+| `lifetime` | 5 | 63 | 0 | 0 | 504 |
+| `packaging` | 229 | 0 | 0 | 106 | 237 |
+| `ownership` | 21 | 0 | 0 | 363 | 188 |
+| `reach` | 227 | 4 | 0 | 341 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 340 files means those trees are
+failure — `reach: unsupported` on 341 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 106 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
@@ -521,7 +521,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 1016
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1330
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 1020
+- `collab-electron/src/main/kernel.ts` — exports kernelMarketReviewArtifactView() at line 946
 - `collab-electron/src/main/market-analysis.ts` — exports analyzeMarketAndReview() at line 28
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38

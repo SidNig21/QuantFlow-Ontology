@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { deriveResearchWorkflow } from "./research-workflow.js";
-import { observationAge, selectionLabel } from "./market-desk.js";
+import { observationAge, selectionLabel, visibleMarketRows } from "./market-desk.js";
 
 describe("market desk one-Canvas projection", () => {
 	test("total-round selections retain their actual line, including zero", () => {
@@ -8,6 +8,12 @@ describe("market desk one-Canvas projection", () => {
 		expect(selectionLabel({ label: "Under", handicap: 1.5 })).toBe("Under 1.5");
 		expect(selectionLabel({ label: "Fighter", handicap: 0 })).toBe("Fighter 0");
 		expect(selectionLabel({ label: "Fighter", handicap: null })).toBe("Fighter");
+	});
+	test("clear historical only filters the board and preserves current rows and source input", () => {
+		const rows = [{ quote_id: "old", current: false, state: "superseded" }, { quote_id: "now", current: true }];
+		expect(visibleMarketRows(rows, true)).toEqual([rows[1]]);
+		expect(visibleMarketRows(rows, false)).toEqual(rows);
+		expect(rows).toHaveLength(2);
 	});
 	test("resolves the selected market context without creating a second Canvas world", () => {
     const mission = { type: "mission", id: "mission-1", fields: { quote_id: "quote-1", state: "ready to staff", method: null } };
