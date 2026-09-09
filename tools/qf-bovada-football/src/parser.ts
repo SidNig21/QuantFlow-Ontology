@@ -120,7 +120,21 @@ export type BovadaFightMenu = {
   event_cutoff: string;
   event: ProviderEvent;
   markets: Array<{ display_group_id: string | null; display_group: string; market: ProviderMarket }>;
-  requested_expression: { expression: string; status: "selection_unavailable" | "offered"; selection_ids: string[]; reason: string; observed_at: string };
+  completeness: {
+    status: "complete" | "provider_reports_additional_markets" | "provider_count_unavailable";
+    provider_reported_market_count: number | null;
+    returned_unique_market_count: number;
+    reason: string;
+  };
+  requested_expression: {
+    expression: string;
+    market_description: string | null;
+    outcome_description: string;
+    status: "selection_unavailable" | "availability_unknown" | "offered";
+    selection_ids: string[];
+    reason: string;
+    observed_at: string;
+  };
 };
 
 export type BovadaRequestedExpression = {
@@ -129,7 +143,7 @@ export type BovadaRequestedExpression = {
   market_description?: string;
 };
 
-/** The event-list response is the entire completeness boundary; never fetch missing markets. */
+/** Preserve the bounded public response and distinguish returned absence from provider-count uncertainty. */
 export function parseBovadaFightMenu(
   body: Uint8Array | string,
   observedAt: string,
@@ -149,7 +163,30 @@ export function parseBovadaFightMenu(
   if (event.competitors.length !== 2 || new Set(event.competitors.map((row) => row.id)).size !== 2 || new Set(event.competitors.map((row) => row.name)).size !== 2) throw new BovadaSelectionError("fight menu competitor identity disagreement");
   const all = event.displayGroups.flatMap((group) => group.markets.map((market) => ({ display_group_id: group.id ?? null, display_group: group.description, market })));
   const ids = new Set(all.map((row) => row.market.id));
-  if (event.numMarkets !== ids.size || ids.size !== all.length) throw new BovadaSelectionError("market_menu_incomplete: numMarkets must equal unique returned markets");
+  if (ids.size !== all.length) throw new BovadaSelectionError("market_menu_incomplete: returned market ids must be unique");
+  if (event.numMarkets !== null && event.numMarkets !== undefined && event.numMarkets < ids.size) {
+    throw new BovadaSelectionError("market_menu_incomplete: provider market count is smaller than returned unique markets");
+  }
+  const completeness = event.numMarkets === ids.size
+    ? {
+        status: "complete" as const,
+        provider_reported_market_count: event.numMarkets,
+        returned_unique_market_count: ids.size,
+        reason: "The provider-reported market count equals the unique markets in this bounded public response.",
+      }
+    : event.numMarkets === null || event.numMarkets === undefined
+      ? {
+          status: "provider_count_unavailable" as const,
+          provider_reported_market_count: null,
+          returned_unique_market_count: ids.size,
+          reason: "The bounded public response returned markets but no usable provider market count, so absence outside the returned set is unconfirmed.",
+        }
+      : {
+          status: "provider_reports_additional_markets" as const,
+          provider_reported_market_count: event.numMarkets,
+          returned_unique_market_count: ids.size,
+          reason: `The provider reports ${event.numMarkets} markets but this bounded public response returned ${ids.size} unique markets, so absence outside the returned set is unconfirmed.`,
+        };
   const selections = new Set<string>();
   for (const { market } of all) {
     if (market.status !== "O" || market.period.live || !market.outcomes.length || market.outcomes.some((outcome) => outcome.status !== "O")) throw new BovadaSelectionError("fight menu contains closed or suspended selections; refresh required");
@@ -167,14 +204,19 @@ export function parseBovadaFightMenu(
       .map((row) => row.id);
   });
   if (requested.length > 1) throw new BovadaSelectionError("ambiguous requested selection identity");
-  return { contract: "qf.market.menu.v1", provider_event_id: event.id, observed_at: observedAt, event_cutoff: new Date(event.startTime).toISOString(), event, markets: all,
+  const requestedStatus = requested.length ? "offered" : completeness.status === "complete" ? "selection_unavailable" : "availability_unknown";
+  return { contract: "qf.market.menu.v1", provider_event_id: event.id, observed_at: observedAt, event_cutoff: new Date(event.startTime).toISOString(), event, markets: all, completeness,
     requested_expression: {
       expression: requestedExpression.expression,
-      status: requested.length ? "offered" : "selection_unavailable",
+      market_description: requestedExpression.market_description ?? null,
+      outcome_description: requestedExpression.outcome_description,
+      status: requestedStatus,
       selection_ids: requested,
       reason: requested.length
-        ? "The exact requested expression is offered in the complete returned fight menu."
-        : "The exact requested expression is absent from the complete returned fight menu.",
+        ? "The exact requested expression is offered in the returned live fight menu."
+        : requestedStatus === "selection_unavailable"
+          ? "The exact requested expression is absent from the complete returned live fight menu."
+          : "The exact requested expression is absent from the returned live fight menu, but provider-count disagreement means its current availability is not confirmed.",
       observed_at: observedAt,
     } };
 }

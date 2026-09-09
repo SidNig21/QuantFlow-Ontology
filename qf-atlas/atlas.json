@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "d21b6262",
+    "commit": "aac01eed",
     "generatedAt": "2026-09-09",
     "filesScanned": 426,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "73b71b800217e40f"
+    "fingerprint": "7d0e25091418046d"
   },
   "stats": {
     "live": 108,
@@ -1821,7 +1821,7 @@
       "id": "2:collab-electron/src/main::market",
       "layer": 2,
       "name": "main/market*",
-      "kb": 25.5,
+      "kb": 25.9,
       "x": -1.69,
       "z": -2.03,
       "status": "ok",
@@ -1842,7 +1842,7 @@
         },
         {
           "path": "collab-electron/src/main/market-analysis.ts",
-          "kb": 8.8,
+          "kb": 9.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3265,9 +3265,9 @@
       "id": "0:packages/qf-kernel/src::market",
       "layer": 0,
       "name": "src/market*",
-      "kb": 50.2,
-      "x": 0.23,
-      "z": -1.3,
+      "kb": 54.2,
+      "x": -1.01,
+      "z": -0.85,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -3276,7 +3276,7 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/market-decision.ts",
-          "kb": 18.8,
+          "kb": 22.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3428,8 +3428,8 @@
       "layer": 0,
       "name": "upgrade.ts",
       "kb": 51.1,
-      "x": -1.01,
-      "z": -0.85,
+      "x": 0.23,
+      "z": -1.3,
       "status": "gray",
       "spawns": 0,
       "writes": 0,
@@ -5114,7 +5114,7 @@
       "id": "0:tools/qf-bovada-football/src::parser",
       "layer": 0,
       "name": "parser.ts",
-      "kb": 23.2,
+      "kb": 25.3,
       "x": -2.03,
       "z": 1.69,
       "status": "ok",
@@ -5125,7 +5125,7 @@
       "files": [
         {
           "path": "tools/qf-bovada-football/src/parser.ts",
-          "kb": 23.2,
+          "kb": 25.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -58627,12 +58627,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "c0a93620",
+      "commit": "d21b6262",
       "generatedAt": "2026-09-09"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "d21b6262",
+      "commit": "aac01eed",
       "generatedAt": "2026-09-09"
     },
     "verdict": "better",

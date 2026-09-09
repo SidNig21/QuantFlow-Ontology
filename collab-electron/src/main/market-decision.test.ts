@@ -18,23 +18,24 @@ const trace = (actor_session_id?: string, mission_id?: string) => ({ trace_id: c
 afterAll(() => { closeAppKernel(); if (saved.db === undefined) delete process.env.QF_KERNEL_DB; else process.env.QF_KERNEL_DB = saved.db; if (saved.artifacts === undefined) delete process.env.QF_ARTIFACT_ROOT; else process.env.QF_ARTIFACT_ROOT = saved.artifacts; const target = resolve(root); if (!target.startsWith(resolve(tmpdir()) + "\\") || !target.includes("qf-decision-test-")) throw Error("unsafe cleanup"); rmSync(target, { recursive: true, force: true }); });
 function response(url: string, text: string) { return { status: 200, url, redirected: false, headers: new Headers({ "content-type": "application/json" }), body: new ReadableStream<Uint8Array>({ start(c) { c.enqueue(new TextEncoder().encode(text)); c.close(); } }) }; }
 
-test("synthetic exact menu → evidence → Run → broker reads → worker Artifact; foreign reads and arbitrary probability refuse", async () => {
+test("synthetic provider-count gap → bounded evidence → Run → broker reads → worker Artifact; foreign reads and arbitrary probability refuse", async () => {
   openAppKernel();
   const now = new Date(); const cutoff = new Date(now.getTime() + 5 * 86400000);
   const competitors = [{ id: "fiorot", name: "Manon Fiorot", home: true }, { id: "grasso", name: "Alexa Grasso", home: false }];
   const period = { id: "bout", description: "Bout", main: true, live: false };
-  const source = [{ path: [{ type: "SPORT", id: "MMA", description: "UFC/MMA" }, { type: "TOUR", id: "UFC", description: "UFC" }, { type: "LEAGUE", id: "league", description: "UFC Test" }], events: [{ id: "29195963", description: "Manon Fiorot vs Alexa Grasso", competitionId: "league", startTime: cutoff.getTime(), live: false, status: "U", numMarkets: 2, competitors, displayGroups: [{ id: "group", description: "Fight Odds", markets: [
+  const source = [{ path: [{ type: "SPORT", id: "MMA", description: "UFC/MMA" }, { type: "TOUR", id: "UFC", description: "UFC" }, { type: "LEAGUE", id: "league", description: "UFC Test" }], events: [{ id: "29195963", description: "Manon Fiorot vs Alexa Grasso", competitionId: "league", startTime: cutoff.getTime(), live: false, status: "U", numMarkets: 3, competitors, displayGroups: [{ id: "group", description: "Fight Odds", markets: [
     { id: "winner", description: "Fight Winner", key: "2W-12", status: "O", period, outcomes: competitors.map((row, index) => ({ id: `selection-${index}`, description: row.name, competitorId: row.id, status: "O", type: index ? "A" : "H", price: { american: index ? "+185" : "-225", decimal: index ? "2.85" : "1.444444", fractional: index ? "37/20" : "4/9" } })) },
     { id: "total", description: "Main Total Rounds Over/Under", key: "2W-OU", status: "O", period, outcomes: ["Over", "Under"].map((name, index) => ({ id: `total-${index}`, description: name, status: "O", type: index ? "U" : "O", price: { american: index ? "+300" : "-450", decimal: index ? "4" : "1.222222", fractional: index ? "3/1" : "2/9", handicap: "2.5" } })) },
   ] }] }] }];
   const capture = await runBovadaLiveMarketsCapture({ db: getKernelDb(), artifactRoot: process.env.QF_ARTIFACT_ROOT!, request: { sport: "ufc", competition: "ufc", market_class: "moneyline" }, provider_event_id: "29195963", requested_expression: { expression: "Alexa Grasso wins by submission", market_description: "Method of Victory", outcome_description: "Alexa Grasso by Submission" }, transport: async () => response(BOVADA_UFC_URL, JSON.stringify(source)), now: () => now, kernel: { execute: (_db, command, input, t) => kernelExecute(command, input, t), getObject: (_db, type, id) => kernelGetObject(type, id), getLinks: (_db, id, options) => kernelGetLinks(id, options) } });
   expect(capture.rows).toHaveLength(2);
   expect(capture.menu.requested_expression).toMatchObject({
-    status: "selection_unavailable",
+    status: "availability_unknown",
     selection_ids: [],
     observed_at: now.toISOString(),
   });
-  expect(capture.menu.requested_expression.reason).toContain("absent");
+  expect(capture.menu.completeness).toMatchObject({ status: "provider_reports_additional_markets", provider_reported_market_count: 3, returned_unique_market_count: 2 });
+  expect(capture.menu.requested_expression.reason).toContain("not confirmed");
   const quoteId = capture.rows[0]!.quote_id;
   const mission = createMarketDeskInvestigation({ quote_id: quoteId, name: "Synthetic decision control", objective: "Test exact lineage" });
   const date = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(cutoff).replace(/^([A-Z][a-z]{2}) /, "$1. ");

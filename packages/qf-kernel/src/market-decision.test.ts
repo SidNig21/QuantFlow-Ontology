@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { decisionComparisonRows, validateMarketDecision, type DecisionContext } from "./market-decision.ts";
 
 function context(probability = false): DecisionContext {
-  return { evidence_facts: [], mission_id: "mission", task_id: "task", worker_session_id: "worker", hypothesis_id: "hypothesis", hypothesis: "Alexa Grasso wins by submission", dataset_id: "dataset", run_id: "run", inputs: [{ id: "evidence", hash: "a".repeat(64) }], method: { id: "synthetic-test-method", version: "1", hash: "b".repeat(64), probability_producing: probability }, selections: [
+  return { evidence_facts: [], mission_id: "mission", task_id: "task", worker_session_id: "worker", hypothesis_id: "hypothesis", hypothesis: "Alexa Grasso wins by submission", dataset_id: "dataset", run_id: "run", inputs: [{ id: "evidence", hash: "a".repeat(64) }], method: { id: "synthetic-test-method", version: "1", hash: "b".repeat(64), probability_producing: probability }, market_availability: { expression: "Alexa Grasso wins by submission", market_description: "Method of Victory", outcome_description: "Alexa Grasso by Submission", status: "offered", selection_ids: ["one"], reason: "Synthetic offered control", observed_at: "2026-09-06T00:00:00Z", completeness: "complete", provider_reported_market_count: 1, returned_unique_market_count: 1 }, selections: [
     { quote_id: "quote", instrument_id: "instrument", selection_id: "one", market_id: "market", label: "One", decimal_price: 3, observed_at: "2026-09-06T00:00:00Z", event_cutoff: "2026-09-12T00:00:00Z", complete_exclusive_set: true, probability: probability ? { low: 0.4, central: 0.5, high: 0.6 } : { unavailable: "No probability model" } },
     { quote_id: "quote", instrument_id: "instrument", selection_id: "two", market_id: "market", label: "Two", decimal_price: 1.5, observed_at: "2026-09-06T00:00:00Z", event_cutoff: "2026-09-12T00:00:00Z", complete_exclusive_set: true, probability: probability ? { low: 0.4, central: 0.5, high: 0.6 } : { unavailable: "No probability model" } },
   ] };
@@ -23,6 +23,15 @@ test("omission, arithmetic, unsupported probabilities, foreign ids and contradic
     (d: any) => d.comparisons[0].observed_at = "stale", (d: any) => d.comparisons[0].minimum_decimal_price = 2,
   ]) { const d = decision(c); mutate(d); expect(() => validateMarketDecision(d, c)).toThrow(); }
   expect(validateMarketDecision(decision(c), c).classification).toBe("WATCH");
+});
+
+test("unconfirmed requested market forces WATCH and blocks a selected wager or CANDIDATE", () => {
+  const c = context(true);
+  c.market_availability = { ...c.market_availability, status: "availability_unknown", selection_ids: [], completeness: "provider_reports_additional_markets", provider_reported_market_count: 3, returned_unique_market_count: 2 };
+  const watch = decision(c, "WATCH");
+  expect(validateMarketDecision(watch, c).classification).toBe("WATCH");
+  expect(() => validateMarketDecision({ ...watch, classification: "PASS" }, c)).toThrow("requires WATCH");
+  expect(() => validateMarketDecision({ ...watch, classification: "CANDIDATE", selection_id: "one", research_assessment: "SUPPORTED" }, c)).toThrow("requires WATCH");
 });
 test("coherent probability totals, range ordering, best expression and exclusive no-vig have failing controls", () => {
   const c = context(true); const wrongBest = decision(c, "CANDIDATE"); wrongBest.selection_id = "two"; expect(() => validateMarketDecision(wrongBest, c)).toThrow("greatest positive");

@@ -12,6 +12,13 @@ export type DecisionContext = {
   mission_id: string; task_id: string; worker_session_id: string; hypothesis_id: string; hypothesis: string;
   dataset_id: string; run_id: string; inputs: Array<{ id: string; hash: string }>;
   method: { id: string; version: string; hash: string; probability_producing: boolean };
+  market_availability: {
+    expression: string; market_description: string | null; outcome_description: string;
+    status: "selection_unavailable" | "availability_unknown" | "offered";
+    selection_ids: string[]; reason: string; observed_at: string;
+    completeness: "complete" | "provider_reports_additional_markets" | "provider_count_unavailable";
+    provider_reported_market_count: number | null; returned_unique_market_count: number;
+  };
   selections: DecisionSelection[];
   evidence_facts: unknown[];
 };
@@ -30,7 +37,7 @@ export function readDecisionArtifact(db: KernelDb, id: string): unknown {
   return JSON.parse(new TextDecoder().decode(bytes));
 }
 
-/** Build the finite comparison from one complete source response, never from participant estimates. */
+/** Build the finite comparison from one bounded source response, never from participant estimates. */
 export function buildDecisionContext(db: KernelDb, input: { mission_id: string; task_id: string; worker_session_id: string; hypothesis_id: string; dataset_id: string; dataset_hash: string; run_id: string; quote_id: string; method_hash: string }, options: { allowAgedQuote?: boolean } = {}): DecisionContext {
   const outgoing = (id: string, kind: string) => (db.query("SELECT to_id FROM links WHERE from_id = ? AND kind = ?").all(id, kind) as Array<{ to_id: string }>).map((row) => row.to_id);
   equal(outgoing(input.task_id, "belongs_to"), [input.mission_id], "decision Task Mission");
@@ -46,7 +53,7 @@ export function buildDecisionContext(db: KernelDb, input: { mission_id: string; 
   const quote = db.query("SELECT coverage, data_ref FROM quote WHERE id = ?").get(input.quote_id) as { coverage: string; data_ref: string } | null;
   if (!quote) throw new KernelError("decision Quote unavailable");
   const coverage = JSON.parse(quote.coverage) as Row;
-  const menu = object(coverage.market_menu, "complete market menu");
+  const menu = object(coverage.market_menu, "bounded market menu");
   const source = readDecisionArtifact(db, quote.data_ref);
   if (!Array.isArray(source)) throw new KernelError("market menu source must be the event-list response");
   const events = source.flatMap((coupon) => { const row = object(coupon, "coupon"); return Array.isArray(row.events) ? row.events : []; }).filter((event) => object(event, "event").id === menu.provider_event_id);
@@ -57,7 +64,20 @@ export function buildDecisionContext(db: KernelDb, input: { mission_id: string; 
   const groups = event.displayGroups;
   if (!Array.isArray(groups)) throw new KernelError("market menu display groups missing");
   const markets = groups.flatMap((group) => { const row = object(group, "display group"); if (!Array.isArray(row.markets)) throw new KernelError("market menu incomplete"); return row.markets.map((value) => object(value, "market")); });
-  if (event.numMarkets !== markets.length || new Set(markets.map((row) => row.id)).size !== markets.length) throw new KernelError("market_menu_incomplete");
+  const uniqueMarketCount = new Set(markets.map((row) => row.id)).size;
+  const providerMarketCount = event.numMarkets;
+  if (providerMarketCount !== null && providerMarketCount !== undefined && (typeof providerMarketCount !== "number" || !Number.isInteger(providerMarketCount) || providerMarketCount < 0)) throw new KernelError("provider market count invalid");
+  if (uniqueMarketCount !== markets.length || (typeof providerMarketCount === "number" && providerMarketCount < uniqueMarketCount)) throw new KernelError("market_menu_incomplete");
+  const completeness = object(menu.completeness, "market menu completeness");
+  const expectedCompleteness = providerMarketCount === uniqueMarketCount ? "complete" : providerMarketCount === null || providerMarketCount === undefined ? "provider_count_unavailable" : "provider_reports_additional_markets";
+  equal(completeness.status, expectedCompleteness, "market menu completeness status");
+  equal(completeness.provider_reported_market_count, providerMarketCount ?? null, "provider-reported market count");
+  equal(completeness.returned_unique_market_count, uniqueMarketCount, "returned unique market count");
+  const requested = object(menu.requested_expression, "requested market expression");
+  const requestedStatus = String(requested.status);
+  if (!['offered', 'selection_unavailable', 'availability_unknown'].includes(requestedStatus)) throw new KernelError("requested market availability status invalid");
+  if (requestedStatus === "selection_unavailable" && expectedCompleteness !== "complete") throw new KernelError("unconfirmed market absence cannot be reported as unavailable");
+  if (requestedStatus === "availability_unknown" && expectedCompleteness === "complete") throw new KernelError("complete market menu cannot report unknown availability");
   const quotes = db.query("SELECT q.id, q.coverage, l.to_id AS instrument_id FROM quote q JOIN links l ON l.from_id=q.id AND l.kind='quotes' WHERE q.data_ref=?").all(quote.data_ref) as Array<{ id: string; coverage: string; instrument_id: string }>;
   const selections: DecisionSelection[] = [];
   for (const market of markets) {
@@ -80,9 +100,25 @@ export function buildDecisionContext(db: KernelDb, input: { mission_id: string; 
     }
   }
   if (new Set(selections.map((row) => row.selection_id)).size !== selections.length) throw new KernelError("duplicate decision selection identity");
+  const requestedSelectionIds = Array.isArray(requested.selection_ids) && requested.selection_ids.every((id) => typeof id === "string") ? requested.selection_ids as string[] : (() => { throw new KernelError("requested selection ids invalid"); })();
+  if (requestedStatus === "offered" && (!requestedSelectionIds.length || requestedSelectionIds.some((id) => !selections.some((selection) => selection.selection_id === id)))) throw new KernelError("offered requested selection is absent from returned market rows");
+  if (requestedStatus !== "offered" && requestedSelectionIds.length) throw new KernelError("unavailable requested market cannot contain selection ids");
   return { mission_id: input.mission_id, task_id: input.task_id, worker_session_id: input.worker_session_id, hypothesis_id: input.hypothesis_id, hypothesis: hypothesis.claim, dataset_id: input.dataset_id, run_id: input.run_id,
     inputs: [{ id: quote.data_ref, hash: quote.data_ref }, { id: input.dataset_hash, hash: input.dataset_hash }, { id: input.method_hash, hash: input.method_hash }],
-    method: { id: MARKET_EXPRESSION_COMPARISON_OPERATION, version: "1", hash: input.method_hash, probability_producing: false }, selections, evidence_facts: object(readDecisionArtifact(db, input.dataset_hash), "Dataset evidence").observations as unknown[] };
+    method: { id: MARKET_EXPRESSION_COMPARISON_OPERATION, version: "1", hash: input.method_hash, probability_producing: false },
+    market_availability: {
+      expression: text(requested.expression, "requested expression"),
+      market_description: requested.market_description === null ? null : text(requested.market_description, "requested market description"),
+      outcome_description: text(requested.outcome_description, "requested outcome description"),
+      status: requestedStatus as DecisionContext["market_availability"]["status"],
+      selection_ids: requestedSelectionIds,
+      reason: text(requested.reason, "requested availability reason"),
+      observed_at: text(requested.observed_at, "requested availability observation"),
+      completeness: expectedCompleteness,
+      provider_reported_market_count: providerMarketCount === null || providerMarketCount === undefined ? null : providerMarketCount,
+      returned_unique_market_count: uniqueMarketCount,
+    },
+    selections, evidence_facts: object(readDecisionArtifact(db, input.dataset_hash), "Dataset evidence").observations as unknown[] };
 }
 type Row = Record<string, unknown>;
 function object(value: unknown, label: string): Row {
@@ -136,10 +172,10 @@ function range(value: unknown): ProbabilityRange {
 /** Validate a participant interpretation against exact Kernel-derived inputs and reproducible method output. */
 export function validateMarketDecision(value: unknown, context: DecisionContext): Row {
   const decision = object(value, "market decision");
-  keys(decision, ["contract", "mission_id", "task_id", "worker_session_id", "hypothesis_id", "hypothesis", "dataset_id", "run_id", "inputs", "method", "comparisons", "research_assessment", "classification", "selection_id", "selection_reason", "change_condition", "rationale", "evidence_refs", "evidence_facts", "limitations", "invalidation", "provenance"], "market decision");
+  keys(decision, ["contract", "mission_id", "task_id", "worker_session_id", "hypothesis_id", "hypothesis", "dataset_id", "run_id", "inputs", "method", "market_availability", "comparisons", "research_assessment", "classification", "selection_id", "selection_reason", "change_condition", "rationale", "evidence_refs", "evidence_facts", "limitations", "invalidation", "provenance"], "market decision");
   equal(decision.contract, "qf.market.decision.v1", "decision contract");
   equal(decision.evidence_facts, context.evidence_facts, "exact source evidence facts");
-  for (const key of ["mission_id", "task_id", "worker_session_id", "hypothesis_id", "hypothesis", "dataset_id", "run_id", "inputs", "method"] as const) equal(decision[key], context[key], key);
+  for (const key of ["mission_id", "task_id", "worker_session_id", "hypothesis_id", "hypothesis", "dataset_id", "run_id", "inputs", "method", "market_availability"] as const) equal(decision[key], context[key], key);
   if (!Array.isArray(decision.comparisons) || decision.comparisons.length !== context.selections.length || !context.selections.length) throw new KernelError("decision must compare every offered selection exactly once in order");
   const refs = decision.evidence_refs;
   if (!Array.isArray(refs) || !refs.length || new Set(refs).size !== refs.length || refs.some((id) => !context.inputs.some((input) => input.id === id))) throw new KernelError("decision contains missing or foreign evidence references");
@@ -180,7 +216,9 @@ export function validateMarketDecision(value: unknown, context: DecisionContext)
   }
   if (!["CANDIDATE", "WATCH", "PASS"].includes(String(decision.classification))) throw new KernelError("invalid decision classification");
   if (!["SUPPORTED", "CHALLENGED", "INCONCLUSIVE", "INSUFFICIENT_EVIDENCE"].includes(String(decision.research_assessment))) throw new KernelError("invalid research assessment");
+  if (context.market_availability.status !== "offered" && (decision.classification !== "WATCH" || decision.selection_id !== null)) throw new KernelError("unavailable or unconfirmed requested market requires WATCH without a selected wager");
   if (decision.classification === "CANDIDATE") {
+    if (context.market_availability.completeness !== "complete") throw new KernelError("CANDIDATE requires a complete current market menu");
     if (decision.research_assessment !== "SUPPORTED") throw new KernelError("CANDIDATE requires a supported research assessment");
     const selected = margins.find((row) => row.id === decision.selection_id);
     if (!selected || selected.margin <= 0 || margins.some((row) => row.margin > selected.margin)) throw new KernelError("CANDIDATE requires greatest positive conservative supported margin");

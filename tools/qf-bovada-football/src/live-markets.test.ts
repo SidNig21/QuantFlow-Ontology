@@ -133,7 +133,7 @@ function responseTransport(body: Uint8Array): BovadaTransport {
 }
 
 describe("Bovada Live Markets UFC path", () => {
-  test("complete fight menu preserves totals and unavailable submission; incomplete and corrupt controls refuse", () => {
+  test("bounded fight menu distinguishes confirmed absence from provider-count uncertainty; corrupt controls refuse", () => {
     const value = coupon() as any;
     value.events[0].numMarkets = 2;
     value.events[0].displayGroups[0].markets.push({ ...market("total"), key: "2W-OU", description: "Main Total Rounds Over/Under", outcomes: [
@@ -153,8 +153,16 @@ describe("Bovada Live Markets UFC path", () => {
     expect(parse(value).markets).toHaveLength(2);
     expect(parse(value).markets[1]!.market.outcomes[0]!.handicap).toBe(2.5);
     expect(parse(value).requested_expression.status).toBe("selection_unavailable");
-    const incomplete = structuredClone(value); incomplete.events[0].numMarkets = 3;
-    expect(() => parse(incomplete)).toThrow("market_menu_incomplete");
+    expect(parse(value).completeness.status).toBe("complete");
+    const providerReportsMore = structuredClone(value); providerReportsMore.events[0].numMarkets = 3;
+    expect(parse(providerReportsMore).requested_expression.status).toBe("availability_unknown");
+    expect(parse(providerReportsMore).completeness).toMatchObject({
+      status: "provider_reports_additional_markets",
+      provider_reported_market_count: 3,
+      returned_unique_market_count: 2,
+    });
+    const contradictory = structuredClone(value); contradictory.events[0].numMarkets = 1;
+    expect(() => parse(contradictory)).toThrow("market_menu_incomplete");
     for (const [field, bad] of [["decimal", "Infinity"], ["handicap", "NaN"]]) {
       const corrupt = structuredClone(value); corrupt.events[0].displayGroups[0].markets[1].outcomes[0].price[field as string] = bad;
       expect(() => parse(corrupt)).toThrow();

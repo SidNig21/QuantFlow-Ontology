@@ -73,12 +73,15 @@ selection actually returned for the exact Fiorot–Grasso provider event—not o
 - provider event, display group, market id/key/description/type/period/status, outcome/selection id and
   label, handicap where present, decimal price, source URL/hash, and observation time;
 - one content-addressed market-menu Artifact and the exact Quote identities derived from that observation;
-- an explicit `selection_unavailable` result with observation time and reason for any requested expression
-  not offered, including Grasso by submission in the frozen authoring observation.
+- an explicit `selection_unavailable` result when the provider count and returned unique markets agree, or
+  `availability_unknown` when the provider reports additional markets that are absent from the bounded public
+  response. Both preserve observation time and reason; neither may fabricate Grasso by submission.
 
-The existing public event-list response is the sole completeness boundary. For the matched event, the
-provider field `numMarkets` must equal the count of unique market ids present across its returned
-`displayGroups[].markets[]`; otherwise acquisition fails explicitly as `market_menu_incomplete`. No second
+The existing public event-list response is the sole bounded acquisition source. Preserve the provider
+`numMarkets` value and the count of unique market ids present across returned `displayGroups[].markets[]`.
+Duplicate ids or a provider count smaller than the returned unique set fail as `market_menu_incomplete`.
+A larger or missing provider count is preserved as explicit completeness uncertainty and blocks
+`CANDIDATE`, but it does not prevent research over the exact markets and evidence actually returned. No second
 request, login, wager account, browser session, alternate book, hidden RPC, or fabricated selection may fill
 an absent market. Reject a mixed-event menu, duplicate selection identity, closed/suspended market presented
 as open, stale mixed-time quotes, non-finite price/handicap, source drift, timeout, redirect, or byte-limit

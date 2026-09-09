@@ -38,6 +38,7 @@ export async function analyzeMarketAndReview(input: { mission_id: string; quote_
     if (coverage.market_menu?.contract !== "qf.market.menu.v1") throw new Error("This observation predates complete-menu capture. Refresh Bovada and open its current investigation.");
     const requested = coverage.market_menu.requested_expression as Record<string, unknown> | undefined;
     if (!requested || typeof requested.expression !== "string" || !requested.expression.trim()) throw new Error("The investigation has no exact requested expression.");
+    const availability = typeof requested.status === "string" ? requested.status : "availability_unknown";
     const existing = kernelGetLinks(input.mission_id, { kind: "belongs_to" }).filter((link) => link.to_id === input.mission_id).map((link) => kernelGetObject("task", link.from_id)).filter((task) => task?.status === "open");
     const retry = input.retry_task_id ? existing.find((task) => task!.id === input.retry_task_id) : null;
     if (input.retry_task_id && (!retry || existing.length !== 1)) throw new Error("The exact unfinished retry task is no longer available.");
@@ -64,6 +65,7 @@ export async function analyzeMarketAndReview(input: { mission_id: string; quote_
       `You are the Market Researcher assigned Task ${taskId}.`,
       `Read each of these exact generated ontology tools once, passing only its id: ${JSON.stringify(scope.allowed)}. Preserve every returned read Artifact id. No other reads or actions are authorized.`,
       `The calculation result Artifact ${String(run.state.result_artifact_id)} contains context, deterministic comparisons, and exact official evidence. Copy all numeric values and ordered comparisons from it; do not invent a probability.`,
+      `The exact Kernel-held requested-market status is ${JSON.stringify(availability)}. If it is selection_unavailable or availability_unknown, classification must be WATCH with selection_id null while research_assessment separately states whether the evidence supports, challenges, or cannot resolve the claim.`,
       'Call collaboration send_result once with the exact task_id, every Quote id as cited_market_ids, and every read receipt as read_trajectory_artifact_ids. The result string is only your bounded judgment JSON with exactly: contract="qf.market.assessment.v1"; research_assessment="SUPPORTED", "CHALLENGED", "INCONCLUSIVE", or "INSUFFICIENT_EVIDENCE"; classification="CANDIDATE", "WATCH", or "PASS"; selection_id (or null); and nonempty selection_reason, change_condition, rationale, limitations, invalidation. QuantFlow supplies immutable identities, comparisons, evidence references, and runtime metadata. Analyze the requested mechanism, counterevidence, source limits, every offered expression, and availability. Never recruit or delegate. If the first send_result is refused, make only the stated correction and try once more; after a second refusal, stop and report the failure. No stake, wagering, arbitrary confidence, or fabricated facts. This is research advice only.',
     ].join("\n");
     await submitAgentSessionInstruction(worker, `${instruction}\r`);
