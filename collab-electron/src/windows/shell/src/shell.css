@@ -2759,6 +2759,15 @@ button.task-fact:focus-visible {
 	cursor: grabbing;
 }
 
+/* Product controls are ordinary one-click controls. The focus-catching overlay is
+   only useful for embedded terminal/webview surfaces, not native Canvas cards. */
+.canvas-focused .canvas-tile[data-qf-surface-kind="director-ready"] .tile-content-overlay,
+.canvas-focused .canvas-tile[data-qf-surface-kind="investigation"] .tile-content-overlay,
+.canvas-focused .canvas-tile[data-qf-surface-kind="decision-result"] .tile-content-overlay {
+	display: none;
+	pointer-events: none;
+}
+
 #tile-layer .canvas-tile {
 	pointer-events: auto;
 }
@@ -2870,6 +2879,7 @@ button.task-fact:focus-visible {
 .qf-decision-surface__question { font: 650 20px/1.25 var(--qf-sans); color: var(--qf-gl-ice); }
 .qf-ready-director__body,
 .qf-investigation-surface__state,
+.qf-investigation-surface__error,
 .qf-decision-surface__reason,
 .qf-decision-surface__condition,
 .qf-decision-surface__critic,
@@ -2878,6 +2888,13 @@ button.task-fact:focus-visible {
 	padding: 9px 11px;
 	border-left: 2px solid color-mix(in srgb, var(--qf-gl-alert) 70%, var(--qf-gl-rule));
 	background: color-mix(in srgb, var(--qf-gl-alert) 7%, transparent);
+	color: var(--qf-gl-text);
+}
+.qf-investigation-surface__error {
+	padding: 9px 11px;
+	border: 1px solid color-mix(in srgb, var(--qf-gl-alert) 55%, var(--qf-gl-rule));
+	border-radius: 4px;
+	background: color-mix(in srgb, var(--qf-gl-alert) 8%, transparent);
 	color: var(--qf-gl-text);
 }
 .qf-ready-director__start,

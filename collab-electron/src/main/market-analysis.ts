@@ -1,22 +1,21 @@
-import { admitAndStartSession, hasLiveAgentSession, submitAgentSessionInstruction } from "./agent-host";
+import { admitAndStartSession, getDockDefinitionAvailability, hasLiveAgentSession, submitAgentSessionInstruction } from "./agent-host";
 import { addOfficialEvidence, RESEARCH_LAB_TOOL_ID } from "./evidence-computation";
 import { kernelExecute, kernelGetLinks, kernelGetObject, kernelListAgentDefinitions, kernelListAgentSessions, kernelQueryObjects, kernelDecisionReadScope, kernelDecisionModelReadView } from "./kernel";
 import { assertMarketRetryTask } from "./market-runtime-failure";
 import { listBovadaMarketDeskRows } from "./market-desk";
+import { selectEligibleDefinition } from "./participant-selection";
 import { MARKET_EXPRESSION_COMPARISON_IMPLEMENTATION, MARKET_EXPRESSION_COMPARISON_OPERATION } from "qf-kernel/portable";
 
 const active = new Set<string>();
 const trace = (actor_session_id?: string, mission_id?: string) => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), ...(actor_session_id ? { actor_session_id } : {}), ...(mission_id ? { mission_id } : {}) });
 type Started = NonNullable<Parameters<typeof admitAndStartSession>[1]>["onStarted"];
-function groups(definition: Record<string, unknown>): string[] {
-  let value: unknown = definition.capability_groups;
-  try { if (typeof value === "string") value = JSON.parse(value); } catch { return []; }
-  return Array.isArray(value) && value.every((entry) => typeof entry === "string") ? value : [];
-}
 export function eligibleDefinition(role: string, capability: string): string {
-  const matches = kernelListAgentDefinitions().filter((definition) => definition.role === role && groups(definition).includes(capability));
-  if (matches.length !== 1 || typeof matches[0]!.id !== "string") throw new Error(`Exactly one admitted ${role} participant with ${capability} is required.`);
-  return String(matches[0]!.id);
+  return selectEligibleDefinition(
+    kernelListAgentDefinitions(),
+    role,
+    capability,
+    (definition) => getDockDefinitionAvailability(definition).available,
+  );
 }
 export async function acquireEligibleParticipant(role: string, capability: string, onStarted?: Started): Promise<string> {
   const definitionId = eligibleDefinition(role, capability);

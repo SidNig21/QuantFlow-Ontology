@@ -274,6 +274,13 @@ export function getHermesDockDiagnostic(): DockAdapterDiagnostic | null {
 export function getDockDefinitionAvailability(
   definition: Record<string, unknown>,
 ): DockDefinitionAvailability {
+  if (definition.id === "hermes-orchestrator") {
+    return {
+      available: false,
+      adapterId: "hermes",
+      message: "Retired Hermes profile. Use Research Director.",
+    };
+  }
   const packageRef = String(definition.package_ref ?? "");
   let runtime: DefinitionRuntime;
   try {

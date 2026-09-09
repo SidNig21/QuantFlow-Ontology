@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "aac01eed",
+    "commit": "ae4f2ed9",
     "generatedAt": "2026-09-09",
-    "filesScanned": 426,
+    "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "7d0e25091418046d"
+    "fingerprint": "2e3d96b7587b01d9"
   },
   "stats": {
     "live": 108,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 119,
-      "indexed": 1260,
+      "indexed": 1261,
       "downgradedFromCheats": 27,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 21,
@@ -409,9 +409,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 566
+      "files": 568
     },
-    "coverageFiles": 566,
+    "coverageFiles": 568,
     "ownership": {
       "responsibilities": 10,
       "contested": 7,
@@ -617,8 +617,8 @@
       "layer": 4,
       "name": "monaco-react-shim.d.ts",
       "kb": 10,
-      "x": -0.39,
-      "z": -3.94,
+      "x": 2,
+      "z": -3.42,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -673,8 +673,8 @@
       "layer": 4,
       "name": "ItemDetailView.tsx",
       "kb": 9.7,
-      "x": 2,
-      "z": -3.42,
+      "x": 3.63,
+      "z": -1.59,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -757,8 +757,8 @@
       "layer": 4,
       "name": "useWorkspaceFileTree.ts",
       "kb": 9,
-      "x": 3.63,
-      "z": -1.59,
+      "x": 3.87,
+      "z": 0.85,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1076,7 +1076,7 @@
       "id": "2:collab-electron/src/main::agent",
       "layer": 2,
       "name": "agent*",
-      "kb": 32.6,
+      "kb": 32.8,
       "x": -0.91,
       "z": 2.48,
       "status": "ok",
@@ -1087,7 +1087,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/agent-host.ts",
-          "kb": 28.1,
+          "kb": 28.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1821,7 +1821,7 @@
       "id": "2:collab-electron/src/main::market",
       "layer": 2,
       "name": "main/market*",
-      "kb": 25.9,
+      "kb": 25.6,
       "x": -1.69,
       "z": -2.03,
       "status": "ok",
@@ -1842,7 +1842,7 @@
         },
         {
           "path": "collab-electron/src/main/market-analysis.ts",
-          "kb": 9.2,
+          "kb": 8.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2809,9 +2809,9 @@
       "id": "4:collab-electron/src/windows/shell/src::market",
       "layer": 4,
       "name": "market-desk.js",
-      "kb": 8.8,
-      "x": 3.87,
-      "z": 0.85,
+      "kb": 10.2,
+      "x": -0.39,
+      "z": -3.94,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2820,7 +2820,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/market-desk.js",
-          "kb": 8.8,
+          "kb": 10.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2837,9 +2837,9 @@
       "id": "4:collab-electron/src/windows/shell/src::one",
       "layer": 4,
       "name": "one-canvas.js",
-      "kb": 16.8,
-      "x": -2.48,
-      "z": -0.91,
+      "kb": 17.2,
+      "x": -2.6,
+      "z": 0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2848,7 +2848,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/one-canvas.js",
-          "kb": 16.8,
+          "kb": 17.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2998,8 +2998,8 @@
       "layer": 4,
       "name": "viewer/src/App.tsx",
       "kb": 17.2,
-      "x": -2.6,
-      "z": 0.45,
+      "x": -2.48,
+      "z": -0.91,
       "status": "ok",
       "spawns": 0,
       "writes": 2,
@@ -3462,7 +3462,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 970.9,
+      "kb": 971.6,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3553,7 +3553,7 @@
         },
         {
           "path": "qa/gates/wave1-critic-decision.ts",
-          "kb": 34.5,
+          "kb": 35.2,
           "spawns": 2,
           "spawnsLive": 1,
           "writes": 3,
@@ -6103,8 +6103,8 @@
     {
       "id": "2:residue",
       "layer": 2,
-      "name": "43 small modules*",
-      "kb": 112.1,
+      "name": "44 small modules*",
+      "kb": 113.1,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6396,6 +6396,16 @@
         {
           "path": "collab-electron/src/main/cwd-fallback.ts",
           "kb": 1.1,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "collab-electron/src/main/participant-selection.ts",
+          "kb": 1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -9115,7 +9125,7 @@
     {
       "path": "collab-electron/src/main/market-analysis.ts",
       "status": "indexed",
-      "indexedFns": 5,
+      "indexedFns": 4,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9204,6 +9214,14 @@
       "path": "collab-electron/src/main/package-resource-paths.ts",
       "status": "indexed",
       "indexedFns": 6,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "collab-electron/src/main/participant-selection.ts",
+      "status": "indexed",
+      "indexedFns": 2,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -11323,9 +11341,9 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports startPrecreatedNativeTuiSession() at line 544",
-            "exports cancelAgentSession() at line 771",
-            "exports closeAgentSessionRow() at line 829"
+            "exports startPrecreatedNativeTuiSession() at line 551",
+            "exports cancelAgentSession() at line 778",
+            "exports closeAgentSessionRow() at line 836"
           ],
           "strong": [],
           "weight": "weak"
@@ -11364,7 +11382,7 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports admitAndStartSession() at line 469"
+            "exports admitAndStartSession() at line 476"
           ],
           "strong": [],
           "weight": "weak"
@@ -11579,7 +11597,7 @@
         {
           "file": "collab-electron/src/main/market-analysis.ts",
           "weak": [
-            "exports analyzeMarketAndReview() at line 29"
+            "exports analyzeMarketAndReview() at line 28"
           ],
           "strong": [],
           "weight": "weak"
@@ -16237,6 +16255,53 @@
     },
     {
       "path": "collab-electron/src/main/package-resource-paths.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "indexed",
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "indexed",
+      "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
+      "reasons": {
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "collab-electron/src/main/participant-selection.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "unsupported",
+      "reasons": {
+        "reach": "no reach row was produced for this path",
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "collab-electron/src/main/participant-selection.ts",
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "indexed",
@@ -25397,42 +25462,42 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 562,
+      "indexed": 564,
       "dynamic": 4
     },
     "ipcRequest": {
       "not-applicable": 280,
-      "indexed": 283,
+      "indexed": 285,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 556,
+      "not-applicable": 558,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 511,
+      "not-applicable": 513,
       "partial": 30,
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 498,
+      "not-applicable": 500,
       "partial": 63,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 233,
+      "not-applicable": 234,
       "unsupported": 106,
-      "indexed": 227
+      "indexed": 228
     },
     "ownership": {
       "not-applicable": 188,
-      "unsupported": 357,
+      "unsupported": 359,
       "indexed": 21
     },
     "reach": {
-      "unsupported": 337,
-      "indexed": 226,
+      "unsupported": 338,
+      "indexed": 227,
       "partial": 3
     }
   },
@@ -26917,9 +26982,10 @@
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-runtime-failure.ts",
         "collab-electron/src/main/market-desk.ts",
+        "collab-electron/src/main/participant-selection.ts",
         "packages/qf-kernel/src/portable.ts"
       ],
-      "importCount": 6
+      "importCount": 7
     },
     {
       "path": "collab-electron/src/main/market-desk.ts",
@@ -27058,6 +27124,16 @@
         "collab-electron/src/main/market-runtime-receipt.ts"
       ],
       "importerCount": 5,
+      "imports": [],
+      "importCount": 0
+    },
+    {
+      "path": "collab-electron/src/main/participant-selection.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/main/market-analysis.ts"
+      ],
+      "importerCount": 1,
       "imports": [],
       "importCount": 0
     },
@@ -31320,6 +31396,7 @@
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/market-runtime-failure.ts",
         "collab-electron/src/main/market-desk.ts",
+        "collab-electron/src/main/participant-selection.ts",
         "packages/qf-kernel/src/portable.ts"
       ],
       "affectedWires": [],
@@ -31572,6 +31649,23 @@
         "qa/gates/windows-research-question.ts"
       ],
       "transitiveTruncated": true,
+      "directDependencies": [],
+      "affectedWires": [],
+      "affectedLoops": [],
+      "affectedProcesses": [],
+      "packaged": "bundled-via-import"
+    },
+    "collab-electron/src/main/participant-selection.ts": {
+      "reach": "reachable",
+      "directDependents": [
+        "collab-electron/src/main/market-analysis.ts"
+      ],
+      "transitiveDependents": [
+        "collab-electron/src/main/index.ts",
+        "collab-electron/src/main/ipc-kernel.ts",
+        "collab-electron/src/main/ipc.ts"
+      ],
+      "transitiveTruncated": false,
       "directDependencies": [],
       "affectedWires": [],
       "affectedLoops": [],
@@ -43148,14 +43242,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "parse",
-            "from": "collab-electron/src/main/market-analysis.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "native_tui",
             "from": "collab-electron/src/main/runtime-route-dispatch.ts",
             "candidates": [
@@ -46884,14 +46970,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "parse",
-            "from": "collab-electron/src/main/market-analysis.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "push",
             "from": "packages/qf-kernel/src/read.ts",
             "candidates": [
@@ -47151,6 +47229,34 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/events.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "collab-electron/src/main/participant-selection.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "resolve",
+            "from": "collab-electron/src/main/package-resource-paths.ts",
+            "candidates": [
+              "collab-electron/src/main/sidecar/client.ts",
+              "collab-electron/src/main/wikilink-index.ts",
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "resolveWslCommand",
+            "from": "collab-electron/src/main/terminal-target.ts",
+            "candidates": [
+              "collab-electron/src/main/agent-host.ts",
+              "collab-electron/src/main/host-native-tui.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -48137,14 +48243,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "parse",
-            "from": "collab-electron/src/main/market-analysis.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "push",
             "from": "packages/qf-kernel/src/read.ts",
             "candidates": [
@@ -48404,6 +48502,34 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/events.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "collab-electron/src/main/participant-selection.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "resolve",
+            "from": "collab-electron/src/main/package-resource-paths.ts",
+            "candidates": [
+              "collab-electron/src/main/sidecar/client.ts",
+              "collab-electron/src/main/wikilink-index.ts",
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "resolveWslCommand",
+            "from": "collab-electron/src/main/terminal-target.ts",
+            "candidates": [
+              "collab-electron/src/main/agent-host.ts",
+              "collab-electron/src/main/host-native-tui.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -51650,14 +51776,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "parse",
-            "from": "collab-electron/src/main/market-analysis.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "all",
             "from": "packages/qf-kernel/src/read.ts",
             "candidates": [
@@ -51844,6 +51962,34 @@
             "from": "packages/qf-kernel/src/read.ts",
             "candidates": [
               "packages/qf-kernel/src/market-decision.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "collab-electron/src/main/participant-selection.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "resolve",
+            "from": "collab-electron/src/main/package-resource-paths.ts",
+            "candidates": [
+              "collab-electron/src/main/sidecar/client.ts",
+              "collab-electron/src/main/wikilink-index.ts",
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "resolveWslCommand",
+            "from": "collab-electron/src/main/terminal-target.ts",
+            "candidates": [
+              "collab-electron/src/main/agent-host.ts",
+              "collab-electron/src/main/host-native-tui.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -58627,12 +58773,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "d21b6262",
+      "commit": "aac01eed",
       "generatedAt": "2026-09-09"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "aac01eed",
+      "commit": "ae4f2ed9",
       "generatedAt": "2026-09-09"
     },
     "verdict": "better",

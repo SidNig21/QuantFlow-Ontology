@@ -65,6 +65,7 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 	let lastWorld = null;
 	let lastWorkflow = null;
 	let selectedSubject = null;
+	const analysisErrors = new Map();
 
 	function clearInspect() {
 		const pane = document.getElementById("dock-inspect-pane");
@@ -240,6 +241,8 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 			: reviewActive ? "Independent review is in progress"
 				: researchActive ? "Research is in progress" : "Ready for evidence, calculation, and independent review";
 		appendText(surface, "qf-investigation-surface__state", stateText);
+		const priorError = analysisErrors.get(mission.id);
+		if (priorError) appendText(surface, "qf-investigation-surface__error", priorError);
 		const analyze = document.createElement("button");
 		analyze.type = "button";
 		analyze.className = "qf-investigation-surface__analyze";
@@ -247,18 +250,23 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 		analyze.disabled = researchActive;
 		analyze.addEventListener("click", async (event) => {
 			event.stopPropagation();
+			analysisErrors.delete(mission.id);
 			analyze.disabled = true;
 			analyze.textContent = "Starting governed research…";
 			try {
 				const result = await window.shellApi.qf.analyzeMarketAndReview({ mission_id: mission.id, quote_id: lastWorkflow.marketQuote.id, ...(runtimeFailed && lastWorkflow.sourceTask?.id ? { retry_task_id: lastWorkflow.sourceTask.id } : {}) });
 				if (!result?.ok) throw new Error(result?.error?.message ?? "Research could not start");
+				analysisErrors.delete(mission.id);
 				analyze.textContent = "Research in progress";
 				showStatus?.("Researcher started. The independent Critic follows the durable result.");
 				await reveal("mission", mission.id);
 			} catch (error) {
+				const message = error?.message ?? String(error);
+				analysisErrors.set(mission.id, message);
 				analyze.disabled = false;
 				analyze.textContent = "Retry analysis";
-				showStatus?.(error?.message ?? String(error));
+				showStatus?.(message);
+				await reveal("mission", mission.id);
 			}
 		});
 		surface.appendChild(analyze);

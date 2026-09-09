@@ -17,8 +17,12 @@ mock.module("./peer-delivery", () => ({
 mock.module("./kernel", () => ({
   getArtifactRoot: () => "",
   kernelGetLinks: () => [],
+  kernelListAgentDefinitions: () => [...definitions.values()],
   kernelListAgentSessions: () => [...sessions.values()],
   kernelListTaskAssignments: () => taskAssignments,
+  kernelQueryObjects: () => [],
+  kernelDecisionReadScope: () => null,
+  kernelDecisionModelReadView: () => null,
   kernelGetObject: (type: string, id: string) => {
     if (type === "agent_definition") return definitions.get(id) ?? null;
     if (type === "agent_session") return sessions.get(id) ?? null;
@@ -170,6 +174,18 @@ function createSession(kernelExecute: Function, id: string, definitionId: string
 
 describe("agent-host native-TUI lifecycle admission", () => {
   const peerBusDb = "peer-bus-fixture";
+
+  test("retired Hermes orchestrator is not launchable inventory", async () => {
+    const { getDockDefinitionAvailability } = await import("./agent-host");
+    expect(getDockDefinitionAvailability({
+      id: "hermes-orchestrator",
+      package_ref: "species/hermes/packed/hermes.aospkg",
+    })).toEqual({
+      available: false,
+      adapterId: "hermes",
+      message: "Retired Hermes profile. Use Research Director.",
+    });
+  });
 
   async function admitSession(id: string): Promise<{
     admitted: { sessionId: string; ptySessionId: string };

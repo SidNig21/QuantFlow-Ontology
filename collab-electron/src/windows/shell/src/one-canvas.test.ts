@@ -57,11 +57,16 @@ test("rendered shell has no alternate Canvas mode controls or persisted Canvas r
 	expect(renderer).toContain('panelManager.initPrefs(prefNavWidth, "closed")');
 	expect(renderer).toContain('channel === "market-decision-settled"');
 	const oneCanvas = await Bun.file(new URL("./one-canvas.js", import.meta.url)).text();
+	const css = await Bun.file(new URL("./shell.css", import.meta.url)).text();
 	expect(oneCanvas).toContain('dom.idSpan.textContent = "DIRECTOR"');
 	expect(oneCanvas).toContain('summary.textContent = "Technical details"');
+	expect(oneCanvas).toContain("analysisErrors.set(mission.id, message)");
+	expect(oneCanvas).toContain('appendText(surface, "qf-investigation-surface__error", priorError)');
 	expect(oneCanvas).toContain("runtimeFailed");
 	expect(oneCanvas).toContain("retry_task_id");
 	expect(oneCanvas).toContain("Your saved evidence is intact; retry after service returns.");
+	expect(css).toContain('.canvas-tile[data-qf-surface-kind="investigation"] .tile-content-overlay');
+	expect(css).toContain(".qf-investigation-surface__error");
 });
 
 test("current report resolves only its exact hash-bound Task Run Artifact and Evaluation", () => {
