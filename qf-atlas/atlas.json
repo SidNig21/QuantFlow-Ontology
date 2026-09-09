@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "fb07c6df",
+    "commit": "4fb278a9",
     "generatedAt": "2026-09-09",
     "filesScanned": 426,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "2a0a24c98f9993bf"
+    "fingerprint": "88dd2d652997900f"
   },
   "stats": {
     "live": 108,
@@ -3462,14 +3462,14 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 970,
+      "kb": 970.9,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 97,
+      "spawns": 98,
       "writes": 55,
-      "dml": 20,
-      "executes": 57,
+      "dml": 19,
+      "executes": 55,
       "files": [
         {
           "path": "qa/gates/hermes-research.ts",
@@ -3522,20 +3522,20 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/research-director-delegation.ts",
+          "path": "qa/gates/hermes-production-inference-receipt.ts",
           "kb": 37.8,
-          "spawns": 2,
-          "spawnsLive": 1,
+          "spawns": 4,
+          "spawnsLive": 0,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
         },
         {
-          "path": "qa/gates/hermes-production-inference-receipt.ts",
-          "kb": 37.6,
-          "spawns": 3,
-          "spawnsLive": 0,
+          "path": "qa/gates/research-director-delegation.ts",
+          "kb": 37.8,
+          "spawns": 2,
+          "spawnsLive": 1,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
@@ -3612,18 +3612,8 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/dev-dock-readiness.ts",
-          "kb": 19.3,
-          "spawns": 4,
-          "spawnsLive": 2,
-          "writes": 2,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "qa/gates/kernel-sole-writer.ts",
-          "kb": 18.9,
+          "kb": 19.5,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 2,
@@ -3633,6 +3623,16 @@
             44,
             46
           ],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/dev-dock-readiness.ts",
+          "kb": 19.3,
+          "spawns": 4,
+          "spawnsLive": 2,
+          "writes": 2,
+          "dml": 0,
+          "dmlLines": [],
           "executes": 0
         },
         {
@@ -3945,7 +3945,7 @@
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
-          "executes": 1
+          "executes": 0
         },
         {
           "path": "qa/gates/golden-g12-package-operations.ts",
@@ -4039,15 +4039,13 @@
         },
         {
           "path": "qa/gates/wave1-evidence-computation.ts",
-          "kb": 3.4,
+          "kb": 3.5,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
-          "dml": 1,
-          "dmlLines": [
-            41
-          ],
-          "executes": 1
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
         },
         {
           "path": "qa/gates/artifact-root.ts",
@@ -4277,16 +4275,6 @@
           "where": "qa/gates/team-composition.ts",
           "lines": [
             186
-          ],
-          "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
-        },
-        {
-          "kind": "outside-write-door",
-          "scope": "qa",
-          "what": "1 SQL statement outside execute()",
-          "where": "qa/gates/wave1-evidence-computation.ts",
-          "lines": [
-            41
           ],
           "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
         }
@@ -4586,7 +4574,7 @@
       "id": "5:qa::verify",
       "layer": 5,
       "name": "verify*",
-      "kb": 8,
+      "kb": 8.3,
       "x": 2.6,
       "z": -0.45,
       "status": "ok",
@@ -4597,7 +4585,7 @@
       "files": [
         {
           "path": "qa/verify-release.ts",
-          "kb": 7.6,
+          "kb": 7.9,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -58634,27 +58622,17 @@
         186
       ],
       "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
-    },
-    {
-      "kind": "outside-write-door",
-      "scope": "qa",
-      "what": "1 SQL statement outside execute()",
-      "where": "qa/gates/wave1-evidence-computation.ts",
-      "lines": [
-        41
-      ],
-      "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
     }
   ],
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "371d86fb",
-      "generatedAt": "2026-09-08"
+      "commit": "fb07c6df",
+      "generatedAt": "2026-09-09"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "fb07c6df",
+      "commit": "4fb278a9",
       "generatedAt": "2026-09-09"
     },
     "verdict": "better",

@@ -118,6 +118,8 @@ const DRIVER_ALLOW = [
   // WO-PRE-R18: independent read-only SQLite Oracle freezes the literal R17
   // world before the production Electron proof; it does not write fixture truth.
   "qa/gates/pre-r18-coherence.ts",
+  // WO-W1-03: independent read-only oracle over the isolated packaged proof Kernel.
+  "qa/gates/wave1-critic-decision.ts",
   // WO-RD-3: independent read-only oracle over the isolated founder-steering Kernel.
   "qa/gates/founder-steering.ts",
   "qa/gates/golden-g10-canvas-runtime.ts",
@@ -151,6 +153,8 @@ const OPEN_ALLOW = [
   // WO-107: deterministic fixture suite/gate open only temporary Kernels.
   "tools/qf-bovada-football/src/runner.test.ts",
   "tools/qf-bovada-football/src/gate.ts",
+  // WO-W1-01: disposable live-market capture fixtures open only in-memory Kernels.
+  "tools/qf-bovada-football/src/live-markets.test.ts",
   "species/hermes/register.ts",
   "species/hermes/host-admit-kernel.ts",
   "species/hermes/a2a-4tile-smoke.ts",
@@ -177,6 +181,8 @@ const OPEN_ALLOW = [
   "qa/gates/windows-golden-seed.ts",
   "qa/gates/golden-g10-canvas-runtime.ts",
   "qa/gates/report-authority.ts",
+  // WO-W1-03: observer-contract fixture writes only through execute().
+  "qa/gates/wave1-critic-decision.test.ts",
 ];
 
 /**
@@ -194,6 +200,9 @@ const WRITE_ALLOW = [
 
   // WO-107: the finite runner writes only through its injected execute boundary.
   "tools/qf-bovada-football/src/runner.ts",
+  // WO-W1-01: production market ingestion receives the Kernel module and uses only execute().
+  "tools/qf-bovada-football/src/live-markets.ts",
+  "tools/qf-bovada-football/src/live-markets.test.ts",
   "species/hermes/register.ts",
   "species/hermes/host-admit-kernel.ts",
   "species/hermes/a2a-4tile-smoke.ts",
@@ -220,6 +229,7 @@ const WRITE_ALLOW = [
   "qa/gates/technique-outcome-loop.ts",
   "collab-electron/",
   "qa/gates/report-authority.ts",
+  "qa/gates/wave1-critic-decision.test.ts",
 ];
 
 /** Production openers that must never pass { create: true } (G3b). */

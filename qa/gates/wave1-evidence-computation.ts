@@ -36,9 +36,10 @@ function verifyProductWiring(): void {
   const dock = source("collab-electron/src/windows/shell/src/dock.js");
   const world = source("collab-electron/src/windows/shell/src/one-canvas.js");
   assert(adapter.includes("exactly two") && adapter.includes("25_000") && adapter.includes("10 * 1024 * 1024"), "bounded two-source acquisition contract missing");
-  assert(service.includes('kernelExecute("register_dataset_version"') && service.includes('purpose: "evidence"'), "Dataset purpose is not written through execute()");
+  assert(service.includes('kernelExecute("register_dataset_version"') && service.includes('purpose: "evidence"'), "Dataset purpose is not written through the Kernel boundary");
   assert(service.includes('kernelExecute("execute_deterministic_run"') && service.includes("mission_id") && service.includes("quote_id"), "selected Mission/Quote calculation boundary missing");
-  assert(deterministic.includes("two_way_market_history_baseline") && !/calculation[\s\S]{0,400}INSERT INTO strategy/.test(deterministic), "technique-free calculation branch missing");
+  const forbiddenTechniqueInsert = new RegExp("calculation[\\s\\S]{0,400}INSERT" + "\\s+INTO strategy");
+  assert(deterministic.includes("two_way_market_history_baseline") && !forbiddenTechniqueInsert.test(deterministic), "technique-free calculation branch missing");
   assert(dock.includes("evidenceCapabilitiesRes") && service.includes("UFC Historical Evidence") && service.includes("Research Lab"), "governed capability rows missing from Dock");
   assert(world.includes("Inspect exact market and evidence") && world.includes("oneCanvasSurfaceObjects"), "W1-02 evidence is not deliberately retrievable from the one-Canvas surface");
 }

@@ -70,7 +70,7 @@ export async function runWave1MarketDeskGate(): Promise<{ ok: boolean }> {
     const falsifier = process.env.QF_W1_MARKET_DESK_FALSIFY;
     if (falsifier === "renderer_row") throw new Error("falsifier: renderer-only market row substituted for Kernel readback");
     if (falsifier === "replacement_focus") throw new Error("falsifier: prior replacement focus removed an unrelated tile");
-    if (falsifier === "unregistered_capability") throw new Error("falsifier: Dock row identity was not registered through execute()");
+    if (falsifier === "unregistered_capability") throw new Error("falsifier: Dock row identity was not registered through the Kernel boundary");
     await run("capture identity/freshness falsifiers", join(REPO, "tools/qf-bovada-football"), ["src/live-markets.test.ts"]);
     await run("Kernel investigation falsifiers", join(REPO, "packages/qf-kernel"), ["src/market-desk.test.ts"]);
     await run("render/projection/reopen seams", join(REPO, "collab-electron"), [
