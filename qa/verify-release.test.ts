@@ -62,7 +62,7 @@ describe("verify-release stages", () => {
     expect(WINDOWS_RELEASE_STAGES[0]).toMatchObject({
       id: "install-electron",
       cwd: "collab-electron",
-      command: ["bun", "install", "--frozen-lockfile"],
+      command: ["bun", "install", "--frozen-lockfile", "--force"],
     });
     expect(WINDOWS_RELEASE_STAGES[1]).toMatchObject({
       id: "install-hermes",

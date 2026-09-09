@@ -23,7 +23,7 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
   {
     id: "install-electron",
     cwd: "collab-electron",
-    command: ["bun", "install", "--frozen-lockfile"],
+    command: ["bun", "install", "--frozen-lockfile", "--force"],
     installCache: "electron",
   },
   {
