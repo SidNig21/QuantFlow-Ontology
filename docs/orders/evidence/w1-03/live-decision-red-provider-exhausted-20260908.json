@@ -1,0 +1,56 @@
+{
+  "schema": "qf.w1-03.live-failure-diagnostic.v1",
+  "result": "RED",
+  "diagnostic_only": true,
+  "last_completed_stage": "analyze_and_review_dispatched",
+  "route": {
+    "visible_market_action_reached": true,
+    "analyze_and_review_dispatched": true
+  },
+  "worker": {
+    "session_id": "41971a50-9656-4b96-b696-681b71d5aa40",
+    "session_status": "running",
+    "task_id": "task-22dfa3ab-d447-43e6-9e42-246c3e8d034e",
+    "task_status": "open",
+    "assigned": true,
+    "assignment_ambiguous": false,
+    "inference": {
+      "log_present": true,
+      "api_rows": [],
+      "turn_rows": []
+    },
+    "trajectory_id": null,
+    "trajectory_present": false,
+    "trajectory_ambiguous": false,
+    "kernel_accepted_and_bound": false
+  },
+  "critic": {
+    "session_id": null,
+    "session_status": null,
+    "task_id": null,
+    "task_status": null,
+    "review_lifecycle": null,
+    "assigned": false,
+    "assignment_ambiguous": false,
+    "inference": {
+      "log_present": false,
+      "api_rows": [],
+      "turn_rows": []
+    },
+    "successful_tools": [],
+    "last_transport_event": null,
+    "completion_failure": null
+  },
+  "governed_result": {
+    "evaluation_present": false,
+    "publication_present": false,
+    "current_decision_present": false
+  },
+  "lifecycle": {
+    "shutdown_attempted": true,
+    "exit_code": 1,
+    "owned_processes_remaining": 0,
+    "disposable_root_removed": true
+  },
+  "error": "worker completion and Critic admission timed out: "
+}

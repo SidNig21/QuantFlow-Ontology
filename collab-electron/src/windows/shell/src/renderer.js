@@ -1484,6 +1484,7 @@ async function init() {
 						String(args[0] ?? ""),
 						args[1] && typeof args[1] === "object" ? args[1] : {},
 					);
+					researchWorldController?.refreshParticipants?.();
 					minimap.update();
 				}
 				if (channel === "spawn-failed") {
@@ -1610,6 +1611,7 @@ async function init() {
 						);
 						tileManager.saveCanvasImmediate();
 						tileManager.spawnTerminalWebview(tile, true);
+						researchWorldController?.refreshParticipants?.();
 						minimap.update();
 						if (sessionId && researchWorldController?.getLastRoot?.()) {
 							window.requestAnimationFrame(() => tidyTilesToGrid());

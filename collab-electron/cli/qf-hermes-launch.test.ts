@@ -59,6 +59,9 @@ describe("Hermes packaged launch wrapper", () => {
     expect(wrapper).toContain("--quantflow-task-oneshot");
     expect(wrapper).toContain('exec "$hermes_command" --toolsets "$quantflow_toolsets" "$@"');
     expect(wrapper).toContain("HERMES_EPHEMERAL_SYSTEM_PROMPT");
+    expect(wrapper).toContain("QuantFlow is one persistent research workspace");
+    expect(wrapper).toContain("not the control plane");
+    expect(wrapper).toContain("never create alternate Mission, History, or lineage worlds");
     expect(wrapper).not.toContain('exec "$hermes_command" -z');
   });
 

@@ -27,15 +27,17 @@ describe("verify-release stages", () => {
     "species/hermes/bun.lock",
     "tools/qf-bovada-football/bun.lock",
     "tools/qf-read-tools/bun.lock",
+    "tools/qf-ufc-history/bun.lock",
     "tools/qf-vault-projection/bun.lock",
   ];
-  const PREINSTALL_IDS = ["install-electron", "install-hermes", "install-bovada", "install-kernel"];
+  const PREINSTALL_IDS = ["install-electron", "install-hermes", "install-bovada", "install-ufc", "install-kernel"];
 
   test("requires the native Windows install, unit, package, and static-gate order", () => {
     expect(WINDOWS_RELEASE_STAGES.map((stage) => stage.id)).toEqual([
       "install-electron",
       "install-hermes",
       "install-bovada",
+      "install-ufc",
       "install-kernel",
       "unit",
       "golden-g12-package-operations",
@@ -56,7 +58,7 @@ describe("verify-release stages", () => {
       "kernel-market-lineage",
       "observe-door",
     ]);
-    expect(WINDOWS_RELEASE_STAGES).toHaveLength(22);
+    expect(WINDOWS_RELEASE_STAGES).toHaveLength(23);
     expect(WINDOWS_RELEASE_STAGES[0]).toMatchObject({
       id: "install-electron",
       cwd: "collab-electron",
@@ -74,18 +76,18 @@ describe("verify-release stages", () => {
     });
   });
 
-  test("classifies all 15 lock roots and rejects install-closure drift", () => {
+  test("classifies all 16 lock roots and rejects install-closure drift", () => {
     const actualLocks = execFileSync("git", ["ls-files"], { cwd: join(import.meta.dir, ".."), encoding: "utf8" })
       .split(/\r?\n/).filter((path) => path.endsWith("bun.lock")).sort();
     expect(actualLocks).toEqual(LOCK_ROOTS);
-    const ids = WINDOWS_RELEASE_STAGES.slice(0, 4).map((stage) => stage.id);
+    const ids = WINDOWS_RELEASE_STAGES.slice(0, 5).map((stage) => stage.id);
     expect(ids).toEqual(PREINSTALL_IDS);
     expect(ids.slice(1)).not.toEqual(PREINSTALL_IDS);
     expect([ids[1], ids[0], ids[2]]).not.toEqual(PREINSTALL_IDS);
     expect([...ids, "install-extra"]).not.toEqual(PREINSTALL_IDS);
-    const wrongOption = WINDOWS_RELEASE_STAGES.slice(0, 4).map((stage) => stage.command.join(" "));
+    const wrongOption = WINDOWS_RELEASE_STAGES.slice(0, 5).map((stage) => stage.command.join(" "));
     wrongOption[2] = wrongOption[2].replace("--backend copyfile", "--backend hardlink");
-    expect(wrongOption).not.toEqual(WINDOWS_RELEASE_STAGES.slice(0, 4).map((stage) => stage.command.join(" ")));
+    expect(wrongOption).not.toEqual(WINDOWS_RELEASE_STAGES.slice(0, 5).map((stage) => stage.command.join(" ")));
   });
 
   test("Kernel frozen install resolves its own dependency root before Windows unit", () => {

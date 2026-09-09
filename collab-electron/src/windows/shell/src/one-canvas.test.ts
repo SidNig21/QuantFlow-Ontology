@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { oneCanvasSurfaceObjects, readyDirectorDefinitions } from "./one-canvas.js";
+import { hasLiveDirectorSurface, oneCanvasSurfaceObjects, readyDirectorDefinitions } from "./one-canvas.js";
 import { contextualInspectReceipt, criticMaterialAttack, deriveResearchWorkflow } from "./research-workflow.js";
 
 test("one Canvas exposes one purposeful investigation surface instead of Kernel-card inventory", () => {
@@ -35,6 +35,13 @@ test("cold open selects the exact Research Director instead of any orchestrator"
   expect(readyDirectorDefinitions(definitions)).toEqual([director]);
   expect(readyDirectorDefinitions([director, { ...director }])).toHaveLength(2);
   expect(readyDirectorDefinitions(definitions.filter((definition) => definition !== director))).toEqual([]);
+});
+
+test("the ready Director is retired only when its real participant surface exists", () => {
+  expect(hasLiveDirectorSurface([{ ontologyType: "ready_director", ontologyId: "hermes-research-director" }])).toBe(false);
+  expect(hasLiveDirectorSurface([{ sessionId: "worker-1", definitionId: "hermes-worker" }])).toBe(false);
+  expect(hasLiveDirectorSurface([{ sessionId: "director-1", definitionId: "hermes-research-director" }])).toBe(true);
+  expect(hasLiveDirectorSurface([{ sessionId: "director-1", definitionId: "hermes-research-director-copy" }])).toBe(false);
 });
 
 test("rendered shell has no alternate Canvas mode controls or persisted Canvas restoration", async () => {

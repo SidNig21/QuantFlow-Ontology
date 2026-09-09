@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "371d86fb",
-    "generatedAt": "2026-09-08",
+    "commit": "fb07c6df",
+    "generatedAt": "2026-09-09",
     "filesScanned": 426,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "88edace1fd666bab"
+    "fingerprint": "2a0a24c98f9993bf"
   },
   "stats": {
     "live": 108,
@@ -729,8 +729,8 @@
       "layer": 4,
       "name": "TreeView.tsx",
       "kb": 16.5,
-      "x": -2.48,
-      "z": -0.91,
+      "x": -1.69,
+      "z": -2.03,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2837,9 +2837,9 @@
       "id": "4:collab-electron/src/windows/shell/src::one",
       "layer": 4,
       "name": "one-canvas.js",
-      "kb": 16.3,
-      "x": -1.69,
-      "z": -2.03,
+      "kb": 16.8,
+      "x": -2.48,
+      "z": -0.91,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2848,7 +2848,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/one-canvas.js",
-          "kb": 16.3,
+          "kb": 16.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2893,7 +2893,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 59.1,
+      "kb": 59.2,
       "x": 1.01,
       "z": 0.85,
       "status": "ice",
@@ -2904,7 +2904,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 59.1,
+          "kb": 59.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3462,7 +3462,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 968.3,
+      "kb": 970,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3553,7 +3553,7 @@
         },
         {
           "path": "qa/gates/wave1-critic-decision.ts",
-          "kb": 32.8,
+          "kb": 34.5,
           "spawns": 2,
           "spawnsLive": 1,
           "writes": 3,
@@ -58649,13 +58649,13 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "ffb8c9de",
+      "commit": "371d86fb",
       "generatedAt": "2026-09-08"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "371d86fb",
-      "generatedAt": "2026-09-08"
+      "commit": "fb07c6df",
+      "generatedAt": "2026-09-09"
     },
     "verdict": "better",
     "why": "37 improvement(s), nothing added or hidden",

@@ -14,9 +14,9 @@ const REPO_ROOT = join(import.meta.dir, "..");
 
 export type ReleaseStage = {
   id: string;
-  cwd: "." | "collab-electron" | "species/hermes" | "tools/qf-bovada-football" | "packages/qf-kernel";
+  cwd: "." | "collab-electron" | "species/hermes" | "tools/qf-bovada-football" | "tools/qf-ufc-history" | "packages/qf-kernel";
   command: readonly [string, ...string[]];
-  installCache?: "electron" | "hermes" | "bovada" | "kernel";
+  installCache?: "electron" | "hermes" | "bovada" | "ufc" | "kernel";
 };
 
 export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
@@ -39,6 +39,14 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
       "bun", "install", "--frozen-lockfile", "--backend", "copyfile", "--linker", "isolated",
     ],
     installCache: "bovada",
+  },
+  {
+    id: "install-ufc",
+    cwd: "tools/qf-ufc-history",
+    command: [
+      "bun", "install", "--frozen-lockfile", "--backend", "copyfile", "--linker", "isolated",
+    ],
+    installCache: "ufc",
   },
   {
     id: "install-kernel",

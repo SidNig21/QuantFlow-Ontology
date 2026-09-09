@@ -48,6 +48,15 @@ class SessionHeaderTests(unittest.TestCase):
             for name in ("name", "aliases", "base_url", "default_aux_model"):
                 self.assertEqual(getattr(actual, name), getattr(original, name))
 
+    def test_non_opencode_provider_does_not_require_opencode_profile(self):
+        registered = []
+        registry = ModuleType("providers")
+        registry.get_provider_profile = lambda name: None
+        registry.register_provider = registered.append
+        with patch.dict(sys.modules, {"providers": registry}), patch.dict(os.environ, {"QF_AGENT_SESSION_ID": "luna-seat"}, clear=True):
+            runpy.run_path(str(Path(__file__).parent / "qf-opencode-session" / "__init__.py"))
+        self.assertEqual(registered, [])
+
     def test_only_terminal_runtime_record_emits_safe_failure(self):
         self.load("worker-failure-test")
         handler = self.module["QuantFlowFailureHandler"]()
@@ -68,6 +77,26 @@ class SessionHeaderTests(unittest.TestCase):
             handler.emit(logging.LogRecord("run_agent", logging.WARNING, "run_agent.py", 1, "Retrying API call in %ss", (120,), None))
             write.assert_called_once_with(1, b"\x1b]777;QF;PROVIDER_UNAVAILABLE;rate-test;\x07")
             self.assertNotIn(b"secret", write.call_args.args[1])
+
+    def test_current_hermes_retry_record_fails_fast_without_leaking_summary(self):
+        self.load("worker-current-rate-test")
+        handler = self.module["QuantFlowFailureHandler"]()
+        message = "API call failed (attempt %s/%s) error_type=%s %s summary=%s"
+        args = (1, 3, "HTTPStatusError", "provider=openai-codex model=gpt-5.6-luna", "HTTP 429: Weekly usage limit reached token=private")
+        with patch.dict(os.environ, {"QF_RUNTIME_FAILURE_NONCE": "current-rate-test"}), patch("os.write") as write:
+            handler.emit(logging.LogRecord("run_agent", logging.WARNING, "run_agent.py", 1, message, args, None))
+            write.assert_called_once_with(1, b"\x1b]777;QF;PROVIDER_UNAVAILABLE;current-rate-test;\x07")
+            self.assertNotIn(b"private", write.call_args.args[1])
+
+    def test_similar_model_or_terminal_text_cannot_forge_provider_failure(self):
+        self.load("worker-rate-falsifier")
+        handler = self.module["QuantFlowFailureHandler"]()
+        message = "API call failed (attempt %s/%s) error_type=%s %s summary=%s"
+        with patch.dict(os.environ, {"QF_RUNTIME_FAILURE_NONCE": "rate-falsifier"}), patch("os.write") as write:
+            handler.emit(logging.LogRecord("tool", logging.WARNING, "tool.py", 1, message, (1, 3, "HTTPStatusError", "provider=x", "HTTP 429"), None))
+            handler.emit(logging.LogRecord("run_agent", logging.WARNING, "run_agent.py", 1, "assistant text: HTTP 429", (), None))
+            handler.emit(logging.LogRecord("run_agent", logging.WARNING, "run_agent.py", 1, message, (1, 3, "TimeoutError", "provider=x", "request timed out"), None))
+            write.assert_not_called()
 
     def test_success_emits_only_credential_safe_structured_receipt(self):
         self.load("worker-receipt-test")

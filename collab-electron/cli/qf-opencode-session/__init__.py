@@ -1,7 +1,8 @@
-"""Supply OpenCode routing identity from the current QuantFlow participant.
+"""Preserve OpenCode routing identity when that provider is selected.
 
 Hermes discovers this override in the disposable participant profile; its
-existing provider client consumes default_headers without another transport.
+existing OpenCode client consumes default_headers without another transport.
+Other configured providers remain untouched.
 """
 
 import os
@@ -18,12 +19,11 @@ if not re.fullmatch(r"[a-zA-Z0-9_-]+", session_id):
     raise RuntimeError("QuantFlow participant session identity is required")
 
 profile = get_provider_profile("opencode-go")
-if profile is None:
-    raise RuntimeError("Hermes OpenCode provider profile is unavailable")
-register_provider(replace(
-    profile,
-    default_headers={**profile.default_headers, "x-opencode-session": session_id},
-))
+if profile is not None:
+    register_provider(replace(
+        profile,
+        default_headers={**profile.default_headers, "x-opencode-session": session_id},
+    ))
 
 # Observe the runtime's literal terminal-failure record, never model text or
 # exception contents. Ordinary stream reconnects do not emit this record.
@@ -44,6 +44,17 @@ class QuantFlowFailureHandler(logging.Handler):
             error = record.args[0] if isinstance(record.args, tuple) and len(record.args) == 1 else None
             status = getattr(error, "status", getattr(error, "status_code", getattr(getattr(error, "response", None), "status_code", None)))
             if status == 429:
+                self.control("PROVIDER_UNAVAILABLE", nonce)
+            return
+        # Current Hermes reports provider failures through this structured
+        # retry record. Inspect only its fixed arguments and emit no error text.
+        if (record.name == "run_agent" and record.levelno == logging.WARNING
+                and record.msg == "API call failed (attempt %s/%s) error_type=%s %s summary=%s"
+                and isinstance(record.args, tuple) and len(record.args) == 5
+                and safe_nonce):
+            error_type, context, summary = record.args[2:]
+            signal = " ".join(str(value) for value in (error_type, context, summary))
+            if re.search(r"(?:^|\D)429(?:\D|$)|rate[ _-]?limit|weekly usage limit", signal, re.IGNORECASE):
                 self.control("PROVIDER_UNAVAILABLE", nonce)
             return
         api_args = None

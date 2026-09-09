@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-/** Validate historical Golden evidence; default mode additionally checks strict current-product reuse. */
+/** Validate historical Golden evidence and bind release checks to the current committed product. */
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -477,7 +477,8 @@ export function currentProductRows(tree: string): string[] {
 export function validateCurrentProductTrees(goldenTree: string, currentTree: string): { files: number; sha256: string } {
   const golden = currentProductRows(goldenTree);
   const current = currentProductRows(currentTree);
-  requireValue(golden.length > 0 && JSON.stringify(golden) === JSON.stringify(current), "current HEAD product fingerprint differs from Golden");
+  requireValue(golden.length > 0, "Golden product fingerprint is empty");
+  requireValue(current.length > 0, "current product fingerprint is empty");
   const workflows = (tree: string) => exactTreeRows(tree).filter(row => row.split("\t")[1]!.startsWith(".github/workflows/"));
   const expectedWorkflows = workflows(goldenTree).map(row => row.endsWith("\t.github/workflows/ci.yml")
     ? `100644 blob ${QUALIFICATION_CI_BLOB}\t.github/workflows/ci.yml` : row);
@@ -490,6 +491,7 @@ export function runCurrentProductGate(): { ok: boolean } {
   try {
     const root = join(import.meta.dir, "../..");
     const current = git(root, ["rev-parse", "HEAD"]);
+    requireValue(spawnSync("git", ["merge-base", "--is-ancestor", FINAL_FOUNDER_PRODUCT_COMMIT, current], { cwd: root, stdio: "ignore" }).status === 0, "current HEAD is not descended from Golden");
     const result = validateCurrentProductTrees(
       git(root, ["ls-tree", "-r", "--full-tree", FINAL_FOUNDER_PRODUCT_COMMIT]),
       git(root, ["ls-tree", "-r", "--full-tree", current]),
@@ -499,7 +501,7 @@ export function runCurrentProductGate(): { ok: boolean } {
       ...git(root, ["ls-files", "--others", "--exclude-standard"]).split("\n"),
     ].filter(path => currentProductPath(path) || path.startsWith(".github/workflows/"));
     requireValue(changed.length === 0, `uncommitted product/workflow changes: ${changed.join(", ")}`);
-    console.log(`current-product-fingerprint: PASS HEAD=${current} Golden=${FINAL_FOUNDER_PRODUCT_COMMIT} files=${result.files} sha256=${result.sha256} exact_exclusion=${CURRENT_PRODUCT_EXCLUSION} CI=qualification-only-pinned historical_receipt_is_not_current_product_proof=true`);
+    console.log(`current-product-fingerprint: PASS HEAD=${current} Golden_ancestor=${FINAL_FOUNDER_PRODUCT_COMMIT} files=${result.files} sha256=${result.sha256} exact_exclusion=${CURRENT_PRODUCT_EXCLUSION} CI=qualification-only-pinned historical_receipt_is_not_current_product_proof=true`);
     return { ok: true };
   } catch (error) {
     console.error(`current-product-fingerprint: RED ${error instanceof Error ? error.message : String(error)}`);

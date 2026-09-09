@@ -14,7 +14,8 @@ const REPO = resolve(import.meta.dir, "../..");
 export const WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS = 10 * 60_000;
 export const CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS = 11 * 60_000;
 type Row = Record<string, any>;
-type SafeInference = { log_present: boolean; api_rows: Row[]; turn_rows: Row[] };
+export type ConfiguredHermesIdentity = { provider: string; model: string };
+type SafeInference = { log_present: boolean; configured: ConfiguredHermesIdentity | null; api_rows: Row[]; turn_rows: Row[] };
 export type LiveFailureDiagnostic = {
   last_completed_stage: string;
   visible_market_action_reached: boolean;
@@ -42,7 +43,28 @@ function query(path: string, sql: string, ...args: string[]): Row[] {
     return db.query(sql).all(...args) as Row[];
   } finally { db.close(true); }
 }
-const emptyInference = (): SafeInference => ({ log_present: false, api_rows: [], turn_rows: [] });
+export function parseHermesModelIdentity(configText: string): ConfiguredHermesIdentity {
+  let inModel = false;
+  let provider = "";
+  let model = "";
+  for (const line of configText.split(/\r?\n/)) {
+    if (/^model:\s*(?:#.*)?$/.test(line)) { inModel = true; continue; }
+    if (!inModel) continue;
+    if (/^[^\s#]/.test(line)) break;
+    const match = /^\s{2}(default|provider):\s*([A-Za-z0-9._/-]+)\s*(?:#.*)?$/.exec(line);
+    if (!match) continue;
+    if (match[1] === "default") model = match[2]!;
+    if (match[1] === "provider") provider = match[2]!;
+  }
+  assert(provider.length > 0 && model.length > 0, "isolated Hermes model identity is missing or unsafe");
+  assert(!/synthetic|fixture|mock|fallback/i.test(`${provider} ${model}`), "isolated Hermes model identity is not production");
+  return { provider, model };
+}
+function configuredHermesIdentity(appDir: string, sessionId: string): ConfiguredHermesIdentity {
+  const safeId = sessionId.replace(/[^A-Za-z0-9_-]/g, "_");
+  return parseHermesModelIdentity(readFileSync(join(appDir, "hermes-profiles", "profiles", `quantflow-runtime-${safeId}`, "config.yaml"), "utf8"));
+}
+const emptyInference = (): SafeInference => ({ log_present: false, configured: null, api_rows: [], turn_rows: [] });
 function safeInference(appDir: string, sessionId: string | null): SafeInference {
   if (!sessionId) return emptyInference();
   try {
@@ -51,6 +73,7 @@ function safeInference(appDir: string, sessionId: string | null): SafeInference 
     const parsed = parseTrustedHermesLog(readFileSync(logs[0]!, "utf8"));
     return {
       log_present: true,
+      configured: configuredHermesIdentity(appDir, sessionId),
       api_rows: parsed.apiFacts.map(({ session, provider, model, input, output, total, latency }) => ({ session_id: session, provider, model, input_tokens: input, output_tokens: output, total_tokens: total, latency_seconds: latency })),
       turn_rows: parsed.turnFacts.map(({ session, model, apiCalls, successful }) => ({ session_id: session, model, api_calls: apiCalls, successful })),
     };
@@ -138,7 +161,9 @@ export function validateLiveDecisionProof(proof: Row): void {
     const identities = new Set([...row.apiFacts, ...(row.turnFacts || [])].map((fact: Row) => fact.session).filter(Boolean));
     assert(identities.size === 1, "participant log has mixed or missing runtime identity");
     const runtimeIdentity = [...identities][0]!; assert(!runtimeIdentities.has(runtimeIdentity), "runtime identity reused across participants"); runtimeIdentities.add(runtimeIdentity);
-    assert(row.apiFacts.length > 0 && row.apiFacts.every((api: Row) => api.session === runtimeIdentity && api.input > 0 && api.output > 0 && api.total === api.input + api.output && api.latency > 0 && api.provider === "opencode-go" && api.model === "kimi-k3" && !/synthetic|fixture|mock|fallback/i.test(`${api.provider} ${api.model}`)), "real configured provider/model and nonzero exact usage required");
+    assert(row.configured?.provider && row.configured?.model && !/synthetic|fixture|mock|fallback/i.test(`${row.configured.provider} ${row.configured.model}`), "configured provider/model identity is missing or unsafe");
+    assert(row.apiFacts.length > 0 && row.apiFacts.every((api: Row) => api.session === runtimeIdentity && api.input > 0 && api.output > 0 && api.total === api.input + api.output && api.latency > 0 && api.provider === row.configured.provider && api.model === row.configured.model && !/synthetic|fixture|mock|fallback/i.test(`${api.provider} ${api.model}`)), "real configured provider/model and nonzero exact usage required");
+    assert((row.turnFacts || []).every((turn: Row) => !turn.model || turn.model === row.configured.model), "Turn telemetry disagrees with configured model");
   }
   assert(proof.lifecycle.worker_closed && proof.lifecycle.critic_closed && proof.lifecycle.reopen_live_sessions === 0 && proof.lifecycle.normal_exit_zero && proof.lifecycle.reopen_exit_zero && proof.lifecycle.processes === 0 && proof.lifecycle.roots_remaining === 0, "close, reopen, exit, or cleanup truth is incomplete");
 }
@@ -211,7 +236,7 @@ export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
     const inference = await until("two production inference API receipts", async () => {
       const rows = [source.executor_session_id, critic].map((id) => {
         const logs = files(join(appDir, "hermes-profiles", "profiles", `quantflow-runtime-${String(id).replace(/[^A-Za-z0-9_-]/g, "_")}`), "agent.log");
-        return logs.length === 1 ? { session_id: id, ...parseTrustedHermesLog(readFileSync(logs[0]!, "utf8")) } : null;
+        return logs.length === 1 ? { session_id: id, configured: configuredHermesIdentity(appDir, String(id)), ...parseTrustedHermesLog(readFileSync(logs[0]!, "utf8")) } : null;
       });
       return rows.every((row) => row?.apiFacts.length) ? rows : null;
     }, 45000);

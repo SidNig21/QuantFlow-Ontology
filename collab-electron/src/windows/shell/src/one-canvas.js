@@ -25,6 +25,12 @@ export function readyDirectorDefinitions(definitions) {
 	);
 }
 
+export function hasLiveDirectorSurface(canvasTiles) {
+	return (Array.isArray(canvasTiles) ? canvasTiles : []).some((tile) =>
+		Boolean(tile?.sessionId) && tile?.definitionId === "hermes-research-director"
+	);
+}
+
 function nextPosition() {
 	const visible = tiles.filter((tile) => !tile.hidden);
 	if (visible.length === 0) return { x: 80, y: 80 };
@@ -172,6 +178,14 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 		tileManager.repositionAllTiles();
 	}
 
+	function retireReadyDirectorWhenLive() {
+		if (!hasLiveDirectorSurface(tiles)) return false;
+		for (const tile of tiles.filter((entry) => entry.ontologyType === "ready_director")) {
+			tileManager.closeCanvasTile(tile.id);
+		}
+		return true;
+	}
+
 	function renderResult(dom, tile, object) {
 		if (!dom?.contentArea) return;
 		const decision = object.fields?.market_decision;
@@ -272,6 +286,7 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 	}
 
 	function decorateVisibleParticipants() {
+		retireReadyDirectorWhenLive();
 		if (!lastWorkflow) return;
 		for (const object of lastWorkflow.objects.filter((entry) => entry.type === "agent_session")) {
 			const tile = tiles.find((entry) => entry.sessionId === object.id);

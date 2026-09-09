@@ -1,79 +1,36 @@
-# QuantFlow Canvas — Gemini CLI Instructions
+# QuantFlow Canvas, Gemini CLI Instructions
 
-You have access to the `qf-canvas` CLI for controlling QuantFlow's spatial canvas.
-The canvas is a pannable, zoomable surface where tiles display terminals, files, images, and graphs.
-
-## Coordinate System
-
-All positions and sizes use **grid units** (1 unit = 20px).
-Origin (0,0) is top-left. X increases rightward, Y downward.
-
-## Tile Types and Default Sizes
-
-| Type    | Default size (w x h) | Use for                          |
-|---------|-----------------------|----------------------------------|
-| `term`  | 20 x 25              | Terminal / shell session         |
-| `note`  | 22 x 27              | Markdown files (.md, .txt)       |
-| `code`  | 22 x 27              | Source code files                |
-| `image` | 14 x 14              | Images (.png, .jpg, .gif, .webp) |
-| `graph` | 30 x 25              | .graph.json or folder graphs     |
-
-Type is inferred from file extension when `--file` is used.
+QuantFlow has one persistent Canvas, not separate Mission, History, Focus, or
+lineage worlds. The Kernel owns durable truth; the Canvas shows only deliberate
+working surfaces. Use `qf-canvas` for presentation, never to materialize the
+Ontology or make an ordinary terminal look like a governed participant.
 
 ## Commands
 
+All positions and sizes use 20-pixel grid units.
+
 ```bash
-# List all tiles
 qf-canvas tile list
-
-# Add a tile (returns tile ID)
-qf-canvas tile create <type> [--file <path>] [--pos x,y] [--size w,h]
-
-# Remove a tile
-qf-canvas tile rm <id>
-
-# Move a tile
+qf-canvas tile create <term|note|code|image|graph> [--file <path>] [--pos x,y] [--size w,h]
 qf-canvas tile move <id> --pos x,y
-
-# Resize a tile
 qf-canvas tile resize <id> --size w,h
-
-# Get viewport state
+qf-canvas tile focus <id> [<id>...]
+qf-canvas tile rm <id>
 qf-canvas viewport
-
-# Set viewport pan/zoom
 qf-canvas viewport set [--pan x,y] [--zoom level]
+qf-canvas terminal read <id> [--lines N]
+qf-canvas terminal write <id> <input>
 ```
 
-## Examples
+## Rules
 
-```bash
-# Side-by-side code comparison
-qf-canvas tile create code --file ./old.ts --pos 0,0
-qf-canvas tile create code --file ./new.ts --pos 23,0
-
-# Research workspace: graph left, notes right, terminal below
-qf-canvas tile create graph --file ./research.graph.json --pos 0,0 --size 30,25
-qf-canvas tile create note --file ./notes.md --pos 31,0
-qf-canvas tile create term --pos 0,26
-
-# Frame the viewport after arranging
-qf-canvas viewport set --pan 0,0 --zoom 0.8
-```
-
-## Conventions
-
-1. Always `qf-canvas tile list` first to see existing tiles before creating new ones.
-2. Use `qf-canvas viewport set` to frame the view after arranging tiles.
-3. Remove tiles when no longer needed with `qf-canvas tile rm`.
-4. Leave 1 grid unit gap between adjacent tiles.
-5. File tiles auto-refresh when you write to the underlying file.
-6. Graph tiles support incremental updates — append nodes to `.graph.json` and the graph updates smoothly.
-
-## Exit Codes
-
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | RPC error |
-| 2 | Connection failure (QuantFlow not running) |
+1. List before changing the desk.
+2. Move or resize existing tiles instead of creating a parallel workspace.
+3. Keep participant TUIs readable and leave one grid unit between tiles.
+4. Keep ids, hashes, paths, raw rows, and full provenance behind Inspect.
+5. Cables represent exact active work only and are not decorative graph edges.
+6. Use the Dock to admit participants and capabilities. A generic terminal is
+   bench equipment, not a governed participant.
+7. Remove temporary surfaces when they stop helping. Durable truth remains in
+   the Kernel.
+8. Never place a bet or trade.
