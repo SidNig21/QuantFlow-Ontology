@@ -1,6 +1,6 @@
 # WO-W1-03 — Meaningful UFC research, independent criticism, and a governed decision
 
-status: BUILDING — fresh Reader returned ORDER SEMANTIC YES and BUILDER DOOR YES after the bounded acceptance correction on 2026-09-07
+status: OPEN — fresh Reader returned ORDER SEMANTIC YES and BUILDER DOOR YES after the bounded acceptance correction on 2026-09-07
 assignee: Builder — selectively salvage the preserved implementation under the corrected one-Canvas contract; never apply the stash wholesale
 depends: WO-W1-02 accepted at repaired product candidate `f9b11bd1d6df38d2e109456c2f1f2c2969a7de19`
 

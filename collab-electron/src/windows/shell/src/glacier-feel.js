@@ -17,46 +17,6 @@ export function cableEndpointsMoved(connection, tilesByIdBefore, tilesByIdAfter,
 }
 
 /**
- * D4: project Kernel events rows into ledger entries (newest first).
- * Projection only — no invented rows, no caching of derived truth.
- * @param {Array<{id:string,type:string,object_type:string,created_at:string}>} rows
- * @param {number} [nowMs]
- */
-export function projectKernelLedger(rows, nowMs = Date.now()) {
-	const sorted = [...rows].sort((a, b) => {
-		const ta = String(a.created_at);
-		const tb = String(b.created_at);
-		if (ta !== tb) return tb.localeCompare(ta);
-		return String(b.id).localeCompare(String(a.id));
-	});
-	return sorted.map((row) => ({
-		id: row.id,
-		type: row.type,
-		object_type: row.object_type,
-		created_at: row.created_at,
-		relative: formatRelative(row.created_at, nowMs),
-	}));
-}
-
-/**
- * @param {string} iso
- * @param {number} nowMs
- */
-export function formatRelative(iso, nowMs = Date.now()) {
-	const t = Date.parse(iso);
-	if (!Number.isFinite(t)) return "—";
-	const sec = Math.max(0, Math.floor((nowMs - t) / 1000));
-	if (sec < 5) return "just now";
-	if (sec < 60) return `${sec}s ago`;
-	const min = Math.floor(sec / 60);
-	if (min < 60) return `${min}m ago`;
-	const hr = Math.floor(min / 60);
-	if (hr < 48) return `${hr}h ago`;
-	const day = Math.floor(hr / 24);
-	return `${day}d ago`;
-}
-
-/**
  * D5: pan/zoom so all tiles fit in the viewport with margin.
  * Zoom clamped to canvas limits [0.25, 1].
  * @param {Array<{x:number,y:number,width:number,height:number}>} tiles

@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "4643574e",
+    "commit": "c0a93620",
     "generatedAt": "2026-09-09",
     "filesScanned": 426,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "18f532194cacdd0a"
+    "fingerprint": "d28a167b80e43b52"
   },
   "stats": {
     "live": 108,
@@ -3462,7 +3462,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 971.4,
+      "kb": 970.9,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -4018,16 +4018,6 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/glacier-feel.ts",
-          "kb": 3.8,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "qa/gates/kernel-drift.ts",
           "kb": 3.5,
           "spawns": 1,
@@ -4052,6 +4042,16 @@
           "kb": 3.3,
           "spawns": 1,
           "spawnsLive": 1,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/glacier-feel.ts",
+          "kb": 3.3,
+          "spawns": 0,
+          "spawnsLive": 0,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
@@ -5406,7 +5406,7 @@
       "id": "4:residue",
       "layer": 4,
       "name": "68 small modules*",
-      "kb": 148.9,
+      "kb": 147.7,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -5536,16 +5536,6 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/src/windows/shell/src/glacier-feel.js",
-          "kb": 4.5,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "collab-electron/packages/components/src/TreeView/fileIcons.tsx",
           "kb": 4.3,
           "spawns": 0,
@@ -5618,6 +5608,16 @@
         {
           "path": "collab-electron/packages/components/src/TreeView/SearchSortControls.tsx",
           "kb": 3.4,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "collab-electron/src/windows/shell/src/glacier-feel.js",
+          "kb": 3.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -58627,12 +58627,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "4fb278a9",
+      "commit": "4643574e",
       "generatedAt": "2026-09-09"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "4643574e",
+      "commit": "c0a93620",
       "generatedAt": "2026-09-09"
     },
     "verdict": "better",

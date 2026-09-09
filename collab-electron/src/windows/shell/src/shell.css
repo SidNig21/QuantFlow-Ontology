@@ -2777,7 +2777,7 @@ button.task-fact:focus-visible {
 	border: 1px solid color-mix(in srgb, var(--qf-accent) 52%, var(--qf-gl-rule));
 	border-radius: 12px;
 	background: var(--qf-gl-panel);
-	box-shadow: 0 24px 70px color-mix(in srgb, #000 42%, transparent);
+	box-shadow: var(--qf-gl-shadow);
 	color: var(--qf-gl-ice);
 	font-family: var(--qf-mono);
 }

@@ -4,7 +4,6 @@ import {
 	cableEndpointsMoved,
 	cableStateLabel,
 	fitViewportToTiles,
-	projectKernelLedger,
 } from "./glacier-feel.js";
 
 describe("WO-g6 D2 cables track tile geometry", () => {
@@ -43,25 +42,6 @@ describe("WO-g6 D2 cables track tile geometry", () => {
 			["b", { x: 300, y: 0, width: 100, height: 100 }],
 		]);
 		expect(cableEndpointsMoved(conn, tiles, tiles, connectionPath)).toBe(false);
-	});
-});
-
-describe("WO-g6 D4 ledger projection", () => {
-	test("newest first; equals input set with no extras", () => {
-		const rows = [
-			{ id: "e1", type: "connection.created", object_type: "connection", created_at: "2026-08-05T04:32:17.308Z" },
-			{ id: "e2", type: "connection.deleted", object_type: "connection", created_at: "2026-08-05T04:34:40.043Z" },
-			{ id: "e3", type: "agent_session.closed", object_type: "agent_session", created_at: "2026-08-05T04:34:40.226Z" },
-		];
-		const projected = projectKernelLedger(rows, Date.parse("2026-08-05T04:34:45.000Z"));
-		expect(projected.map((p) => p.id)).toEqual(["e3", "e2", "e1"]);
-		expect(projected.map((p) => `${p.type}|${p.object_type}`)).toEqual([
-			"agent_session.closed|agent_session",
-			"connection.deleted|connection",
-			"connection.created|connection",
-		]);
-		expect(new Set(projected.map((p) => p.id))).toEqual(new Set(rows.map((r) => r.id)));
-		expect(projected).toHaveLength(rows.length);
 	});
 });
 

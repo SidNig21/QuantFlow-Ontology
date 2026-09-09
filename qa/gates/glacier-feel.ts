@@ -1,5 +1,5 @@
 /**
- * WO-g6: D2 cable geometry tracking + D4 ledger projection equality.
+ * WO-g6/W1-03: live cable geometry plus the one-Canvas projection boundary.
  * Falsify: mutate assertions / strip a row and watch it go red.
  */
 import { readFileSync } from "node:fs";
@@ -7,7 +7,6 @@ import { join } from "node:path";
 import { connectionPath } from "../../collab-electron/src/windows/shell/src/cable-math.js";
 import {
   cableEndpointsMoved,
-  projectKernelLedger,
 } from "../../collab-electron/src/windows/shell/src/glacier-feel.js";
 
 const REPO = join(import.meta.dir, "../..");
@@ -50,43 +49,27 @@ export function checkGlacierFeel(): { ok: boolean; errors: string[] } {
     errors.push("D2: renderer must redraw cable overlay on reposition");
   }
 
-  // D4 — projected ledger equals events query set/order
-  const rows = [
-    { id: "e1", type: "connection.created", object_type: "connection", created_at: "2026-08-05T04:32:17.308Z" },
-    { id: "e2", type: "agent_session.started", object_type: "agent_session", created_at: "2026-08-05T04:30:00.000Z" },
-    { id: "e3", type: "connection.deleted", object_type: "connection", created_at: "2026-08-05T04:34:40.043Z" },
-  ];
-  const projected = projectKernelLedger(rows);
-  const ids = projected.map((p) => p.id);
-  if (ids.join(",") !== "e3,e1,e2") {
-    errors.push(`D4: expected newest-first e3,e1,e2 got ${ids.join(",")}`);
-  }
-  if (projected.length !== rows.length) {
-    errors.push("D4: projected length diverged from events rows");
-  }
-  for (const row of rows) {
-    const hit = projected.find((p) => p.id === row.id);
-    if (!hit) {
-      errors.push(`D4: missing event ${row.id}`);
-      continue;
-    }
-    if (hit.type !== row.type || hit.object_type !== row.object_type) {
-      errors.push(`D4: row ${row.id} type/object_type mismatch`);
-    }
-  }
-
-  // Ledger module must exist and project, not invent
-  const ledgerSrc = readFileSync(
-    join(REPO, "collab-electron/src/windows/shell/src/kernel-ledger.js"),
+  // W1-03 — one Canvas deliberately projects useful work instead of one tile
+  // per Kernel row. Exact provenance remains available through Inspect.
+  const oneCanvas = readFileSync(
+    join(REPO, "collab-electron/src/windows/shell/src/one-canvas.js"),
     "utf8",
   );
-  if (!ledgerSrc.includes("projectKernelLedger")) {
-    errors.push("D4: kernel-ledger.js must project via projectKernelLedger");
+  if (!oneCanvas.includes("oneCanvasSurfaceObjects")) {
+    errors.push("W1-03: one Canvas must own the deliberate surface projection");
+  }
+  if (!oneCanvas.includes("Technical details")) {
+    errors.push("W1-03: exact Kernel detail must remain reachable through Inspect");
+  }
+  for (const obsolete of ["kernel-ledger", "research-world-projection", "CURRENT_MISSION", "FULL_LINEAGE"]) {
+    if (renderer.includes(obsolete)) {
+      errors.push(`W1-03: renderer revived obsolete alternate-world surface ${obsolete}`);
+    }
   }
 
   // Coverage floor. Fixed-path reads throw on missing files; still refuse PASS
   // if any protected source arrived empty (truncated/moved content).
-  if (!canvasState.trim() || !renderer.trim() || !ledgerSrc.trim()) {
+  if (!canvasState.trim() || !renderer.trim() || !oneCanvas.trim()) {
     errors.push(
       "glacier-feel: scan collapsed — a protected source file was empty. " +
         "Refusing to report PASS on a scan that read nothing.",
@@ -98,7 +81,7 @@ export function checkGlacierFeel(): { ok: boolean; errors: string[] } {
     for (const e of errors) console.error(`  - ${e}`);
     return { ok: false, errors };
   }
-  console.log("glacier-feel OK (D2 geometry tracking + D4 ledger projection)");
+  console.log("glacier-feel OK (live cable geometry + deliberate one-Canvas projection)");
   return { ok: true, errors: [] };
 }
 
