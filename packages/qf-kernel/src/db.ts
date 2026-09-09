@@ -439,6 +439,7 @@ export function attachKernel(
       shape === "task_steering" ||
       shape === "pre_r17_current" ||
       shape === "pre_market_desk" ||
+      shape === "pre_wave1_evidence" ||
       shape === "pre_market_reschedule"
     ) {
       const profileIdentitySql = readFileSync(

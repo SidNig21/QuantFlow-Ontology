@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "ae4f2ed9",
+    "commit": "9e639b93",
     "generatedAt": "2026-09-09",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "2e3d96b7587b01d9"
+    "fingerprint": "57ec684c6b7fcc0a"
   },
   "stats": {
     "live": 108,
@@ -409,9 +409,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 568
+      "files": 569
     },
-    "coverageFiles": 568,
+    "coverageFiles": 569,
     "ownership": {
       "responsibilities": 10,
       "contested": 7,
@@ -20527,6 +20527,33 @@
       "unexplained": []
     },
     {
+      "path": "packages/qf-kernel/src/wave1-evidence-upgrade.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "partial",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "unsupported",
+      "reasons": {
+        "reach": "no reach row was produced for this path",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "8 of 8 SQL site(s) are not inside a named function, so no call path can be traced",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
       "path": "qa/fixtures/kernel-drift/prior-schema/schema.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -25462,41 +25489,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 564,
+      "indexed": 565,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 280,
+      "not-applicable": 281,
       "indexed": 285,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 558,
+      "not-applicable": 559,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
       "not-applicable": 513,
-      "partial": 30,
+      "partial": 31,
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 500,
+      "not-applicable": 501,
       "partial": 63,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 234,
+      "not-applicable": 235,
       "unsupported": 106,
       "indexed": 228
     },
     "ownership": {
       "not-applicable": 188,
-      "unsupported": 359,
+      "unsupported": 360,
       "indexed": 21
     },
     "reach": {
-      "unsupported": 338,
+      "unsupported": 339,
       "indexed": 227,
       "partial": 3
     }
@@ -58773,12 +58800,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "aac01eed",
+      "commit": "ae4f2ed9",
       "generatedAt": "2026-09-09"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "ae4f2ed9",
+      "commit": "9e639b93",
       "generatedAt": "2026-09-09"
     },
     "verdict": "better",
