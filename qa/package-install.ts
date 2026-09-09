@@ -65,7 +65,7 @@ export function packageInstallArgsForTypecheck(
  * CopyFileW/EPERM failure. Remove only those exact generated destinations;
  * never touch Bun's cache or any path outside cwd/node_modules.
  */
-function clearStaleLocalFileDependencyDestinations(
+export function clearStaleLocalFileDependencyDestinations(
   gateName: string,
   cwd: string,
 ): boolean {

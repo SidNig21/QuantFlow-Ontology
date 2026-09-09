@@ -9,6 +9,7 @@
 import { randomUUID } from "node:crypto";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
+import { clearStaleLocalFileDependencyDestinations } from "./package-install.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -233,8 +234,15 @@ export const executeReleaseStage: ReleaseStageExecutor = async (
     .filter((value): value is string => Boolean(value))
     .join(delimiter);
   const installCache = releaseInstallCacheDir(stage, runId);
+  const cwd = join(REPO_ROOT, stage.cwd);
+  if (
+    stage.command[1] === "install" &&
+    !clearStaleLocalFileDependencyDestinations(`release:${stage.id}`, cwd)
+  ) {
+    return 1;
+  }
   const child = Bun.spawn(executableCommand(stage.command), {
-    cwd: join(REPO_ROOT, stage.cwd),
+    cwd,
     env: {
       ...process.env,
       PATH: path,

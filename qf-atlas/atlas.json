@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "c0a93620",
+    "commit": "d21b6262",
     "generatedAt": "2026-09-09",
     "filesScanned": 426,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "d28a167b80e43b52"
+    "fingerprint": "73b71b800217e40f"
   },
   "stats": {
     "live": 108,
@@ -4574,7 +4574,7 @@
       "id": "5:qa::verify",
       "layer": 5,
       "name": "verify*",
-      "kb": 8.3,
+      "kb": 8.5,
       "x": 2.6,
       "z": -0.45,
       "status": "ok",
@@ -4585,7 +4585,7 @@
       "files": [
         {
           "path": "qa/verify-release.ts",
-          "kb": 7.9,
+          "kb": 8.1,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -58627,12 +58627,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "4643574e",
+      "commit": "c0a93620",
       "generatedAt": "2026-09-09"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "c0a93620",
+      "commit": "d21b6262",
       "generatedAt": "2026-09-09"
     },
     "verdict": "better",

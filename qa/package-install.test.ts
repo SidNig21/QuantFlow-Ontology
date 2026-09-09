@@ -1,7 +1,10 @@
 import { execFileSync } from "node:child_process";
 import { describe, expect, test } from "bun:test";
-import { resolve } from "node:path";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import {
+  clearStaleLocalFileDependencyDestinations,
   FROZEN_PACKAGE_INSTALL_ARGS,
   TYPECHECK_ELECTRON_INSTALL_ARGS,
   TYPECHECK_ELECTRON_PACKAGE,
@@ -24,6 +27,28 @@ function isGitIgnored(path: string): boolean {
 }
 
 describe("shared frozen package install", () => {
+  test("clears only exact generated destinations for direct file dependencies", () => {
+    const root = mkdtempSync(join(tmpdir(), "qf-package-install-"));
+    try {
+      const modules = join(root, "node_modules");
+      const localDependency = join(modules, "qf-kernel");
+      const registryDependency = join(modules, "zod");
+      mkdirSync(localDependency, { recursive: true });
+      mkdirSync(registryDependency, { recursive: true });
+      writeFileSync(join(localDependency, "stale.txt"), "stale");
+      writeFileSync(join(registryDependency, "keep.txt"), "keep");
+      writeFileSync(join(root, "package.json"), JSON.stringify({
+        dependencies: { "qf-kernel": "file:../packages/qf-kernel", zod: "^4.0.0" },
+      }));
+
+      expect(clearStaleLocalFileDependencyDestinations("test", root)).toBe(true);
+      expect(() => readFileSync(join(localDependency, "stale.txt"))).toThrow();
+      expect(readFileSync(join(registryDependency, "keep.txt"), "utf8")).toBe("keep");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   test("keeps the Windows copyfile and isolated linker contract explicit", () => {
     expect(FROZEN_PACKAGE_INSTALL_ARGS).toEqual([
       "bun",
