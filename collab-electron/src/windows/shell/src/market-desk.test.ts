@@ -44,12 +44,16 @@ describe("market desk one-Canvas projection", () => {
 		expect(marketDesk).toContain('element("details", "market-research-details")');
 		expect(marketDesk).toContain('open.removeAttribute("open")');
 		expect(marketDesk).toMatch(/await onResearch.*\n\s*root\.hidden = true/s);
+		expect(marketDesk).toContain("data-market-drag-handle");
+		expect(marketDesk).toContain('dragHandle.setPointerCapture(event.pointerId)');
 		expect(handoff).toContain('handoff?.status === "open"');
 		expect(handoff).not.toContain('className = "handoff-card"');
 		expect(styles).toMatch(/#handoff-layer[\s\S]*?z-index: 5/);
 		expect(styles).toMatch(/\.handoff-card[\s\S]*?display: none/);
 		expect(styles).toMatch(/\.market-desk-rows[^}]*overscroll-behavior: contain/);
 		expect(styles).toMatch(/\.market-desk-surface[\s\S]*?background: var\(--qf-gl-panel\)/);
+		expect(styles).toMatch(/\.market-desk-surface[\s\S]*?width: min\(480px,[\s\S]*?height: min\(720px,[\s\S]*?resize: both/);
+		expect(styles).not.toMatch(/\.market-desk-surface\s*\{[^}]*inset:/);
 		expect(styles).toContain('.market-desk-surface[hidden] { display: none; }');
   });
 });

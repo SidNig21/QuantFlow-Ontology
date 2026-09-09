@@ -2765,13 +2765,20 @@ button.task-fact:focus-visible {
 
 .market-desk-surface {
 	position: absolute;
-	inset: 24px;
+	top: 24px;
+	left: 24px;
 	z-index: 24;
 	display: flex;
 	flex-direction: column;
-	width: auto;
-	max-height: none;
+	box-sizing: border-box;
+	width: min(480px, calc(100% - 48px));
+	height: min(720px, calc(100% - 48px));
+	min-width: min(360px, calc(100% - 48px));
+	min-height: min(320px, calc(100% - 48px));
+	max-width: calc(100% - 48px);
+	max-height: calc(100% - 48px);
 	overflow: hidden;
+	resize: both;
 	pointer-events: auto;
 	padding: 18px;
 	border: 1px solid color-mix(in srgb, var(--qf-accent) 52%, var(--qf-gl-rule));
@@ -2783,6 +2790,15 @@ button.task-fact:focus-visible {
 }
 
 .market-desk-surface[hidden] { display: none; }
+
+.market-desk-surface > header {
+	flex: 0 0 auto;
+	cursor: grab;
+	user-select: none;
+}
+
+.market-desk-surface.is-dragging > header { cursor: grabbing; }
+.market-desk-surface > header button { cursor: pointer; }
 
 .market-desk-surface > header,
 .market-row-head,

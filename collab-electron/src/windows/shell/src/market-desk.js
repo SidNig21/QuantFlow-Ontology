@@ -20,11 +20,37 @@ export function createMarketDesk({ layerEl, onResearch, showStatus } = {}) {
 	const root = element("section", "market-desk-surface");
 	root.hidden = true;
 	root.setAttribute("aria-label", "Bovada live markets");
-	root.innerHTML = `<header><div><span class="market-desk-kicker">DATA · BOVADA</span><h2>Bovada Live Markets</h2></div><div class="market-desk-actions"><button type="button" data-market-refresh>Refresh</button><button type="button" data-market-close aria-label="Close markets">×</button></div></header><div class="market-desk-status" role="status" aria-live="polite"></div><div class="market-desk-rows"></div>`;
+	root.innerHTML = `<header data-market-drag-handle><div><span class="market-desk-kicker">DATA · BOVADA</span><h2>Bovada Live Markets</h2></div><div class="market-desk-actions"><button type="button" data-market-refresh>Refresh</button><button type="button" data-market-close aria-label="Close markets">×</button></div></header><div class="market-desk-status" role="status" aria-live="polite"></div><div class="market-desk-rows"></div>`;
 	layerEl?.appendChild(root);
 	const status = root.querySelector(".market-desk-status");
 	const rowsHost = root.querySelector(".market-desk-rows");
 	rowsHost.addEventListener("wheel", (event) => event.stopPropagation());
+	const dragHandle = root.querySelector("[data-market-drag-handle]");
+	dragHandle?.addEventListener("pointerdown", (event) => {
+		if (event.button !== 0 || (event.target instanceof Element && event.target.closest("button"))) return;
+		const layerBounds = layerEl?.getBoundingClientRect();
+		const rootBounds = root.getBoundingClientRect();
+		if (!layerBounds) return;
+		const start = { x: event.clientX, y: event.clientY, left: rootBounds.left - layerBounds.left, top: rootBounds.top - layerBounds.top };
+		dragHandle.setPointerCapture(event.pointerId);
+		root.classList.add("is-dragging");
+		const move = (moveEvent) => {
+			const maxLeft = Math.max(0, layerBounds.width - root.offsetWidth);
+			const maxTop = Math.max(0, layerBounds.height - root.offsetHeight);
+			root.style.left = `${Math.min(maxLeft, Math.max(0, start.left + moveEvent.clientX - start.x))}px`;
+			root.style.top = `${Math.min(maxTop, Math.max(0, start.top + moveEvent.clientY - start.y))}px`;
+		};
+		const finish = () => {
+			root.classList.remove("is-dragging");
+			dragHandle.removeEventListener("pointermove", move);
+			dragHandle.removeEventListener("pointerup", finish);
+			dragHandle.removeEventListener("pointercancel", finish);
+		};
+		dragHandle.addEventListener("pointermove", move);
+		dragHandle.addEventListener("pointerup", finish);
+		dragHandle.addEventListener("pointercancel", finish);
+		event.preventDefault();
+	});
 	let rows = [];
 	let loading = false;
 
