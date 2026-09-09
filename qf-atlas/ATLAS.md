@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-w1-03-one-canvas @ d6b5b454` on 2026-09-09 by
+> Generated from `codex/wo-w1-03-one-canvas @ 5b7a55f3` on 2026-09-09 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -521,7 +521,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 1016
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1330
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 1008
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 1019
 - `collab-electron/src/main/market-analysis.ts` — exports analyzeMarketAndReview() at line 28
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38

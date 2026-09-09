@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "d6b5b454",
+    "commit": "5b7a55f3",
     "generatedAt": "2026-09-09",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "dc0ad3f8bec33e0b"
+    "fingerprint": "90681cdda059d81d"
   },
   "stats": {
     "live": 108,
@@ -1694,7 +1694,7 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 86.8,
+      "kb": 87.7,
       "x": 1.01,
       "z": 0.85,
       "status": "gray",
@@ -1705,7 +1705,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 86.8,
+          "kb": 87.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 8,
@@ -11587,9 +11587,9 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelRequestGovernedReview() at line 1008",
-            "exports kernelGovernedReviewContextForSession() at line 1108",
-            "exports kernelGovernedReviewNextSequence() at line 1118"
+            "exports kernelRequestGovernedReview() at line 1019",
+            "exports kernelGovernedReviewContextForSession() at line 1119",
+            "exports kernelGovernedReviewNextSequence() at line 1129"
           ],
           "strong": [],
           "weight": "weak"
@@ -58802,12 +58802,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "9e639b93",
+      "commit": "d6b5b454",
       "generatedAt": "2026-09-09"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "d6b5b454",
+      "commit": "5b7a55f3",
       "generatedAt": "2026-09-09"
     },
     "verdict": "better",

@@ -83,6 +83,14 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   const boundedPacket = kernelDecisionModelReadView("qf_artifact_get", String(run.state.result_artifact_id), scope.run, null) as Record<string, unknown>;
   expect(new TextEncoder().encode(JSON.stringify(boundedPacket)).byteLength).toBeLessThanOrEqual(16 * 1024);
   expect(boundedPacket.contract).toBe("qf.market.model-evidence.v1");
+  const fullCalculation = (kernelDecisionArtifactView(String(run.state.result_artifact_id), scope.run) as { content: { comparisons: unknown[] } }).content;
+  const compactRows = boundedPacket.offered_market_comparisons as Record<string, unknown>[];
+  const comparisonContext = boundedPacket.comparison_context as Record<string, unknown>;
+  expect(compactRows.map((row) => ({ ...comparisonContext, ...row }))).toEqual(fullCalculation.comparisons);
+  expect(compactRows).toHaveLength(fullCalculation.comparisons.length);
+  expect(comparisonContext).toHaveProperty("event_cutoff");
+  expect(comparisonContext).not.toHaveProperty("raw_break_even");
+  expect(compactRows.every((row) => typeof row.selection_id === "string" && typeof row.quote_id === "string")).toBe(true);
   expect(JSON.stringify(boundedPacket)).not.toContain(String(sourceArtifact.storage_ref));
   const manyFactsRun = structuredClone(scope.run);
   const manyFactsParams = JSON.parse(String(manyFactsRun.params));

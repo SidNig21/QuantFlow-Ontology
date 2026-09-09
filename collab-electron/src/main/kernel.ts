@@ -945,13 +945,24 @@ export function kernelDecisionModelReadView(toolName: string, id: string, run: R
     const comparisons = Array.isArray(content.comparisons) ? content.comparisons : null;
     const evidence = Array.isArray(context.evidence_facts) ? context.evidence_facts : null;
     if (!comparisons || !evidence) throw new Error("Decision evidence packet requires every declared comparison and evidence fact");
+    // Carry identical per-selection context once, without truncating facts or
+    // widening the transport bound. Each row inherits these exact fields.
+    const comparisonContext: Record<string, unknown> = {};
+    const first = jsonRecord(comparisons[0]);
+    for (const key of ["event_cutoff", "observed_at", "probability", "minimum_decimal_price", "conservative_margin"]) {
+      if (Object.hasOwn(first, key) && comparisons.every((row) => Object.hasOwn(jsonRecord(row), key) && JSON.stringify(jsonRecord(row)[key]) === JSON.stringify(first[key]))) {
+        comparisonContext[key] = first[key];
+      }
+    }
     const packet = {
       contract: "qf.market.model-evidence.v1",
       exact_ids: { mission_id: context.mission_id, task_id: context.task_id, worker_session_id: context.worker_session_id, hypothesis_id: context.hypothesis_id, dataset_id: context.dataset_id, run_id: run.id, result_artifact_id: id, inputs: context.inputs },
       exact_counts: { comparisons: comparisons.length, evidence_facts: evidence.length, inputs: Array.isArray(context.inputs) ? context.inputs.length : 0 },
       hypothesis: context.hypothesis,
       method: context.method,
-      offered_market_comparisons: comparisons,
+      comparison_context: comparisonContext,
+      comparison_context_rule: "Every offered_market_comparisons row inherits comparison_context; combine both to read the complete exact comparison.",
+      offered_market_comparisons: comparisons.map((row) => Object.fromEntries(Object.entries(jsonRecord(row)).filter(([key]) => !Object.hasOwn(comparisonContext, key)))),
       official_evidence: evidence,
     };
     const text = JSON.stringify(packet);
