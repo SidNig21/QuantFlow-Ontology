@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { contentHash } from "qf-kernel";
+import { contentHash } from "qf-kernel/portable";
 import { closeAppKernel, kernelExecute, kernelListEvents, openAppKernel } from "./kernel";
 import {
   createMarketDeskInvestigation,

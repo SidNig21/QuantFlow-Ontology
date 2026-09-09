@@ -876,7 +876,7 @@ const gates: Gate[] = [
   {
     name: "kernel-sole-writer-app",
     description:
-      "WO-006b: only collab-electron/src/main/kernel.ts may import qf-kernel/sqlite or reference the Kernel db file",
+      "WO-006b: only the app Kernel gateway and named fixtures may import stateful qf-kernel/sqlite or reference the Kernel db file; portable helpers remain pure",
     run: async () => {
       const { checkKernelSoleWriterApp } = await import(
         "./gates/kernel-sole-writer-app.ts"

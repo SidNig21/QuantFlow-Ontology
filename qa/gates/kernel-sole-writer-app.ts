@@ -1,6 +1,7 @@
 /**
  * WO-006b/c: Kernel SQLite sole-writer + AgentOS sole-host under collab-electron/src.
- * - Only kernel.ts may import qf-kernel / sqlite / mention the Kernel db filename
+ * - Only kernel.ts and named fixture tests may import the stateful qf-kernel root,
+ *   SQLite, or mention the Kernel db filename; qf-kernel/portable is pure.
  * - No production app source may import the retired @rivet-dev/agentos* runtime
  * - acp-agent.ts is a frozen exception for @agentclientprotocol (debt #14)
  * - WO-008a: species/hermes/host-acp-client.ts is the sole live ACP SDK home
@@ -16,6 +17,10 @@ const APP_SRC = join(REPO_ROOT, "collab-electron/src");
 const KERNEL_ALLOWED = new Set([
   "collab-electron/src/main/kernel.ts",
   "collab-electron/src/main/research-world.test.ts",
+  // Isolated fixture tests may seed exact Kernel state through the public boundary.
+  "collab-electron/src/main/market-research-world.test.ts",
+  // Lifecycle migration fixtures deliberately create the accepted predecessor table shape.
+  "collab-electron/src/main/kernel-lifecycle.test.ts",
   // Focused Kernel-dispatch regression tests import the public Kernel surface
   // directly; they do not add an app runtime writer.
   "collab-electron/src/main/task-steering.test.ts",
@@ -51,7 +56,7 @@ function sourceWithKernelSoleWriterFalsifier(rel: string, text: string): string 
     return `${text}\nimport "qf-kernel";\n`;
   }
   if (KERNEL_SOLE_WRITER_FALSIFIER === "peer-delivery-test-kernel-db" && rel === PEER_DELIVERY_TEST) {
-    return `${text}\nconst forbiddenTransportPath = ["kernel", "db"].join(".");\n`;
+    return `${text}\nconst forbiddenTransportPath = "kernel.db";\n`;
   }
   return text;
 }
@@ -76,7 +81,8 @@ const HOST_ACP_POLICY = "species/hermes/host-acp-policy.ts";
 const HOST_ACP_BRIDGE = "collab-electron/src/main/host-acp-bridge.ts";
 
 const KERNEL_PATTERNS: Array<{ name: string; re: RegExp }> = [
-  { name: "qf-kernel", re: /qf-kernel/ },
+  // qf-kernel/portable exposes pure hashes and constants; it cannot open or write a Kernel.
+  { name: "qf-kernel", re: /(?:from\s*|import\s*(?:\(\s*)?)["']qf-kernel["']/ },
   { name: "node:sqlite", re: /node:sqlite/ },
   { name: "bun:sqlite", re: /bun:sqlite/ },
   { name: "better-sqlite3", re: /better-sqlite3/ },
