@@ -2,8 +2,32 @@ import { expect, test } from "bun:test";
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { deflateSync } from "node:zlib";
+import { createHash } from "node:crypto";
 import { closeKernel, execute, openKernel } from "../../packages/qf-kernel/src/index.ts";
-import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, sanitizeLiveFailureError, validateLiveDecisionProof, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
+import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, sanitizeLiveFailureError, validateLiveDecisionProof, validateUiCaptureReceipt, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
+
+function png(width = 1, height = 1): Buffer {
+  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  const chunk = (type: string, data: Buffer) => {
+    const result = Buffer.alloc(12 + data.length);
+    result.writeUInt32BE(data.length, 0);
+    result.write(type, 4, 4, "ascii");
+    data.copy(result, 8);
+    return result;
+  };
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(width, 0);
+  header.writeUInt32BE(height, 4);
+  header[8] = 8;
+  header[9] = 6;
+  return Buffer.concat([
+    signature,
+    chunk("IHDR", header),
+    chunk("IDAT", deflateSync(Buffer.alloc(height * (1 + width * 4)))),
+    chunk("IEND", Buffer.alloc(0)),
+  ]);
+}
 
 function red(): LiveFailureDiagnostic {
   return {
@@ -44,6 +68,7 @@ function positiveProof(): Record<string, any> {
     worker: { assignment_count: 1, completion_count: 1, task_status: "done", trajectory_hash_valid: true, produced_by_exact_worker: true, complete_read_lineage: true, frozen_source_work_exact: true },
     critic: { assignment_count: 1, task_status: "done", review_lifecycle: "completed", successful_read_tools: ["qf_hypothesis_get", "qf_run_get", "qf_artifact_get"], evaluation_writes: 1, evaluation_write_success: true, performed_by_exact_critic: true, source_work_exact: true },
     publication: { current: true, evaluation_id: "evaluation-1", report_id: "report-1", worker_artifact_id: "artifact-1" },
+    visual: { sha256: "a".repeat(64), width: 1200, height: 800, bytes: 1024 },
     lifecycle: { worker_closed: true, critic_closed: true, reopen_live_sessions: 0, normal_exit_zero: true, reopen_exit_zero: true, processes: 0, roots_remaining: 0 },
   };
 }
@@ -87,10 +112,23 @@ test("product lifecycle proof accepts optional Turn telemetry and falsifies ever
     (p) => { p.critic.evaluation_writes = 0; }, (p) => { p.critic.evaluation_write_success = false; },
     (p) => { p.critic.performed_by_exact_critic = false; }, (p) => { p.critic.source_work_exact = false; },
     (p) => { p.publication.current = false; }, (p) => { p.publication.evaluation_id = "foreign"; },
+    (p) => { p.visual.bytes = 0; },
     (p) => { p.lifecycle.worker_closed = false; }, (p) => { p.lifecycle.critic_closed = false; },
     (p) => { p.lifecycle.reopen_live_sessions = 1; }, (p) => { p.lifecycle.processes = 1; }, (p) => { p.lifecycle.roots_remaining = 1; },
   ];
   for (const mutate of baits) { const bait = structuredClone(positiveProof()); mutate(bait); expect(() => validateLiveDecisionProof(bait)).toThrow(); }
+});
+
+test("live screenshot receipt requires exact nonempty decodable PNG bytes", () => {
+  const bytes = png(2, 1);
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  const receipt = { outputPath: "decision.png", width: 2, height: 1, bytes: bytes.length, sha256 };
+  expect(validateUiCaptureReceipt(receipt, bytes, "decision.png")).toMatchObject({ width: 2, height: 1, bytes: bytes.length, sha256 });
+  expect(() => validateUiCaptureReceipt({ ...receipt, outputPath: "other.png" }, bytes, "decision.png")).toThrow(/path/);
+  expect(() => validateUiCaptureReceipt({ ...receipt, width: 0 }, bytes, "decision.png")).toThrow(/dimensions/);
+  expect(() => validateUiCaptureReceipt({ ...receipt, bytes: 0 }, bytes, "decision.png")).toThrow(/byte count/);
+  expect(() => validateUiCaptureReceipt({ ...receipt, sha256: "0".repeat(64) }, bytes, "decision.png")).toThrow(/hash/);
+  expect(() => validateUiCaptureReceipt({ outputPath: "decision.png", width: 2, height: 1, bytes: 7, sha256: createHash("sha256").update("invalid").digest("hex") }, Buffer.from("invalid"), "decision.png")).toThrow(/PNG/);
 });
 
 test("Hermes identity is read only from the bounded model block", () => {
@@ -126,7 +164,12 @@ test("real Kernel schema resolves the canonical worker assignment and distinguis
     session("director-1", "observer-director", "orchestrator", "Research Director");
     session("worker-1", "observer-worker", "worker", "Market Researcher");
     execute(db, "create_task", { task_id: "task-1", title: "Analyze requested expression", description: "Compare every exact offered selection for independent review.", assignee_session_id: "worker-1" }, { ...trace, actor_session_id: "director-1" });
-  } finally { closeKernel(db); }
+  } finally {
+    closeKernel(db);
+    // Bun retains finalized prepared statements until a forced collection on
+    // Windows; release them before asserting that the disposable DB can leave.
+    Bun.gc(true);
+  }
   try {
     const diagnostic = observeLiveFailure(dbPath, join(root, "app"), "analyze_and_review_dispatched", true, true, new Error("publication timed out"));
     expect(diagnostic.worker).toMatchObject({ task_id: "task-1", task_status: "open", session_id: "worker-1", session_status: "running", assigned: true, assignment_ambiguous: false, trajectory_id: null, trajectory_present: false, trajectory_ambiguous: false, kernel_accepted_and_bound: false });

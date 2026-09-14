@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-w1-03-one-canvas @ 6d49c69b` on 2026-09-14 by
+> Generated from `codex/wo-w1-03-one-canvas @ 6220e6ab` on 2026-09-14 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -247,7 +247,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 16 | the app starts here |
-| `reachable` | 211 | imported from an entrypoint |
+| `reachable` | 214 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -352,8 +352,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 230 of
-231 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 233 of
+234 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/updater/update-manager.ts` — **2 files depend on it**, it imports 1
@@ -382,11 +382,11 @@ asked before the change, when nothing is red yet.
 
 ### Blast-radius coverage
 
-**230 of 231 files that have a reachability verdict** carry a blast radius.
+**233 of 234 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**573 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**580 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 342 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 346 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -433,7 +433,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (573 files)
+## Per-analyzer coverage (580 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -441,17 +441,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 569 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 288 | 0 | 3 | 0 | 282 |
-| `ipcPush` | 7 | 0 | 3 | 0 | 563 |
-| `persistence` | 25 | 31 | 0 | 0 | 517 |
-| `lifetime` | 5 | 63 | 0 | 0 | 505 |
-| `packaging` | 229 | 0 | 0 | 106 | 238 |
-| `ownership` | 21 | 0 | 0 | 363 | 189 |
-| `reach` | 227 | 4 | 0 | 342 | 0 |
+| `imports` | 576 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 295 | 0 | 3 | 0 | 282 |
+| `ipcPush` | 7 | 0 | 3 | 0 | 570 |
+| `persistence` | 25 | 31 | 0 | 0 | 524 |
+| `lifetime` | 5 | 64 | 0 | 0 | 511 |
+| `packaging` | 232 | 0 | 0 | 106 | 242 |
+| `ownership` | 21 | 0 | 0 | 370 | 189 |
+| `reach` | 230 | 4 | 0 | 346 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 342 files means those trees are
+failure — `reach: unsupported` on 346 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 106 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.

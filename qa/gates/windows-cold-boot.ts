@@ -689,6 +689,7 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
   mkdirSync(artifactRoot, { recursive: true });
   const childEnv = isolatedEnvironment(tempRoot, kernelDb, artifactRoot);
   delete childEnv.QF_DOCK_QA_MODE;
+  childEnv.QF_UI_PROOF = "1";
   const endpointFile = join(childEnv.USERPROFILE!, ".quantflow", "app", "socket-path");
   const defaultStateRoot = join(homedir(), ".quantflow");
   const defaultBefore = snapshotTree(defaultStateRoot);
@@ -709,6 +710,9 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
   });
   let ownedPids = new Set<number>([child.pid ?? -1]);
   let cleanShutdownRequested = false;
+  const secondaryChildren = new Set<ChildProcess>();
+  let repeatedLaunchReceipt: Record<string, unknown> | null = null;
+  let distinctProfileReceipt: Record<string, unknown> | null = null;
   try {
     assert(child.pid !== undefined, "Windows application process did not provide a PID");
     const ready = await waitForReady(child, endpointFile);
@@ -725,6 +729,102 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
     console.log(`windows-cold-boot: canvas/Dock ready; profiles=${JSON.stringify(profileIds)} owned-processes=${ownedPids.size}`);
     console.log(`windows-cold-boot: ownership-receipt=${JSON.stringify(ownership)}`);
     console.log(`windows-cold-boot: readiness-receipt=${JSON.stringify({ readiness: ready.readiness, profileIds, kernelDb, artifactRoot })}`);
+
+    const controlRoot = join(tempRoot, "distinct-profile-control");
+    const controlStore = join(controlRoot, "stores");
+    const controlKernel = join(controlStore, "kernel.db");
+    const controlArtifacts = join(controlStore, "artifacts");
+    const controlAppRoot = join(controlRoot, "app-root");
+    const controlAppDir = join(controlAppRoot, "profile");
+    mkdirSync(controlArtifacts, { recursive: true });
+    const controlEnv = isolatedEnvironment(controlRoot, controlKernel, controlArtifacts);
+    controlEnv.QF_APP_ROOT = controlAppRoot;
+    controlEnv.QF_APP_DIR = controlAppDir;
+    controlEnv.QF_UI_PROOF = "1";
+    const controlBefore = await processSnapshot();
+    const control = spawn(executable, ["--disable-gpu"], {
+      cwd: packageRoot,
+      env: controlEnv,
+      windowsHide: true,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    secondaryChildren.add(control);
+    assert(control.pid !== undefined, "different-profile control did not provide a PID");
+    try {
+      const controlReady = await waitForReady(control, join(controlAppRoot, "socket-path"));
+      assert(controlReady.endpoint !== ready.endpoint, "different profiles resolved to the same broker endpoint");
+      assertPing(controlReady.ping);
+      assertReadiness(controlReady.readiness);
+      const controlAfterReady = await processSnapshot();
+      const controlOwnership = processOwnershipReceipt(controlBefore, controlAfterReady, control.pid);
+      assert(controlOwnership.pids.length > 0, "different-profile control has no owned process tree");
+      assertShutdownReceipt(await rpcCall(controlReady.endpoint, "app.shutdown"));
+      const controlExit = await waitForExit(control, SHUTDOWN_TIMEOUT_MS);
+      assert(controlExit === 0, `different-profile control exited ${String(controlExit)}`);
+      secondaryChildren.delete(control);
+      const controlDeadline = Date.now() + SHUTDOWN_TIMEOUT_MS;
+      let controlLingering = ownedProcessRows(await processSnapshot(), new Set(controlOwnership.pids));
+      while (controlLingering.length > 0 && Date.now() < controlDeadline) {
+        await wait(POLL_INTERVAL_MS);
+        controlLingering = ownedProcessRows(await processSnapshot(), new Set(controlOwnership.pids));
+      }
+      assert(controlLingering.length === 0, "different-profile control left owned processes");
+      distinctProfileReceipt = {
+        independentEndpoint: true,
+        processExitCode: controlExit,
+        remainingOwnedProcesses: controlLingering.length,
+      };
+    } finally {
+      if (control.exitCode === null && control.pid !== undefined) {
+        await terminateOwnedProcessTree(control.pid);
+        await waitForExit(control, SHUTDOWN_TIMEOUT_MS).catch(() => null);
+      }
+      secondaryChildren.delete(control);
+    }
+
+    const prepared = await rpcCall(ready.endpoint, "app.ui.prepareRepeatedLaunch") as Record<string, unknown>;
+    assert(prepared.minimized === true, "primary native window did not enter the minimized repeat-launch control state");
+    const repeatBefore = await processSnapshot();
+    const repeated = spawn(executable, ["--disable-gpu"], {
+      cwd: packageRoot,
+      env: childEnv,
+      windowsHide: true,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    secondaryChildren.add(repeated);
+    assert(repeated.pid !== undefined, "same-profile repeated launch did not provide a PID");
+    const repeatedExit = await waitForExit(repeated, SHUTDOWN_TIMEOUT_MS);
+    assert(repeatedExit === 0, `same-profile repeated launch exited ${String(repeatedExit)}`);
+    secondaryChildren.delete(repeated);
+    const repeatAfter = await processSnapshot();
+    const repeatedSurvivors = [...collectOwnedPids(repeatBefore, repeatAfter, repeated.pid)]
+      .filter((pid) => repeatAfter.some((row) => row.pid === pid));
+    assert(repeatedSurvivors.length === 0, `same-profile repeated launch left processes: ${repeatedSurvivors.join(",")}`);
+
+    const activationDeadline = Date.now() + 10_000;
+    let activated: Record<string, unknown> = {};
+    while (Date.now() < activationDeadline) {
+      activated = await rpcCall(ready.endpoint, "app.ui.windowState") as Record<string, unknown>;
+      if (activated.visible === true && activated.minimized === false && activated.focused === true) break;
+      await wait(POLL_INTERVAL_MS);
+    }
+    assert(activated.visible === true && activated.minimized === false && activated.focused === true, `repeated launch did not activate the primary native window: ${JSON.stringify(activated)}`);
+    assertPing(await rpcCall(ready.endpoint, "ping"));
+    const repeatedReadiness = await rpcCall(ready.endpoint, "app.readiness");
+    assertReadiness(repeatedReadiness);
+    const primaryAfterRepeat = await processSnapshot();
+    const missingPrimaryProcesses = ownership.pids.filter((pid) => !primaryAfterRepeat.some((row) => row.pid === pid));
+    assert(missingPrimaryProcesses.length === 0, `repeated launch disrupted the primary process tree: ${missingPrimaryProcesses.join(",")}`);
+    repeatedLaunchReceipt = {
+      secondaryExitCode: repeatedExit,
+      remainingSecondaryProcesses: repeatedSurvivors.length,
+      primaryWindow: activated,
+      primaryBrokerReady: true,
+      primaryOwnedProcessesPreserved: true,
+    };
+    console.log(`windows-cold-boot: repeated-launch=${JSON.stringify(repeatedLaunchReceipt)}`);
+    console.log(`windows-cold-boot: different-profile=${JSON.stringify(distinctProfileReceipt)}`);
+
     const shutdown = await rpcCall(ready.endpoint, "app.shutdown");
     assertShutdownReceipt(shutdown);
     cleanShutdownRequested = true;
@@ -774,6 +874,8 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
           remainingGateOwnedProcesses: lingering.length,
         },
         ownership,
+        repeatedLaunch: repeatedLaunchReceipt,
+        distinctProfile: distinctProfileReceipt,
         recordedAt: new Date().toISOString(),
       }, null, 2) + "\n",
       "utf8",
@@ -785,6 +887,12 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
     console.log("windows-cold-boot: clean shutdown requested=true remaining-gate-owned-processes=0 process-exit=0");
   } catch (error) {
     writeFileSync(join(tempRoot, "packaged-app.log"), output, "utf8");
+    for (const secondary of secondaryChildren) {
+      if (secondary.exitCode === null && secondary.pid !== undefined) {
+        await terminateOwnedProcessTree(secondary.pid);
+        await waitForExit(secondary, SHUTDOWN_TIMEOUT_MS).catch(() => null);
+      }
+    }
     if (child.exitCode === null && child.pid !== undefined) {
       await terminateOwnedProcessTree(child.pid);
       await exitPromise.catch(() => null);

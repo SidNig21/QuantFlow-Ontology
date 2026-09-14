@@ -68,6 +68,34 @@ Reader evidence: a separate Sol review confirmed the production path already acc
 matchups; the fixed-case coupling is in this order and four selectors in the existing live gate. The
 review identified exact source/identity and future-cutoff checks to retain. Final acceptance is still open.
 
+### Duplicate launch and real visual evidence — 2026-09-14
+
+The founder confirmed repeated and hidden QuantFlow instances are an actual product problem. The ordinary
+walkthrough reproduced two copies against one saved profile; the second copy minted agent access in its
+own process but connected its agents to the first copy's broker. This left research unusable while its
+Canvas still said research was in progress. The next bounded repair is:
+
+- Acquire Electron's same-profile application lock after selecting the existing `userData` path and before
+  logger/bootstrap/broker/participant side effects. A repeated launch exits cleanly and restores, shows,
+  and focuses the original window. Handle a second launch that arrives before the first window is ready.
+  Distinct explicitly isolated application directories retain independent instances for existing proofs.
+  No new persistent lock database, credential handling, dependency, or app runtime is needed.
+- Treat inability to establish the required application broker as failed startup; do not leave an apparently
+  usable application whose agents connect to another process. Cleanup must not remove or terminate another
+  process's endpoint, breadcrumbs, sidecar, or participants. Preserve the existing graceful shutdown path.
+- Extend the existing native Windows cold-boot check with the actual same-profile repeat launch, prompt
+  secondary exit, surviving primary readiness, and normal cleanup. Use a different isolated profile as
+  the valid control. Check primary window activation using the existing native window/Electron facilities;
+  do not replace this boundary with a static string check or a mocked lock result.
+- Correct the existing live decision gate's visual capture requirement: zero dimensions, empty output,
+  or invalid image bytes cannot count as screenshot evidence. Reuse the current capture helper pattern and
+  preserve the actual worker/Critic proof. The empty capture at `6220e6ab` is a known evidence failure,
+  not proof of rendered legibility. Batch this repair with the integrated candidate; do not rerun providers
+  solely to manufacture another screenshot when the next product repair already needs integrated proof.
+
+This extends the existing desktop-launch/lifecycle acceptance, not the product's domain or acquisition
+scope. The same existing checkout, Sol delegation, independent verification, and batched-check rules apply.
+
 ## Binding product meaning
 
 W1-02 proved trustworthy point-in-time history and a transparent calculation, but its two records and

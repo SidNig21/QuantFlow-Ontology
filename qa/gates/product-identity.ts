@@ -226,15 +226,32 @@ function productionDelegation(): Result {
     return fail("logger still initializes by side-effect before app migration");
   }
   const migrationCall = index.search(/\brunAppMigrationBeforeBoot\s*\(\s*\{/);
-  const userDataBind = index.search(
-    /app\.setPath\s*\(\s*["']userData["']\s*,\s*join\s*\(\s*QF_APP_DIR\s*,\s*["']electron["']\s*\)\s*\)/,
-  );
+  const profileAcquire = index.search(/\bacquireProfileInstance\s*\(\s*app\s*,\s*\{/);
+  const loggerInit = index.search(/\binitializeLogger\s*\(\s*\)/);
   const configLoad = index.search(/\bloadConfig\s*\(\s*\)/);
   if (migrationCall < 0) return fail("production boot does not call runAppMigrationBeforeBoot");
-  if (userDataBind < 0) return fail("production boot does not bind Electron userData to QF_APP_DIR/electron");
+  if (profileAcquire < 0) return fail("production boot does not acquire its selected profile instance");
   if (configLoad < 0) return fail("production boot config load is not visible to the identity gate");
-  if (!(migrationCall < userDataBind && userDataBind < configLoad)) {
-    return fail("production boot must migrate, bind userData, then load config in that order");
+  if (!(profileAcquire < migrationCall && migrationCall < loggerInit && loggerInit < configLoad)) {
+    return fail("production boot must lock, migrate, initialize logging, then load config in that order");
+  }
+  if (!/else\s+app\.exit\(0\)/.test(index)) {
+    return fail("a duplicate profile can continue after losing the instance lock");
+  }
+
+  const profile = text("collab-electron/src/main/single-instance-profile.ts");
+  const existingProfile = profile.indexOf("existsSync(options.electronUserData)");
+  const selectProfile = profile.indexOf('app.setPath("userData", options.electronUserData)', existingProfile);
+  const lockProfile = profile.indexOf("app.requestSingleInstanceLock()", selectProfile);
+  const bootstrapLock = profile.indexOf("if (!app.requestSingleInstanceLock()) return false", lockProfile);
+  const bootMigrate = profile.indexOf("options.migrate()", bootstrapLock);
+  const finalSelect = profile.indexOf('app.setPath("userData", options.electronUserData)', bootMigrate);
+  const finalLock = profile.indexOf("return app.requestSingleInstanceLock()", finalSelect);
+  if (!(existingProfile >= 0 && existingProfile < selectProfile && selectProfile < lockProfile)) {
+    return fail("existing QF profiles are not selected before their instance lock");
+  }
+  if (!(lockProfile < bootstrapLock && bootstrapLock < bootMigrate && bootMigrate < finalSelect && finalSelect < finalLock)) {
+    return fail("first boot does not guard migration before acquiring the final profile lock");
   }
 
   const workspace = text("collab-electron/src/main/ipc-workspace.ts");

@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { Database } from "bun:sqlite";
 import { buildWindowsPackage, isolatedEnvironment, rpcCall, waitForReady, waitForExit, processSnapshot, collectOwnedPids, terminateOwnedProcessTree, wait } from "./windows-cold-boot.ts";
 import { parseTrustedHermesLog } from "./hermes-production-inference.ts";
+import { validateProofPngHeader } from "../../collab-electron/src/main/ui-proof-capture.ts";
 
 const REPO = resolve(import.meta.dir, "../..");
 // Worker inference and Critic inference are sequential product stages. Observe
@@ -108,6 +109,34 @@ export function sanitizeLiveFailureError(error: unknown): string {
     .replace(/\b(?:api[_-]?key|authorization|bearer|token|secret|password)\b\s*[:=]?\s*[^\s,;]+/gi, "credential=[redacted]")
     .replace(/[\r\n\t]+/g, " ").slice(0, 500);
 }
+export function validateUiCaptureReceipt(
+  receipt: Record<string, unknown>,
+  png: Buffer,
+  expectedPath: string,
+): { sha256: string; width: number; height: number; bytes: number } {
+  const width = Number(receipt.width ?? 0);
+  const height = Number(receipt.height ?? 0);
+  const bytes = Number(receipt.bytes ?? 0);
+  const sha256 = createHash("sha256").update(png).digest("hex");
+  assert(receipt.outputPath === expectedPath, "UI evidence path differs from the requested capture");
+  assert(Number.isInteger(bytes) && bytes > 0 && bytes === png.length, "UI evidence byte count is invalid");
+  assert(receipt.sha256 === sha256, "UI evidence hash differs from the captured bytes");
+  validateProofPngHeader(png, width, height);
+  return {
+    sha256,
+    width,
+    height,
+    bytes,
+  };
+}
+async function captureUiEvidence(
+  endpoint: string,
+  outputPath: string,
+): Promise<{ sha256: string; width: number; height: number; bytes: number }> {
+  const receipt = await rpcCall(endpoint, "app.ui.capturePage", { outputPath }) as Record<string, unknown>;
+  assert(existsSync(outputPath), `UI evidence was not written: ${outputPath}`);
+  return validateUiCaptureReceipt(receipt, readFileSync(outputPath), outputPath);
+}
 export function buildLiveFailureDiagnostic(input: LiveFailureDiagnostic): Row {
   return {
     schema: "qf.w1-03.live-failure-diagnostic.v1",
@@ -188,6 +217,7 @@ export function validateLiveDecisionProof(proof: Row, acceptanceCase: Wave1Accep
   assert(proof.worker.assignment_count === 1 && proof.worker.completion_count === 1 && proof.worker.task_status === "done" && proof.worker.trajectory_hash_valid && proof.worker.produced_by_exact_worker && proof.worker.complete_read_lineage && proof.worker.frozen_source_work_exact, "worker lifecycle or exact evidence binding is incomplete");
   assert(proof.critic.assignment_count === 1 && proof.critic.task_status === "done" && proof.critic.review_lifecycle === "completed" && proof.critic.successful_read_tools.join("\0") === "qf_hypothesis_get\0qf_run_get\0qf_artifact_get" && proof.critic.evaluation_writes === 1 && proof.critic.evaluation_write_success === true && proof.critic.performed_by_exact_critic === true && proof.critic.source_work_exact === true, "Critic lifecycle, reads, evaluation invocation, or binding is incomplete");
   assert(proof.publication.current === true && proof.publication.evaluation_id === proof.evaluation_id && proof.publication.report_id === proof.report_id && proof.publication.worker_artifact_id === proof.worker_artifact_id, "current publication is not bound to the exact Evaluation and worker Artifact");
+  assert(/^[a-f0-9]{64}$/.test(String(proof.visual?.sha256)) && Number.isInteger(proof.visual?.width) && proof.visual.width > 0 && Number.isInteger(proof.visual?.height) && proof.visual.height > 0 && Number.isInteger(proof.visual?.bytes) && proof.visual.bytes > 0, "rendered Decision screenshot evidence is invalid");
   assert(proof.inference.length === 2 && new Set(proof.inference.map((row: Row) => row.session_id)).size === 2, "production inference receipts replayed or duplicated");
   const runtimeIdentities = new Set<string>();
   for (const row of proof.inference) {
@@ -313,7 +343,7 @@ export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
       critic: { assignment_count: criticAssignments.length, task_status: criticTask.status, review_lifecycle: review.lifecycle, successful_read_tools: invocations.filter((row) => row.tool_name !== "qf_record_evaluation" && row.success === 1).map((row) => row.tool_name), evaluation_writes: invocations.filter((row) => row.tool_name === "qf_record_evaluation").length, evaluation_write_success: invocations.filter((row) => row.tool_name === "qf_record_evaluation")[0]?.success === 1, performed_by_exact_critic: performedBy.length === 1 && performedBy[0]!.to_id === critic, source_work_exact: JSON.stringify(JSON.parse(review.source_work)) === JSON.stringify(source) && JSON.stringify(evaluationSource) === JSON.stringify(source) },
       publication: { current: work.is_current === 1, evaluation_id: work.publication_evaluation_id, report_id: work.report_artifact_id, worker_artifact_id: payload.source_work?.result_artifact_id ?? source.result_artifact_id }, lifecycle: { worker_closed: false, critic_closed: false, reopen_live_sessions: -1, normal_exit_zero: false, reopen_exit_zero: false, processes: -1, roots_remaining: 1 } };
     await until("rendered Decision", async () => await evaluate(endpoint, `(()=>{const tile=document.querySelector('[data-qf-surface-kind="decision-result"]');return tile?.textContent.includes(${JSON.stringify(String(payload.decision.classification))})&&tile?.textContent.includes('Research:')&&tile?.textContent.includes('Critic:')?true:null})()`));
-    await rpcCall(endpoint, "app.ui.capturePage", { outputPath: join(evidenceDir, "decision.png") });
+    proof.visual = await captureUiEvidence(endpoint, join(evidenceDir, "decision.png"));
     await rpcCall(endpoint, "app.shutdown", {}); const normalExit = await waitForExit(child!, 15000); assert(normalExit === 0, "normal close failed"); child = null;
     const closed = query(dbPath, "SELECT id,status FROM agent_session WHERE id IN (?,?)", source.executor_session_id, critic);
     proof.lifecycle.worker_closed = closed.find((row) => row.id === source.executor_session_id)?.status === "closed";
@@ -333,7 +363,7 @@ export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
   } catch (error) {
     failure = error;
     diagnostic = observeLiveFailure(dbPath, appDir, stage, marketReached, analysisDispatched, error);
-    if (endpoint) try { await rpcCall(endpoint, "app.ui.capturePage", { outputPath: join(evidenceDir, "live-decision-red.png") }); } catch {}
+    if (endpoint) try { await captureUiEvidence(endpoint, join(evidenceDir, "live-decision-red.png")); } catch {}
     try { writeFileSync(failureReceiptPath, JSON.stringify(buildLiveFailureDiagnostic(diagnostic), null, 2) + "\n"); } catch {}
   }
   finally {

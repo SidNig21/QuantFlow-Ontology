@@ -4,6 +4,7 @@ import {
   dialog,
   ipcMain,
   Menu,
+  nativeImage,
   nativeTheme,
   net,
   protocol,
@@ -14,6 +15,7 @@ import {
   type WebContents,
 } from "electron";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -120,6 +122,12 @@ import { registerBrowserIpc } from "./ipc-browser";
 import { cancelBovadaMarketDeskCaptures } from "./market-desk";
 import { cancelEvidenceComputation } from "./evidence-computation";
 import { runShutdownLifecycle } from "./shutdown-lifecycle";
+import { acquireProfileInstance } from "./single-instance-profile";
+import {
+  activatePrimaryWindow,
+  createPrimaryWindowActivationController,
+} from "./window-activation";
+import { captureProofPage } from "./ui-proof-capture";
 
 import {
   bootstrapPackagedDockProfiles,
@@ -221,21 +229,27 @@ function peerIdentityForSession(sessionId: string): { sessionId: string; role: s
   return requirePeerSessionRole(sessionId, role);
 }
 
-// Capture Electron's legacy default before replacing it. The migration must
-// publish app state before logger/config/sidecar consumers create destinations.
-if (!QF_APP_PATHS_EXPLICIT) {
-  runAppMigrationBeforeBoot({
-    legacyElectronUserData: legacyElectronUserDataPath({
-      appData: app.getPath("appData"),
-      devWorktreeId: DEV_WORKTREE_ID,
-    }),
-    log: (message) => console.warn(message),
-  });
-}
 const electronUserData = join(QF_APP_DIR, "electron");
-mkdirSync(electronUserData, { recursive: true });
-app.setPath("userData", electronUserData);
-initializeLogger();
+// Capture Electron's legacy default before selecting the QF profile. On the
+// one first-boot path where the final directory is absent, Electron's current
+// profile lock guards the unchanged atomic migration. The winner then switches
+// to and acquires the same final profile lock used by every later launch.
+const legacyElectronUserData = legacyElectronUserDataPath({
+  appData: app.getPath("appData"),
+  devWorktreeId: DEV_WORKTREE_ID,
+});
+const ownsProfileInstance = acquireProfileInstance(app, {
+  electronUserData,
+  migrateBeforeFirstBoot: !QF_APP_PATHS_EXPLICIT,
+  migrate: () => {
+    runAppMigrationBeforeBoot({
+      legacyElectronUserData,
+      log: (message) => console.warn(message),
+    });
+  },
+});
+if (ownsProfileInstance) initializeLogger();
+else app.exit(0);
 
 // macOS apps launched from Finder don't inherit the user's shell
 // LANG, so child processes (tmux, shells) default to ASCII.
@@ -264,11 +278,15 @@ process.on("unhandledRejection", (reason) => {
 });
 
 let mainWindow: BrowserWindow | null = null;
+const primaryWindowActivation = createPrimaryWindowActivationController(
+  () => mainWindow,
+);
 let pendingFilePath: string | null = null;
 let config = loadConfig();
 let shuttingDown = false;
 let shutdownPromise: Promise<void> | null = null;
 let bovadaCaptureBinding: BovadaCaptureRpcBinding | null = null;
+let startupComplete = false;
 
 // Apply saved theme preference (light/dark/system)
 const savedTheme = config.ui.theme;
@@ -687,6 +705,7 @@ function createWindow(): void {
   }
 
   mainWindow = new BrowserWindow(windowOptions);
+  primaryWindowActivation.windowReady();
 
   if (state.isMaximized) {
     mainWindow.maximize();
@@ -932,6 +951,11 @@ async function shutdownBackgroundServices(): Promise<void> {
   return shutdownPromise;
 }
 
+if (ownsProfileInstance) {
+app.on("second-instance", () => {
+  primaryWindowActivation.request();
+});
+
 app.on("open-file", (event, path) => {
   event.preventDefault();
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -1023,30 +1047,6 @@ app.whenReady().then(async () => {
     onBeforeQuit: () => shutdownBackgroundServices(),
   });
 
-  // Package defaults enter through execute; runtime truth remains in the Kernel.
-  try {
-    bootstrapPackagedDockProfiles();
-    bootstrapPackagedDockProfiles(); // explicit startup idempotence control
-    reconcileStaleSessions();
-  } catch (err) {
-    console.error("agent-host: startup FAILED", err);
-    throw err;
-  }
-
-  try {
-    await pty.ensureSidecar();
-  } catch (err) {
-    console.error("Sidecar failed to start:", err);
-  }
-
-  buildAppMenu();
-  createWindow();
-
-  registerToggleShortcuts(mainWindow!);
-
-  initMainAnalytics();
-  trackEvent("app_launched");
-
   const projectStartedSession = (
     sessionId: string,
     definitionId: string,
@@ -1084,16 +1084,6 @@ app.whenReady().then(async () => {
     onStarted: projectStartedSession,
   });
 
-  mainWindow!.webContents.on("did-finish-load", () => {
-    sendLoadingDone();
-    if (pendingFilePath) {
-      mainWindow!.webContents.send(
-        "shell:forward", "viewer", "file-selected", pendingFilePath,
-      );
-      pendingFilePath = null;
-    }
-  });
-
   registerMethod("ping", () => ({ pong: true }), {
     description: "Health check — returns {pong: true}",
   });
@@ -1108,7 +1098,8 @@ app.whenReady().then(async () => {
       mainWindow &&
         !mainWindow.isDestroyed() &&
         mainWindow.webContents.getURL().includes("/shell") &&
-        !mainWindow.webContents.isLoading(),
+        !mainWindow.webContents.isLoading() &&
+        startupComplete,
     ),
     windowUrl: mainWindow?.webContents.getURL() ?? "",
     dockProfileIds: getKernelAgentDefinitionIds(),
@@ -1146,13 +1137,56 @@ app.whenReady().then(async () => {
     if (!mainWindow || mainWindow.isDestroyed()) {
       throw new Error("production shell window is not available");
     }
-    const image = await mainWindow.webContents.capturePage();
-    writeFileSync(outputPath, image.toPNG());
-    const size = image.getSize();
-    return { outputPath, width: size.width, height: size.height };
+    // UI proof must observe a real native window even when the gate launcher
+    // itself was started without a console window.
+    activatePrimaryWindow(mainWindow);
+    const capture = await captureProofPage(
+      mainWindow.webContents,
+      (png) => nativeImage.createFromBuffer(png),
+    );
+    writeFileSync(outputPath, capture.png);
+    return {
+      outputPath,
+      width: capture.width,
+      height: capture.height,
+      bytes: capture.png.length,
+      sha256: createHash("sha256").update(capture.png).digest("hex"),
+    };
   }, {
     description: "Bounded production UI proof capture of the live shell BrowserWindow",
     params: { outputPath: "Absolute PNG path for the bounded proof capture" },
+  });
+  registerMethod("app.ui.windowState", () => {
+    if (process.env.QF_UI_PROOF !== "1") {
+      throw new Error("app.ui.windowState is disabled outside the bounded UI proof");
+    }
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      throw new Error("production shell window is not available");
+    }
+    return {
+      visible: mainWindow.isVisible(),
+      minimized: mainWindow.isMinimized(),
+      focused: mainWindow.isFocused(),
+    };
+  }, {
+    description: "Bounded native window-state proof for repeated-launch activation",
+  });
+  registerMethod("app.ui.prepareRepeatedLaunch", () => {
+    if (process.env.QF_UI_PROOF !== "1") {
+      throw new Error("app.ui.prepareRepeatedLaunch is disabled outside the bounded UI proof");
+    }
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      throw new Error("production shell window is not available");
+    }
+    activatePrimaryWindow(mainWindow);
+    mainWindow.minimize();
+    return {
+      visible: mainWindow.isVisible(),
+      minimized: mainWindow.isMinimized(),
+      focused: mainWindow.isFocused(),
+    };
+  }, {
+    description: "Minimize the real primary window before the repeated-launch proof",
   });
   registerMethod("app.ui.pressKey", async (params) => {
     if (process.env.QF_UI_PROOF !== "1") {
@@ -1814,11 +1848,41 @@ app.whenReady().then(async () => {
     },
   });
 
+  // The broker is required infrastructure. Establish it before reconciling
+  // saved sessions, exposing a window, or attaching to a reusable sidecar.
+  await startJsonRpcServer();
+
+  // Package defaults enter through execute; runtime truth remains in the Kernel.
   try {
-    await startJsonRpcServer();
+    bootstrapPackagedDockProfiles();
+    bootstrapPackagedDockProfiles(); // explicit startup idempotence control
+    reconcileStaleSessions();
   } catch (err) {
-    console.error("Failed to start JSON-RPC server:", err);
+    console.error("agent-host: startup FAILED", err);
+    throw err;
   }
+
+  buildAppMenu();
+  createWindow();
+  registerToggleShortcuts(mainWindow!);
+  initMainAnalytics();
+  trackEvent("app_launched");
+  mainWindow!.webContents.on("did-finish-load", () => {
+    sendLoadingDone();
+    if (pendingFilePath) {
+      mainWindow!.webContents.send(
+        "shell:forward", "viewer", "file-selected", pendingFilePath,
+      );
+      pendingFilePath = null;
+    }
+  });
+
+  try {
+    await pty.ensureSidecar();
+  } catch (err) {
+    console.error("Sidecar failed to start:", err);
+  }
+  startupComplete = true;
 }).catch(async (error) => {
   console.error("QuantFlow startup failed:", error);
   await shutdownBackgroundServices().catch(() => {});
@@ -1837,3 +1901,4 @@ app.on("window-all-closed", async () => {
   await shutdownAnalytics();
   app.quit();
 });
+}

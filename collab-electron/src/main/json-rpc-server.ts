@@ -64,6 +64,7 @@ function discoverMethods(): {
   }));
 }
 let server: Server | null = null;
+let ownsEndpoint = false;
 const connections = new Set<Socket>();
 
 function isJsonRpcRequest(obj: unknown): obj is JsonRpcRequest {
@@ -203,12 +204,17 @@ export function startJsonRpcServer(): Promise<void> {
     );
 
     server.listen(SOCKET_PATH, () => {
-      writeFileSync(SOCKET_PATH_FILE, SOCKET_PATH, "utf-8");
-      writeFileSync(NODE_PATH_FILE, process.execPath, "utf-8");
-      console.log(
-        `[json-rpc] Listening on ${SOCKET_PATH}`,
-      );
-      resolve();
+      ownsEndpoint = true;
+      try {
+        writeFileSync(SOCKET_PATH_FILE, SOCKET_PATH, "utf-8");
+        writeFileSync(NODE_PATH_FILE, process.execPath, "utf-8");
+        console.log(
+          `[json-rpc] Listening on ${SOCKET_PATH}`,
+        );
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
     });
   });
 }
@@ -219,11 +225,13 @@ export function stopJsonRpcServer(): void {
   }
   connections.clear();
 
-  if (server) {
+  if (server?.listening) {
     server.close();
-    server = null;
   }
+  server = null;
 
+  if (!ownsEndpoint) return;
+  ownsEndpoint = false;
   cleanupEndpoint(SOCKET_PATH);
 
   for (const f of [SOCKET_PATH_FILE, NODE_PATH_FILE]) {

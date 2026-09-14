@@ -25,6 +25,12 @@ the bounded current-case gate correction and invalid desktop-shortcut repair. Ba
 around integrated features; preserve independent verification and real live acceptance. No new order is
 opened by this note, and W1-03 remains unaccepted.
 
+Current repair, 2026-09-14: prevent duplicate applications for the same saved profile and restore/show/focus
+the existing window on a repeated launch. The founder confirmed repeated/hidden QuantFlow instances are
+an actual problem. The active order also requires failed broker startup to stop honestly, a nonempty visual
+capture check, and the existing unfinished revision/control loop. The real isolated researcher/Critic run
+at `6220e6ab` passed; ordinary desktop acceptance remains open after a duplicate-launch failure.
+
 - [Active order](active/WO-W1-03-UFC-RESEARCH-DECISION.md)
 - [W1-02 acceptance](evidence/w1-02/ACCEPTANCE.md)
 - [W1-01 acceptance](evidence/w1-01/ACCEPTANCE.md)

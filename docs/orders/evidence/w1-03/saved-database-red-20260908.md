@@ -123,3 +123,81 @@ The existing app opened and refreshed current UFC markets; the complete research
   not a claim that uncommitted product changes have already been accepted.
 - These results prepare a runnable candidate. Packaged inference, independent verification, real desktop
   shortcut launch, ordinary result/retrieval controls, and final owned-process cleanup are still pending.
+
+### Independent real run and native duplicate-launch finding — 2026-09-14
+
+The isolated application completed genuine research and independent review; the normal desktop walkthrough
+then exposed a duplicate-instance failure, so W1-03 remains open.
+
+- Frozen candidate: `6220e6abd9a1319c22048035be54ad58f6f4e4e3`. `bun run package:unsigned` completed with
+  package time `2026-09-14T18:21:18.647Z` and `app.asar` SHA-256
+  `3e23d8d243511d5658d38aa15732b0b901d0d3318abecef7bc6ea4a4615d0e84`. No publish or merge was performed.
+- A fresh Sol verifier returned semantic YES and focused verification YES for the bounded repair, reran the
+  eight tests/60 assertions and Atlas checks, and ran the real gate once against that package. The command
+  printed `PASS wave1-critic-decision`. Its full receipt is `live-decision.json`: event `30189205`, observed
+  `2026-09-14T18:27:01.682Z`, cutoff `2026-09-19T21:00:00Z`, exact Giga/Brito source identities, distinct
+  real worker and Critic, four offered selections, current Report, successful reopen, zero remaining
+  processes and disposable roots. The research assessment was SUPPORTED with a directional rationale;
+  actionability was WATCH because the exact requested submission expression was absent and probability
+  was unavailable. This does not establish predictive accuracy or a defensible probability.
+- The verifier found `decision.png` was zero bytes. The old capture call ignored its dimensions/content.
+  DOM result presence and exact lineage passed, but visual legibility evidence did not. The gate must
+  reject empty capture; the full feature was not accepted based on the command's PASS line.
+- Shortcut clarification: COM resolves user-folder links differently under the sandbox account. Read-back
+  under the actual Windows user confirms target and working directory under the real `rybow` checkout and
+  target existence. The earlier sandbox-relative `CodexSandboxOffline` target is not by itself proof of a
+  broken founder link. The literal-path writer repair and its native COM test are independently verified.
+- The root walkthrough first launched the desktop shortcut hidden at local `11:31:04` (PID 8804), then
+  launched the executable visibly at `11:31:20` (PID 31224) when no targetable window appeared. This created
+  two application roots; it was a confounded single-profile acceptance attempt and is not a clean saved-
+  profile regression. The visible copy accepted the same current inquiry but its worker reported unavailable
+  ontology tools and `live seat capability is invalid`; Canvas still showed research in progress. Original
+  native images are `native-canvas-during-start-20260914.jpg` and `native-research-seat-failure-20260914.jpg`.
+- Read-only source tracing explains the duplicate case: both roots hash the same application directory to
+  the same broker pipe and attach to the same sidecar. Broker listen failure is logged and ignored; the second
+  root's process-local seat access cannot validate in the first root. No access values were read or printed.
+- Native window Close removed the visible copy. An initial request to shut down the hidden copy through the
+  shared pipe was rejected by automatic approval review for insufficient ownership proof. A read-only Windows
+  `GetNamedPipeServerProcessId` check proved the server was exactly PID 8804 with the recorded creation time,
+  executable, and parent. A subsequent shutdown rechecked that ownership on the connected pipe before sending
+  the existing `app.shutdown` request; it returned `shuttingDown:true`. A subsequent QuantFlow process check
+  returned zero. This is recovery of this walkthrough's instances, not a blanket process-termination policy.
+- The next repair protects same-profile startup and activation, stops failed broker startup honestly, and
+  rejects empty screenshot proof. Actual revised work and reachable controls remain unfinished; exposing
+  the existing hidden buttons alone would not execute a revision.
+- A subsequent read-only query of the founder Kernel found the exact native inquiry
+  `e254cf08-73e5-41ed-9453-136435d8cd29`, Task `task-7fc97c34-f03f-451b-a70d-9458be7f308e` still open,
+  and Run `analysis:79d6b3bb-8ded-4563-a459-57133d8904e2` succeeded. Its assigned researcher
+  `53de2921-9d2a-448c-a459-27c102c0fa77` was failed after closure. Work survived; successful retry and
+  completed research on this ordinary saved inquiry have not yet been proved. The zero-byte PNG was
+  removed after recording the verifier's finding; the two original native JPEG captures remain intact.
+
+### Duplicate-launch repair — candidate preparation, 2026-09-14
+
+Opening the app again is intended to recover the existing window; the new native package still needs to prove it.
+
+- The Sol Builder added one final Electron profile lock, with a temporary first-migration lock only when the
+  final directory is absent. Losing launches exit before logging/configuration/services. Pending repeat launches
+  restore, show, and focus the primary window when it exists. The required broker starts before saved-session
+  reconciliation, the window, and sidecar attachment; failed contenders preserve the owner's connection files.
+- Real visual capture now activates the window and checks positive dimensions, PNG bytes, Electron decoding,
+  and exact file hash/size. The native cold-boot gate includes minimized-window repeat launch, separate-profile
+  coexistence, primary survival, and owned-process cleanup. No new dependency or durable product store was added.
+- Builder checks from `collab-electron`: the profile, activation, capture, and wave-decision unit batch returned
+  **18 pass / 0 fail / 99 assertions**; the separate two-process broker collision test returned
+  **1 pass / 0 fail / 7 assertions**. The refused contender left the owner's broker responsive and its breadcrumb
+  intact; normal owner shutdown removed its breadcrumb. `bunx tsc --noEmit` exited zero.
+- Root-directory `bun qa/gates/product-identity.ts` exited zero: B=1, C=152, D=6; migration old-only=7,
+  both=preserved, failure=absent, retry=published, workspace=before-consumers. `git diff --check` was clean.
+  The existing Windows disposable-Database test now forces collection after close so native prepared statements
+  release before removal; its assertions remain intact.
+- An initial two-Bun-process conflict probe hit a Bun 1.3.12 Windows internal assertion. The final test uses
+  the existing Node runtime and a temporary Bun-built bundle of the actual broker source. Both recorded children
+  have bounded waits and explicit cleanup; no owned processes or `qf-rpc-owner-*`/`qf-profile-lock-*` roots remained.
+- Judgment: the first-migration directory must remain absent until atomic migration publishes it, so a temporary
+  bootstrap lock protects that step before every surviving launch acquires the same final profile lock. The
+  screenshot repair uses Electron's decoder instead of introducing a custom image codec. Native packaged repeat
+  launch, genuine capture, and successful retry of the saved founder inquiry are still pending.
+- Root regenerated Atlas; `--check` reported current (431 files, 119 channels), ratchet completed in 4.4 seconds
+  with HARD RED 0, unexplained coverage 0, undecided without blocker 0, AMBER 23, and the diff against `6220e6ab`
+  reported no architectural change. These checks describe wiring and do not establish native acceptance.
