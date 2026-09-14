@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "a552cd13",
+    "commit": "6d49c69b",
     "generatedAt": "2026-09-14",
     "filesScanned": 428,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "fceaca2178dae76c"
+    "fingerprint": "5311c3d23ac5d5dc"
   },
   "stats": {
     "live": 108,
@@ -409,9 +409,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 572
+      "files": 573
     },
-    "coverageFiles": 572,
+    "coverageFiles": 573,
     "ownership": {
       "responsibilities": 10,
       "contested": 7,
@@ -3462,7 +3462,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 971.6,
+      "kb": 976.7,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3522,6 +3522,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/wave1-critic-decision.ts",
+          "kb": 40.3,
+          "spawns": 2,
+          "spawnsLive": 1,
+          "writes": 3,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/hermes-production-inference-receipt.ts",
           "kb": 37.8,
           "spawns": 4,
@@ -3547,16 +3557,6 @@
           "spawns": 4,
           "spawnsLive": 3,
           "writes": 1,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/wave1-critic-decision.ts",
-          "kb": 35.2,
-          "spawns": 2,
-          "spawnsLive": 1,
-          "writes": 3,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -6114,7 +6114,7 @@
       "id": "2:residue",
       "layer": 2,
       "name": "44 small modules*",
-      "kb": 113.3,
+      "kb": 114.7,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6199,6 +6199,16 @@
           "spawns": 3,
           "spawnsLive": 1,
           "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "collab-electron/scripts/refresh-desktop-shortcut.mjs",
+          "kb": 4.5,
+          "spawns": 2,
+          "spawnsLive": 0,
+          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -6307,16 +6317,6 @@
           "path": "collab-electron/scripts/package-lib/extra-resources.ts",
           "kb": 3.1,
           "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/scripts/refresh-desktop-shortcut.mjs",
-          "kb": 3.1,
-          "spawns": 2,
           "spawnsLive": 0,
           "writes": 0,
           "dml": 0,
@@ -14147,6 +14147,31 @@
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
         "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "collab-electron/scripts/refresh-desktop-shortcut.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
       "unexplained": []
@@ -25577,41 +25602,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 568,
+      "indexed": 569,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 281,
+      "not-applicable": 282,
       "indexed": 288,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 562,
+      "not-applicable": 563,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 516,
+      "not-applicable": 517,
       "partial": 31,
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 504,
+      "not-applicable": 505,
       "partial": 63,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 237,
+      "not-applicable": 238,
       "unsupported": 106,
       "indexed": 229
     },
     "ownership": {
-      "not-applicable": 188,
+      "not-applicable": 189,
       "unsupported": 363,
       "indexed": 21
     },
     "reach": {
-      "unsupported": 341,
+      "unsupported": 342,
       "indexed": 227,
       "partial": 4
     }
@@ -58914,12 +58939,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "e5296384",
-      "generatedAt": "2026-09-09"
+      "commit": "a552cd13",
+      "generatedAt": "2026-09-14"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "a552cd13",
+      "commit": "6d49c69b",
       "generatedAt": "2026-09-14"
     },
     "verdict": "better",

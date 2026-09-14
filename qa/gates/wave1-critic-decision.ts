@@ -13,6 +13,27 @@ const REPO = resolve(import.meta.dir, "../..");
 // outlives the product's ten-minute Critic completion monitor.
 export const WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS = 10 * 60_000;
 export const CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS = 11 * 60_000;
+export type Wave1AcceptanceCase = {
+  event_label: string;
+  entry_market: string;
+  competitors: readonly [string, string];
+  claim: string;
+  requested_market: string;
+  requested_selection: string;
+  official_sources: readonly [string, string];
+};
+export const DEFAULT_WAVE1_ACCEPTANCE_CASE: Wave1AcceptanceCase = Object.freeze({
+  event_label: "Giga Chikadze vs Joanderson Brito",
+  entry_market: "Fight Winner",
+  competitors: Object.freeze(["Giga Chikadze", "Joanderson Brito"] as const),
+  claim: "Joanderson Brito wins by submission",
+  requested_market: "Method of Victory",
+  requested_selection: "Joanderson Brito by Submission",
+  official_sources: Object.freeze([
+    "https://www.ufc.com/athlete/giga-chikadze",
+    "https://www.ufc.com/athlete/joanderson-brito",
+  ] as const),
+});
 type Row = Record<string, any>;
 export type ConfiguredHermesIdentity = { provider: string; model: string };
 type SafeInference = { log_present: boolean; configured: ConfiguredHermesIdentity | null; api_rows: Row[]; turn_rows: Row[] };
@@ -145,12 +166,25 @@ async function evaluate(endpoint: string, expression: string): Promise<any> {
   const result = await rpcCall(endpoint, "app.ui.evaluate", { expression: `(async()=>{try{return {ok:true,value:await (${expression})};}catch(e){return {ok:false,error:String(e)}}})()` }) as Row;
   assert(result.ok, `visible action failed: ${result.error}`); return result.value;
 }
-export function validateLiveDecisionProof(proof: Row): void {
+function exactAcceptanceRowExpression(input: Wave1AcceptanceCase): string {
+  const expected = JSON.stringify({ event_label: input.event_label, entry_market: input.entry_market });
+  return `(()=>{const expected=${expected};const rows=[...document.querySelectorAll('.market-row[data-current="true"]')].filter(row=>row.querySelector('h3')?.textContent?.trim()===expected.event_label&&row.querySelector('.market-row-kind')?.textContent?.split('·',1)[0]?.trim()===expected.entry_market);if(rows.length!==1)throw new Error('Expected exactly one current acceptance row for '+expected.event_label+' / '+expected.entry_market+'; found '+rows.length);return rows[0]})()`;
+}
+export function validateLiveDecisionProof(proof: Row, acceptanceCase: Wave1AcceptanceCase = DEFAULT_WAVE1_ACCEPTANCE_CASE): void {
   assert(proof.diagnostic_only !== true, "diagnostic receipt cannot satisfy positive proof");
+  assert(JSON.stringify(proof.acceptance_case) === JSON.stringify(acceptanceCase), "proof acceptance case differs from the single gate input");
+  const selected = proof.selected_case;
+  assert(selected?.provider === "bovada" && typeof selected.provider_event_id === "string" && selected.provider_event_id.length > 0, "selected provider event identity is missing or foreign");
+  const observedAt = Date.parse(String(selected.observed_at));
+  const eventCutoff = Date.parse(String(selected.event_cutoff));
+  assert(Number.isFinite(observedAt) && Number.isFinite(eventCutoff) && observedAt < eventCutoff && eventCutoff > Date.now(), "selected observation or future event cutoff is invalid");
+  assert(Array.isArray(selected.competitors) && selected.competitors.length === 2 && selected.competitors.every((row: Row, index: number) => row.label === acceptanceCase.competitors[index] && typeof row.competitor_id === "string" && row.competitor_id.length > 0 && typeof row.selection_id === "string" && row.selection_id.length > 0), "selected ordered competitor identities disagree with the acceptance case");
+  assert(Array.isArray(selected.official_sources) && selected.official_sources.length === 2 && selected.official_sources.every((row: Row, index: number) => row.competitor_id === selected.competitors[index].competitor_id && row.selection_id === selected.competitors[index].selection_id && row.competitor_name === acceptanceCase.competitors[index] && row.source_url === acceptanceCase.official_sources[index] && /^[a-f0-9]{64}$/.test(String(row.source_hash))), "official UFC source identities or hashes disagree with the acceptance case");
   assert(proof.worker_session_id && proof.critic_session_id && proof.worker_session_id !== proof.critic_session_id, "worker and Critic must be different sessions");
   assert(proof.worker_artifact_id === proof.source_work.result_artifact_id && proof.run_id === proof.source_work.run_id && proof.worker_task_id === proof.source_work.source_task_id && proof.worker_session_id === proof.source_work.executor_session_id, "exact source work substituted");
   assert(proof.menu_selection_ids.length === proof.decision.comparisons.length && proof.menu_selection_ids.every((id: string, i: number) => proof.decision.comparisons[i].selection_id === id), "offered selection omitted or reordered");
   assert(proof.decision.contract === "qf.market.decision.v1", "worker decision envelope is not strict");
+  assert(proof.decision.hypothesis === acceptanceCase.claim && proof.decision.market_availability?.expression === acceptanceCase.claim && proof.decision.market_availability?.market_description === acceptanceCase.requested_market && proof.decision.market_availability?.outcome_description === acceptanceCase.requested_selection && proof.decision.market_availability?.observed_at === selected.observed_at, "decision claim or requested expression differs from the acceptance case observation");
   assert(proof.worker.assignment_count === 1 && proof.worker.completion_count === 1 && proof.worker.task_status === "done" && proof.worker.trajectory_hash_valid && proof.worker.produced_by_exact_worker && proof.worker.complete_read_lineage && proof.worker.frozen_source_work_exact, "worker lifecycle or exact evidence binding is incomplete");
   assert(proof.critic.assignment_count === 1 && proof.critic.task_status === "done" && proof.critic.review_lifecycle === "completed" && proof.critic.successful_read_tools.join("\0") === "qf_hypothesis_get\0qf_run_get\0qf_artifact_get" && proof.critic.evaluation_writes === 1 && proof.critic.evaluation_write_success === true && proof.critic.performed_by_exact_critic === true && proof.critic.source_work_exact === true, "Critic lifecycle, reads, evaluation invocation, or binding is incomplete");
   assert(proof.publication.current === true && proof.publication.evaluation_id === proof.evaluation_id && proof.publication.report_id === proof.report_id && proof.publication.worker_artifact_id === proof.worker_artifact_id, "current publication is not bound to the exact Evaluation and worker Artifact");
@@ -170,6 +204,8 @@ export function validateLiveDecisionProof(proof: Row): void {
 
 export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
   assert(process.platform === "win32", "W1-03 requires native Windows");
+  const acceptanceCase = DEFAULT_WAVE1_ACCEPTANCE_CASE;
+  const acceptanceRow = exactAcceptanceRowExpression(acceptanceCase);
   const providerFreePreflight = process.env.QF_W1_PROVIDER_FREE_PREFLIGHT === "1";
   const root = mkdtempSync(join(tmpdir(), "qf-w1-decision-live-"));
   const runRoot = join(root, "run"), appDir = join(runRoot, "app"), dbPath = join(runRoot, "kernel.sqlite"), artifacts = join(runRoot, "artifacts");
@@ -202,16 +238,18 @@ export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
     await until("clean Director-only cold open", async () => await evaluate(endpoint, `(()=>{const ready=document.querySelectorAll('[data-qf-surface-kind="director-ready"]');const unexpected=document.querySelectorAll('[data-qf-surface-kind="participant"],[data-qf-surface-kind="investigation"],[data-qf-surface-kind="decision-result"],webview[data-session-id]');return ready.length===1&&unexpected.length===0?true:null})()`));
     await evaluate(endpoint, `(()=>{const b=document.querySelector('#dock-browse-catalog');if(b)b.click();return true})()`);
     await until("rendered Bovada capability", async () => await evaluate(endpoint, `(()=>{const b=document.querySelector('[data-capability-id="bovada-live-markets"]');if(!b||b.getAttribute('aria-disabled')==='true')return null;b.click();return true})()`));
+    await until("saved market load result", async () => await evaluate(endpoint, `(()=>{const status=document.querySelector('.market-desk-status');if(!status)return null;if(status.dataset.tone==='error')throw new Error(status.textContent||'Saved market load failed');return status.dataset.tone==='ok'||status.textContent==='No supported markets in the bounded response'?status.textContent:null})()`));
     await until("visible market refresh", async () => await evaluate(endpoint, `(()=>{const b=document.querySelector('[data-market-refresh]');if(!b)return null;b.click();return true})()`));
-    await until("current exact fight", async () => await evaluate(endpoint, `(()=>{const row=[...document.querySelectorAll('.market-row[data-current="true"]')].find(r=>r.textContent.includes('Manon Fiorot')&&r.textContent.includes('Alexa Grasso')&&r.textContent.includes('Fight Winner'));if(!row)return null;const inputs=row.querySelectorAll('.market-inquiry-input');const b=row.querySelector('.market-research');if(inputs.length!==3||!b)return null;inputs[0].value='Alexa Grasso wins by submission';inputs[0].dispatchEvent(new Event('input',{bubbles:true}));inputs[1].value='Method of Victory';inputs[1].dispatchEvent(new Event('input',{bubbles:true}));inputs[2].value='Alexa Grasso by Submission';inputs[2].dispatchEvent(new Event('input',{bubbles:true}));return [...inputs].every(i=>i.value.length>0)?true:null})()`), 45000);
+    await until("market refresh result", async () => await evaluate(endpoint, `(()=>{const status=document.querySelector('.market-desk-status');if(!status)return null;if(status.dataset.tone==='error')throw new Error(status.textContent||'Bovada refresh failed');return status.dataset.tone==='ok'?status.textContent:null})()`), 45000);
+    await evaluate(endpoint, `(()=>{const row=${acceptanceRow};const input=${JSON.stringify(acceptanceCase)};const inputs=row.querySelectorAll('.market-inquiry-input');const b=row.querySelector('.market-research');if(inputs.length!==3||!b)throw new Error('Acceptance row research controls are unavailable');for(const [field,value] of [[inputs[0],input.claim],[inputs[1],input.requested_market],[inputs[2],input.requested_selection]]){field.value=value;field.dispatchEvent(new Event('input',{bubbles:true}));}return [...inputs].every(field=>field.value.length>0)})()`);
     if (providerFreePreflight) {
-      await evaluate(endpoint, `(()=>{const row=[...document.querySelectorAll('.market-row[data-current="true"]')].find(r=>r.textContent.includes('Manon Fiorot')&&r.textContent.includes('Alexa Grasso'));const b=row?.querySelector('.market-research');if(!b)return false;b.click();return true})()`);
+      await evaluate(endpoint, `(()=>{const row=${acceptanceRow};const b=row.querySelector('.market-research');if(!b)throw new Error('Acceptance row Open investigation control is unavailable');b.click();return true})()`);
       await until("rendered directly operable Analyze control", async () => await evaluate(endpoint, `(()=>{const b=document.querySelector('.qf-investigation-surface__analyze');if(!b||b.disabled)return null;const r=b.getBoundingClientRect();const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return hit&&(hit===b||b.contains(hit))?true:null})()`));
-      await until("visible canary erase", async () => await evaluate(endpoint, `(()=>{const row=[...document.querySelectorAll('.market-row[data-current="true"]')].find(r=>r.textContent.includes('Manon Fiorot')&&r.textContent.includes('Alexa Grasso'));if(!row)return null;const inputs=[...row.querySelectorAll('.market-inquiry-input')];if(inputs.length!==3||!inputs.every(i=>i.value.length>0))return null;for(const input of inputs){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));}return inputs.every(i=>i.value==='')?true:null})()`));
+      await until("visible canary erase", async () => await evaluate(endpoint, `(()=>{const row=${acceptanceRow};const inputs=[...row.querySelectorAll('.market-inquiry-input')];if(inputs.length!==3||!inputs.every(i=>i.value.length>0))return null;for(const input of inputs){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));}return inputs.every(i=>i.value==='')?true:null})()`));
       await rpcCall(endpoint, "app.shutdown", {}); const preflightExit = await waitForExit(child!, 15000); assert(preflightExit === 0, "provider-free preflight close failed"); child = null;
       stage = "provider_free_preflight_complete";
     } else {
-      await evaluate(endpoint, `(()=>{const row=[...document.querySelectorAll('.market-row[data-current="true"]')].find(r=>r.textContent.includes('Manon Fiorot')&&r.textContent.includes('Alexa Grasso'));const b=row?.querySelector('.market-research');if(!b)return false;b.click();return true})()`);
+      await evaluate(endpoint, `(()=>{const row=${acceptanceRow};const b=row.querySelector('.market-research');if(!b)throw new Error('Acceptance row Open investigation control is unavailable');b.click();return true})()`);
     }
     if (providerFreePreflight) {
       console.log("wave1-critic-decision: provider-free choreography PASS launch → Director-only Canvas → Dock → Bovada → Refresh → visible input → investigation → directly operable Analyze → erase → close");
@@ -234,6 +272,19 @@ export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
     const bytes = readFileSync(report.storage_ref); assert(createHash("sha256").update(bytes).digest("hex") === report.content_hash, "published Report hash mismatch");
     const payload = JSON.parse(bytes.toString("utf8"));
     const run = JSON.parse(query(dbPath, "SELECT params FROM run WHERE id=?", source.run_id)[0]!.params);
+    const quote = query(dbPath, "SELECT book,coverage FROM quote WHERE id=?", String(run.quote_id))[0];
+    assert(quote, "acceptance Quote is unavailable");
+    const quoteCoverage = JSON.parse(String(quote.coverage));
+    const evidenceFacts = Array.isArray(run.decision_context?.evidence_facts) ? run.decision_context.evidence_facts : [];
+    const selectedCase = {
+      provider: String(quote.book),
+      provider_event_id: String(quoteCoverage.provider_event_id ?? ""),
+      quote_id: String(run.quote_id ?? ""),
+      observed_at: String(quoteCoverage.observed_at ?? ""),
+      event_cutoff: String(run.event_cutoff ?? ""),
+      competitors: Array.isArray(quoteCoverage.selections) ? quoteCoverage.selections.map((row: Row) => ({ competitor_id: String(row.competitor_id ?? ""), selection_id: String(row.selection_id ?? ""), label: String(row.label ?? "") })) : [],
+      official_sources: evidenceFacts.map((row: Row) => ({ competitor_id: String(row.competitor_id ?? ""), selection_id: String(row.selection_id ?? ""), competitor_name: String(row.competitor_name ?? ""), source_url: String(row.source_url ?? ""), source_hash: String(row.source_hash ?? "") })),
+    };
     const critic = query(dbPath, "SELECT to_id FROM links WHERE from_id=? AND kind='performed_by'", work.publication_evaluation_id)[0]!.to_id;
     const inference = await until("two production inference API receipts", async () => {
       const rows = [source.executor_session_id, critic].map((id) => {
@@ -257,7 +308,7 @@ export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
     const invocations = query(dbPath, "SELECT tool_name,success FROM qf_review_invocation WHERE session_id=? AND task_id=? ORDER BY broker_sequence", critic, review.task_id);
     const performedBy = query(dbPath, "SELECT to_id FROM links WHERE kind='performed_by' AND from_id=?", work.publication_evaluation_id);
     const evaluationSource = JSON.parse(query(dbPath, "SELECT source_work FROM evaluation WHERE id=?", work.publication_evaluation_id)[0]!.source_work);
-    proof = { candidate_base: Bun.spawnSync(["git", "rev-parse", "HEAD"], { cwd: REPO }).stdout.toString().trim(), package_hash: createHash("sha256").update(readFileSync(join(packageRoot, "resources/app.asar"))).digest("hex"), source_work: source, worker_session_id: source.executor_session_id, critic_session_id: critic, worker_task_id: source.source_task_id, worker_artifact_id: source.result_artifact_id, run_id: source.run_id, evaluation_id: work.publication_evaluation_id, report_id: work.report_artifact_id, menu_selection_ids: run.decision_context.selections.map((row: Row) => row.selection_id), decision: payload.decision, inference,
+    proof = { candidate_base: Bun.spawnSync(["git", "rev-parse", "HEAD"], { cwd: REPO }).stdout.toString().trim(), package_hash: createHash("sha256").update(readFileSync(join(packageRoot, "resources/app.asar"))).digest("hex"), acceptance_case: acceptanceCase, selected_case: selectedCase, source_work: source, worker_session_id: source.executor_session_id, critic_session_id: critic, worker_task_id: source.source_task_id, worker_artifact_id: source.result_artifact_id, run_id: source.run_id, evaluation_id: work.publication_evaluation_id, report_id: work.report_artifact_id, menu_selection_ids: run.decision_context.selections.map((row: Row) => row.selection_id), decision: payload.decision, inference,
       worker: { assignment_count: assignments.length, completion_count: completions.length, task_status: workerTask.status, trajectory_hash_valid: trajectory.kind === "trajectory" && createHash("sha256").update(trajectoryBytes).digest("hex") === trajectory.content_hash, produced_by_exact_worker: producer.length === 1 && producer[0]!.from_id === source.executor_session_id, complete_read_lineage: derivedReads.length > 0 && producedReads.length === derivedReads.length, frozen_source_work_exact: frozen.length === 1 && JSON.stringify(JSON.parse(frozen[0]!.source_work)) === JSON.stringify(source) },
       critic: { assignment_count: criticAssignments.length, task_status: criticTask.status, review_lifecycle: review.lifecycle, successful_read_tools: invocations.filter((row) => row.tool_name !== "qf_record_evaluation" && row.success === 1).map((row) => row.tool_name), evaluation_writes: invocations.filter((row) => row.tool_name === "qf_record_evaluation").length, evaluation_write_success: invocations.filter((row) => row.tool_name === "qf_record_evaluation")[0]?.success === 1, performed_by_exact_critic: performedBy.length === 1 && performedBy[0]!.to_id === critic, source_work_exact: JSON.stringify(JSON.parse(review.source_work)) === JSON.stringify(source) && JSON.stringify(evaluationSource) === JSON.stringify(source) },
       publication: { current: work.is_current === 1, evaluation_id: work.publication_evaluation_id, report_id: work.report_artifact_id, worker_artifact_id: payload.source_work?.result_artifact_id ?? source.result_artifact_id }, lifecycle: { worker_closed: false, critic_closed: false, reopen_live_sessions: -1, normal_exit_zero: false, reopen_exit_zero: false, processes: -1, roots_remaining: 1 } };

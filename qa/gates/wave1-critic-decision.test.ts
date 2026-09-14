@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { closeKernel, execute, openKernel } from "../../packages/qf-kernel/src/index.ts";
-import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, observeLiveFailure, parseHermesModelIdentity, sanitizeLiveFailureError, validateLiveDecisionProof, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
+import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, sanitizeLiveFailureError, validateLiveDecisionProof, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
 
 function red(): LiveFailureDiagnostic {
   return {
@@ -23,8 +23,20 @@ function positiveProof(): Record<string, any> {
   const configured = { provider: "openai-codex", model: "gpt-5.6-luna" };
   const api = (session: string) => ({ session, ...configured, input: 10, output: 4, total: 14, latency: 1 });
   return {
+    acceptance_case: DEFAULT_WAVE1_ACCEPTANCE_CASE,
+    selected_case: {
+      provider: "bovada", provider_event_id: "provider-event-1", quote_id: "quote-1", observed_at: "2026-09-14T12:00:00.000Z", event_cutoff: "2099-09-19T21:00:00.000Z",
+      competitors: [
+        { competitor_id: "giga", selection_id: "giga-selection", label: "Giga Chikadze" },
+        { competitor_id: "brito", selection_id: "brito-selection", label: "Joanderson Brito" },
+      ],
+      official_sources: [
+        { competitor_id: "giga", selection_id: "giga-selection", competitor_name: "Giga Chikadze", source_url: "https://www.ufc.com/athlete/giga-chikadze", source_hash: "c".repeat(64) },
+        { competitor_id: "brito", selection_id: "brito-selection", competitor_name: "Joanderson Brito", source_url: "https://www.ufc.com/athlete/joanderson-brito", source_hash: "d".repeat(64) },
+      ],
+    },
     source_work: source, worker_session_id: "worker-1", critic_session_id: "critic-1", worker_task_id: "task-1", worker_artifact_id: "artifact-1", run_id: "run-1", evaluation_id: "evaluation-1", report_id: "report-1",
-    menu_selection_ids: ["a", "b"], decision: { contract: "qf.market.decision.v1", comparisons: [{ selection_id: "a" }, { selection_id: "b" }] },
+    menu_selection_ids: ["a", "b"], decision: { contract: "qf.market.decision.v1", hypothesis: "Joanderson Brito wins by submission", market_availability: { expression: "Joanderson Brito wins by submission", market_description: "Method of Victory", outcome_description: "Joanderson Brito by Submission", observed_at: "2026-09-14T12:00:00.000Z" }, comparisons: [{ selection_id: "a" }, { selection_id: "b" }] },
     inference: [
       { session_id: "worker-1", configured, apiFacts: [api("runtime-worker")], turnFacts: [] },
       { session_id: "critic-1", configured, apiFacts: [api("runtime-critic"), api("runtime-critic")], turnFacts: [{ session: "runtime-critic", model: "gpt-5.6-luna", successful: false }] },
@@ -62,6 +74,12 @@ test("product lifecycle proof accepts optional Turn telemetry and falsifies ever
     (p) => { p.worker.trajectory_hash_valid = false; }, (p) => { p.worker.produced_by_exact_worker = false; },
     (p) => { p.worker.complete_read_lineage = false; }, (p) => { p.worker.frozen_source_work_exact = false; },
     (p) => { p.worker_artifact_id = "substituted"; },
+    (p) => { p.selected_case.provider = "foreign"; },
+    (p) => { p.selected_case.event_cutoff = "2020-01-01T00:00:00.000Z"; },
+    (p) => { p.selected_case.competitors.reverse(); },
+    (p) => { p.selected_case.official_sources[0].competitor_id = "foreign"; },
+    (p) => { p.selected_case.official_sources[1].source_url = "https://www.ufc.com/athlete/other"; },
+    (p) => { p.decision.market_availability.outcome_description = "Joanderson Brito by Decision"; },
     (p) => { p.decision.comparisons.pop(); }, (p) => { p.decision.comparisons.reverse(); },
     (p) => { p.critic_session_id = "worker-1"; }, (p) => { p.critic.assignment_count = 2; },
     (p) => { p.critic.task_status = "open"; }, (p) => { p.critic.review_lifecycle = "running"; },

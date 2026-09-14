@@ -1,26 +1,72 @@
 # WO-W1-03 — Meaningful UFC research, independent criticism, and a governed decision
 
 status: OPEN — fresh Reader returned ORDER SEMANTIC YES and BUILDER DOOR YES after the bounded acceptance correction on 2026-09-07
+amended: 2026-09-14 — founder-authorized execution restart; current UFC acceptance case and batched delivery
 assignee: Builder — selectively salvage the preserved implementation under the corrected one-Canvas contract; never apply the stash wholesale
 depends: WO-W1-02 accepted at repaired product candidate `f9b11bd1d6df38d2e109456c2f1f2c2969a7de19`
 
 ## Objective
 
-Turn Ryan's exact lean—`Alexa Grasso wins by submission`—into a falsifiable Hypothesis over the real
-current Bovada Fiorot–Grasso market menu, then produce a useful, evidence-rich, price-sensitive
+Turn a stated research claim about one currently offered upcoming UFC matchup into a falsifiable
+Hypothesis over that exact current Bovada market menu, then produce a useful, evidence-rich, price-sensitive
 `CANDIDATE`, `WATCH`, or `PASS` decision that an independent production Critic has evaluated against
 the exact research Artifact.
 
 ## In plain terms
 
-Ryan opens Fiorot–Grasso, records his Grasso-by-submission lean, and asks QuantFlow to test it. QuantFlow
+Ryan opens a current supported UFC matchup, records a specific research claim, and asks QuantFlow to test it. QuantFlow
 reads every currently offered Bovada market for that fight, tries to disprove the mechanism, compares the
 listed ways to express any surviving view, and either identifies the best defensible offered expression or
 says exactly why the right answer is WATCH/PASS—without inventing a prop or placing a bet.
 
-Fiorot–Grasso is the exact acceptance case for this order, not the identity of the product. No fighter,
+The live acceptance case is selected from a fresh visible Bovada observation and recorded with its exact
+event, two ordered competitors, future cutoff, claim, and requested expression. Fiorot–Grasso remains a
+historical regression, not a live requirement after its cutoff. No fighter,
 claim, provider event id, market label, or expected WATCH result may be hard-coded into production paths.
 The same visible action and institutional contract must accept another valid UFC inquiry and current event.
+
+### Execution restart — 2026-09-14
+
+The founder authorized execution toward the agreed product, including reconciling the old fixed live case,
+repairing the current workflow, and independently verifying substantial integrated deliveries. This amendment
+authorizes the corresponding bounded gate repair; it does not relax any real-data, independent-critic,
+publication, freshness, identity, negative-case, or cleanup requirement.
+
+- The root architect uses Astra. Every delegated Reader, Builder, and Verifier uses `gpt-5.6-sol`, in a
+  separate context without inherited conversation. This direct founder preference supersedes older
+  different-model requirements; independent roles and evidence remain required.
+- Use the existing checkout and branch. One product writer at a time. Preserve prior founder work and data.
+  Do not merge or push without founder acceptance.
+- The immediate integrated delivery is the current research/review/report path, reachable revision controls,
+  normal desktop launch, and clean continuation. Fix observed blockers of that journey within the existing
+  owners; no architecture rewrite or second runtime is included in this order.
+- Batch relevant focused checks after a coherent repair. Reuse established failure cases rather than
+  manufacturing new gates or repeating unchanged suites. Independent verification checks the integrated
+  candidate; actual live inference and native product proof remain required for product acceptance.
+- The first observed replacement candidate is Giga Chikadze versus Joanderson Brito, shown by the ordinary
+  app's refresh on 2026-09-14 among 11 current UFC markets, scheduled for 2026-09-19. The proposed research
+  claim is `Joanderson Brito wins by submission`, requested market `Method of Victory`, requested selection
+  `Joanderson Brito by Submission`. These are test inputs, not conclusions or production defaults. Fresh
+  current identity, cutoff, exact official-page identities, and available markets must still be verified.
+- Replace the four gate-local fixed-matchup selectors with one explicit acceptance-case input and exact
+  matching to one current visible row. Record the selected provider event, cutoff, ordered competitors,
+  and two official source identities in the live receipt. Missing, ambiguous, stale, unsupported, or
+  identity-mismatched input fails clearly. Do not search through multiple fights until an agent agrees.
+- `bun qa/run.ts wave1-critic-decision` uses the Giga Chikadze / Joanderson Brito tuple above as its
+  explicit gate-local default; it requires no unlisted environment variables. Keep the tuple in one
+  gate-local definition consumed by all four UI selectors and the proof receipt. It is never imported by
+  product code. The default does not waive fresh market/source/cutoff checks; after this case expires,
+  replacing it is an explicit acceptance-input correction, not an automatic search for a passing case.
+- Keep the old Fiorot–Grasso and Moreno–Morales fixtures as historical regression evidence. A new live case
+  must still test meaningful research, requested-expression availability, every actually offered selection,
+  a different real Critic, and the complete preserved proof predicates.
+- Repair the observed invalid desktop shortcut through the existing packaging/shortcut code. Read-back of
+  the shortcut must resolve to this checkout's existing executable and working directory. No new installer,
+  dependency, wrapper, credential access, or secondary checkout is authorized.
+
+Reader evidence: a separate Sol review confirmed the production path already accepts generic current
+matchups; the fixed-case coupling is in this order and four selectors in the existing live gate. The
+review identified exact source/identity and future-cutoff checks to retain. Final acceptance is still open.
 
 ## Binding product meaning
 
@@ -47,17 +93,17 @@ No named Technique is required. A selected Technique remains valid when one exis
 technique-free market investigation must be able to reach governed publication without synthesizing a
 fake Strategy or Technique.
 
-### Frozen authoring fact, not a promised future menu
+### Historical regression fact, not a promised future menu
 
 On 2026-09-06 the existing Bovada UFC source returned provider event `29195963` for Manon Fiorot vs
 Alexa Grasso with exactly two visible markets: Fight Winner (`Fiorot -225`, `Grasso +185`) and Main Total
 Rounds 2.5 (`Over -450`, `Under +300`). It returned no Grasso-by-submission selection. Those prices may
-move and the menu may expand; acceptance uses a fresh observation. This starting fact is a required
+move and the menu may expand; live acceptance uses a fresh upcoming case. This historical fact remains a required
 honesty case: absence of the desired prop is product truth, not permission to fabricate it.
 
 ## Deliverable 0 — exact Hypothesis and complete fight menu
 
-Use the existing Hypothesis object to record `Alexa Grasso wins by submission`, bound to the selected
+Use the existing Hypothesis object to record the exact selected research claim, bound to the selected
 Mission, exact provider event, pre-event cutoff, and creation time. It remains a proposition to
 falsify, not a recommendation or a Technique. Record explicit invalidation and refresh conditions.
 
@@ -68,14 +114,14 @@ method Artifact. The Hypothesis row supplies its creation time, claim, success c
 state. A missing, foreign, duplicated, or cross-Mission member makes the closure invalid.
 
 Extend the existing Bovada acquisition only far enough to preserve every open pre-event market and
-selection actually returned for the exact Fiorot–Grasso provider event—not only Fight Winner. Preserve:
+selection actually returned for the exact selected provider event—not only Fight Winner. Preserve:
 
 - provider event, display group, market id/key/description/type/period/status, outcome/selection id and
   label, handicap where present, decimal price, source URL/hash, and observation time;
 - one content-addressed market-menu Artifact and the exact Quote identities derived from that observation;
 - an explicit `selection_unavailable` result when the provider count and returned unique markets agree, or
   `availability_unknown` when the provider reports additional markets that are absent from the bounded public
-  response. Both preserve observation time and reason; neither may fabricate Grasso by submission.
+  response. Both preserve observation time and reason; neither may fabricate the requested selection.
 
 The existing public event-list response is the sole bounded acquisition source. Preserve the provider
 `numMarkets` value and the count of unique market ids present across returned `displayGroups[].markets[]`.
@@ -104,7 +150,7 @@ present in those captured bytes that materially help compare a matchup. The mini
 - submission average;
 - submission wins/losses and finish method for eligible bouts when the official source states them;
 - submission-attempt, takedown, control, positional, or opponent-adjusted facts actually available and
-  relevant to Grasso's submission path and Fiorot's defense, with source-level limitations;
+  relevant to the selected claim and the opponent's counterevidence, with source-level limitations;
 - the existing eligible pre-cutoff bout rows, sample counts, exclusions, observation time, source URL,
   source hash, parser version, and event cutoff.
 
@@ -277,10 +323,11 @@ The accepted behavior is:
 - Update the packaged Research Director prompt and Canvas-control skill so they teach this same one-Canvas,
   deliberate-surface contract. They must distinguish an ordinary terminal from an admitted Participant and
   must not instruct a runtime to enter a Mission world, restore old tiles, or materialize Kernel rows as tiles.
-- The result surface first states whether the evidence supports, challenges, or cannot resolve the Grasso
-  submission claim. It separately states `WATCH` because the desired Bovada selection is not currently
-  offered, plus the exact refresh condition. A future accepted run must derive those words from current
-  truth; the Grasso sentence is not production copy.
+- The result surface first states whether the evidence supports, challenges, or cannot resolve the exact
+  research claim. It separately derives market actionability from current evidence and availability; an
+  unavailable or unresolved requested expression carries its precise condition and refresh requirement.
+  Neither `WATCH`, a particular finding, nor agreement is a predetermined live answer. The historical Grasso
+  sentence remains a regression example, never production copy.
 - The Critic's material attack is summarized with the result; exact Evaluation and evidence are available
   through Inspect. It does not require its own permanent database card.
 - Cables are absent by default. Selection may show eligible collaboration; active delegation, capability

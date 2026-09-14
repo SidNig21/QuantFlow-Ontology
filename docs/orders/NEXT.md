@@ -16,7 +16,14 @@ receipts remain linked below. W1-03 is open but its current working-tree impleme
 preserved outside `main` until fresh Reader scoping. The corrected outcome is one real UFC inquiry on the
 single Canvas: separate research assessment and current-market actionability, real worker and Critic,
 contextual Inspect, no alternate Mission/History/Lineage worlds, clean cold-open, and deliberate retrieval.
-Fiorot–Grasso is the acceptance case, never production hard-coding.
+Live acceptance uses one freshly observed upcoming supported UFC matchup, recorded with exact identity,
+cutoff, claim, and requested expression. Fiorot–Grasso remains historical regression evidence.
+
+Execution restart, 2026-09-14: the founder authorized building the agreed QuantFlow product, with Astra
+only for the root and `gpt-5.6-sol` for every delegated Reader/Builder/Verifier. The active order records
+the bounded current-case gate correction and invalid desktop-shortcut repair. Batch meaningful checks
+around integrated features; preserve independent verification and real live acceptance. No new order is
+opened by this note, and W1-03 remains unaccepted.
 
 - [Active order](active/WO-W1-03-UFC-RESEARCH-DECISION.md)
 - [W1-02 acceptance](evidence/w1-02/ACCEPTANCE.md)

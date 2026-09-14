@@ -62,31 +62,62 @@ export function refreshDesktopShortcut({
   const when = new Date().toISOString().slice(0, 19).replace("T", " ");
   const description = `QuantFlow Ontology ${version} @ ${sha} · packaged ${when}`;
 
+  const literal = (value) =>
+    `[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${Buffer.from(value, "utf8").toString("base64")}'))`;
+
   // PowerShell COM is the reliable way to rewrite .lnk on Windows.
   const ps = `
 $ErrorActionPreference = 'Stop'
 $sh = New-Object -ComObject WScript.Shell
-$lnk = $sh.CreateShortcut(${JSON.stringify(shortcutPath)})
-$lnk.TargetPath = ${JSON.stringify(exePath)}
-$lnk.WorkingDirectory = ${JSON.stringify(workingDirectory)}
-$lnk.IconLocation = ${JSON.stringify(`${exePath},0`)}
-$lnk.Description = ${JSON.stringify(description)}
+$shortcutPath = ${literal(shortcutPath)}
+$targetPath = ${literal(exePath)}
+$workingDirectory = ${literal(workingDirectory)}
+$iconLocation = ${literal(`${exePath},0`)}
+$description = ${literal(description)}
+$lnk = $sh.CreateShortcut($shortcutPath)
+$lnk.TargetPath = $targetPath
+$lnk.WorkingDirectory = $workingDirectory
+$lnk.IconLocation = $iconLocation
+$lnk.Description = $description
 $lnk.Save()
-Write-Output "ok"
+$saved = $sh.CreateShortcut($shortcutPath)
+Write-Output 'qf-shortcut-v1'
+Write-Output ([Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($saved.TargetPath)))
+Write-Output ([Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($saved.WorkingDirectory)))
+Write-Output ([Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($saved.IconLocation)))
 `.trim();
+
+  const encodedCommand = Buffer.from(ps, "utf16le").toString("base64");
 
   const result = spawnSync(
     "powershell.exe",
-    ["-NoProfile", "-NonInteractive", "-Command", ps],
-    { encoding: "utf8" },
+    ["-NoProfile", "-NonInteractive", "-WindowStyle", "Hidden", "-EncodedCommand", encodedCommand],
+    { encoding: "utf8", windowsHide: true },
   );
-  if (result.status !== 0 || !String(result.stdout).includes("ok")) {
+  const output = String(result.stdout).split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const marker = output.indexOf("qf-shortcut-v1");
+  if (result.status !== 0 || marker < 0 || output.length < marker + 4) {
     return {
       ok: false,
       reason: (result.stderr || result.stdout || "shortcut write failed").trim(),
     };
   }
-  return { ok: true, shortcutPath, exePath, description };
+  const decoded = output.slice(marker + 1, marker + 4).map((value) => Buffer.from(value, "base64").toString("utf8"));
+  const [savedTargetPath, savedWorkingDirectory, savedIconLocation] = decoded;
+  if (savedTargetPath !== exePath || savedWorkingDirectory !== workingDirectory || savedIconLocation !== `${exePath},0`) {
+    return {
+      ok: false,
+      reason: "shortcut read-back differs from the requested target, working directory, or icon",
+    };
+  }
+  return {
+    ok: true,
+    shortcutPath,
+    exePath: savedTargetPath,
+    workingDirectory: savedWorkingDirectory,
+    iconLocation: savedIconLocation,
+    description,
+  };
 }
 
 if (import.meta.main) {

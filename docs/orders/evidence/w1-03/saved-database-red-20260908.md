@@ -71,3 +71,55 @@ Related surface correction in the same candidate: Bovada now opens through the s
 - Founder-requested surface corrections: restored the rotating cube/wordmark with hidden-window suspension and reduced-motion behavior; added **Clear historical**, which filters this board's old rows without deleting Quotes, research, or evidence. The prior static-logo test prohibition is explicitly superseded by Ryan's spinning-logo correction; noninteractive and accessibility behavior remain checked.
 - Focused commands: the market-decision, market-desk, flow-cube, handoff-layer and one-canvas test batch returned **16 pass / 0 fail / 366 assertions**. A separate ontology-gateway batch returned **7 pass / 0 fail / 143 assertions**. `typecheck` passed after a Windows temporary-directory permission failure in dependency setup was rerun with the required access.
 - These are repair and regression receipts, not live acceptance. The combined candidate still needs the real worker, independent Critic, visible reviewed result, deliberate retrieval, attached-cable walkthrough and unfinished-work shutdown proof.
+
+## Execution restart — native observation, 2026-09-14
+
+The existing app opened and refreshed current UFC markets; the complete research and review result is still unproved.
+
+- Source checkout began at `6d49c69b` on `codex/wo-w1-03-one-canvas`, with no working changes. This is the
+  domain-documentation commit over product candidate `a552cd13`, not new product acceptance.
+- A native `@oai/sky` observation of the existing checkout executable showed the one-Canvas application,
+  a Director start surface, no launched participants, and build `a552cd13a5e8c12c3270bf599d8da33c46391dde`,
+  packaged `2026-09-09T07:02:29.878Z`. Native clicks opened the catalog and Bovada surface and invoked Refresh.
+- Before refresh the retained board showed `0 current / 169 historical`. After refresh it showed
+  `11 current / 169 historical`. The first visible current Fight Winner was Giga Chikadze versus
+  Joanderson Brito, scheduled `2026-09-19 14:00` local, with +310 / -390 and an observation marked just now.
+  Provider update displayed `2026-09-14 10:30:26` local. These observed prices are evidence, not test expectations.
+- Read-only COM inspection of the desktop shortcut found its target under the nonexistent
+  `C:\Users\CodexSandboxOffline\QuantFlow-Ontology` path, while the checkout's executable under
+  `C:\Users\rybow\QuantFlow-Ontology` exists and launched. The shortcut working directory contained doubled
+  backslashes. The existing shortcut writer embeds JSON string quoting in PowerShell; literal-safe handling
+  and exact read-back are the scoped repair, followed by a real shortcut launch.
+- The native Close action was issued after the market observation; a subsequent `Get-Process -Name QuantFlow`
+  returned no process. No research participant was started in this observation. This is not open-assignment
+  shutdown proof and does not replace the required full owned-process check.
+- No researcher or Critic inference, reviewed report, or final retrieval was claimed. A separate Sol Reader
+  reviewed the current-case amendment, found the initial command input unspecified, then returned YES after
+  the order made the single gate-local default explicit. The existing gate's proof predicates remain required.
+- Pre-edit Atlas commands: `bun qf-atlas/generate.mjs --check` reported current (428 files, 119 channels);
+  `bun qf-atlas/ratchet.mjs` completed in 6.8 seconds with HARD RED 0, unexplained coverage 0, undecided without
+  blocker 0, AMBER 23. These map checks do not establish product acceptance.
+
+### Current-case and desktop launch repair — candidate preparation
+
+- The Sol Builder replaced the four historical gate selectors with one explicit Giga/Brito acceptance
+  input and exact single-current-row matching. The receipt checks provider event, future cutoff, ordered
+  competitors, and their official UFC source identities. Existing research, independent Critic, publication,
+  lifecycle, and cleanup requirements remain. Restore now finishes before the gate clicks Refresh.
+- The shortcut writer now transfers literal strings to hidden PowerShell and reads the saved shortcut back
+  through COM, checking target, working directory, and icon. No real desktop shortcut was changed during
+  the focused test; the valid control used only a task-owned temporary target and shortcut.
+- Builder command `bun test qa/gates/wave1-critic-decision.test.ts collab-electron/scripts/refresh-desktop-shortcut.test.ts`
+  returned **8 pass / 0 fail / 60 assertions**. Invalid provider, expired cutoff, changed competitor order,
+  mismatched official identity/source, and changed requested selection were rejected. Literal Windows paths
+  containing spaces, a dollar sign, and an apostrophe survived COM read-back. `git diff --check` was clean.
+- Root command `bun qa/run.ts typecheck` initially stopped at the sandbox's Windows temporary-directory
+  permission boundary. The same command with the needed filesystem access completed its frozen installs
+  and printed **PASS typecheck**. The existing gate refreshed ignored local-package junctions; it did not
+  change dependency declarations or lockfiles.
+- Final map preparation: generation completed; `--check` reported current (428 files, 119 channels);
+  ratchet completed in 7.8 seconds with HARD RED 0, unexplained coverage 0, undecided without blocker 0,
+  AMBER 23; `--diff 6d49c69b` reported no architectural change. The displayed map revisions are map metadata,
+  not a claim that uncommitted product changes have already been accepted.
+- These results prepare a runnable candidate. Packaged inference, independent verification, real desktop
+  shortcut launch, ordinary result/retrieval controls, and final owned-process cleanup are still pending.
