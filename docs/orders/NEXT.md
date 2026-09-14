@@ -31,6 +31,12 @@ an actual problem. The active order also requires failed broker startup to stop 
 capture check, and the existing unfinished revision/control loop. The real isolated researcher/Critic run
 at `6220e6ab` passed; ordinary desktop acceptance remains open after a duplicate-launch failure.
 
+Repair verified, 2026-09-14: candidate `8f15e6e5` independently passed same-profile repeat launch, native
+window recovery, distinct-profile isolation, broker survival, shutdown cleanup, and real screenshot capture.
+The actual desktop shortcut also recovered its original process. The saved inquiry reopened, but retry still
+refuses its expired observation after the board is refreshed. Continue the active order by repairing saved-work
+continuation with fresh exact evidence, then the unfinished revision/control loop; W1-03 remains unaccepted.
+
 - [Active order](active/WO-W1-03-UFC-RESEARCH-DECISION.md)
 - [W1-02 acceptance](evidence/w1-02/ACCEPTANCE.md)
 - [W1-01 acceptance](evidence/w1-01/ACCEPTANCE.md)

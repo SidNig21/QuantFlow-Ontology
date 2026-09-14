@@ -201,3 +201,36 @@ Opening the app again is intended to recover the existing window; the new native
 - Root regenerated Atlas; `--check` reported current (431 files, 119 channels), ratchet completed in 4.4 seconds
   with HARD RED 0, unexplained coverage 0, undecided without blocker 0, AMBER 23, and the diff against `6220e6ab`
   reported no architectural change. These checks describe wiring and do not establish native acceptance.
+
+### Independently verified duplicate-launch repair — 2026-09-14
+
+Opening QuantFlow twice now recovers the original window and leaves one owner of the saved profile.
+
+- Candidate `8f15e6e5abc35bf79c7169da4d8d97bf724649f3`, tree
+  `dd91ed7a3d33f31b18466c61f8ca770b8e24ff05`; package time `2026-09-14T19:04:03.902Z`,
+  app.asar SHA-256 `cd49609f597a6426676539609ed1b515c2af168c373a6081099c9d57b416579c`.
+  Unsigned local package completed; the real desktop shortcut was refreshed. No merge or publish occurred.
+- A fresh Sol verifier independently returned semantic YES, focused YES, and native YES for this bounded repair.
+  It repeated the 18/99 and 1/7 focused tests, TypeScript, product identity, and Atlas checks with the same results.
+  `bun qa/run.ts windows-cold-boot` reused this exact package and passed on native Windows: repeated same-profile
+  launch exited zero with no survivors, primary visible=true/minimized=false/focused=true, original broker ready,
+  and all ten original process receipts preserved. A distinct isolated profile worked independently and closed
+  with zero survivors. The primary then closed normally with zero owned processes remaining.
+- A separate provider-free capture used the actual packaged window. `guard-native-capture.png` is 1200x800,
+  142,384 bytes, SHA-256 `aebbb82723c01548f7e1ee508323d92d2c2decf27565044e4446f6143e0c286b`.
+  Independent visual inspection found a legible Director-only cold-open Canvas. Its app exited zero and its
+  owned processes/root were removed. This is cold-open screenshot proof, not reviewed-result legibility.
+- Root then opened the actual desktop shortcut at `12:11:06` local, PID 15948. A second executable launch
+  recovered its hidden window. A native screenshot showed build `8f15e6e5`, one ready Director, and zero active
+  participants. CIM confirmed the original PID 15948 remained the sole root; all nine QuantFlow children had
+  that parent. The normal saved-inquiry retry is continuing. Full W1-03 remains open, including revision controls.
+- The ordinary saved inquiry reopened with `Retry analysis`, retaining its exact question. Retry refused the
+  now-historical observation before any participant started. A real board Refresh produced 11 current markets,
+  including Giga/Brito at +315/-400, provider update `2026-09-14 11:41:02` local. Retrying the same saved inquiry
+  after that refresh still returned `Refresh Bovada and open the current UFC investigation.` The new observation
+  is not connected to this unfinished inquiry by the existing UI path. Original native evidence is
+  `native-saved-retry-stale-quote-20260914.jpg`. No inference ran in these two refused attempts.
+- Native window Close then completed; `Get-Process -Name QuantFlow` returned zero. The duplicate-instance repair
+  is independently verified, while saved-work continuation after freshness expiry is the next concrete product
+  gap. Preserve old observations/Runs; do not weaken freshness or silently start an unrelated inquiry as proof
+  of continuation. A bounded source investigation is determining the existing action path before implementation.
