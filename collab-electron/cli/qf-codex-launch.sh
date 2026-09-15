@@ -35,9 +35,9 @@ exec "$codex_command" \
   --sandbox read-only \
   -c "$mcp_config" \
   -c "mcp_servers.node_repl.enabled=false" \
-  -c "mcp_servers.codex_apps.enabled=false" \
   -c "features.shell_tool=false" \
   -c "web_search='disabled'" \
+  -c "features.apps=false" \
   -c "apps._default.enabled=false" \
   -c "features.plugins=false" \
   -c "features.browser_use=false" \
