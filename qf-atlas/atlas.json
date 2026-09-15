@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "c88def2d",
+    "commit": "c521cb4e",
     "generatedAt": "2026-09-15",
     "filesScanned": 433,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "18c9de18976a98e7"
+    "fingerprint": "d12610f571e15109"
   },
   "stats": {
     "live": 108,
@@ -3035,22 +3035,22 @@
       "id": "0:packages/qf-kernel/src::create",
       "layer": 0,
       "name": "create.ts",
-      "kb": 59.3,
+      "kb": 61.6,
       "x": -1.24,
       "z": 0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
-      "dml": 16,
+      "dml": 17,
       "executes": 0,
       "files": [
         {
           "path": "packages/qf-kernel/src/create.ts",
-          "kb": 59.3,
+          "kb": 61.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
-          "dml": 16,
+          "dml": 17,
           "dmlLines": [
             363,
             481,
@@ -9623,8 +9623,8 @@
       "path": "packages/qf-kernel/src/create.ts",
       "status": "indexed",
       "indexedFns": 34,
-      "sqlInText": 16,
-      "sqlIndexed": 16,
+      "sqlInText": 17,
+      "sqlIndexed": 17,
       "sqlUnrecognised": 0
     },
     {
@@ -11141,133 +11141,133 @@
         {
           "impl": "publishArtifact",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1671
+          "line": 1709
         }
       ],
       "create_agent_session": [
         {
           "impl": "createAgentSession",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1672
+          "line": 1710
         }
       ],
       "create_task": [
         {
           "impl": "createTask",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1673
+          "line": 1711
         }
       ],
       "create_connection": [
         {
           "impl": "createConnection",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1674
+          "line": 1712
         }
       ],
       "delete_connection": [
         {
           "impl": "deleteConnection",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1675
+          "line": 1713
         }
       ],
       "register_agent_definition": [
         {
           "impl": "registerAgentDefinition",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1676
+          "line": 1714
         }
       ],
       "create_hypothesis": [
         {
           "impl": "createHypothesis",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1677
+          "line": 1715
         }
       ],
       "register_dataset_version": [
         {
           "impl": "registerDatasetVersion",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1678
+          "line": 1716
         }
       ],
       "create_run": [
         {
           "impl": "createRun",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1679
+          "line": 1717
         }
       ],
       "execute_deterministic_run": [
         {
           "impl": "executeDeterministicRun",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1680
+          "line": 1718
         }
       ],
       "record_evaluation": [
         {
           "impl": "recordEvaluation",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1681
+          "line": 1719
         }
       ],
       "create_mission": [
         {
           "impl": "createMission",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1682
+          "line": 1720
         }
       ],
       "register_tool": [
         {
           "impl": "registerTool",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1683
+          "line": 1721
         }
       ],
       "create_market_investigation": [
         {
           "impl": "createMarketInvestigation",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1684
+          "line": 1722
         }
       ],
       "create_ticket": [
         {
           "impl": "createTicket",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1685
+          "line": 1723
         }
       ],
       "observe_ticket": [
         {
           "impl": "observeTicket",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1686
+          "line": 1724
         }
       ],
       "register_venue": [
         {
           "impl": "registerVenue",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1687
+          "line": 1725
         }
       ],
       "schedule_market_event": [
         {
           "impl": "scheduleMarketEvent",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1688
+          "line": 1726
         }
       ],
       "reschedule_market_event": [
         {
           "impl": "rescheduleMarketEvent",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1689
+          "line": 1727
         }
       ],
       "ingest_market_batch": [
@@ -11347,17 +11347,17 @@
       },
       "createMarketInvestigation": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 1453,
+        "line": 1491,
         "kind": "function"
       },
       "createTicket": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 1604,
+        "line": 1642,
         "kind": "function"
       },
       "observeTicket": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 1636,
+        "line": 1674,
         "kind": "function"
       },
       "executeDeterministicRun": {
@@ -20259,11 +20259,12 @@
       "reach": "unsupported",
       "blockers": {
         "reach": "scope-boundary",
+        "persistence": "ast-coverage",
         "ownership": "scope-boundary"
       },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
+      "persistence": "partial",
       "lifetime": "not-applicable",
       "packaging": "not-applicable",
       "ownership": "unsupported",
@@ -20271,7 +20272,7 @@
         "reach": "no reach row was produced for this path",
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
+        "persistence": "3 of 3 SQL site(s) are not inside a named function, so no call path can be traced",
         "lifetime": "starts no long-lived child process",
         "packaging": "test or QA code does not ship",
         "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
@@ -25981,8 +25982,8 @@
       "dynamic": 3
     },
     "persistence": {
-      "not-applicable": 526,
-      "partial": 31,
+      "not-applicable": 525,
+      "partial": 32,
       "indexed": 26
     },
     "lifetime": {
@@ -58058,7 +58059,7 @@
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
             1407,
-            1500
+            1538
           ]
         }
       ]
@@ -58108,7 +58109,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            1447
+            1485
           ]
         }
       ]
@@ -58133,7 +58134,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            1586
+            1624
           ]
         }
       ]
@@ -58184,6 +58185,31 @@
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
             1330
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:registerTool:tool:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "registerTool",
+      "table": "tool",
+      "verb": "UPDATE",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            1470
           ]
         }
       ]
@@ -60021,16 +60047,16 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "6220e6ab",
-      "generatedAt": "2026-09-14"
-    },
-    "to": {
-      "branch": "codex/wo-w1-03-one-canvas",
       "commit": "c88def2d",
       "generatedAt": "2026-09-15"
     },
-    "verdict": "better",
-    "why": "37 improvement(s), nothing added or hidden",
+    "to": {
+      "branch": "codex/wo-w1-03-one-canvas",
+      "commit": "c521cb4e",
+      "generatedAt": "2026-09-15"
+    },
+    "verdict": "worse",
+    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -60297,7 +60323,16 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [],
+    "changedCoverage": [
+      {
+        "path": "packages/qf-kernel/src/market-desk.test.ts",
+        "analyzer": "persistence",
+        "from": "not-applicable",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "3 of 3 SQL site(s) are not inside a named function, so no call path can be traced"
+      }
+    ],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -60305,7 +60340,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 0,
+      "coverageWorse": 1,
       "coverageBetter": 0,
       "undecidedFrom": 37,
       "undecidedTo": null

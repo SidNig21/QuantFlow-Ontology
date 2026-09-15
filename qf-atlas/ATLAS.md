@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-w1-03-one-canvas @ c88def2d` on 2026-09-15 by
+> Generated from `codex/wo-w1-03-one-canvas @ c521cb4e` on 2026-09-15 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -444,7 +444,7 @@ mechanism behind the invariant below, not a promise about it.
 | `imports` | 579 | 0 | 4 | 0 | 0 |
 | `ipcRequest` | 297 | 0 | 3 | 0 | 283 |
 | `ipcPush` | 7 | 0 | 3 | 0 | 573 |
-| `persistence` | 26 | 31 | 0 | 0 | 526 |
+| `persistence` | 26 | 32 | 0 | 0 | 525 |
 | `lifetime` | 5 | 64 | 0 | 0 | 514 |
 | `packaging` | 234 | 0 | 0 | 106 | 243 |
 | `ownership` | 21 | 0 | 0 | 373 | 189 |

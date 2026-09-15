@@ -1,0 +1,58 @@
+{
+  "schema": "qf.w1-03.live-failure-diagnostic.v1",
+  "result": "RED",
+  "diagnostic_only": true,
+  "last_completed_stage": "real_saved_kernel_snapshot_validated",
+  "route": {
+    "visible_market_action_reached": false,
+    "analyze_and_review_dispatched": false
+  },
+  "worker": {
+    "session_id": "53de2921-9d2a-448c-a459-27c102c0fa77",
+    "session_status": "failed",
+    "task_id": "task-7fc97c34-f03f-451b-a70d-9458be7f308e",
+    "task_status": "open",
+    "assigned": true,
+    "assignment_ambiguous": false,
+    "inference": {
+      "log_present": false,
+      "configured": null,
+      "api_rows": [],
+      "turn_rows": []
+    },
+    "trajectory_id": null,
+    "trajectory_present": false,
+    "trajectory_ambiguous": false,
+    "kernel_accepted_and_bound": false
+  },
+  "critic": {
+    "session_id": null,
+    "session_status": null,
+    "task_id": null,
+    "task_status": null,
+    "review_lifecycle": null,
+    "assigned": false,
+    "assignment_ambiguous": false,
+    "inference": {
+      "log_present": false,
+      "configured": null,
+      "api_rows": [],
+      "turn_rows": []
+    },
+    "successful_tools": [],
+    "last_transport_event": null,
+    "completion_failure": null
+  },
+  "governed_result": {
+    "evaluation_present": false,
+    "publication_present": false,
+    "current_decision_present": false
+  },
+  "lifecycle": {
+    "shutdown_attempted": false,
+    "exit_code": 1,
+    "owned_processes_remaining": 0,
+    "disposable_root_removed": true
+  },
+  "error": "application exited before readiness: socket-path not written"
+}

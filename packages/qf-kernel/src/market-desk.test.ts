@@ -50,6 +50,18 @@ describe("W1 market desk Kernel boundary", () => {
       events: (db.query("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n,
     }).toEqual(counts);
     expect(() => execute(db, "register_tool", { ...input, capability_class: "tool" }, TRACE)).toThrow("conflicting registered identity");
+
+    db.query("UPDATE tool SET capability_class = NULL, implementation_version = NULL WHERE id = ?").run(input.tool_id);
+    expect(() => execute(db, "register_tool", { ...input, capability_class: "tool" }, TRACE)).toThrow("conflicting registered identity");
+    expect(db.query("SELECT capability_class, implementation_version FROM tool WHERE id = ?").get(input.tool_id)).toEqual({ capability_class: null, implementation_version: null });
+    execute(db, "register_tool", input, TRACE);
+    expect(db.query("SELECT capability_class, implementation_version FROM tool WHERE id = ?").get(input.tool_id)).toEqual({ capability_class: "data", implementation_version: "1.0.0" });
+    expect((db.query("SELECT COUNT(*) AS n FROM events WHERE object_type = 'tool' AND object_id = ?").get(input.tool_id) as { n: number }).n).toBe(1);
+
+    db.query("UPDATE tool SET capability_class = NULL, implementation_version = NULL WHERE id = ?").run(input.tool_id);
+    db.query("INSERT INTO events (id, type, object_type, object_id, payload, trace_id, created_at) SELECT ?, type, object_type, object_id, ?, trace_id, created_at FROM events WHERE object_type = 'tool' AND object_id = ? LIMIT 1").run("ambiguous-legacy-tool-event", JSON.stringify({ command: "register_tool", name: input.name, summary: input.summary, capability_class: "data", implementation_version: "2.0.0" }), input.tool_id);
+    expect(() => execute(db, "register_tool", input, TRACE)).toThrow("missing or ambiguous legacy registration identity");
+    expect(db.query("SELECT capability_class, implementation_version FROM tool WHERE id = ?").get(input.tool_id)).toEqual({ capability_class: null, implementation_version: null });
   });
 
   test("creates a current quote-linked Mission without a Task or Strategy", () => {

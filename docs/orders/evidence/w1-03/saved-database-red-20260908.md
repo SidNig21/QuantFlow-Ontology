@@ -282,3 +282,25 @@ The ordinary saved investigation now has a real Resume action that refreshes its
 - Atlas was regenerated from the candidate: 433 files, 119 channels, 108 live wires, zero unreached wires,
   zero dead wires. These are candidate checks. They do not replace independent packaged execution against the
   isolated copy of the founder's saved profile.
+
+### First real saved-resume package run — RED, 2026-09-14
+
+The real packaged app exposed a legacy Dock identity migration defect before it spent a provider call.
+
+- Independent Sol verification froze candidate `c521cb4e1d4863c48802d681baf3844225e8e5f7`, tree
+  `622521d0b6709585877c4a1272e65f7fc489be4f`. Its focused resume guards, schema suite, six-package
+  TypeScript closure, Atlas check/ratchet, and unsigned package completed successfully.
+- With explicit founder approval, the named saved-resume gate opened a read-only snapshot of the real profile.
+  The snapshot validated, but the packaged app exited code 1 before readiness. No Canvas action, market refresh,
+  worker, Critic, Evaluation, Report, or provider inference occurred. Cleanup left zero processes and removed the
+  disposable root. `saved-resume-red.json` is the preserved diagnostic receipt.
+- A second provider-free cold-boot diagnostic retained its disposable logs long enough to expose the cause:
+  `bovada-live-markets` already existed with conflicting registered identity. All three legacy Dock Tool rows
+  retained exact class/version in their original `tool.registered` Kernel events, while a prior table rebuild had
+  left the materialized class/version columns null.
+- The repair lets the existing `register_tool` execution path reconstruct only a wholly missing legacy identity
+  when every durable registration event agrees with the current name, summary, class, and version. Conflicting,
+  partial, missing, or ambiguous identity still refuses. No new truth store or startup-only SQL path was added.
+- Focused Kernel checks returned **5 pass / 0 fail / 26 assertions**. A copy of the actual saved database then
+  reconstructed all three Tool identities exactly from their original events at schema metadata 95. That
+  diagnostic copy was deleted by exact verified path; the real profile remained unchanged.

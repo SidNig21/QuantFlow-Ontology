@@ -1433,6 +1433,44 @@ function registerTool(
   }
   const existing = db.query("SELECT * FROM tool WHERE id = ?").get(id) as Record<string, unknown> | null;
   if (existing) {
+    if (existing.capability_class === null && existing.implementation_version === null) {
+      const registrationRows = db.query(
+        "SELECT payload FROM events WHERE object_type = 'tool' AND object_id = ? AND type = 'tool.registered' ORDER BY rowid",
+      ).all(id) as Array<{ payload: string }>;
+      const registrations = registrationRows.map((row) => {
+        try {
+          const value = JSON.parse(row.payload) as Record<string, unknown>;
+          return value.command === "register_tool" && typeof value.name === "string" &&
+            typeof value.summary === "string" &&
+            (value.capability_class === "data" || value.capability_class === "tool") &&
+            typeof value.implementation_version === "string" && value.implementation_version.length > 0
+            ? {
+                name: value.name,
+                summary: value.summary,
+                capability_class: value.capability_class,
+                implementation_version: value.implementation_version,
+              }
+            : null;
+        } catch { return null; }
+      });
+      if (!registrations.length || registrations.some((value) => value === null)) {
+        throw new KernelError(`tool "${id}" has missing or ambiguous legacy registration identity`);
+      }
+      const recoveredRegistrations = registrations as Array<{ name: string; summary: string; capability_class: "data" | "tool"; implementation_version: string }>;
+      const exact = new Map(recoveredRegistrations.map((value) => [JSON.stringify(value), value]));
+      if (exact.size !== 1) throw new KernelError(`tool "${id}" has missing or ambiguous legacy registration identity`);
+      const recovered = [...exact.values()][0]!;
+      if (
+        recovered.name !== name || recovered.summary !== summary ||
+        recovered.capability_class !== capabilityClass ||
+        recovered.implementation_version !== implementationVersion ||
+        existing.name !== recovered.name || existing.summary !== recovered.summary
+      ) throw new KernelError(`tool "${id}" already exists with a conflicting registered identity`);
+      db.query(
+        "UPDATE tool SET capability_class = ?, implementation_version = ? WHERE id = ? AND capability_class IS NULL AND implementation_version IS NULL",
+      ).run(recovered.capability_class, recovered.implementation_version, id);
+      return creationResult(cmd, id, cmd.event, { ...existing, ...recovered });
+    }
     if (
       existing.name !== name || existing.summary !== summary ||
       existing.capability_class !== capabilityClass ||
