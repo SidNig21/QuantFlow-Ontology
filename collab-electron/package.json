@@ -80,6 +80,10 @@
         "to": "qf-hermes-launch.sh"
       },
       {
+        "from": "cli/qf-codex-launch.sh",
+        "to": "qf-codex-launch.sh"
+      },
+      {
         "from": "cli/qf-opencode-session",
         "to": "qf-opencode-session"
       },

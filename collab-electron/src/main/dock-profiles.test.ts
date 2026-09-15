@@ -12,6 +12,7 @@ import {
   bootstrapDockProfiles,
   discoverDockProfileManifests,
   getMissingHermesDockDiagnostic,
+  getMissingProductionDockDiagnostics,
   type DockProfileRegistration,
 } from "./dock-profiles";
 
@@ -24,8 +25,8 @@ afterEach(() => {
 
 function seedAdapter(
   root: string,
-  base: "species/hermes" | "tools/qf-proof-agent",
-  adapterId: "hermes" | "qf-proof-agent",
+  base: "species/hermes" | "species/codex" | "tools/qf-proof-agent",
+  adapterId: "hermes" | "codex" | "qf-proof-agent",
   profiles: Array<{
     id: string;
     role: string;
@@ -38,6 +39,8 @@ function seedAdapter(
 ): void {
   const packageName = adapterId === "hermes"
     ? "hermes.aospkg"
+    : adapterId === "codex"
+      ? "codex.aospkg"
     : "qf-proof-agent.aospkg";
   const packed = join(root, base, "packed");
   mkdirSync(packed, { recursive: true });
@@ -53,6 +56,13 @@ function seedAdapter(
             argv: ["--tui"],
             profile_argv: ["-p", "{runtime_profile}", "--tui"],
           }
+        : adapterId === "codex"
+          ? {
+              command: "codex",
+              terminal_target: "wsl:auto",
+              argv: ["--no-alt-screen"],
+              peer_delivery: { mode: "pty_role", runtime_profiles: ["default"] },
+            }
         : adapterId === "qf-proof-agent"
           ? {
               command: "node",
@@ -118,6 +128,17 @@ function seedRequired(root: string): void {
   writeFileSync(join(root, "species/hermes/prompts/research-director.md"), "director");
   writeFileSync(join(root, "species/hermes/prompts/worker.md"), "worker");
   writeFileSync(join(root, "species/hermes/prompts/critic.md"), "critic");
+  seedAdapter(root, "species/codex", "codex", [
+    {
+      id: "codex-worker",
+      role: "worker",
+      runtime_profile: "default",
+      system_prompt_ref: "prompts/worker.md",
+      capability_groups: ["market.read"],
+    },
+  ]);
+  mkdirSync(join(root, "species/codex/prompts"), { recursive: true });
+  writeFileSync(join(root, "species/codex/prompts/worker.md"), "worker");
 }
 
 function seedQaFixtures(root: string): void {
@@ -170,6 +191,7 @@ describe("Dock profile manifests", () => {
     const manifests = discoverDockProfileManifests(freshRoot());
     const profiles = manifests.flatMap((manifest) => manifest.profiles);
     expect(profiles.map((profile) => profile.name).sort()).toEqual([
+      "codex-worker",
       "hermes-critic",
       "hermes-research-director",
       "hermes-worker",
@@ -180,6 +202,9 @@ describe("Dock profile manifests", () => {
         (profile) => profile.package_ref === "species/hermes/packed/hermes.aospkg",
       ),
     ).toBe(true);
+    expect(profiles.find((profile) => profile.name === "codex-worker")?.package_ref).toBe(
+      "species/codex/packed/codex.aospkg",
+    );
   });
 
   test("production discovery requires the exact Research Director contract", () => {
@@ -188,14 +213,14 @@ describe("Dock profile manifests", () => {
     const raw = JSON.parse(readFileSync(manifest, "utf8")) as {
       profiles: Array<Record<string, unknown>>;
     };
-    raw.profiles[0]!.id = "hermes-orchestrator";
+    raw.profiles[0]!.display_name = "Orchestrator";
     writeFileSync(manifest, `${JSON.stringify(raw)}\n`);
-    expect(() => discoverDockProfileManifests(root)).toThrow(/exactly one hermes-research-director/);
+    expect(() => discoverDockProfileManifests(root)).toThrow(/exactly one Research Director/);
 
-    raw.profiles[0]!.id = "hermes-research-director";
-    raw.profiles[0]!.system_prompt_ref = "prompts/orchestrator.md";
+    raw.profiles[0]!.display_name = "Research Director";
+    raw.profiles[0]!.role = "worker";
     writeFileSync(manifest, `${JSON.stringify(raw)}\n`);
-    expect(() => discoverDockProfileManifests(root)).toThrow(/exact Research Director profile contract/);
+    expect(() => discoverDockProfileManifests(root)).toThrow(/Research Director must use/);
   });
 
   test("invalid display names enumerate the exact four allowed values", () => {
@@ -214,6 +239,7 @@ describe("Dock profile manifests", () => {
   test("QA discovery explicitly includes proof fixtures", () => {
     const manifests = discoverDockProfileManifests(freshQaRoot(), { qaMode: true });
     expect(manifests.flatMap((manifest) => manifest.profiles).map((profile) => profile.name).sort()).toEqual([
+      "codex-worker",
       "hermes-critic",
       "hermes-research-director",
       "hermes-worker",
@@ -223,6 +249,7 @@ describe("Dock profile manifests", () => {
     ]);
     expect(manifests.map((manifest) => manifest.manifestRef)).toEqual([
       "species/hermes/dock-profiles.json",
+      "species/codex/dock-profiles.json",
       "tools/qf-proof-agent/dock-profiles.json",
     ]);
   });
@@ -250,6 +277,7 @@ describe("Dock profile manifests", () => {
 
     seedRequired(root);
     expect(getMissingHermesDockDiagnostic(root)).toBeNull();
+    expect(getMissingProductionDockDiagnostics(root)).toEqual([]);
   });
 
   test("registers once, skips identical rows, and preserves conflicts", () => {
@@ -264,14 +292,14 @@ describe("Dock profile manifests", () => {
     };
     const root = freshRoot();
     const first = bootstrapDockProfiles(root, deps);
-    expect(first.registered).toHaveLength(4);
+    expect(first.registered).toHaveLength(5);
     expect(first.conflicts).toHaveLength(0);
-    expect(writes).toHaveLength(4);
+    expect(writes).toHaveLength(5);
 
     const second = bootstrapDockProfiles(root, deps);
     expect(second.registered).toHaveLength(0);
-    expect(second.skipped).toHaveLength(4);
-    expect(writes).toHaveLength(4);
+    expect(second.skipped).toHaveLength(5);
+    expect(writes).toHaveLength(5);
 
     rows.set("hermes-worker", {
       ...rows.get("hermes-worker"),
@@ -282,7 +310,7 @@ describe("Dock profile manifests", () => {
       "hermes-worker",
     ]);
     expect(rows.get("hermes-worker")?.role).toBe("operator-custom-role");
-    expect(writes).toHaveLength(4);
+    expect(writes).toHaveLength(5);
 
     const qaRows = new Map<string, Record<string, unknown>>();
     const qaWrites: DockProfileRegistration[] = [];
@@ -293,8 +321,8 @@ describe("Dock profile manifests", () => {
         qaRows.set(input.name, { id: input.name, ...input });
       },
     }, { qaMode: true });
-    expect(qa.registered).toHaveLength(6);
-    expect(qaWrites).toHaveLength(6);
+    expect(qa.registered).toHaveLength(7);
+    expect(qaWrites).toHaveLength(7);
   });
 
   test("validates every manifest before making a Kernel call", () => {

@@ -15,6 +15,8 @@ import { resolveRuntimeAdapterMetadata } from "./runtime-adapter";
 
 export const HERMES_DOCK_MANIFEST_REF = "species/hermes/dock-profiles.json";
 export const HERMES_DOCK_PACKAGE_REF = "species/hermes/packed/hermes.aospkg";
+export const CODEX_DOCK_MANIFEST_REF = "species/codex/dock-profiles.json";
+export const CODEX_DOCK_PACKAGE_REF = "species/codex/packed/codex.aospkg";
 
 export type DockAdapterDiagnostic = {
   id: string;
@@ -25,6 +27,7 @@ export type DockAdapterDiagnostic = {
 /** Product inventory: only real, launchable species are bootstrapped by default. */
 export const PRODUCTION_DOCK_PROFILE_MANIFESTS = [
   HERMES_DOCK_MANIFEST_REF,
+  CODEX_DOCK_MANIFEST_REF,
 ] as const;
 
 /** QA-only inventory used by deterministic collaboration/runtime gates. */
@@ -43,15 +46,6 @@ export const DOCK_DISPLAY_NAMES = [
   "Critic",
 ] as const;
 export type DockDisplayName = (typeof DOCK_DISPLAY_NAMES)[number];
-
-const HERMES_RESEARCH_DIRECTOR_PROFILE = {
-  id: "hermes-research-director",
-  role: "orchestrator",
-  display_name: "Research Director",
-  runtime_profile: "default",
-  system_prompt_ref: "prompts/research-director.md",
-  capability_groups: ["desk.orchestrate"] as const,
-};
 
 export type DockProfileDiscoveryOptions = {
   qaMode?: boolean;
@@ -130,6 +124,34 @@ export function getMissingHermesDockDiagnostic(
   return null;
 }
 
+/** Missing-only diagnostics for every production participant declaration. */
+export function getMissingProductionDockDiagnostics(
+  appRoot: string,
+  exists: (path: string) => boolean = existsSync,
+): DockAdapterDiagnostic[] {
+  const adapters = [
+    { id: "hermes", name: "Hermes", manifest: HERMES_DOCK_MANIFEST_REF, package: HERMES_DOCK_PACKAGE_REF },
+    { id: "codex", name: "Codex", manifest: CODEX_DOCK_MANIFEST_REF, package: CODEX_DOCK_PACKAGE_REF },
+  ];
+  const diagnostics: DockAdapterDiagnostic[] = [];
+  for (const adapter of adapters) {
+    if (!exists(join(appRoot, adapter.manifest))) {
+      diagnostics.push({
+        id: `${adapter.id}-dock-manifest-missing`,
+        name: adapter.name,
+        message: `${adapter.name} unavailable: the packaged Dock manifest is missing. Reinstall QuantFlow or run the development app.`,
+      });
+    } else if (!exists(join(appRoot, adapter.package))) {
+      diagnostics.push({
+        id: `${adapter.id}-dock-package-missing`,
+        name: adapter.name,
+        message: `${adapter.name} unavailable: the packaged adapter package is missing. Reinstall QuantFlow or run the development app.`,
+      });
+    }
+  }
+  return diagnostics;
+}
+
 function record(value: unknown, label: string): Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw new DockProfilesContractError(`${label} must be an object`);
@@ -173,36 +195,31 @@ function displayName(value: unknown, label: string): DockDisplayName {
   return name as DockDisplayName;
 }
 
-function validateProductionHermesDirector(manifest: DockProfileManifest): void {
-  if (manifest.manifestRef !== HERMES_DOCK_MANIFEST_REF) return;
-  const directorProfiles = manifest.profiles.filter(
-    (profile) => profile.name === HERMES_RESEARCH_DIRECTOR_PROFILE.id,
+function validateProductionDirector(manifests: DockProfileManifest[]): void {
+  const directorProfiles = manifests.flatMap((manifest) => manifest.profiles).filter(
+    (profile) => profile.display_name === "Research Director",
   );
   if (directorProfiles.length !== 1) {
     throw new DockProfilesContractError(
-      `${manifest.manifestPath} must contain exactly one ${HERMES_RESEARCH_DIRECTOR_PROFILE.id} profile`,
-    );
-  }
-  if (manifest.profiles.some((profile) => profile.name === "hermes-orchestrator")) {
-    throw new DockProfilesContractError(
-      `${manifest.manifestPath} must not contain the retired hermes-orchestrator profile`,
+      "production Dock manifests must contain exactly one Research Director",
     );
   }
   const director = directorProfiles[0]!;
-  const expected = HERMES_RESEARCH_DIRECTOR_PROFILE;
   if (
-    director.role !== expected.role ||
-    director.display_name !== expected.display_name ||
-    director.runtime_profile !== expected.runtime_profile ||
-    director.system_prompt_ref !== expected.system_prompt_ref ||
-    JSON.stringify(director.capability_groups) !== JSON.stringify(expected.capability_groups)
+    director.role !== "orchestrator" ||
+    director.runtime_profile === null ||
+    director.system_prompt_ref === null ||
+    JSON.stringify(director.capability_groups) !== JSON.stringify(["desk.orchestrate"])
   ) {
     throw new DockProfilesContractError(
-      `${manifest.manifestPath} ${expected.id} must use the exact Research Director profile contract`,
+      "Research Director must use the orchestrator role, a runtime profile and prompt, and only desk.orchestrate",
     );
   }
+  const owningManifest = manifests.find((manifest) =>
+    manifest.profiles.some((profile) => profile.name === director.name)
+  )!;
   requireRegularFile(
-    join(dirname(manifest.manifestPath), expected.system_prompt_ref),
+    join(dirname(owningManifest.manifestPath), director.system_prompt_ref),
     "Research Director prompt",
   );
 }
@@ -348,9 +365,9 @@ export function discoverDockProfileManifests(
   const manifests = required.map((manifestRef) => {
     return readManifest(appRoot, manifestRef);
   });
+  validateProductionDirector(manifests);
   const definitionIds = new Set<string>();
   for (const manifest of manifests) {
-    validateProductionHermesDirector(manifest);
     for (const profile of manifest.profiles) {
       if (definitionIds.has(profile.name)) {
         throw new DockProfilesContractError(

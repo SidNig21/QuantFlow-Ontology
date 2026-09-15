@@ -1,0 +1,19 @@
+{
+  "route": "native_tui",
+  "name": "codex",
+  "command": "codex",
+  "terminal_target": "wsl:auto",
+  "argv": [
+    "--no-alt-screen"
+  ],
+  "peer_delivery": {
+    "mode": "pty_role",
+    "runtime_profiles": [
+      "default"
+    ]
+  },
+  "package": "codex.aospkg",
+  "tools": [
+    "kind:think"
+  ]
+}

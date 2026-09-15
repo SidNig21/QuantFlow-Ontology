@@ -163,7 +163,7 @@ export async function admitNativeTuiDefinition(opts: {
       })
     : null;
   const mcpLaunchWrapper = usesWslMcpLauncher
-    ? resolveCollaborationResourcePath("qf-hermes-launch.sh", {
+    ? resolveCollaborationResourcePath(`qf-${adapterId}-launch.sh`, {
         resourcesPath: process.resourcesPath,
         moduleDir: __dirname,
       })

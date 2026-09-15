@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-w1-03-one-canvas @ 3fd42b17` on 2026-09-15 by
+> Generated from `codex/wo-w2-01-codex-admission @ 0aae5ecd` on 2026-09-15 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -384,9 +384,9 @@ asked before the change, when nothing is red yet.
 
 **235 of 236 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**583 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**584 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 347 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 348 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -433,7 +433,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (583 files)
+## Per-analyzer coverage (584 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -441,19 +441,19 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 579 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 297 | 0 | 3 | 0 | 283 |
-| `ipcPush` | 7 | 0 | 3 | 0 | 573 |
-| `persistence` | 26 | 32 | 0 | 0 | 525 |
-| `lifetime` | 5 | 64 | 0 | 0 | 514 |
-| `packaging` | 234 | 0 | 0 | 106 | 243 |
-| `ownership` | 22 | 0 | 0 | 372 | 189 |
-| `reach` | 232 | 4 | 0 | 347 | 0 |
+| `imports` | 580 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 297 | 0 | 3 | 0 | 284 |
+| `ipcPush` | 7 | 0 | 3 | 0 | 574 |
+| `persistence` | 26 | 32 | 0 | 0 | 526 |
+| `lifetime` | 5 | 64 | 0 | 0 | 515 |
+| `packaging` | 234 | 0 | 0 | 107 | 243 |
+| `ownership` | 22 | 0 | 0 | 372 | 190 |
+| `reach` | 232 | 4 | 0 | 348 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 347 files means those trees are
+failure — `reach: unsupported` on 348 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
-`packaging: unsupported` on 106 files means the packaging
+`packaging: unsupported` on 107 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
 
 ### The invariant
@@ -501,7 +501,7 @@ discovered from the AST.
 
 - **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 577
-- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 551
+- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 550
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 413
 - `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 868
 

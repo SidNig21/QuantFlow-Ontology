@@ -54,6 +54,11 @@ export const HERMES_META = "species/hermes/packed/hermes.meta.json";
 export const HERMES_LAUNCH = "species/hermes/launch.json";
 export const HERMES_DOCK_PROFILES = "species/hermes/dock-profiles.json";
 export const HERMES_TOOLS_ALLOWLIST = "species/hermes/tools-allowlist.json";
+export const CODEX_REF = "species/codex/packed/codex.aospkg";
+export const CODEX_META = "species/codex/packed/codex.meta.json";
+export const CODEX_LAUNCH = "species/codex/launch.json";
+export const CODEX_DOCK_PROFILES = "species/codex/dock-profiles.json";
+export const CODEX_TOOLS_ALLOWLIST = "species/codex/tools-allowlist.json";
 
 export const QF_LINUX_EXECUTABLE = "quantflow";
 export const QF_PACKAGE_NAME = "@quantflow/electron";
@@ -65,6 +70,10 @@ export const PRODUCTION_RUNTIME_CONTROL_FILES = [
   HERMES_LAUNCH,
   HERMES_DOCK_PROFILES,
   HERMES_TOOLS_ALLOWLIST,
+  CODEX_META,
+  CODEX_LAUNCH,
+  CODEX_DOCK_PROFILES,
+  CODEX_TOOLS_ALLOWLIST,
 ] as const;
 
 export const QA_RUNTIME_CONTROL_FILES = [
@@ -253,7 +262,7 @@ function inspectStagedRuntimeReferences(
       packageRef,
       resourcesRoot,
       checked,
-      packageRef === HERMES_REF,
+      packageRef.startsWith("species/"),
     );
     if (auxFail) return auxFail;
   }

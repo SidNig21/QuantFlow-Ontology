@@ -45,7 +45,7 @@ import {
 } from "./kernel";
 import {
   getDockDefinitionAvailability,
-  getHermesDockDiagnostic,
+  getDockDiagnostics,
 } from "./agent-host";
 import { QF_EXECUTE_ALLOWLIST } from "./qf-execute-allowlist";
 import { acquireEligibleParticipant, analyzeMarketAndReview, reviseMarketAndReview } from "./market-analysis";
@@ -846,9 +846,7 @@ export function registerKernelHandlers(): void {
   ipcMain.handle("qf:definitions:list", (event) => {
     try {
       assertTrustedSender(event);
-      const diagnostics = [];
-      const hermesDiagnostic = getHermesDockDiagnostic();
-      if (hermesDiagnostic) diagnostics.push(hermesDiagnostic);
+      const diagnostics = getDockDiagnostics();
       const definitions = kernelListAgentDefinitions().map((definition) => {
         const availability = getDockDefinitionAvailability(definition);
         let capabilityGroups: unknown = definition.capability_groups;

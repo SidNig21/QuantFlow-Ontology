@@ -43,7 +43,7 @@ import { hasUndeliveredResult } from "./peer-delivery";
 import { writeAgentTrajectoryArtifact } from "./agent-artifact-writer";
 import {
   bootstrapDockProfiles,
-  getMissingHermesDockDiagnostic,
+  getMissingProductionDockDiagnostics,
   type DockAdapterDiagnostic,
 } from "./dock-profiles";
 import {
@@ -262,8 +262,8 @@ export type DockDefinitionAvailability = {
   adapterId: string;
 };
 
-export function getHermesDockDiagnostic(): DockAdapterDiagnostic | null {
-  return getMissingHermesDockDiagnostic(appRoot());
+export function getDockDiagnostics(): DockAdapterDiagnostic[] {
+  return getMissingProductionDockDiagnostics(appRoot());
 }
 
 /**
@@ -293,7 +293,8 @@ export function getDockDefinitionAvailability(
     };
   }
   const adapterId = runtime.metadata.adapterId;
-  if (!packageRef.startsWith("species/hermes/")) {
+  const usesWsl = runtime.metadata.terminalTarget?.startsWith("wsl:") === true;
+  if (!usesWsl) {
     try {
       if (runtime.metadata.command) {
         resolveHostAcpCommand(runtime.metadata.command);
@@ -324,16 +325,16 @@ export function getDockDefinitionAvailability(
     "qf-ontology-mcp.mjs",
     { resourcesPath: process.resourcesPath, moduleDir: __dirname },
   );
-  const hermesLaunchWrapper = resolveCollaborationResourcePath(
-    "qf-hermes-launch.sh",
+  const launchWrapper = resolveCollaborationResourcePath(
+    `qf-${adapterId}-launch.sh`,
     { resourcesPath: process.resourcesPath, moduleDir: __dirname },
   );
-  if (!collaborationBridge || !ontologyBridge || !hermesLaunchWrapper) {
+  if (!collaborationBridge || !ontologyBridge || !launchWrapper) {
     return {
       available: false,
       adapterId,
       message:
-        "Hermes unavailable: QuantFlow collaboration resources are missing. " +
+        `${adapterId} unavailable: QuantFlow collaboration resources are missing. ` +
         "Reinstall QuantFlow or run the development app.",
     };
   }
@@ -342,7 +343,7 @@ export function getDockDefinitionAvailability(
     return {
       available: false,
       adapterId,
-      message: "Hermes unavailable: native Windows with WSL2 is required for this seat.",
+      message: `${adapterId} unavailable: native Windows with WSL2 is required for this seat.`,
     };
   }
 
@@ -353,7 +354,7 @@ export function getDockDefinitionAvailability(
     cwdHostPath: homedir(),
     getDefaultWslDistro,
     resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
-    guestCommand: runtime.metadata.command ?? "hermes",
+    guestCommand: runtime.metadata.command ?? adapterId,
   });
   if (diagnostic) return { available: false, adapterId, message: diagnostic.message };
 
@@ -361,18 +362,16 @@ export function getDockDefinitionAvailability(
     available: true,
     adapterId,
     message:
-      "Hermes authentication is checked at launch; if sign-in is required, authenticate in Ubuntu and retry.",
+      `${adapterId} authentication is checked at launch; if sign-in is required, authenticate in Ubuntu and retry.`,
   };
 }
 
 /** Initialize missing package-owned Dock definitions through execute() only. */
 export function bootstrapPackagedDockProfiles(): void {
   const qaMode = process.env.QF_DOCK_QA_MODE === "1";
-  const missing = getHermesDockDiagnostic();
-  if (missing) {
-    console.error(
-      `agent-host: ${missing.message}`,
-    );
+  const missing = getDockDiagnostics();
+  if (missing.length > 0) {
+    for (const diagnostic of missing) console.error(`agent-host: ${diagnostic.message}`);
     return;
   }
   const result = bootstrapDockProfiles(appRoot(), {

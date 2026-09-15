@@ -12,6 +12,7 @@ import { createPackage } from "@electron/asar";
 import {
   HERMES_REF,
   HERMES_DOCK_PROFILES,
+  CODEX_REF,
   hasStaticBunSqliteImport,
   inspectPackagedResources,
   normalizeAsarEntryPath,
@@ -61,8 +62,12 @@ function seedMinimalPackage(root: string): void {
   const resources = join(root, "resources");
   mkdirSync(join(resources, "species/hermes/packed"), { recursive: true });
   writeFileSync(join(resources, HERMES_REF), "hermes");
+  mkdirSync(join(resources, "species/codex/packed"), { recursive: true });
+  writeFileSync(join(resources, CODEX_REF), "codex");
   mkdirSync(join(resources, "species/hermes/prompts"), { recursive: true });
   copyFileSync(join(repoRoot, "species/hermes/prompts/research-director.md"), join(resources, "species/hermes/prompts/research-director.md"));
+  mkdirSync(join(resources, "species/codex/prompts"), { recursive: true });
+  copyFileSync(join(repoRoot, "species/codex/prompts/worker.md"), join(resources, "species/codex/prompts/worker.md"));
   for (const rel of RUNTIME_CONTROL_FILES) {
     const destination = join(resources, rel);
     mkdirSync(dirname(destination), { recursive: true });

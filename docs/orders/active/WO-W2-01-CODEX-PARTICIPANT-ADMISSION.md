@@ -1,7 +1,7 @@
 # WO-W2-01 — Admit Codex as a real QuantFlow participant
 
 status: BUILDING — founder directed implementation in the real app; standalone hidden D0 loop ended
-assignee: Builder — use `gpt-5.6-sol`; the root architect remains the only Astra seat
+assignee: root architect — founder ended the delegated probe loop and directed immediate real-app implementation; any later delegated Builder or Verifier uses `gpt-5.6-sol`
 depends: WO-W1-03 accepted at candidate `665ddcd2783a9e218cb5095b51943d026d17f70a`
 
 ## Objective
@@ -157,6 +157,13 @@ The Task identity is checked from Kernel/Canvas truth and delivered in the exist
 
 ## Contract
 
+- Anything that is a QuantFlow product capability belongs to the Participant contract, not to Hermes.
+  Hermes is the first adapter and Codex is the first proof that the product contract is runtime-independent.
+  An adapter owns only its runtime-specific launch, terminal, approval, and transport behavior. Once admitted,
+  every runtime receives the same role, Task, permission, evidence, capability, Artifact, communication,
+  criticism, revision, steering, replacement, lifecycle, Canvas, history, and retrieval semantics that its
+  declared role and grants authorize. A genuine runtime limitation is shown honestly and never hidden by a
+  species-specific product branch or fake parity.
 - The Kernel remains the only durable truth and `execute()` remains the only write path.
 - Do not add a schema entity, role, capability group, dependency, service, or persistent store.
 - Private runtime context stays private. Shared Task, tool use, result, session, and lineage facts are Kernel truth.

@@ -23,6 +23,10 @@ export const PRODUCTION_RUNTIME_CONTROL_FILES = [
   "species/hermes/launch.json",
   "species/hermes/packed/hermes.meta.json",
   "species/hermes/tools-allowlist.json",
+  "species/codex/dock-profiles.json",
+  "species/codex/launch.json",
+  "species/codex/packed/codex.meta.json",
+  "species/codex/tools-allowlist.json",
 ] as const;
 
 export const PRODUCTION_RUNTIME_RESOURCES = [
@@ -30,6 +34,8 @@ export const PRODUCTION_RUNTIME_RESOURCES = [
   "species/hermes/prompts/research-director.md",
   "species/hermes/prompts/worker.md",
   "species/hermes/prompts/critic.md",
+  "species/codex/packed/codex.aospkg",
+  "species/codex/prompts/worker.md",
 ] as const;
 
 export const PRODUCTION_RUNTIME_FILES = [
@@ -119,9 +125,11 @@ export function prepareRuntimeStaging(
   const stagingWorkspace = mkdtempSync(join(tmpdir(), "qf-runtime-staging-"));
   const stagingRepo = join(stagingWorkspace, "repo");
   const hermesDir = join(stagingRepo, "species/hermes");
+  const codexDir = join(stagingRepo, "species/codex");
   const proofAgentDir = join(stagingRepo, "tools/qf-proof-agent");
   try {
     copySourceTree(join(repoRoot, "species/hermes"), hermesDir);
+    copySourceTree(join(repoRoot, "species/codex"), codexDir);
     if (qaMode) {
       copySourceTree(join(repoRoot, "tools/qf-proof-agent"), proofAgentDir);
     }
@@ -130,6 +138,7 @@ export function prepareRuntimeStaging(
       runOrThrow("node", ["./scripts/pack-agent.mjs"], proofAgentDir);
     }
     runOrThrow("node", ["./scripts/pack-agent.mjs"], hermesDir);
+    runOrThrow("node", ["./scripts/pack-agent.mjs"], codexDir);
     const stagedRepo = stagingRepo;
     discoverDockProfileManifests(stagedRepo, { qaMode });
     for (const rel of runtimeFiles) {

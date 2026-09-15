@@ -1,7 +1,7 @@
 /**
  * G6 production/QA Dock inventory gate.
  *
- * Production is the exact Hermes runtime set. QA may add only the generic
+ * Production is the exact Hermes and Codex runtime set. QA may add only the generic
  * deterministic qf-proof runtime, and every staged path is set-equal checked.
  */
 import {
@@ -117,12 +117,14 @@ export function runDockProductionInventoryGate(): { ok: boolean } {
       "hermes-research-director",
       "hermes-worker",
       "hermes-worker-2",
+      "codex-worker",
     ]);
     assertProfileSet("QA", qaRows, [
       "hermes-critic",
       "hermes-research-director",
       "hermes-worker",
       "hermes-worker-2",
+      "codex-worker",
       "qf-proof-orchestrator",
       "qf-proof-worker",
     ]);
@@ -137,7 +139,7 @@ export function runDockProductionInventoryGate(): { ok: boolean } {
         `qaControls=${QA_RUNTIME_CONTROL_FILES.length} ` +
         `qaResources=${QA_RUNTIME_RESOURCES.length} ` +
         `qaTotal=${qaRows.length} ` +
-        "productionRuntime=hermes-only qaRuntime=qf-proof-only",
+        "productionRuntime=hermes+codex qaRuntime=qf-proof-addition",
     );
     return { ok: true };
   } catch (error) {

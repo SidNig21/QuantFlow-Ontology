@@ -14,29 +14,35 @@ function sorted(paths: readonly string[]): string[] {
 }
 
 describe("runtime staging inventory", () => {
-  test("normal production staging is exactly Hermes controls and resources", () => {
+  test("normal production staging is exactly Hermes and Codex controls and resources", () => {
     expect(RUNTIME_FILES).toEqual(PRODUCTION_RUNTIME_FILES);
-    expect(sorted(PRODUCTION_RUNTIME_CONTROL_FILES)).toEqual([
+    expect(sorted(PRODUCTION_RUNTIME_CONTROL_FILES)).toEqual(sorted([
       "species/hermes/dock-profiles.json",
       "species/hermes/launch.json",
       "species/hermes/packed/hermes.meta.json",
       "species/hermes/tools-allowlist.json",
-    ]);
-    expect(sorted(PRODUCTION_RUNTIME_RESOURCES)).toEqual([
+      "species/codex/dock-profiles.json",
+      "species/codex/launch.json",
+      "species/codex/packed/codex.meta.json",
+      "species/codex/tools-allowlist.json",
+    ]));
+    expect(sorted(PRODUCTION_RUNTIME_RESOURCES)).toEqual(sorted([
       "species/hermes/packed/hermes.aospkg",
       "species/hermes/prompts/critic.md",
       "species/hermes/prompts/research-director.md",
       "species/hermes/prompts/worker.md",
-    ]);
+      "species/codex/packed/codex.aospkg",
+      "species/codex/prompts/worker.md",
+    ]));
     expect(sorted(PRODUCTION_RUNTIME_FILES)).toEqual(sorted([
       ...PRODUCTION_RUNTIME_CONTROL_FILES,
       ...PRODUCTION_RUNTIME_RESOURCES,
     ]));
     expect(PRODUCTION_RUNTIME_FILES.some((path) => path.startsWith("tools/"))).toBe(false);
-    expect(PRODUCTION_RUNTIME_FILES.every((path) => path.startsWith("species/hermes/"))).toBe(true);
+    expect(PRODUCTION_RUNTIME_FILES.every((path) => path.startsWith("species/hermes/") || path.startsWith("species/codex/"))).toBe(true);
   });
 
-  test("QA staging is exactly Hermes plus generic qf-proof controls and resources", () => {
+  test("QA staging is exactly production participants plus generic qf-proof controls and resources", () => {
     expect(sorted(QA_RUNTIME_CONTROL_FILES)).toEqual(sorted([
       "tools/qf-proof-agent/dock-profiles.json",
       "tools/qf-proof-agent/launch.json",
@@ -45,6 +51,10 @@ describe("runtime staging inventory", () => {
       "species/hermes/launch.json",
       "species/hermes/packed/hermes.meta.json",
       "species/hermes/tools-allowlist.json",
+      "species/codex/dock-profiles.json",
+      "species/codex/launch.json",
+      "species/codex/packed/codex.meta.json",
+      "species/codex/tools-allowlist.json",
     ]));
     expect(sorted(QA_RUNTIME_RESOURCES)).toEqual(sorted([
       "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
@@ -55,7 +65,7 @@ describe("runtime staging inventory", () => {
       ...QA_RUNTIME_CONTROL_FILES,
       ...QA_RUNTIME_RESOURCES,
     ]));
-    expect(QA_RUNTIME_FILES.length).toBe(13);
+    expect(QA_RUNTIME_FILES.length).toBe(19);
     expect(QA_RUNTIME_FILES.some((path) => path.startsWith("species/claude-code/"))).toBe(false);
   });
 

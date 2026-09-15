@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "adapter": {
+    "id": "codex",
+    "package": "packed/codex.aospkg"
+  },
+  "profiles": [
+    {
+      "id": "codex-worker",
+      "role": "worker",
+      "display_name": "Market Researcher",
+      "runtime_profile": "default",
+      "system_prompt_ref": "prompts/worker.md",
+      "capability_groups": ["market.read"]
+    }
+  ]
+}
