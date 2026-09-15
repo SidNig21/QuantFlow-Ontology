@@ -1,6 +1,6 @@
 # WO-W2-01 — Admit Codex as a real QuantFlow participant
 
-status: OPEN — fresh `gpt-5.6-sol` Reader returned ORDER SEMANTIC YES and BUILDER DOOR YES
+status: OPEN — founder-specified WSL Codex amendment received fresh Reader semantic YES / builder-door YES
 assignee: Builder — use `gpt-5.6-sol`; the root architect remains the only Astra seat
 depends: WO-W1-03 accepted at candidate `665ddcd2783a9e218cb5095b51943d026d17f70a`
 
@@ -35,18 +35,22 @@ change only the assumptions encountered by this first Codex consumer.
 
 ## Deliverable 0 — prove the runtime boundary before shared product edits
 
-Use the installed native-Windows Codex CLI. `codex-cli 0.146.0` was observed during order preparation,
-and its measured supported isolation route is the one-task `codex exec` command. Interactive `codex`
-does not accept the required ignore-user-configuration controls and is prohibited for this order. The
-Builder must measure the executable and controls again. This probe is a hard door: if any item below
-cannot be proved, stop without editing shared product code and report the exact failure.
+Use the founder-specified Codex CLI inside the default Ubuntu WSL2 distribution. Read-only order evidence
+resolved `codex` to version `codex-cli 0.142.5`; production must resolve the declared WSL command without
+hard-coding an operator home directory. Its supported isolation route is the one-task `codex exec` command.
+Interactive `codex` does not accept the required ignore-user-configuration controls and is prohibited for
+this order. The Builder must measure the WSL distribution, executable, and controls again. This probe is a
+hard door: if any item below cannot be proved, stop without editing shared product code and report the exact
+failure.
 
-1. Resolve the same native-Windows `codex` executable the packaged host would launch. Use the operator's
-   existing authentication opaquely. Do not read, copy, log, hash, or record auth files, account ids,
-   tokens, secrets, user configuration, or credential-bearing environment values.
-2. Start a real one-task Codex process with `codex exec --ephemeral --ignore-user-config --ignore-rules`
-   in an empty temporary working directory. Disable approval prompts, shell access, web search, apps,
-   persistent history, and memory generation. Use a read-only sandbox. QuantFlow must inject only its
+1. Through `wsl.exe`, resolve the same declared WSL `codex` command the packaged Windows host will launch.
+   Use the operator's existing WSL authentication opaquely. Do not read, copy, log, hash, or record auth
+   files, account ids, tokens, secrets, user configuration, or credential-bearing environment values.
+2. Start a real one-task WSL Codex process with
+   `codex exec --ephemeral --ignore-user-config --ignore-rules` in an empty app-owned WSL temporary working
+   directory. Disable approval prompts, shell access, web search, apps, plugins, skill install/search,
+   computer/browser use, image generation, multi-agent delegation, hooks, workspace-dependency tools,
+   persistent history, and memory use/generation. Use a read-only sandbox. QuantFlow must inject only its
    required ontology and collaboration stdio MCP servers.
 3. Declare the two QuantFlow MCP servers required and wait for the real child plus both servers before
    reporting readiness. The process must list its governed QuantFlow tools, receive one bounded probe Task
@@ -54,8 +58,9 @@ cannot be proved, stop without editing shared product code and report the exact 
 4. Prove that shell, web, apps, and foreign MCP tools are unavailable. A malformed or wrong seat capability
    must be denied. QuantFlow may pass the names of its session, role, RPC, and seat-capability variables to
    the child; secret or capability values must never appear in argv, diagnostics, logs, or evidence.
-5. Exercise normal one-task completion and cancellation separately. Both must confirm owned process-tree
-   exit and removal of temporary scratch.
+5. Exercise normal one-task completion and cancellation separately. Both must confirm the owned WSL child
+   process tree exits without terminating unrelated WSL processes, and remove the app-owned temporary
+   directory.
 
 An authentication prompt, unsupported safety control, ambient tool, MCP startup failure, security-value
 leak, or uncertain cleanup is a red result. D0 is runtime evidence; it does not by itself claim product
@@ -69,10 +74,11 @@ Add the smallest current declaration under `species/codex/` that the measured D0
   capability group;
 - package and launch metadata accepted by the existing runtime definition contract;
 - the bounded role instruction and declared tool surface needed for this seat;
-- a species-owned Windows launcher only if D0 proves translation from the generic QuantFlow bridge
-  environment to Codex CLI arguments is required.
+- a species-owned WSL launcher only if D0 proves translation from the generic QuantFlow bridge environment
+  to Codex CLI arguments is required. Production metadata selects the WSL adapter and command; it must not
+  hard-code the measured operator home path.
 
-The launcher may translate transport details and emit the existing readiness marker. It must not decide
+The launcher may translate WSL transport details and emit the existing readiness marker. It must not decide
 institutional roles, grants, Task meaning, review authority, or Kernel state. Do not add a Codex branch to
 the Canvas, Dock semantics, Mission semantics, Kernel, or role policy.
 
@@ -85,7 +91,7 @@ Repair only the current shared seams that block this declared participant:
 - `collab-electron/src/main/agent-host.ts` and `collab-electron/src/main/ipc-kernel.ts`: report availability
   and launch readiness per declared adapter instead of treating global Hermes health as every runtime's
   precondition. Support the measured Codex task-first lifecycle: create the governed seat, bind the exact
-  Task, then launch one isolated process with that Task as its initial input.
+  Task, then launch one isolated WSL process with that Task as its initial input.
 - Keep definition resolution, Kernel admission, role/capability selection, live-seat authentication,
   ontology/collaboration gateways, peer delivery, Dock rendering, participant projection, and Task
   composition unchanged unless D0 or an acceptance falsifier proves a specific blocker.
@@ -112,8 +118,8 @@ red; the existing Hermes-missing control must remain red.
 ## Deliverable 4 — prove the four-pillar connection in the real app
 
 Add one bounded integrated gate named `windows-dock-species`. It must run the packaged Windows application
-with the real installed Codex runtime; a fixture, scripted responder, pre-seeded result, or substituted model
-cannot satisfy it.
+with the real Codex CLI inside the founder's default WSL distribution; a fixture, scripted responder,
+pre-seeded result, or substituted model cannot satisfy it.
 
 1. The Dock shows the retained Hermes definitions and one available Codex Market Researcher as a normal
    Participant. The role is primary; runtime identity is shown second.
@@ -122,7 +128,7 @@ cannot satisfy it.
    assignment; it may not claim a runtime process is working before one exists.
 3. Launch the retained Hermes Research Director. From the existing Canvas Task composer, create one exact
    Task assigned to the Codex session. The existing assignment/Redirect path must bind that exact Task and
-   start one isolated `codex exec` process with the Task envelope as its initial input. This order does not
+   start one isolated WSL `codex exec` process with the Task envelope as its initial input. This order does not
    build a second delegation UI or a persistent interactive Codex terminal.
 4. Real Codex receives the exact Task envelope and invokes one non-hard-coded allowed `market.read` tool,
    such as `qf_event_query`, through the real ontology MCP. Its real tool result and Kernel-published
@@ -145,8 +151,8 @@ The Task identity is checked from Kernel/Canvas truth and delivered in the exist
 - Do not add a schema entity, role, capability group, dependency, service, or persistent store.
 - Private runtime context stays private. Shared Task, tool use, result, session, and lineage facts are Kernel truth.
 - Runtime identity is provenance and transport selection; it does not determine institutional authority.
-- Codex is one isolated process per exact Task in this order. QuantFlow may retain Kernel truth after the
-  process exits, but it may not retain Codex's private runtime transcript as a second shared memory.
+- Codex is one isolated WSL process per exact Task in this order. QuantFlow may retain Kernel truth after
+  the process exits, but it may not retain Codex's private runtime transcript as a second shared memory.
 - Hermes keeps the same Research Director, worker, Critic, tool grants, launch behavior, and cleanup meaning.
 - QuantFlow remains research/advisor only and exposes no wager, trade, stake, bankroll, or execution action.
 - Every delegated Reader, Builder, or Verifier uses `gpt-5.6-sol`; only the root architect uses Astra.
