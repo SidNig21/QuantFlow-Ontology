@@ -27,7 +27,7 @@ export function deriveResearchWorkflow(world) {
 	const rootedSourceTask = rootedTask?.fields?.review_source_task_id ? object(rootedTask.fields.review_source_task_id) : rootedTask;
 	const rootedMission = root?.type === "mission" ? root : object(unique(linksFrom(rootedTask?.id, "belongs_to"))?.to_id);
 	const openMissionTasks = rootedMission ? objects.filter((entry) => entry.type === "task" && entry.fields?.status === "open" && links.some((link) => link.kind === "belongs_to" && link.from_id === entry.id && link.to_id === rootedMission.id)) : [];
-	const activeReviewTask = unique(openMissionTasks.filter((entry) => typeof entry.fields?.review_source_task_id === "string"));
+	const missionReviewTask = unique(openMissionTasks.filter((entry) => typeof entry.fields?.review_source_task_id === "string"));
 	const activeMissionTask = unique(openMissionTasks.filter((entry) => typeof entry.fields?.review_source_task_id !== "string"));
 	const projectedEvaluations = objects.filter((entry) => entry.type === "evaluation" && sourceWorkOf(entry));
 	const evaluatedSourceTask = unique(projectedEvaluations.map((entry) => object(sourceWorkOf(entry)?.source_task_id)).filter(Boolean));
@@ -35,8 +35,9 @@ export function deriveResearchWorkflow(world) {
 	const reportSourceWork = sourceWorkOf(reportEvaluation);
 	const sourceTask = reportSourceWork
 		? object(reportSourceWork.source_task_id)
-		: (rootedSourceTask ?? object(activeReviewTask?.fields?.review_source_task_id) ?? activeMissionTask ?? evaluatedSourceTask ?? missionSourceTask);
+		: (rootedSourceTask ?? object(missionReviewTask?.fields?.review_source_task_id) ?? activeMissionTask ?? evaluatedSourceTask ?? missionSourceTask);
 	const mission = rootedMission ?? object(unique(linksFrom(sourceTask?.id, "belongs_to"))?.to_id);
+	const activeReviewTask = unique(objects.filter((entry) => entry.type === "task" && entry.fields?.status === "open" && entry.fields?.review_source_task_id === sourceTask?.id));
 	const exactEvaluations = projectedEvaluations.filter((entry) => sourceWorkOf(entry)?.source_task_id === sourceTask?.id);
 	const evaluationById = new Map(exactEvaluations.map((entry) => [entry.id, entry]));
 	const evaluationDepth = (entry, seen = new Set()) => {

@@ -167,13 +167,11 @@ test("blocked publication keeps both exact Critic verdicts and strongest finding
   ];
   const links = [
     { kind: "belongs_to", from_id: "task-source", to_id: "mission-1" },
-    { kind: "belongs_to", from_id: "review-1", to_id: "mission-1" },
-    { kind: "belongs_to", from_id: "review-2", to_id: "mission-1" },
-    { kind: "belongs_to", from_id: "review-3", to_id: "mission-1" },
   ];
   const workflow = deriveResearchWorkflow({ root: { type: "mission", id: "mission-1" }, current_report_id: null, objects, links });
   const blocked = blockedReviewPresentation(workflow);
   expect(workflow.sourceTask?.id).toBe("task-source");
+  expect(workflow.reviewTask?.id).toBe("review-3");
   expect(workflow.evaluation?.id).toBe("eval-2");
   expect(blocked).toEqual({
     state: "Publication blocked",

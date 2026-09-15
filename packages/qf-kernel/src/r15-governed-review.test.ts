@@ -224,6 +224,11 @@ describe("R15 governed review", () => {
     const second = requestSecondCritic(db!, f.work, firstEvaluationId, "second-distinct", "critic-2", trace);
     expect(second.kind).toBe("admitted");
     expect(second.source_work).toEqual(f.work);
+    sessionFromExistingDefinition("critic-3");
+    const duplicate = requestSecondCritic(db!, f.work, firstEvaluationId, "second-concurrent", "critic-3", trace);
+    expect(duplicate.kind).toBe("refused");
+    expect(duplicate.receipt?.reason_code).toBe("SECOND_CRITIC_IN_PROGRESS");
+    expect((db!.query("SELECT COUNT(*) AS n FROM qf_review_task").get() as { n: number }).n).toBe(before.tasks + 1);
     markGovernedDelivery(db!, String(second.review_task_id), "delivered", trace);
     const reads = [
       ["qf_hypothesis_get", { id: f.hypothesisId }],
