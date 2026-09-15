@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { deflateSync } from "node:zlib";
 import { createHash } from "node:crypto";
 import { Database } from "bun:sqlite";
 import { closeKernel, execute, openKernel } from "../../packages/qf-kernel/src/index.ts";
-import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, remainingProofProcesses, sanitizeLiveFailureError, snapshotSavedKernel, validateLiveDecisionProof, validateSavedResumeProof, validateUiCaptureReceipt, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
+import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, parseLastSendResultRefusal, remainingProofProcesses, sanitizeLiveFailureError, snapshotSavedKernel, validateLiveDecisionProof, validateSavedResumeProof, validateUiCaptureReceipt, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
 import { processIdentityKey, type ProcessInfo } from "./windows-cold-boot.ts";
 
 function png(width = 1, height = 1): Buffer {
@@ -36,7 +36,7 @@ function red(): LiveFailureDiagnostic {
     last_completed_stage: "analyze_and_review_dispatched",
     visible_market_action_reached: true,
     analyze_and_review_dispatched: true,
-    worker: { session_id: "worker-1", session_status: "failed", task_id: "task-1", task_status: "open", assigned: true, assignment_ambiguous: false, inference: { log_present: true, configured: { provider: "openai-codex", model: "gpt-5.6-luna" }, api_rows: [{ session_id: "runtime-worker", provider: "openai-codex", model: "gpt-5.6-luna", input_tokens: 10, output_tokens: 4, total_tokens: 14, latency_seconds: 1 }], turn_rows: [{ session_id: "runtime-worker", model: "gpt-5.6-luna", api_calls: 1, successful: false }] }, trajectory_id: null, trajectory_present: false, trajectory_ambiguous: false, kernel_accepted_and_bound: false },
+    worker: { session_id: "worker-1", session_status: "failed", task_id: "task-1", task_status: "open", assigned: true, assignment_ambiguous: false, inference: { log_present: true, configured: { provider: "openai-codex", model: "gpt-5.6-luna" }, api_rows: [{ session_id: "runtime-worker", provider: "openai-codex", model: "gpt-5.6-luna", input_tokens: 10, output_tokens: 4, total_tokens: 14, latency_seconds: 1 }], turn_rows: [{ session_id: "runtime-worker", model: "gpt-5.6-luna", api_calls: 1, successful: false }] }, trajectory_id: null, trajectory_present: false, trajectory_ambiguous: false, kernel_accepted_and_bound: false, last_result_refusal: null },
     critic: { session_id: null, session_status: null, task_id: null, task_status: null, review_lifecycle: null, assigned: false, assignment_ambiguous: false, inference: { log_present: false, configured: null, api_rows: [], turn_rows: [] } },
     governed_result: { evaluation_present: false, publication_present: false, current_decision_present: false },
     lifecycle: { shutdown_attempted: true, exit_code: 0, owned_processes_remaining: 0, disposable_root_removed: true },
@@ -158,6 +158,19 @@ test("failure sanitizer removes locations and credential values", () => {
   expect(sanitizeLiveFailureError("failed C:\\private\\run https://example.test/x bearer abc123")).toBe("failed [path] [location] credential=[redacted]");
 });
 
+test("failure diagnostic parser returns the last exact Task-scoped send_result refusal", () => {
+  const log = [
+    '[2026-09-14] [warn] [qf.send_result.refused] {"taskId":"other","workerSessionId":"worker-1","message":"foreign"}',
+    '[2026-09-14] [warn] [qf.send_result.refused] {"taskId":"task-1","workerSessionId":"worker-1","message":"send_result required governed read is missing: qf_run_get:run-1"}',
+  ].join("\n");
+  expect(parseLastSendResultRefusal(log, "task-1", "worker-1")).toEqual({
+    task_id: "task-1",
+    worker_session_id: "worker-1",
+    message: "send_result required governed read is missing: qf_run_get:run-1",
+  });
+  expect(parseLastSendResultRefusal(log, "task-1", "foreign-worker")).toBeNull();
+});
+
 test("Critic observation receives a fresh window after sequential Worker completion", () => {
   const workerCompletedAt = 5 * 60_000;
   const productCriticDeadline = workerCompletedAt + 10 * 60_000;
@@ -195,8 +208,11 @@ test("real Kernel WAL snapshot preserves committed work and observer distinguish
     Bun.gc(true);
   }
   try {
-    const diagnostic = observeLiveFailure(dbPath, join(root, "app"), "analyze_and_review_dispatched", true, true, new Error("publication timed out"));
-    expect(diagnostic.worker).toMatchObject({ task_id: "task-1", task_status: "open", session_id: "worker-1", session_status: "running", assigned: true, assignment_ambiguous: false, trajectory_id: null, trajectory_present: false, trajectory_ambiguous: false, kernel_accepted_and_bound: false });
+    const appDir = join(root, "app");
+    mkdirSync(join(appDir, "logs"), { recursive: true });
+    writeFileSync(join(appDir, "logs", "main-2026-09-14.log"), '[warn] [qf.send_result.refused] {"taskId":"task-1","workerSessionId":"worker-1","message":"send_result required governed read is missing: qf_run_get:run-1"}\n');
+    const diagnostic = observeLiveFailure(dbPath, appDir, "analyze_and_review_dispatched", true, true, new Error("publication timed out"));
+    expect(diagnostic.worker).toMatchObject({ task_id: "task-1", task_status: "open", session_id: "worker-1", session_status: "running", assigned: true, assignment_ambiguous: false, trajectory_id: null, trajectory_present: false, trajectory_ambiguous: false, kernel_accepted_and_bound: false, last_result_refusal: { task_id: "task-1", worker_session_id: "worker-1", message: "send_result required governed read is missing: qf_run_get:run-1" } });
     expect(diagnostic.critic).toMatchObject({ task_id: null, session_id: null, review_lifecycle: null });
   } finally {
     for (let attempt = 0; attempt < 20 && existsSync(root); attempt += 1) {

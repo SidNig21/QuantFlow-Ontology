@@ -56,7 +56,7 @@ const tools = [
   },
   {
     name: "send_result",
-    description: "Return a cited result for an assigned Kernel task using actual ontology-read trajectory ids.",
+    description: "Return a cited result for an assigned Kernel task. QuantFlow resolves the Task's complete durable ontology-read receipts; supplied receipt ids remain optional provenance and must belong to this exact Task.",
     inputSchema: {
       type: "object",
       properties: {
@@ -69,9 +69,8 @@ const tools = [
         },
         read_trajectory_artifact_ids: {
           type: "array",
-          minItems: 1,
           items: { type: "string" },
-          description: "Artifact ids returned by the ontology reads used for this result.",
+          description: "Optional subset of Artifact ids returned by this Task's ontology reads. Use [] when no ids were retained; QuantFlow resolves and validates the complete authoritative set.",
         },
       },
       required: ["task_id", "result", "cited_market_ids", "read_trajectory_artifact_ids"],
@@ -105,8 +104,8 @@ export function validateToolArguments(name, args) {
     if (!Array.isArray(args.cited_market_ids) || args.cited_market_ids.some((id) => typeof id !== "string" || !id.trim())) {
       throw new Error("send_result requires cited_market_ids to be a string array");
     }
-    if (!Array.isArray(args.read_trajectory_artifact_ids) || args.read_trajectory_artifact_ids.length === 0 || args.read_trajectory_artifact_ids.some((id) => typeof id !== "string" || !id.trim())) {
-      throw new Error("send_result requires non-empty read_trajectory_artifact_ids");
+    if (!Array.isArray(args.read_trajectory_artifact_ids) || args.read_trajectory_artifact_ids.some((id) => typeof id !== "string" || !id.trim())) {
+      throw new Error("send_result requires read_trajectory_artifact_ids to be a string array");
     }
   }
   return args;

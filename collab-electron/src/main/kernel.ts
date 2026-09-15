@@ -942,6 +942,68 @@ export function kernelDecisionReadScope(sessionId: string): { run: Record<string
   return { run, allowed: [...new Set([`qf_hypothesis_get:${context.hypothesis_id}`, `qf_run_get:${run.id}`, `qf_dataset_get:${context.dataset_id}`, ...((context.inputs as Array<{ id: string }>).map((row) => `qf_artifact_get:${row.id}`)), `qf_artifact_get:${params.result_artifact_id}`, ...((context.selections as Array<{ quote_id: string }>).map((row) => `qf_quote_get:${row.quote_id}`))])] };
 }
 
+/** Resolve one exact durable worker read receipt for every read required by this decision Task. */
+export function kernelResolveDecisionReadTrajectories(
+  taskId: string,
+  workerSessionId: string,
+  suppliedArtifactIds: string[],
+): string[] {
+  const run = kernelDecisionRunForTask(taskId);
+  if (!run) return suppliedArtifactIds;
+  const assignees = kernelGetLinks(taskId, { kind: "assigned_to" }).filter((link) => link.from_id === taskId);
+  const params = jsonRecord(run.params);
+  const context = jsonRecord(params.decision_context);
+  if (assignees.length !== 1 || assignees[0]!.to_id !== workerSessionId || context.worker_session_id !== workerSessionId) {
+    throw new Error("send_result read receipts do not belong to the assigned worker");
+  }
+  const expected = [...new Set([
+    `qf_hypothesis_get:${context.hypothesis_id}`,
+    `qf_run_get:${run.id}`,
+    `qf_dataset_get:${context.dataset_id}`,
+    ...((context.inputs as Array<{ id: string }>).map((row) => `qf_artifact_get:${row.id}`)),
+    `qf_artifact_get:${params.result_artifact_id}`,
+    ...((context.selections as Array<{ quote_id: string }>).map((row) => `qf_quote_get:${row.quote_id}`)),
+  ])];
+  const runEvent = getKernelDb().query(
+    "SELECT rowid AS sequence FROM events WHERE type = 'run.created' AND object_type = 'run' AND object_id = ? ORDER BY rowid ASC",
+  ).all(String(run.id)) as Array<{ sequence: number }>;
+  if (runEvent.length !== 1) throw new Error("send_result decision Run receipt is missing or ambiguous");
+  const rows = getKernelDb().query(
+    `SELECT artifact.id, artifact.storage_ref, events.payload
+       FROM artifact
+       JOIN links ON links.to_id = artifact.id AND links.kind = 'produces' AND links.from_id = ?
+       JOIN events ON events.object_id = artifact.id AND events.type = 'artifact.published' AND events.object_type = 'artifact'
+      WHERE artifact.kind = 'trajectory' AND events.rowid > ?
+      ORDER BY events.rowid ASC, artifact.id ASC`,
+  ).all(workerSessionId, runEvent[0]!.sequence) as Array<{ id: string; storage_ref: string; payload: string }>;
+  const byExpected = new Map(expected.map((key) => [key, [] as string[]]));
+  const eligibleIds = new Set<string>();
+  for (const row of rows) {
+    const marker = jsonRecord(jsonRecord(row.payload).ontology_read_receipt);
+    if (marker.contract !== "qf.ontology.v1" || marker.actor_session_id !== workerSessionId) continue;
+    assertDurableOntologyReadReceipt(getKernelDb(), row.id, workerSessionId);
+    const payload = jsonRecord(readFileSync(row.storage_ref, "utf8"));
+    const args = jsonRecord(payload.arguments);
+    if (typeof payload.tool !== "string" || Object.keys(args).length !== 1 || typeof args.id !== "string") continue;
+    const key = `${payload.tool}:${args.id}`;
+    const matches = byExpected.get(key);
+    if (!matches) continue;
+    matches.push(row.id);
+    eligibleIds.add(row.id);
+  }
+  for (const suppliedId of suppliedArtifactIds) {
+    if (!eligibleIds.has(suppliedId)) {
+      throw new Error(`send_result supplied read trajectory is foreign to this Task: ${suppliedId}`);
+    }
+  }
+  return expected.map((key) => {
+    const matches = byExpected.get(key)!;
+    if (matches.length === 0) throw new Error(`send_result required governed read is missing: ${key}`);
+    if (matches.length !== 1) throw new Error(`send_result required governed read is ambiguous: ${key}`);
+    return matches[0]!;
+  });
+}
+
 export function kernelDecisionArtifactView(id: string, _run: Record<string, unknown>): unknown {
   const artifact = kernelGetObject("artifact", id);
   if (!artifact || artifact.content_hash !== id) throw new Error("Decision input Artifact missing");

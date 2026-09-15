@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-w1-03-one-canvas @ 072c7858` on 2026-09-15 by
+> Generated from `codex/wo-w1-03-one-canvas @ 3fd42b17` on 2026-09-15 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -521,7 +521,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 1048
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1330
-- `collab-electron/src/main/kernel.ts` — exports kernelMarketReviewArtifactView() at line 963
+- `collab-electron/src/main/kernel.ts` — exports kernelMarketReviewArtifactView() at line 1025
 - `collab-electron/src/main/market-analysis.ts` — exports reviseMarketAndReview() at line 72
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `collab-electron/src/windows/shell/src/research-workflow.js` — exports blockedReviewPresentation() at line 102

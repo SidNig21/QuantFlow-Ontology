@@ -68,6 +68,7 @@ import {
   kernelGovernedCriticProgress,
   kernelMarketObjectExists,
   kernelReadMarketTrajectoryResult,
+  kernelResolveDecisionReadTrajectories,
   kernelCompleteMarketAssessment,
   kernelCurrentTaskCoordinator,
   kernelSessionCoordinatesOtherOpenTask,
@@ -1299,7 +1300,11 @@ app.whenReady().then(async () => {
       execute: kernelExecute,
       missionForSession: missionForDirectorSession,
       marketObjectExists: kernelMarketObjectExists,
+      resolveReadTrajectoryArtifactIds: kernelResolveDecisionReadTrajectories,
       readMarketTrajectoryResult: kernelReadMarketTrajectoryResult,
+      recordResultRefusal: (refusal) => {
+        console.warn("[qf.send_result.refused]", JSON.stringify(refusal));
+      },
       commitResult: (input) => commitCollaborationResult({ ...input, result: kernelCompleteMarketAssessment(input.taskId, input.workerSessionId, input.result) }, (artifactId) => {
         const decisionRun = kernelDecisionRunForTask(input.taskId);
         if (decisionRun) {

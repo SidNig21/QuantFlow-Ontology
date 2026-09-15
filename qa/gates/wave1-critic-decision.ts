@@ -42,7 +42,7 @@ export type LiveFailureDiagnostic = {
   last_completed_stage: string;
   visible_market_action_reached: boolean;
   analyze_and_review_dispatched: boolean;
-  worker: { session_id: string | null; session_status: string | null; task_id: string | null; task_status: string | null; assigned: boolean; assignment_ambiguous: boolean; inference: SafeInference; trajectory_id: string | null; trajectory_present: boolean; trajectory_ambiguous: boolean; kernel_accepted_and_bound: boolean };
+  worker: { session_id: string | null; session_status: string | null; task_id: string | null; task_status: string | null; assigned: boolean; assignment_ambiguous: boolean; inference: SafeInference; trajectory_id: string | null; trajectory_present: boolean; trajectory_ambiguous: boolean; kernel_accepted_and_bound: boolean; last_result_refusal: { task_id: string; worker_session_id: string; message: string } | null };
   critic: { session_id: string | null; session_status: string | null; task_id: string | null; task_status: string | null; review_lifecycle: string | null; assigned: boolean; assignment_ambiguous: boolean; inference: SafeInference; successful_tools: string[]; last_transport_event: { type: string; object_type: string; object_id: string } | null; completion_failure: { reason_code: string; message: string } | null };
   governed_result: { evaluation_present: boolean; publication_present: boolean; current_decision_present: boolean };
   lifecycle: { shutdown_attempted: boolean; exit_code: number | null; owned_processes_remaining: number; disposable_root_removed: boolean };
@@ -50,6 +50,38 @@ export type LiveFailureDiagnostic = {
 };
 function assert(value: unknown, message: string): asserts value { if (!value) throw new Error(message); }
 function files(root: string, name: string): string[] { if (!existsSync(root)) return []; return readdirSync(root, { withFileTypes: true }).flatMap((entry) => entry.isDirectory() ? files(join(root, entry.name), name) : entry.name === name ? [join(root, entry.name)] : []); }
+
+export function parseLastSendResultRefusal(logText: string, taskId: string, workerSessionId: string): { task_id: string; worker_session_id: string; message: string } | null {
+  for (const line of logText.split(/\r?\n/).reverse()) {
+    const marker = line.indexOf("[qf.send_result.refused]");
+    const start = marker < 0 ? -1 : line.indexOf("{", marker);
+    if (start < 0) continue;
+    try {
+      const row = JSON.parse(line.slice(start)) as Row;
+      if (row.taskId !== taskId || row.workerSessionId !== workerSessionId || typeof row.message !== "string") continue;
+      return { task_id: taskId, worker_session_id: workerSessionId, message: sanitizeLiveFailureError(row.message) };
+    } catch { /* inspect the preceding bounded log row */ }
+  }
+  return null;
+}
+
+function lastSendResultRefusal(appDir: string, taskId: string | null, workerSessionId: string | null): { task_id: string; worker_session_id: string; message: string } | null {
+  if (!taskId || !workerSessionId) return null;
+  const logDir = join(appDir, "logs");
+  if (!existsSync(logDir)) return null;
+  const logs = readdirSync(logDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && /^main-.*\.log$/.test(entry.name))
+    .map((entry) => join(logDir, entry.name))
+    .sort()
+    .reverse();
+  for (const path of logs) {
+    try {
+      const refusal = parseLastSendResultRefusal(readFileSync(path, "utf8"), taskId, workerSessionId);
+      if (refusal) return refusal;
+    } catch { /* a missing/incomplete log cannot hide Kernel state */ }
+  }
+  return null;
+}
 async function until<T>(label: string, read: () => Promise<T | null>, duration = 30000): Promise<T> {
   const deadline = Date.now() + duration; let last = "";
   while (Date.now() < deadline) { try { const value = await read(); if (value !== null) return value; } catch (error) { last = error instanceof Error ? error.message : "read failed"; } await wait(500); }
@@ -333,7 +365,7 @@ export function observeLiveFailure(dbPath: string, appDir: string, stage: string
   try { completionFailure = completionFailureEvent ? JSON.parse(String(completionFailureEvent.payload)) as Row : null; } catch { completionFailure = null; }
   return {
     last_completed_stage: stage, visible_market_action_reached: marketReached, analyze_and_review_dispatched: analysisDispatched,
-    worker: { session_id: workerId, session_status: workerSession?.status ? String(workerSession.status) : null, task_id: workerTask?.id ? String(workerTask.id) : null, task_status: workerTask?.status ? String(workerTask.status) : null, assigned: Boolean(workerTask && workerId), assignment_ambiguous: assignmentAmbiguous, inference: safeInference(appDir, workerId), trajectory_id: resultId, trajectory_present: trajectory, trajectory_ambiguous: trajectoryAmbiguous, kernel_accepted_and_bound: Boolean(trajectory && bound && workerTask?.status === "done") },
+    worker: { session_id: workerId, session_status: workerSession?.status ? String(workerSession.status) : null, task_id: workerTask?.id ? String(workerTask.id) : null, task_status: workerTask?.status ? String(workerTask.status) : null, assigned: Boolean(workerTask && workerId), assignment_ambiguous: assignmentAmbiguous, inference: safeInference(appDir, workerId), trajectory_id: resultId, trajectory_present: trajectory, trajectory_ambiguous: trajectoryAmbiguous, kernel_accepted_and_bound: Boolean(trajectory && bound && workerTask?.status === "done"), last_result_refusal: lastSendResultRefusal(appDir, workerTask?.id ? String(workerTask.id) : null, workerId) },
     critic: { session_id: criticId, session_status: criticSession?.status ? String(criticSession.status) : null, task_id: criticTask?.id ? String(criticTask.id) : null, task_status: criticTask?.status ? String(criticTask.status) : null, review_lifecycle: review?.lifecycle ? String(review.lifecycle) : null, assigned: Boolean(criticTask && criticId), assignment_ambiguous: criticAssignmentAmbiguous, inference: safeInference(appDir, criticId), successful_tools: invocations.filter((row) => row.success === 1).map((row) => String(row.tool_name)), last_transport_event: lastTransport ? { type: String(lastTransport.type), object_type: String(lastTransport.object_type), object_id: String(lastTransport.object_id) } : null, completion_failure: completionFailure ? { reason_code: String(completionFailure.reason_code), message: sanitizeLiveFailureError(completionFailure.message) } : null },
     governed_result: { evaluation_present: Boolean(evaluation), publication_present: Boolean(publication), current_decision_present: publication?.is_current === 1 && Boolean(evaluation?.publication_report_id) },
     lifecycle: { shutdown_attempted: false, exit_code: null, owned_processes_remaining: -1, disposable_root_removed: false }, error: sanitizeLiveFailureError(error),

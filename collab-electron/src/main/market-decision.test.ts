@@ -6,12 +6,13 @@ import { createHash } from "node:crypto";
 import { runBovadaLiveMarketsCapture, BOVADA_UFC_URL } from "qf-bovada-football";
 import { assertMarketInvestigationQuote } from "qf-kernel/portable";
 mock.module("electron", () => ({ BrowserWindow: { getAllWindows: () => [] } }));
-import { openAppKernel, closeAppKernel, getKernelDb, kernelExecute, kernelGetObject, kernelGetLinks, kernelDecisionReadScope, kernelDecisionArtifactView, kernelDecisionModelReadView, kernelMarketReviewArtifactView, kernelCompleteMarketAssessment, kernelBindSourceWork, commitCollaborationResult, kernelRequestGovernedReview, kernelMarkGovernedDelivery, kernelFinalizeResearchEvaluation, kernelGetResearchWorldProjection, kernelReadMarketTrajectoryResult, kernelSessionCoordinatesOtherOpenTask, kernelSessionFailureReason } from "./kernel";
+import { openAppKernel, closeAppKernel, getKernelDb, kernelExecute, kernelGetObject, kernelGetLinks, kernelDecisionReadScope, kernelResolveDecisionReadTrajectories, kernelDecisionArtifactView, kernelDecisionModelReadView, kernelMarketReviewArtifactView, kernelCompleteMarketAssessment, kernelBindSourceWork, commitCollaborationResult, kernelRequestGovernedReview, kernelMarkGovernedDelivery, kernelFinalizeResearchEvaluation, kernelGetResearchWorldProjection, kernelReadMarketTrajectoryResult, kernelSessionCoordinatesOtherOpenTask, kernelSessionFailureReason } from "./kernel";
 import { addOfficialEvidence } from "./evidence-computation";
 import { createMarketDeskInvestigation } from "./market-desk";
 import { createMarketFailureReceiver, recordMarketRuntimeFailure, assertMarketRetryTask } from "./market-runtime-failure";
 import { recordMarketRuntimeReceipt } from "./market-runtime-receipt";
 import { handleMarketResumeFailure } from "./market-resume-failure";
+import { createCollaborationService } from "./collaboration-gateway";
 const { callOntologyReadTool, callOntologyTool, registerOntologyGatewayRpc } = await import("./ontology-gateway");
 
 const root = mkdtempSync(join(tmpdir(), "qf-decision-test-"));
@@ -157,8 +158,13 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   expect(() => callOntologyReadTool({ sessionId: "worker", role: "worker" }, "qf_dataset_query", {})).toThrow("exact Hypothesis");
   expect(() => callOntologyReadTool({ sessionId: "worker", role: "worker" }, "qf_dataset_get", { id: evidence.dataset_id, extra: true })).toThrow("exact Hypothesis");
   expect(getKernelDb().query("SELECT count(*) AS n FROM events").get()).toEqual(before);
-  const readResponses = scope.allowed.map((key) => { const colon = key.indexOf(":"); return callOntologyReadTool({ sessionId: "worker", role: "worker" }, key.slice(0, colon), { id: key.slice(colon + 1) }); });
+  const readOne = (key: string) => { const colon = key.indexOf(":"); return callOntologyReadTool({ sessionId: "worker", role: "worker" }, key.slice(0, colon), { id: key.slice(colon + 1) }); };
+  const firstRead = readOne(scope.allowed[0]!);
+  expect(() => kernelResolveDecisionReadTrajectories(taskId, "worker", [firstRead.artifactId])).toThrow("required governed read is missing");
+  const readResponses = [firstRead, ...scope.allowed.slice(1).map(readOne)];
   const receipts = readResponses.map((response) => response.artifactId);
+  expect(kernelResolveDecisionReadTrajectories(taskId, "worker", [firstRead.artifactId])).toEqual(receipts);
+  expect(() => kernelResolveDecisionReadTrajectories(taskId, "worker", [genericRead])).toThrow("foreign to this Task");
   const largestRead = readResponses.toSorted((left, right) => JSON.stringify(right.result).length - JSON.stringify(left.result).length)[0]!;
   expect(JSON.stringify(largestRead.result).length).toBeGreaterThan(1_000);
   expect(JSON.stringify(largestRead).slice(0, 128)).toContain(largestRead.artifactId);
@@ -192,10 +198,31 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   expect(kernelGetObject("task", taskId)?.status).toBe("open");
   expect(() => commit(decision, receipts.slice(1))).toThrow("complete exact input set");
   expect(() => commit(decision, receipts.slice(0, -1))).toThrow("complete exact input set");
-  // Exercise the real assessment adapter, not a separately assembled full-decision fixture.
-  const completed = commit(completedAssessment);
+  // Exercise the collaboration boundary with no model-carried receipt ids. The
+  // service resolves every durable Task read before citation and commit checks.
+  const completed = createCollaborationService({
+    authenticate: () => { throw new Error("not used"); },
+    capabilityGroups: (sessionId) => sessionId === "worker" ? ["market.read"] : [],
+    liveRecipientForRole: () => { throw new Error("not used"); },
+    identityForSession: () => ({ sessionId: "director", role: "orchestrator" }),
+    currentCoordinatorForTask: () => "director",
+    isLiveSession: (sessionId) => sessionId === "director",
+    getObject: kernelGetObject,
+    getLinks: kernelGetLinks,
+    execute: kernelExecute,
+    marketObjectExists: (id) => kernelGetObject("quote", id) !== null,
+    resolveReadTrajectoryArtifactIds: kernelResolveDecisionReadTrajectories,
+    readMarketTrajectoryResult: kernelReadMarketTrajectoryResult,
+    commitResult: (input) => commitCollaborationResult({ ...input, result: kernelCompleteMarketAssessment(input.taskId, input.workerSessionId, input.result) }, (artifactId) => kernelBindSourceWork({ source_task_id: taskId, hypothesis_id: hypothesis.object_id, run_id: "decision-run", result_artifact_id: artifactId, executor_session_id: "worker" })),
+    notify: () => ({ messageId: "test-result-notice", delivered: true }),
+  }).sendResult(
+    { sessionId: "worker", role: "worker" },
+    { taskId, result: JSON.stringify(assessment), citedMarketIds: capture.rows.map((row) => row.quote_id), readTrajectoryArtifactIds: [] },
+  );
   expect(kernelGetObject("task", taskId)?.status).toBe("done");
   expect(kernelGetObject("artifact", completed.artifactId)?.kind).toBe("trajectory");
+  readOne(scope.allowed.find((key) => key.startsWith("qf_quote_get:"))!);
+  expect(() => kernelResolveDecisionReadTrajectories(taskId, "worker", [firstRead.artifactId])).toThrow("required governed read is ambiguous");
   kernelExecute("register_agent_definition", { name: "hermes-critic", role: "critic", package_ref: "species/hermes/packed/hermes.aospkg", runtime_profile: "default", capability_groups: ["research.evaluate"] }, trace());
   kernelExecute("create_agent_session", { session_id: "critic", agent_definition_id: "hermes-critic" }, trace()); kernelExecute("start_agent_session", { session_id: "critic" }, trace());
   const review = kernelRequestGovernedReview(taskId, "review-attempt", "critic");

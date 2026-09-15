@@ -32,6 +32,12 @@ test("collaboration bridge rejects missing and malicious extra fields", () => {
     cited_market_ids: [],
     read_trajectory_artifact_ids: ["read-empty"],
   })).toBeTruthy();
+  expect(validateToolArguments("send_result", {
+    task_id: "task-1",
+    result: "QuantFlow resolves the durable reads.",
+    cited_market_ids: ["venue-1"],
+    read_trajectory_artifact_ids: [],
+  })).toBeTruthy();
 });
 
 test("packaged collaboration bridge has no generic peer-send bypass", () => {

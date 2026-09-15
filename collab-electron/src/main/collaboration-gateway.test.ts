@@ -22,7 +22,9 @@ function fixture() {
     ["task-1:delegated_by", [{ from_id: "task-1", to_id: "orch-1" }]],
   ]);
   const revoked = new Set<string>();
+  let canonicalReads = ["read-1"];
   let notifyError: Error | null = null;
+  const refusals: Array<{ taskId: string | null; workerSessionId: string | null; message: string }> = [];
   const deps: CollaborationDependencies = {
     authenticate(capability, sessionId, role) {
       if (
@@ -87,11 +89,18 @@ function fixture() {
     marketObjectExists(id) {
       return id === "venue-1" || id === "venue-2";
     },
+    resolveReadTrajectoryArtifactIds(_taskId, _workerSessionId, suppliedArtifactIds) {
+      for (const id of suppliedArtifactIds) {
+        if (!canonicalReads.includes(id)) throw new Error(`foreign read trajectory: ${id}`);
+      }
+      return [...canonicalReads];
+    },
     readMarketTrajectoryResult(artifactId, workerSessionId) {
-      if (workerSessionId !== "worker-1" || artifactId !== "read-1") {
+      if (workerSessionId !== "worker-1" || !canonicalReads.includes(artifactId)) {
         throw new Error("foreign read trajectory");
       }
-      return { id: "venue-1", nested: [{ venue_id: "venue-1" }] };
+      const venueId = artifactId === "read-1" ? "venue-1" : "venue-2";
+      return { id: venueId, nested: [{ venue_id: venueId }] };
     },
     commitResult(input) {
       published.push(input);
@@ -108,6 +117,7 @@ function fixture() {
       if (notifyError) throw notifyError;
       return { messageId: `notice-${notices.length}`, delivered: true };
     },
+    recordResultRefusal(input) { refusals.push(input); },
     mintTaskId: () => "task-minted",
   };
   return {
@@ -118,6 +128,8 @@ function fixture() {
     objects,
     links,
     revoked,
+    refusals,
+    setCanonicalReads(ids: string[]) { canonicalReads = [...ids]; },
     setNotifyError(error: Error | null) {
       notifyError = error;
     },
@@ -297,6 +309,40 @@ describe("collaboration gateway", () => {
       expect(f.effects).toHaveLength(0);
       expect(f.notices).toHaveLength(0);
     }
+  });
+
+  test("send_result completes an incomplete valid supplied receipt subset from the authoritative Task set", () => {
+    const f = fixture();
+    f.setCanonicalReads(["read-1", "read-2"]);
+    createCollaborationService(f.deps).sendResult(
+      { sessionId: "worker-1", role: "worker" },
+      {
+        taskId: "task-1",
+        result: "Both venues were read",
+        citedMarketIds: ["venue-1", "venue-2"],
+        readTrajectoryArtifactIds: [],
+      },
+    );
+    expect(f.published[0]?.readTrajectoryArtifactIds).toEqual(["read-1", "read-2"]);
+  });
+
+  test("registered send_result captures the exact bounded refusal", () => {
+    const f = fixture();
+    const sendResult = registerHandlers(f).get("qf.collaboration.send_result")!;
+    expect(() => sendResult({
+      seat_capability: "cap:worker-1:worker",
+      session_id: "worker-1",
+      from_role: "worker",
+      task_id: "task-1",
+      result: "Answer",
+      cited_market_ids: ["venue-1"],
+      read_trajectory_artifact_ids: ["foreign-read"],
+    })).toThrow("foreign read trajectory");
+    expect(f.refusals).toEqual([{
+      taskId: "task-1",
+      workerSessionId: "worker-1",
+      message: "foreign read trajectory: foreign-read",
+    }]);
   });
 
   test("send_result permits one concise correction and then refuses an unbounded loop", () => {

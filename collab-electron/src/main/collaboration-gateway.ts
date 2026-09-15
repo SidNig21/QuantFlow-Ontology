@@ -37,6 +37,11 @@ export type CollaborationDependencies = {
   ) => unknown;
   missionForSession?: (sessionId: string) => string | undefined;
   marketObjectExists: (id: string) => boolean;
+  resolveReadTrajectoryArtifactIds: (
+    taskId: string,
+    workerSessionId: string,
+    suppliedArtifactIds: string[],
+  ) => string[];
   readMarketTrajectoryResult: (artifactId: string, workerSessionId: string) => unknown;
   commitResult: (input: {
     taskId: string;
@@ -58,6 +63,11 @@ export type CollaborationDependencies = {
     taskId: string;
     artifactId?: string;
   }) => { messageId: string; delivered: boolean };
+  recordResultRefusal?: (input: {
+    taskId: string | null;
+    workerSessionId: string | null;
+    message: string;
+  }) => void;
   mintTaskId?: () => string;
 };
 
@@ -193,6 +203,14 @@ function bestEffortNotification(
   }
 }
 
+export function sanitizeResultRefusal(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  return message
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/\b(?:api[_-]?key|authorization|bearer|token|secret|password)\b\s*[:=]?\s*\S*/gi, "[redacted]")
+    .slice(0, 512);
+}
+
 export function createCollaborationService(deps: CollaborationDependencies) {
   const resultAttempts = new Map<string, number>();
   return {
@@ -257,9 +275,10 @@ export function createCollaborationService(deps: CollaborationDependencies) {
         "cited_market_ids",
         true,
       );
-      const readTrajectoryArtifactIds = boundedIdList(
+      const suppliedReadTrajectoryArtifactIds = boundedIdList(
         input.readTrajectoryArtifactIds,
         "read_trajectory_artifact_ids",
+        true,
       );
       const task = deps.getObject("task", taskId);
       if (!task || task.status !== "open") {
@@ -275,6 +294,11 @@ export function createCollaborationService(deps: CollaborationDependencies) {
         throw new Error("send_result requires the live current Task coordinator");
       }
       const coordinator = deps.identityForSession(coordinatorSessionId);
+      const readTrajectoryArtifactIds = deps.resolveReadTrajectoryArtifactIds(
+        taskId,
+        identity.sessionId,
+        suppliedReadTrajectoryArtifactIds,
+      );
 
       const observedIds = new Set<string>();
       for (const trajectoryId of readTrajectoryArtifactIds) {
@@ -362,41 +386,55 @@ export function registerCollaborationGatewayRpc(
   register(
     "qf.collaboration.send_result",
     (params) => {
-      const input = exactRecord(params, "send_result", [
-        "seat_capability",
-        "session_id",
-        "from_role",
-        "task_id",
-        "result",
-        "cited_market_ids",
-        "read_trajectory_artifact_ids",
-      ]);
-      const identity = deps.authenticate(
-        input.seat_capability,
-        input.session_id,
-        input.from_role,
-      );
-      const result = service.sendResult(identity, {
-        taskId: nonEmptyString(input.task_id, "task_id"),
-        result: nonEmptyString(input.result, "result"),
-        citedMarketIds: stringIdArray(
-          input.cited_market_ids,
+      let taskId: string | null = null;
+      let workerSessionId: string | null = null;
+      try {
+        const input = exactRecord(params, "send_result", [
+          "seat_capability",
+          "session_id",
+          "from_role",
+          "task_id",
+          "result",
           "cited_market_ids",
-          true,
-        ),
-        readTrajectoryArtifactIds: stringIdArray(
-          input.read_trajectory_artifact_ids,
           "read_trajectory_artifact_ids",
-        ),
-      });
-      onChanged({
-        kind: "result",
-        taskId: result.taskId,
-        artifactId: result.artifactId,
-        workerSessionId: identity.sessionId,
-        coordinatorSessionId: deps.currentCoordinatorForTask(result.taskId),
-      });
-      return result;
+        ]);
+        taskId = typeof input.task_id === "string" ? input.task_id : null;
+        workerSessionId = typeof input.session_id === "string" ? input.session_id : null;
+        const identity = deps.authenticate(
+          input.seat_capability,
+          input.session_id,
+          input.from_role,
+        );
+        const result = service.sendResult(identity, {
+          taskId: nonEmptyString(input.task_id, "task_id"),
+          result: nonEmptyString(input.result, "result"),
+          citedMarketIds: stringIdArray(
+            input.cited_market_ids,
+            "cited_market_ids",
+            true,
+          ),
+          readTrajectoryArtifactIds: stringIdArray(
+            input.read_trajectory_artifact_ids,
+            "read_trajectory_artifact_ids",
+            true,
+          ),
+        });
+        onChanged({
+          kind: "result",
+          taskId: result.taskId,
+          artifactId: result.artifactId,
+          workerSessionId: identity.sessionId,
+          coordinatorSessionId: deps.currentCoordinatorForTask(result.taskId),
+        });
+        return result;
+      } catch (error) {
+        deps.recordResultRefusal?.({
+          taskId,
+          workerSessionId,
+          message: sanitizeResultRefusal(error),
+        });
+        throw error;
+      }
     },
     { description: "Publish cited result lineage, complete its Kernel task, then notify." },
   );
