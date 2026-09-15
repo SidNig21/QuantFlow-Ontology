@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "f25b8a5b",
+    "commit": "501348ea",
     "generatedAt": "2026-09-15",
     "filesScanned": 433,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "a54324a32089e22c"
+    "fingerprint": "13efed80eaf1743a"
   },
   "stats": {
     "live": 108,
@@ -6181,7 +6181,7 @@
       "id": "2:residue",
       "layer": 2,
       "name": "47 small modules*",
-      "kb": 118.7,
+      "kb": 119.4,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6411,21 +6411,21 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/src/main/analytics.ts",
-          "kb": 1.9,
+          "path": "collab-electron/src/main/ui-proof-capture.ts",
+          "kb": 2.6,
           "spawns": 0,
           "spawnsLive": 0,
-          "writes": 1,
+          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
         },
         {
-          "path": "collab-electron/src/main/ui-proof-capture.ts",
+          "path": "collab-electron/src/main/analytics.ts",
           "kb": 1.9,
           "spawns": 0,
           "spawnsLive": 0,
-          "writes": 0,
+          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -60047,12 +60047,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "c521cb4e",
+      "commit": "f25b8a5b",
       "generatedAt": "2026-09-15"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "f25b8a5b",
+      "commit": "501348ea",
       "generatedAt": "2026-09-15"
     },
     "verdict": "better",

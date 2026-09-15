@@ -22,6 +22,11 @@ export type ProofPageCapture = {
   height: number;
 };
 
+export type ProofPageCaptureOptions = {
+  emptyAttempts?: number;
+  waitAfterEmpty?: () => Promise<void>;
+};
+
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
 
 export function validateProofPngHeader(
@@ -53,12 +58,21 @@ export function validateProofPngHeader(
 export async function captureProofPage(
   capturer: ProofPageCapturer,
   decodePng: (png: Buffer) => DecodedProofImage,
+  options: ProofPageCaptureOptions = {},
 ): Promise<ProofPageCapture> {
-  const image = await capturer.capturePage(undefined, {
-    stayHidden: false,
-    stayAwake: true,
-  });
-  if (image.isEmpty()) throw new Error("UI evidence capture is empty");
+  const emptyAttempts = options.emptyAttempts ?? 10;
+  if (!Number.isInteger(emptyAttempts) || emptyAttempts < 1) throw new Error("UI evidence capture attempts are invalid");
+  const waitAfterEmpty = options.waitAfterEmpty ?? (() => new Promise<void>((resolve) => setTimeout(resolve, 100)));
+  let image: ProofNativeImage | null = null;
+  for (let attempt = 0; attempt < emptyAttempts; attempt += 1) {
+    image = await capturer.capturePage(undefined, {
+      stayHidden: false,
+      stayAwake: true,
+    });
+    if (!image.isEmpty()) break;
+    if (attempt + 1 < emptyAttempts) await waitAfterEmpty();
+  }
+  if (!image || image.isEmpty()) throw new Error("UI evidence capture is empty");
   const { width, height } = image.getSize();
   const png = image.toPNG();
   validateProofPngHeader(png, width, height);

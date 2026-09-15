@@ -2,57 +2,110 @@
   "schema": "qf.w1-03.live-failure-diagnostic.v1",
   "result": "RED",
   "diagnostic_only": true,
-  "last_completed_stage": "real_saved_kernel_snapshot_validated",
+  "last_completed_stage": "publication_observed",
   "route": {
-    "visible_market_action_reached": false,
-    "analyze_and_review_dispatched": false
+    "visible_market_action_reached": true,
+    "analyze_and_review_dispatched": true
   },
   "worker": {
-    "session_id": "53de2921-9d2a-448c-a459-27c102c0fa77",
-    "session_status": "failed",
+    "session_id": "4657bedb-812d-4190-a09b-88c82d37ec19",
+    "session_status": "closed",
     "task_id": "task-7fc97c34-f03f-451b-a70d-9458be7f308e",
-    "task_status": "open",
+    "task_status": "done",
     "assigned": true,
     "assignment_ambiguous": false,
     "inference": {
-      "log_present": false,
-      "configured": null,
-      "api_rows": [],
+      "log_present": true,
+      "configured": {
+        "provider": "openai-codex",
+        "model": "gpt-5.6-luna"
+      },
+      "api_rows": [
+        {
+          "session_id": "20260914_181738_f8b656",
+          "provider": "openai-codex",
+          "model": "gpt-5.6-luna",
+          "input_tokens": 2456,
+          "output_tokens": 560,
+          "total_tokens": 3016,
+          "latency_seconds": 11.2
+        },
+        {
+          "session_id": "20260914_181738_f8b656",
+          "provider": "openai-codex",
+          "model": "gpt-5.6-luna",
+          "input_tokens": 8463,
+          "output_tokens": 1084,
+          "total_tokens": 9547,
+          "latency_seconds": 24.7
+        }
+      ],
       "turn_rows": []
     },
-    "trajectory_id": null,
-    "trajectory_present": false,
+    "trajectory_id": "c5f5c7d90e682c9b9ade50d6189cd141190ff824250359522416c42d163467d4",
+    "trajectory_present": true,
     "trajectory_ambiguous": false,
-    "kernel_accepted_and_bound": false
+    "kernel_accepted_and_bound": true
   },
   "critic": {
-    "session_id": null,
-    "session_status": null,
-    "task_id": null,
-    "task_status": null,
-    "review_lifecycle": null,
-    "assigned": false,
+    "session_id": "critic-d0e2d0a3-11c6-4151-b050-e034ba10701a",
+    "session_status": "closed",
+    "task_id": "review-task-adff9fcc-0c66-4c56-a870-dd0aa3725c56",
+    "task_status": "done",
+    "review_lifecycle": "completed",
+    "assigned": true,
     "assignment_ambiguous": false,
     "inference": {
-      "log_present": false,
-      "configured": null,
-      "api_rows": [],
+      "log_present": true,
+      "configured": {
+        "provider": "openai-codex",
+        "model": "gpt-5.6-luna"
+      },
+      "api_rows": [
+        {
+          "session_id": "20260914_181833_145ae8",
+          "provider": "openai-codex",
+          "model": "gpt-5.6-luna",
+          "input_tokens": 2596,
+          "output_tokens": 190,
+          "total_tokens": 2786,
+          "latency_seconds": 7.9
+        },
+        {
+          "session_id": "20260914_181833_145ae8",
+          "provider": "openai-codex",
+          "model": "gpt-5.6-luna",
+          "input_tokens": 14682,
+          "output_tokens": 1669,
+          "total_tokens": 16351,
+          "latency_seconds": 33.8
+        }
+      ],
       "turn_rows": []
     },
-    "successful_tools": [],
-    "last_transport_event": null,
+    "successful_tools": [
+      "qf_hypothesis_get",
+      "qf_run_get",
+      "qf_artifact_get",
+      "qf_record_evaluation"
+    ],
+    "last_transport_event": {
+      "type": "agent_session.closed",
+      "object_type": "agent_session",
+      "object_id": "critic-d0e2d0a3-11c6-4151-b050-e034ba10701a"
+    },
     "completion_failure": null
   },
   "governed_result": {
-    "evaluation_present": false,
-    "publication_present": false,
-    "current_decision_present": false
+    "evaluation_present": true,
+    "publication_present": true,
+    "current_decision_present": true
   },
   "lifecycle": {
-    "shutdown_attempted": false,
+    "shutdown_attempted": true,
     "exit_code": 1,
     "owned_processes_remaining": 0,
     "disposable_root_removed": true
   },
-  "error": "application exited before readiness: socket-path not written"
+  "error": "UI evidence capture is empty"
 }

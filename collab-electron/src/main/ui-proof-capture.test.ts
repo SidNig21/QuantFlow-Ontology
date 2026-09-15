@@ -36,6 +36,29 @@ test("capture activates Chromium's hidden-page capturer and verifies the native 
   expect(result).toEqual({ png: bytes, width: 2, height: 1 });
 });
 
+test("capture waits through a transient empty native frame", async () => {
+  const empty: ProofNativeImage = { isEmpty: () => true, getSize: () => ({ width: 0, height: 0 }), toPNG: () => Buffer.alloc(0) };
+  const bytes = png();
+  const ready: ProofNativeImage = { isEmpty: () => false, getSize: () => ({ width: 1, height: 1 }), toPNG: () => bytes };
+  const frames = [empty, ready];
+  let waits = 0;
+  const result = await captureProofPage(
+    { capturePage: async () => frames.shift() ?? ready },
+    () => decoded(),
+    { waitAfterEmpty: async () => { waits += 1; } },
+  );
+  expect(waits).toBe(1);
+  expect(result).toEqual({ png: bytes, width: 1, height: 1 });
+
+  let emptyCalls = 0;
+  await expect(captureProofPage(
+    { capturePage: async () => { emptyCalls += 1; return empty; } },
+    () => decoded(),
+    { emptyAttempts: 3, waitAfterEmpty: async () => {} },
+  )).rejects.toThrow(/empty/);
+  expect(emptyCalls).toBe(3);
+});
+
 test("empty, zero-size, malformed, mismatched, and undecodable captures fail closed", async () => {
   const image = (overrides: Partial<ProofNativeImage>): ProofNativeImage => ({
     isEmpty: () => false,
@@ -44,7 +67,7 @@ test("empty, zero-size, malformed, mismatched, and undecodable captures fail clo
     ...overrides,
   });
   const capture = (value: ProofNativeImage, decodedImage = decoded()) =>
-    captureProofPage({ capturePage: async () => value }, () => decodedImage);
+    captureProofPage({ capturePage: async () => value }, () => decodedImage, { emptyAttempts: 1 });
   await expect(capture(image({ isEmpty: () => true }))).rejects.toThrow(/empty/);
   await expect(capture(image({ getSize: () => ({ width: 0, height: 1 }) }))).rejects.toThrow(/dimensions/);
   await expect(capture(image({ getSize: () => ({ width: 2, height: 1 }) }))).rejects.toThrow(/disagree/);

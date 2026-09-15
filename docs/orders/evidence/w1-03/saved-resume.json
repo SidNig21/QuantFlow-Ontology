@@ -1,5 +1,5 @@
 {
-  "candidate_base": "f25b8a5bf55b980e7aaec2e089adc2c5c0987bb5",
+  "candidate_base": "501348ea077d97a0907e3a8daae70702f1408af8",
   "package_hash": "c499668301b6d4ec53188e7387a065b25cbd3c898d66f188099e884d883089e1",
   "acceptance_case": {
     "event_label": "Giga Chikadze vs Joanderson Brito",
@@ -19,8 +19,8 @@
   "selected_case": {
     "provider": "bovada",
     "provider_event_id": "30189205",
-    "quote_id": "bovada:quote:4da09d261c711746334de786ca11392e426d2868da7e72505fcd9ea8ba11e4ec",
-    "observed_at": "2026-09-15T00:54:56.321Z",
+    "quote_id": "bovada:quote:b14414c22a2752981b021e02179d6881eddf37523427cab4f5a14e2b10962a34",
+    "observed_at": "2026-09-15T01:17:27.138Z",
     "event_cutoff": "2026-09-19T21:00:00.000Z",
     "competitors": [
       {
@@ -40,31 +40,31 @@
         "selection_id": "2391916735",
         "competitor_name": "Giga Chikadze",
         "source_url": "https://www.ufc.com/athlete/giga-chikadze",
-        "source_hash": "ebcd3fcbb2641c1a9d9da2fbc45df6fe923f17f8494967e811beae02fa8f751a"
+        "source_hash": "d9937d5c764e434e5d0e0f13d30c168a2622e1d2ab009fd6abe72d7fff5a1444"
       },
       {
         "competitor_id": "30189205-16521459",
         "selection_id": "2391916736",
         "competitor_name": "Joanderson Brito",
         "source_url": "https://www.ufc.com/athlete/joanderson-brito",
-        "source_hash": "858713e37da0988fdaa3bb34a3314ab91493250b6964f549d44a48b88a663f0a"
+        "source_hash": "25ef6dbb978cf69166a421f2944cc84974fcaca7c2a5ceacc121f391f647ac84"
       }
     ]
   },
   "source_work": {
     "source_task_id": "task-7fc97c34-f03f-451b-a70d-9458be7f308e",
     "hypothesis_id": "14b10f84-0c19-4633-a6c9-3f7603199a7b",
-    "run_id": "analysis:4f444c96-be45-4a14-839d-580d85c95561",
-    "result_artifact_id": "5bc05caf41b6750d81f20c6412d63bc2c33e77324f637eb6ca2b325944127f69",
-    "executor_session_id": "f5320fcb-2815-45fc-8606-457d26a1fdf6"
+    "run_id": "analysis:03320038-8132-41b4-a9e3-02b22c0be618",
+    "result_artifact_id": "c5f5c7d90e682c9b9ade50d6189cd141190ff824250359522416c42d163467d4",
+    "executor_session_id": "4657bedb-812d-4190-a09b-88c82d37ec19"
   },
-  "worker_session_id": "f5320fcb-2815-45fc-8606-457d26a1fdf6",
-  "critic_session_id": "critic-59b642ad-5808-42f5-bbc1-067f21734f6f",
+  "worker_session_id": "4657bedb-812d-4190-a09b-88c82d37ec19",
+  "critic_session_id": "critic-d0e2d0a3-11c6-4151-b050-e034ba10701a",
   "worker_task_id": "task-7fc97c34-f03f-451b-a70d-9458be7f308e",
-  "worker_artifact_id": "5bc05caf41b6750d81f20c6412d63bc2c33e77324f637eb6ca2b325944127f69",
-  "run_id": "analysis:4f444c96-be45-4a14-839d-580d85c95561",
-  "evaluation_id": "f8072848-df40-4166-a09b-2ed66e731194",
-  "report_id": "28ea49df5be2b9fe0dc5cbb9da23a25d1101d11854499804ff0b7be1f2864d99",
+  "worker_artifact_id": "c5f5c7d90e682c9b9ade50d6189cd141190ff824250359522416c42d163467d4",
+  "run_id": "analysis:03320038-8132-41b4-a9e3-02b22c0be618",
+  "evaluation_id": "acb2a704-baf5-4543-85b0-9885c4f13290",
+  "report_id": "32c60471339e28af918aa7574407cbf9fbb4d7270fcf80a63786bde5432f31b6",
   "menu_selection_ids": [
     "2391916735",
     "2391916736",
@@ -75,19 +75,19 @@
     "contract": "qf.market.decision.v1",
     "mission_id": "e254cf08-73e5-41ed-9453-136435d8cd29",
     "task_id": "task-7fc97c34-f03f-451b-a70d-9458be7f308e",
-    "worker_session_id": "f5320fcb-2815-45fc-8606-457d26a1fdf6",
+    "worker_session_id": "4657bedb-812d-4190-a09b-88c82d37ec19",
     "hypothesis_id": "14b10f84-0c19-4633-a6c9-3f7603199a7b",
     "hypothesis": "Joanderson Brito wins by submission",
-    "dataset_id": "dataset:7bb1d887530457b53e0636beba2bc34fae7cef76856a94d77200d43de7355f26",
-    "run_id": "analysis:4f444c96-be45-4a14-839d-580d85c95561",
+    "dataset_id": "dataset:39ba52c5c88c1be5eb695f2cf96d5191c3cc33855fc0621d705413ead5029640",
+    "run_id": "analysis:03320038-8132-41b4-a9e3-02b22c0be618",
     "inputs": [
       {
-        "id": "ad2bee69b40aea50eaffdbfcb0dc9ae79eb9f578cdfd25b1b8f2635165f6f1cd",
-        "hash": "ad2bee69b40aea50eaffdbfcb0dc9ae79eb9f578cdfd25b1b8f2635165f6f1cd"
+        "id": "f6e7bfcc9ce19ba5276a5319f94d4adcd306df77a9ca76ebe174011ba6ef8289",
+        "hash": "f6e7bfcc9ce19ba5276a5319f94d4adcd306df77a9ca76ebe174011ba6ef8289"
       },
       {
-        "id": "7bb1d887530457b53e0636beba2bc34fae7cef76856a94d77200d43de7355f26",
-        "hash": "7bb1d887530457b53e0636beba2bc34fae7cef76856a94d77200d43de7355f26"
+        "id": "39ba52c5c88c1be5eb695f2cf96d5191c3cc33855fc0621d705413ead5029640",
+        "hash": "39ba52c5c88c1be5eb695f2cf96d5191c3cc33855fc0621d705413ead5029640"
       },
       {
         "id": "a1d5486bf7559d800e228364cab4ce5e99a0470c969fbd6f0b729aede8964e61",
@@ -107,7 +107,7 @@
       "status": "selection_unavailable",
       "selection_ids": [],
       "reason": "The exact requested expression is absent from the complete returned live fight menu.",
-      "observed_at": "2026-09-15T00:54:56.321Z",
+      "observed_at": "2026-09-15T01:17:27.138Z",
       "completeness": "complete",
       "provider_reported_market_count": 2,
       "returned_unique_market_count": 2
@@ -122,11 +122,11 @@
         "market_id": "522421781",
         "minimum_decimal_price": null,
         "no_vig": 0.23148148148148148,
-        "observed_at": "2026-09-15T00:54:56.321Z",
+        "observed_at": "2026-09-15T01:17:27.138Z",
         "probability": {
           "unavailable": "The two official athlete pages provide descriptive aggregates and sparse bout history, with no validated matchup probability or submission-path uncertainty method."
         },
-        "quote_id": "bovada:quote:4da09d261c711746334de786ca11392e426d2868da7e72505fcd9ea8ba11e4ec",
+        "quote_id": "bovada:quote:b14414c22a2752981b021e02179d6881eddf37523427cab4f5a14e2b10962a34",
         "raw_break_even": 0.24096385542168672,
         "selection_id": "2391916735"
       },
@@ -139,11 +139,11 @@
         "market_id": "522421781",
         "minimum_decimal_price": null,
         "no_vig": 0.7685185185185186,
-        "observed_at": "2026-09-15T00:54:56.321Z",
+        "observed_at": "2026-09-15T01:17:27.138Z",
         "probability": {
           "unavailable": "The two official athlete pages provide descriptive aggregates and sparse bout history, with no validated matchup probability or submission-path uncertainty method."
         },
-        "quote_id": "bovada:quote:4da09d261c711746334de786ca11392e426d2868da7e72505fcd9ea8ba11e4ec",
+        "quote_id": "bovada:quote:b14414c22a2752981b021e02179d6881eddf37523427cab4f5a14e2b10962a34",
         "raw_break_even": 0.8,
         "selection_id": "2391916736"
       },
@@ -156,11 +156,11 @@
         "market_id": "527350841",
         "minimum_decimal_price": null,
         "no_vig": 0.5992713370559558,
-        "observed_at": "2026-09-15T00:54:56.321Z",
+        "observed_at": "2026-09-15T01:17:27.138Z",
         "probability": {
           "unavailable": "The two official athlete pages provide descriptive aggregates and sparse bout history, with no validated matchup probability or submission-path uncertainty method."
         },
-        "quote_id": "bovada:quote:15bec74312180e2f796a39da95db7bf07d494818b45d5e7d4c8a86862caacffc",
+        "quote_id": "bovada:quote:1c60e4da3984073115cbeb45c5d9923417dd4642775781ee3ed422542c81fd83",
         "raw_break_even": 0.6363634628099647,
         "selection_id": "2410767474"
       },
@@ -173,11 +173,11 @@
         "market_id": "527350841",
         "minimum_decimal_price": null,
         "no_vig": 0.4007286629440441,
-        "observed_at": "2026-09-15T00:54:56.321Z",
+        "observed_at": "2026-09-15T01:17:27.138Z",
         "probability": {
           "unavailable": "The two official athlete pages provide descriptive aggregates and sparse bout history, with no validated matchup probability or submission-path uncertainty method."
         },
-        "quote_id": "bovada:quote:15bec74312180e2f796a39da95db7bf07d494818b45d5e7d4c8a86862caacffc",
+        "quote_id": "bovada:quote:1c60e4da3984073115cbeb45c5d9923417dd4642775781ee3ed422542c81fd83",
         "raw_break_even": 0.425531914893617,
         "selection_id": "2410767475"
       }
@@ -185,12 +185,12 @@
     "research_assessment": "SUPPORTED",
     "classification": "WATCH",
     "selection_id": null,
-    "selection_reason": "The exact requested Method of Victory expression, Joanderson Brito by Submission, is unavailable in the complete live menu; therefore no selection can be assigned. The offered Brito/Giga winner expressions and the Over/Under expressions were all reviewed, but none is the requested submission outcome.",
-    "change_condition": "Reassess only when the exact Brito-by-submission expression is offered and its event, cutoff, source coverage, and quote freshness remain valid; update the judgment if matchup-specific evidence, a validated probability method, or material fighter information changes.",
-    "rationale": "The official evidence supports the mechanism: Brito has documented submission success and a materially stronger submission-oriented profile, including recent submission-finishing evidence. Counterevidence is meaningful: the matchup sample is sparse, career aggregates are descriptive rather than matchup probabilities, Brito's documented takedown accuracy is limited, and Giga's takedown defense and lack of observed recent submission losses constrain the inference. The available winner and Over/Under expressions provide market context but do not identify or validate the submission path. Thus the claim is supported directionally, not quantified.",
+    "selection_reason": "The requested Joanderson Brito by submission expression is selection_unavailable in the complete returned live menu; only Brito/Giga moneyline and Over/Under expressions were offered, so no selection can be identified.",
+    "change_condition": "Reassess if the exact Method of Victory—Joanderson Brito by Submission—becomes available before the 2026-09-19T21:00:00.000Z cutoff, with refreshed quotes and evidence; a validated matchup probability or submission-path model would also be required.",
+    "rationale": "The mechanism is supported directionally: Brito's official evidence shows a recent submission win, eight career submission wins, a 1.23 submission average per 15 minutes, and substantially more takedown activity than Giga. Counterevidence is meaningful: Brito's displayed takedown accuracy is 6% with only two takedowns landed in the sampled rows, while Giga has 66% takedown defense; the supplied recent Giga sample contains no submission wins, but all three sampled bouts are losses and does not establish matchup-specific submission vulnerability. The offered moneyline and total expressions were assessed but do not represent the requested submission mechanism. No probability-producing method is available, so this remains research support rather than a priced recommendation.",
     "evidence_refs": [
-      "ad2bee69b40aea50eaffdbfcb0dc9ae79eb9f578cdfd25b1b8f2635165f6f1cd",
-      "7bb1d887530457b53e0636beba2bc34fae7cef76856a94d77200d43de7355f26",
+      "f6e7bfcc9ce19ba5276a5319f94d4adcd306df77a9ca76ebe174011ba6ef8289",
+      "39ba52c5c88c1be5eb695f2cf96d5191c3cc33855fc0621d705413ead5029640",
       "a1d5486bf7559d800e228364cab4ce5e99a0470c969fbd6f0b729aede8964e61"
     ],
     "evidence_facts": [
@@ -347,7 +347,7 @@
           ]
         },
         "no_contests": 0,
-        "observed_at": "2026-09-15T00:54:56.584Z",
+        "observed_at": "2026-09-15T01:17:27.452Z",
         "parser_version": "ufc-athlete-html-v2",
         "rows": [
           {
@@ -359,7 +359,7 @@
               "status": "available",
               "value": "KO/TKO"
             },
-            "observed_at": "2026-09-15T00:54:56.584Z",
+            "observed_at": "2026-09-15T01:17:27.452Z",
             "opponent_url": "https://www.ufc.com/athlete/kevin-vallejos",
             "outcome": "LOSS",
             "selection_id": "2391916735"
@@ -373,7 +373,7 @@
               "status": "available",
               "value": "Decision - Unanimous"
             },
-            "observed_at": "2026-09-15T00:54:56.584Z",
+            "observed_at": "2026-09-15T01:17:27.452Z",
             "opponent_url": "https://www.ufc.com/athlete/david-onama",
             "outcome": "LOSS",
             "selection_id": "2391916735"
@@ -387,14 +387,14 @@
               "status": "available",
               "value": "Decision - Unanimous"
             },
-            "observed_at": "2026-09-15T00:54:56.584Z",
+            "observed_at": "2026-09-15T01:17:27.452Z",
             "opponent_url": "https://www.ufc.com/athlete/arnold-allen",
             "outcome": "LOSS",
             "selection_id": "2391916735"
           }
         ],
         "selection_id": "2391916735",
-        "source_hash": "ebcd3fcbb2641c1a9d9da2fbc45df6fe923f17f8494967e811beae02fa8f751a",
+        "source_hash": "d9937d5c764e434e5d0e0f13d30c168a2622e1d2ab009fd6abe72d7fff5a1444",
         "source_url": "https://www.ufc.com/athlete/giga-chikadze",
         "wins": 0
       },
@@ -551,7 +551,7 @@
           ]
         },
         "no_contests": 0,
-        "observed_at": "2026-09-15T00:54:56.584Z",
+        "observed_at": "2026-09-15T01:17:27.452Z",
         "parser_version": "ufc-athlete-html-v2",
         "rows": [
           {
@@ -563,7 +563,7 @@
               "status": "available",
               "value": "Submission"
             },
-            "observed_at": "2026-09-15T00:54:56.584Z",
+            "observed_at": "2026-09-15T01:17:27.452Z",
             "opponent_url": "https://www.ufc.com/athlete/jordan-leavitt",
             "outcome": "WIN",
             "selection_id": "2391916736"
@@ -577,7 +577,7 @@
               "status": "available",
               "value": "Decision - Unanimous"
             },
-            "observed_at": "2026-09-15T00:54:56.584Z",
+            "observed_at": "2026-09-15T01:17:27.452Z",
             "opponent_url": "https://www.ufc.com/athlete/isaac-thomson",
             "outcome": "WIN",
             "selection_id": "2391916736"
@@ -591,20 +591,20 @@
               "status": "available",
               "value": "Decision - Unanimous"
             },
-            "observed_at": "2026-09-15T00:54:56.584Z",
+            "observed_at": "2026-09-15T01:17:27.452Z",
             "opponent_url": "https://www.ufc.com/athlete/pat-sabatini",
             "outcome": "LOSS",
             "selection_id": "2391916736"
           }
         ],
         "selection_id": "2391916736",
-        "source_hash": "858713e37da0988fdaa3bb34a3314ab91493250b6964f549d44a48b88a663f0a",
+        "source_hash": "25ef6dbb978cf69166a421f2944cc84974fcaca7c2a5ceacc121f391f647ac84",
         "source_url": "https://www.ufc.com/athlete/joanderson-brito",
         "wins": 2
       }
     ],
-    "limitations": "No validated matchup or submission-path probability is available. Official bout histories are limited, absent submission losses are not zero, and opponent adjustment, positional detail, and control-time data are unavailable. Market availability is complete for the returned menu but does not include the requested expression.",
-    "invalidation": "Invalidate or refresh if the event, competitors, source evidence, or event cutoff disagree; if the exact requested expression is not current when acted upon; or if new reliable evidence materially weakens Brito's submission mechanism.",
+    "limitations": "Official athlete pages provide descriptive career aggregates and sparse displayed bout histories, not matchup probabilities. Submission attempts, submission losses, opponent adjustment, positional detail, and control time are unavailable; absent submission losses are not zero. Source coverage and market observations are limited to the supplied Bovada quotes and official UFC pages, and offered expressions may change.",
+    "invalidation": "Invalidate or refresh on event identity, source, cutoff, competitor, or market-expression disagreement; invalidate the directional support if refreshed official evidence materially weakens Brito's submission activity or establishes strong opponent-adjusted resistance, or if the exact requested market remains unavailable at decision time.",
     "provenance": {
       "provider": "openai-codex",
       "model": "gpt-5.6-luna",
@@ -613,85 +613,65 @@
   },
   "inference": [
     {
-      "session_id": "f5320fcb-2815-45fc-8606-457d26a1fdf6",
+      "session_id": "4657bedb-812d-4190-a09b-88c82d37ec19",
       "configured": {
         "provider": "openai-codex",
         "model": "gpt-5.6-luna"
       },
       "apiFacts": [
         {
-          "timestamp": 1789433724000,
-          "session": "20260914_175508_2f0880",
+          "timestamp": 1789435073000,
+          "session": "20260914_181738_f8b656",
           "ordinal": 1,
           "model": "gpt-5.6-luna",
           "provider": "openai-codex",
-          "input": 2453,
-          "output": 578,
-          "total": 3031,
-          "latency": 12.7
+          "input": 2456,
+          "output": 560,
+          "total": 3016,
+          "latency": 11.2
         },
         {
-          "timestamp": 1789433755000,
-          "session": "20260914_175508_2f0880",
+          "timestamp": 1789435106000,
+          "session": "20260914_181738_f8b656",
           "ordinal": 2,
           "model": "gpt-5.6-luna",
           "provider": "openai-codex",
-          "input": 8466,
-          "output": 1181,
-          "total": 9647,
-          "latency": 22.6
-        },
-        {
-          "timestamp": 1789433757000,
-          "session": "20260914_175508_2f0880",
-          "ordinal": 3,
-          "model": "gpt-5.6-luna",
-          "provider": "openai-codex",
-          "input": 9934,
-          "output": 11,
-          "total": 9945,
-          "latency": 1.9
+          "input": 8463,
+          "output": 1084,
+          "total": 9547,
+          "latency": 24.7
         }
       ],
-      "turnFacts": [
-        {
-          "timestamp": 1789433757000,
-          "session": "20260914_175508_2f0880",
-          "model": "gpt-5.6-luna",
-          "apiCalls": 3,
-          "responseLength": 49,
-          "successful": true
-        }
-      ]
+      "turnFacts": []
     },
     {
-      "session_id": "critic-59b642ad-5808-42f5-bbc1-067f21734f6f",
+      "session_id": "critic-d0e2d0a3-11c6-4151-b050-e034ba10701a",
       "configured": {
         "provider": "openai-codex",
         "model": "gpt-5.6-luna"
       },
       "apiFacts": [
         {
-          "timestamp": 1789433773000,
-          "session": "20260914_175603_dbdc51",
+          "timestamp": 1789435124000,
+          "session": "20260914_181833_145ae8",
           "ordinal": 1,
           "model": "gpt-5.6-luna",
           "provider": "openai-codex",
-          "input": 2602,
-          "output": 189,
-          "total": 2791,
-          "latency": 5.8
+          "input": 2596,
+          "output": 190,
+          "total": 2786,
+          "latency": 7.9
         },
         {
-          "timestamp": 1789433803000,
-          "session": "20260914_175603_dbdc51",
+          "timestamp": 1789435159000,
+          "session": "20260914_181833_145ae8",
           "ordinal": 2,
           "model": "gpt-5.6-luna",
           "provider": "openai-codex",
-          "input": 14614,
-          "output": 1449,
-          "total": 16063,
-          "latency": 28.2
+          "input": 14682,
+          "output": 1669,
+          "total": 16351,
+          "latency": 33.8
         }
       ],
       "turnFacts": []
@@ -722,18 +702,18 @@
   },
   "publication": {
     "current": true,
-    "evaluation_id": "f8072848-df40-4166-a09b-2ed66e731194",
-    "report_id": "28ea49df5be2b9fe0dc5cbb9da23a25d1101d11854499804ff0b7be1f2864d99",
-    "worker_artifact_id": "5bc05caf41b6750d81f20c6412d63bc2c33e77324f637eb6ca2b325944127f69"
+    "evaluation_id": "acb2a704-baf5-4543-85b0-9885c4f13290",
+    "report_id": "32c60471339e28af918aa7574407cbf9fbb4d7270fcf80a63786bde5432f31b6",
+    "worker_artifact_id": "c5f5c7d90e682c9b9ade50d6189cd141190ff824250359522416c42d163467d4"
   },
   "lifecycle": {
-    "worker_closed": true,
-    "critic_closed": true,
-    "reopen_live_sessions": 0,
-    "normal_exit_zero": true,
-    "reopen_exit_zero": true,
-    "processes": 1,
-    "roots_remaining": 1
+    "worker_closed": false,
+    "critic_closed": false,
+    "reopen_live_sessions": -1,
+    "normal_exit_zero": false,
+    "reopen_exit_zero": false,
+    "processes": 0,
+    "roots_remaining": 0
   },
   "saved_resume": {
     "mode": "real_saved_kernel",
@@ -745,9 +725,9 @@
     "original_director_id": "f34cfda7-75ca-44d9-8f6e-ad4f1c632b35",
     "old_worker_id": "53de2921-9d2a-448c-a459-27c102c0fa77",
     "old_run_id": "analysis:79d6b3bb-8ded-4563-a459-57133d8904e2",
-    "new_run_id": "analysis:4f444c96-be45-4a14-839d-580d85c95561",
-    "new_quote_id": "bovada:quote:4da09d261c711746334de786ca11392e426d2868da7e72505fcd9ea8ba11e4ec",
-    "coordinator_id": "7e5295b0-6116-4e69-b4d1-05018ef64006",
+    "new_run_id": "analysis:03320038-8132-41b4-a9e3-02b22c0be618",
+    "new_quote_id": "bovada:quote:b14414c22a2752981b021e02179d6881eddf37523427cab4f5a14e2b10962a34",
+    "coordinator_id": "5e1b526d-11fb-46b1-8d5a-e91d53e0c48a",
     "resume_visible": true,
     "fresh_targeted_capture": true,
     "history_unchanged": true,
@@ -755,18 +735,13 @@
     "notification_to_coordinator": true,
     "review_by_coordinator": true,
     "projection_exact": true,
-    "reopen_lineage_exact": true,
-    "handoff_event_id": "8b06fb62-76bf-44d1-8d9f-ef96eec9201e"
-  },
-  "visual": {
-    "sha256": "6cbc0513df60dda7013b2f59255f732d34fc838875035c360db62664b0c378d8",
-    "width": 1200,
-    "height": 800,
-    "bytes": 163502
+    "reopen_lineage_exact": false,
+    "handoff_event_id": "251a87a4-4b13-4d00-87c2-1ab7d3beca82"
   },
   "result": "RED",
   "cleanup": {
-    "processes": 1,
-    "roots_remaining": 1
+    "processes": 0,
+    "roots_remaining": 0,
+    "survivors": []
   }
 }
