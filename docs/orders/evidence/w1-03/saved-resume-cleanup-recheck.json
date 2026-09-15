@@ -1,0 +1,27 @@
+{
+  "schema": "qf.w1-03.saved-resume-cleanup-recheck.v1",
+  "result": "PASS",
+  "scope": "cleanup_recheck_only",
+  "source_receipt_result": "RED",
+  "source_receipt_sha256": "236cdcb6ce01ce2d1b376210c1e7d0f7bb2e80d30c7254551f0f1a164b504e30",
+  "source_candidate_base": "f25b8a5bf55b980e7aaec2e089adc2c5c0987bb5",
+  "observer_candidate": "f1830d4e",
+  "observed_at": "2026-09-15T01:08:28.252Z",
+  "semantic_predicates": "PASS_WHEN_COMBINED_WITH_THIS_CLEANUP_RECHECK",
+  "process_snapshot": {
+    "total": 401,
+    "missing_creation_date": 0,
+    "proof_root_references": 0,
+    "package_references": 0
+  },
+  "cleanup": {
+    "exact_root": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-w1-decision-live-ijqqx1",
+    "root_existed_before": true,
+    "root_exists_after": false
+  },
+  "package": {
+    "root": "C:\\Users\\rybow\\QuantFlow-Ontology\\collab-electron\\dist\\win-unpacked",
+    "app_asar_sha256": "c499668301b6d4ec53188e7387a065b25cbd3c898d66f188099e884d883089e1"
+  },
+  "provider_inference_repeated": false
+}
