@@ -114,6 +114,12 @@ and whether the item is currently on the Canvas.
 Catalog presence never creates a tile. Selecting an item deliberately opens, recruits, binds, or invokes
 it on the current Canvas.
 
+The selected item's class determines what happens. A Participant starts an admitted runtime seat and opens
+its real working surface; terminal-based participants such as Hermes and Codex open terminal tiles. Data,
+Tools, Methods, and Compute open, attach, or invoke the surface appropriate to their job—a table, chart,
+document, media view, controls, or progress/result surface. They use the same declared capability and
+Ontology contracts, but they never pose as terminal colleagues merely because they came from the Dock.
+
 ### Canvas
 
 The Canvas answers: **what am I working with right now?** It contains only deliberately present working

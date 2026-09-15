@@ -1,6 +1,6 @@
 # WO-W2-01 — Admit Codex as a real QuantFlow participant
 
-status: OPEN — founder-selected interactive Codex WSL tile received fresh Reader semantic YES / builder-door YES
+status: BUILDING — founder directed implementation in the real app; standalone hidden D0 loop ended
 assignee: Builder — use `gpt-5.6-sol`; the root architect remains the only Astra seat
 depends: WO-W1-03 accepted at candidate `665ddcd2783a9e218cb5095b51943d026d17f70a`
 
@@ -33,20 +33,23 @@ Read only these current authorities before source work:
 Do not use archived PB-0 inventories or Vault notes as a repair checklist. Inspect the current source and
 change only the assumptions encountered by this first Codex consumer.
 
-## Deliverable 0 — prove the runtime boundary before shared product edits
+## Measured runtime boundary and live-app proof rule
 
 Use the founder-specified interactive Codex CLI inside the default Ubuntu WSL2 distribution. Read-only
 order evidence resolved `codex` to version `codex-cli 0.142.5`; production must resolve the declared WSL
-command without hard-coding an operator home directory. The Builder must measure the WSL distribution,
-interactive executable, configuration overrides, and PTY behavior again. This probe is a hard door: if any
-item below cannot be proved, stop without editing shared product code and report the exact failure.
+command without hard-coding an operator home directory. Earlier standalone probes established the WSL
+route, attached-process requirement, Windows `node.exe` MCP bridge pattern, and one unsupported flag:
+`skill_search` is not recognized by this CLI and must not be passed. The founder ended further hidden
+probe cycles and directed the Builder to construct the actual tile, package the app, and test it visibly.
+The requirements below are therefore proved through the real packaged application, not another standalone
+harness.
 
 1. Through `wsl.exe`, resolve the same declared WSL `codex` command the packaged Windows host will launch.
    Use the operator's existing WSL authentication opaquely. Do not read, copy, log, hash, or record auth
    files, account ids, tokens, secrets, user configuration, or credential-bearing environment values.
-2. Start the real interactive `codex` command in a PTY through WSL, using the same launch shape the product
-   will use. Preserve the operator's existing WSL login opaquely. Apply command-line configuration overrides
-   that disable approval prompts, shell access, web search, apps, plugins, skill install/search,
+2. Start the real interactive `codex` command in a PTY through WSL, using the product launch shape. Preserve
+   the operator's existing WSL login opaquely. Apply only controls supported by the measured CLI to disable
+   approval prompts, shell access, web search, apps, plugins, skill installation and any available discovery,
    computer/browser use, image generation, multi-agent delegation, hooks, workspace-dependency tools,
    persistent history, and memory use/generation. Use a read-only sandbox. QuantFlow must inject only its
    required ontology and collaboration stdio MCP servers.
@@ -67,9 +70,10 @@ item below cannot be proved, stop without editing shared product code and report
    run's owned WSL child process tree exits without terminating unrelated WSL processes, and remove any
    app-owned temporary directory.
 
-An authentication prompt, unsupported safety control, ambient tool, MCP startup failure, security-value
-leak, or uncertain cleanup is a red result. D0 is runtime evidence; it does not by itself claim product
-admission.
+An authentication prompt, ambient tool, MCP startup failure, security-value leak, or uncertain cleanup is
+a red live-app result. An unavailable feature that is absent from the CLI is not enabled and must not be
+passed as an unsupported flag. These checks remain product acceptance requirements; they no longer block
+construction of the real tile that must demonstrate them.
 
 ## Deliverable 1 — declare Codex at the species boundary
 
@@ -159,6 +163,8 @@ The Task identity is checked from Kernel/Canvas truth and delivered in the exist
 - Runtime identity is provenance and transport selection; it does not determine institutional authority.
 - Codex keeps its private interactive conversation inside its own WSL seat. QuantFlow retains only the
   shared Task, tool-use, result, lineage, Evaluation, and lifecycle facts that belong in Kernel truth.
+- Dock opening follows class: Participants open their admitted working surface; Data, Tools, Methods, and
+  Compute open, attach, or invoke a job-appropriate Canvas surface and never pose as terminal participants.
 - Hermes keeps the same Research Director, worker, Critic, tool grants, launch behavior, and cleanup meaning.
 - QuantFlow remains research/advisor only and exposes no wager, trade, stake, bankroll, or execution action.
 - Every delegated Reader, Builder, or Verifier uses `gpt-5.6-sol`; only the root architect uses Astra.

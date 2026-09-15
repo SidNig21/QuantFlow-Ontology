@@ -16,6 +16,10 @@ _Avoid_: application, sole front door, orchestrator screen
 The governed catalog of Participants, Data, Tools, Methods, and Compute that Ryan or the Director may bring onto the Canvas. Catalog presence never implies Canvas presence.
 _Avoid_: agent launcher, plugin store, second workspace
 
+**Dock opening rule**:
+Opening a Participant starts its admitted runtime seat and opens the surface that runtime actually uses, such as the Hermes or Codex terminal tile. Opening Data, a Tool, a Method, or Compute instead opens, attaches, or invokes the useful surface for its job—such as a table, chart, document, clip, controls, or progress view. Every class uses the same governed declaration and Ontology connection; equipment never becomes a pretend terminal Participant.
+_Avoid_: terminal for every item, hidden invocation, capability posing as a participant
+
 **Inspect**:
 The contextual read-only detail drawer for the selected work, including evidence, calculations, Evaluation, revisions, history, and lineage. It never rearranges or replaces the Canvas.
 _Avoid_: Inspect mode, History mode, Full Lineage view
