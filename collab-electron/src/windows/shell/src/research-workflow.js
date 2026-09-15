@@ -30,10 +30,11 @@ export function deriveResearchWorkflow(world) {
 		: (rootedTask ?? object(activeReviewTask?.fields?.review_source_task_id) ?? activeMissionTask);
 	const mission = rootedMission ?? object(unique(linksFrom(sourceTask?.id, "belongs_to"))?.to_id);
 	const exactTaskRuns = sourceTask ? objects.filter((entry) => entry.type === "run" && entry.fields?.source_task_id === sourceTask.id) : [];
-	const run = sourceWork ? object(sourceWork.run_id) : unique(exactTaskRuns);
+	const run = object(world?.current_attempt_run_id) ?? (sourceWork ? object(sourceWork.run_id) : unique(exactTaskRuns));
 	const rawArtifact = sourceWork ? object(sourceWork.result_artifact_id) : object(run?.fields?.result_artifact_id);
 	const executor = sourceWork ? object(sourceWork.executor_session_id) : object(run?.fields?.executor_session_id ?? unique(linksFrom(sourceTask?.id, "assigned_to"))?.to_id);
-	const director = object(unique(linksFrom(sourceTask?.id, "delegated_by"))?.to_id ?? sourceTask?.fields?.delegator_session_id);
+	const originalDelegator = object(unique(linksFrom(sourceTask?.id, "delegated_by"))?.to_id ?? sourceTask?.fields?.original_delegator_session_id ?? sourceTask?.fields?.delegator_session_id);
+	const director = object(unique(linksFrom(sourceTask?.id, "coordinated_by"))?.to_id ?? sourceTask?.fields?.current_coordinator_session_id ?? originalDelegator?.id);
 	const reviewTask = object(evaluation?.fields?.review_task_id) ?? activeReviewTask;
 	const critic = object(unique(linksFrom(evaluation?.id, "performed_by"))?.to_id ?? evaluation?.fields?.critic_session_id ?? unique(linksFrom(reviewTask?.id, "assigned_to"))?.to_id);
 	const investigation = unique(linksFrom(mission?.id, "investigates"));
@@ -41,7 +42,7 @@ export function deriveResearchWorkflow(world) {
 	const marketInstrument = object(unique(linksFrom(marketQuote?.id, "quotes"))?.to_id);
 	const marketEvent = object(unique(linksFrom(marketInstrument?.id, "offered_on"))?.to_id);
 	const marketVenue = object(unique(linksTo(marketInstrument?.id, "lists"))?.from_id);
-	return { objects, links, byId, mission, sourceTask, sourceWork, executor, director, run, rawArtifact, evaluation, reviewTask, critic, currentReport, marketQuote, marketInstrument, marketEvent, marketVenue, reportIds: Array.isArray(world?.report_ids) ? world.report_ids : [] };
+	return { objects, links, byId, mission, sourceTask, sourceWork, executor, director, originalDelegator, run, attemptRuns: exactTaskRuns, rawArtifact, evaluation, reviewTask, critic, currentReport, marketQuote, marketInstrument, marketEvent, marketVenue, reportIds: Array.isArray(world?.report_ids) ? world.report_ids : [] };
 }
 
 export function criticMaterialAttack(workflow) {
@@ -72,6 +73,9 @@ export function contextualInspectReceipt(workflow, selected) {
 		evidence: evidence.map((entry) => ({ type: entry.type, id: entry.id, fields: entry.fields })),
 		evaluation: workflow.evaluation ? { type: workflow.evaluation.type, id: workflow.evaluation.id, fields: workflow.evaluation.fields } : null,
 		source_work: workflow.sourceWork,
+		attempts: workflow.attemptRuns?.map((entry) => ({ type: entry.type, id: entry.id, fields: entry.fields })) ?? [],
+		original_delegator: workflow.originalDelegator ? { type: workflow.originalDelegator.type, id: workflow.originalDelegator.id, fields: workflow.originalDelegator.fields } : null,
+		current_coordinator: workflow.director ? { type: workflow.director.type, id: workflow.director.id, fields: workflow.director.fields } : null,
 		revisions: workflow.reportIds,
 	};
 }

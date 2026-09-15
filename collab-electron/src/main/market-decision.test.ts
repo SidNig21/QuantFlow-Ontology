@@ -4,12 +4,14 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { runBovadaLiveMarketsCapture, BOVADA_UFC_URL } from "qf-bovada-football";
+import { assertMarketInvestigationQuote } from "qf-kernel/portable";
 mock.module("electron", () => ({ BrowserWindow: { getAllWindows: () => [] } }));
-import { openAppKernel, closeAppKernel, getKernelDb, kernelExecute, kernelGetObject, kernelGetLinks, kernelDecisionReadScope, kernelDecisionArtifactView, kernelDecisionModelReadView, kernelMarketReviewArtifactView, kernelCompleteMarketAssessment, kernelBindSourceWork, commitCollaborationResult, kernelRequestGovernedReview, kernelMarkGovernedDelivery, kernelFinalizeResearchEvaluation, kernelGetResearchWorldProjection, kernelReadMarketTrajectoryResult } from "./kernel";
+import { openAppKernel, closeAppKernel, getKernelDb, kernelExecute, kernelGetObject, kernelGetLinks, kernelDecisionReadScope, kernelDecisionArtifactView, kernelDecisionModelReadView, kernelMarketReviewArtifactView, kernelCompleteMarketAssessment, kernelBindSourceWork, commitCollaborationResult, kernelRequestGovernedReview, kernelMarkGovernedDelivery, kernelFinalizeResearchEvaluation, kernelGetResearchWorldProjection, kernelReadMarketTrajectoryResult, kernelSessionCoordinatesOtherOpenTask, kernelSessionFailureReason } from "./kernel";
 import { addOfficialEvidence } from "./evidence-computation";
 import { createMarketDeskInvestigation } from "./market-desk";
 import { createMarketFailureReceiver, recordMarketRuntimeFailure, assertMarketRetryTask } from "./market-runtime-failure";
 import { recordMarketRuntimeReceipt } from "./market-runtime-receipt";
+import { handleMarketResumeFailure } from "./market-resume-failure";
 const { callOntologyReadTool, callOntologyTool, registerOntologyGatewayRpc } = await import("./ontology-gateway");
 
 const root = mkdtempSync(join(tmpdir(), "qf-decision-test-"));
@@ -244,11 +246,11 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   expect(kernelGetObject("artifact", finalized.reportArtifactId!)?.kind).toBe("report");
   expect(kernelGetObject("evaluation", evaluationId)?.verdict).toBe("supports");
   expect(recordMarketRuntimeFailure("worker")).toBe(false);
-  expect(() => assertMarketRetryTask(taskId, () => true)).toThrow("Retry refused");
+  expect(() => assertMarketRetryTask(taskId, () => true)).toThrow("Resume refused");
   kernelExecute("create_task", { task_id: "interrupted-task", title: "Analyze Grasso retry control", description: "Preserve the unfinished task", assignee_session_id: "worker" }, trace("director", mission.mission_id));
   const runInput = { run_id: "interrupted-run", dataset_id: evidence.dataset_id, mission_id: mission.mission_id, quote_id: quoteId, tool_id: "research-lab", hypothesis_id: hypothesis.object_id, calculation: { contract: "qf.calculation.v1", operation: "market_expression_comparison", version: 1, formula_version: 1, implementation_version: "qf-market-expression-comparison-v1" }, params: { task_id: "interrupted-task" } };
   kernelExecute("execute_deterministic_run", runInput, trace("worker"));
-  expect(() => assertMarketRetryTask("interrupted-task", () => true)).toThrow("Retry refused");
+  expect(() => assertMarketRetryTask("interrupted-task", () => true)).toThrow("Resume refused");
   let failures = 0;
   const receive = createMarketFailureReceiver("test-nonce", () => { if (recordMarketRuntimeFailure("worker")) failures++; });
   receive(Buffer.from("Upstream idle timeout exceeded\nQF_STREAM_FAILURE foreign\n"));
@@ -259,15 +261,16 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   expect(kernelGetObject("agent_session", "worker")?.status).toBe("failed");
   expect(kernelGetObject("task", "interrupted-task")?.status).toBe("open");
   expect(kernelGetObject("artifact", receipts[0]!)).not.toBeNull();
-  expect(() => assertMarketRetryTask("interrupted-task", () => true)).toThrow("Retry refused");
-  expect(() => assertMarketRetryTask("interrupted-task", () => false)).toThrow("original Research Director");
-  expect(assertMarketRetryTask("interrupted-task", (id) => id === "director")).toBe("director");
+  expect(() => assertMarketRetryTask("interrupted-task", () => true)).toThrow("Resume refused");
+  expect(assertMarketRetryTask("interrupted-task", () => false)).toBe("worker");
   const failedWorld = kernelGetResearchWorldProjection({ root_type: "task", root_id: taskId });
   expect(failedWorld.ok && failedWorld.world.objects.find((object) => object.id === "worker")?.fields.failure_reason).toBe("provider_stream_interrupted");
   kernelExecute("create_agent_session", { session_id: "retry-worker", agent_definition_id: "definition-worker" }, trace());
   kernelExecute("start_agent_session", { session_id: "retry-worker" }, trace());
-  expect(() => kernelExecute("reassign_task", { task_id: "interrupted-task", assignee_session_id: "retry-worker" }, trace("critic"))).toThrow("delegator");
-  kernelExecute("reassign_task", { task_id: "interrupted-task", assignee_session_id: "retry-worker" }, trace("director"));
+  expect(() => kernelExecute("resume_interrupted_market_task", { task_id: "interrupted-task", coordinator_session_id: "director", assignee_session_id: "retry-worker", attempt_id: "forged-resume" }, trace("critic"))).toThrow("operator-only");
+  kernelExecute("resume_interrupted_market_task", { task_id: "interrupted-task", coordinator_session_id: "director", assignee_session_id: "retry-worker", attempt_id: "accepted-resume" }, trace());
+  expect(kernelGetLinks("interrupted-task", { kind: "delegated_by" }).map((link) => link.to_id)).toEqual(["director"]);
+  expect(kernelGetLinks("interrupted-task", { kind: "coordinated_by" }).map((link) => link.to_id)).toEqual(["director"]);
   kernelExecute("execute_deterministic_run", { ...runInput, run_id: "retry-run" }, trace("retry-worker"));
   expect(kernelDecisionReadScope("retry-worker")?.run.id).toBe("retry-run");
   expect(kernelDecisionReadScope("worker")).toBeNull();
@@ -278,5 +281,48 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   kernelExecute("start_agent_session", { session_id: "other-failure" }, trace());
   kernelExecute("create_task", { task_id: "other-failure-task", title: "Other failure control", description: "Not an authorized stream retry", assignee_session_id: "other-failure" }, trace("director", mission.mission_id));
   kernelExecute("fail_agent_session", { session_id: "other-failure", reason: "app_terminated" }, trace());
-  expect(() => kernelExecute("reassign_task", { task_id: "other-failure-task", assignee_session_id: "retry-worker" }, trace("director"))).toThrow("not running");
+  expect(assertMarketRetryTask("other-failure-task", () => false)).toBe("other-failure");
+  expect(() => kernelExecute("resume_interrupted_market_task", { task_id: "other-failure-task", coordinator_session_id: "director", assignee_session_id: "retry-worker", attempt_id: "busy-worker" }, trace())).toThrow("already owns open work");
+
+  kernelExecute("create_agent_session", { session_id: "failed-resume-worker", agent_definition_id: "definition-worker" }, trace());
+  kernelExecute("start_agent_session", { session_id: "failed-resume-worker" }, trace());
+  kernelExecute("resume_interrupted_market_task", { task_id: "other-failure-task", coordinator_session_id: "director", assignee_session_id: "failed-resume-worker", attempt_id: "failed-dispatch" }, trace());
+  kernelExecute("execute_deterministic_run", { ...runInput, run_id: "failed-resume-run", params: { task_id: "other-failure-task" } }, trace("failed-resume-worker"));
+  const stopped: string[] = [];
+  await handleMarketResumeFailure({ committed: true, dispatchAttempted: true, worker: { sessionId: "failed-resume-worker", requestOwned: false }, coordinator: { sessionId: "director", requestOwned: true } }, {
+    resultCommitted: () => false,
+    coordinatorHasOtherOpenWork: (sessionId) => kernelSessionCoordinatesOtherOpenTask(sessionId, "other-failure-task"),
+    workerRunning: (sessionId) => kernelGetObject("agent_session", sessionId)?.status === "running",
+    failWorker: (sessionId, reason) => { kernelExecute("fail_agent_session", { session_id: sessionId, reason }, trace()); },
+    stopParticipant: async (sessionId) => { stopped.push(sessionId); },
+  });
+  expect(kernelSessionFailureReason("failed-resume-worker")).toBe("market_resume_dispatch_failed");
+  expect(kernelGetObject("task", "other-failure-task")?.status).toBe("open");
+  expect(stopped).toEqual(["failed-resume-worker"]);
+  kernelExecute("create_agent_session", { session_id: "recovered-resume-worker", agent_definition_id: "definition-worker" }, trace());
+  kernelExecute("start_agent_session", { session_id: "recovered-resume-worker" }, trace());
+  kernelExecute("resume_interrupted_market_task", { task_id: "other-failure-task", coordinator_session_id: "director", assignee_session_id: "recovered-resume-worker", attempt_id: "recovered-dispatch" }, trace());
+  kernelExecute("execute_deterministic_run", { ...runInput, run_id: "recovered-resume-run", params: { task_id: "other-failure-task" } }, trace("recovered-resume-worker"));
+  expect(kernelDecisionReadScope("recovered-resume-worker")?.run.id).toBe("recovered-resume-run");
+  expect(kernelGetObject("run", "failed-resume-run")).not.toBeNull();
+  const resumedWorld = kernelGetResearchWorldProjection({ root_type: "task", root_id: "other-failure-task" });
+  expect(resumedWorld.ok).toBe(true);
+  if (!resumedWorld.ok) throw new Error("resumed projection refused");
+  expect(resumedWorld.world.current_attempt_run_id).toBe("recovered-resume-run");
+  expect(resumedWorld.world.objects.find((row) => row.id === "other-failure-task")?.fields).toMatchObject({
+    original_delegator_session_id: "director",
+    current_coordinator_session_id: "director",
+  });
+  expect(resumedWorld.world.objects.map((row) => row.id)).toEqual(expect.arrayContaining(["failed-resume-worker", "recovered-resume-worker", "failed-resume-run", "recovered-resume-run"]));
+
+  const changedOdds = structuredClone(source);
+  changedOdds[0]!.events[0]!.displayGroups[0]!.markets[0]!.outcomes[0]!.price.american = "-210";
+  changedOdds[0]!.events[0]!.displayGroups[0]!.markets[0]!.outcomes[0]!.price.decimal = "1.47619";
+  const recapture = async (requestedExpression: string, millis: number) => runBovadaLiveMarketsCapture({ db: getKernelDb(), artifactRoot: process.env.QF_ARTIFACT_ROOT!, request: { sport: "ufc", competition: "ufc", market_class: "moneyline" }, provider_event_id: "29195963", requested_expression: { expression: requestedExpression, market_description: "Method of Victory", outcome_description: "Alexa Grasso by Submission" }, transport: async () => response(BOVADA_UFC_URL, JSON.stringify(changedOdds)), now: () => new Date(now.getTime() + millis), kernel: { execute: (_db, command, input, t) => kernelExecute(command, input, t), getObject: (_db, type, id) => kernelGetObject(type, id), getLinks: (_db, id, options) => kernelGetLinks(id, options) } });
+  const changed = await recapture("Alexa Grasso wins by submission", 2_000);
+  const changedQuote = changed.rows.find((row) => row.provider_market_id === "winner")!.quote_id;
+  expect(() => assertMarketInvestigationQuote(getKernelDb(), mission.mission_id, changedQuote, { now: now.getTime() + 2_000 })).not.toThrow();
+  const foreign = await recapture("Manon Fiorot wins by submission", 3_000);
+  const foreignQuote = foreign.rows.find((row) => row.provider_market_id === "winner")!.quote_id;
+  expect(() => assertMarketInvestigationQuote(getKernelDb(), mission.mission_id, foreignQuote, { now: now.getTime() + 3_000 })).toThrow("original requested expression");
 });

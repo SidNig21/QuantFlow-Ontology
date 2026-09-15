@@ -11,8 +11,8 @@ import {
   type HistoricalMarketContext,
   type HistoryTransport,
 } from "qf-ufc-history";
-import { contentHash } from "qf-kernel/portable";
-import { getArtifactRoot, kernelExecute, kernelGetLinks, kernelGetObject } from "./kernel";
+import { assertMarketInvestigationQuote, contentHash } from "qf-kernel/portable";
+import { getArtifactRoot, getKernelDb, kernelExecute, kernelGetObject } from "./kernel";
 import { listBovadaMarketDeskRows } from "./market-desk";
 
 export const RESEARCH_LAB_TOOL_ID = "research-lab";
@@ -53,8 +53,7 @@ export function getEvidenceComputationCapabilities(): Record<string, unknown>[] 
 }
 
 function exactMarketContext(missionId: string, quoteId: string): HistoricalMarketContext {
-  const investigates = kernelGetLinks(missionId, { kind: "investigates" }).filter((link) => link.from_id === missionId);
-  if (investigates.length !== 1 || investigates[0]!.to_id !== quoteId) throw new Error("Selected Quote is no longer the Mission's exact investigated observation; select or refresh explicitly.");
+  assertMarketInvestigationQuote(getKernelDb(), missionId, quoteId);
   const row = listBovadaMarketDeskRows().find((candidate) => candidate.quote_id === quoteId);
   if (!row) throw new Error("The exact selected Bovada Quote and its market lineage are unavailable.");
   const selections = Array.isArray(row.selections) ? row.selections : [];

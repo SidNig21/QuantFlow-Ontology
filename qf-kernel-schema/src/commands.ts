@@ -310,6 +310,7 @@ export const internalCommands: readonly { action: string }[] = [
   { action: "request_second_opinion" },
   { action: "governed_review_task" },
   { action: "record_strategy_outcome" },
+  { action: "resume_interrupted_market_task" },
 ] as const;
 
 /** All legal (type, from, to) edges from the transition tables. */

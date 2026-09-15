@@ -1,4 +1,5 @@
 import type { CreationCommand } from "qf-kernel-schema/commands";
+import { readFileSync } from "node:fs";
 import type { KernelDb } from "./db.ts";
 import { KernelError, MarketContextConflictError } from "./errors.ts";
 import { appendEvent } from "./events.ts";
@@ -8,6 +9,20 @@ import type { CreationEnvelopePresence, LinkSpec } from "./links.ts";
 import type { TraceContext } from "./trace.ts";
 
 type JsonRecord = Record<string, unknown>;
+
+export type MarketInvestigationQuoteContext = {
+  starting_quote_id: string;
+  quote_id: string;
+  instrument_id: string;
+  market_event_id: string;
+  venue_id: string;
+  observed_at: string;
+  event_cutoff: string;
+  source_artifact_id: string;
+  coverage: JsonRecord;
+  params: JsonRecord;
+  sides: unknown[];
+};
 
 export const MARKET_EXPRESSION_COMPARISON_OPERATION = "market_expression_comparison";
 export const MARKET_EXPRESSION_COMPARISON_IMPLEMENTATION = "qf-market-expression-comparison-v1";
@@ -63,6 +78,126 @@ function stableCanonical(value: unknown): string {
       .join(",")}}`;
   }
   throw new KernelError("Context digest refuses non-JSON values");
+}
+
+function parsedObject(value: unknown, label: string): JsonRecord {
+  try {
+    const parsed = typeof value === "string" ? JSON.parse(value) as unknown : value;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error();
+    return parsed as JsonRecord;
+  } catch {
+    throw new KernelError(`${label} is not a JSON object`);
+  }
+}
+
+function exactTarget(db: KernelDb, fromId: string, kind: string, label: string): string {
+  const rows = db.query("SELECT to_id FROM links WHERE from_id = ? AND kind = ? ORDER BY created_at, id").all(fromId, kind) as Array<{ to_id: string }>;
+  if (rows.length !== 1 || !rows[0]!.to_id) throw new KernelError(`${label} requires exactly one lineage edge`);
+  return rows[0]!.to_id;
+}
+
+function exactSource(db: KernelDb, toId: string, kind: string, label: string): string {
+  const rows = db.query("SELECT from_id FROM links WHERE to_id = ? AND kind = ? ORDER BY created_at, id").all(toId, kind) as Array<{ from_id: string }>;
+  if (rows.length !== 1 || !rows[0]!.from_id) throw new KernelError(`${label} requires exactly one lineage edge`);
+  return rows[0]!.from_id;
+}
+
+function quoteContext(db: KernelDb, quoteId: string, requireContinuationLineage: boolean): MarketInvestigationQuoteContext {
+  const quote = db.query("SELECT data_ref, coverage FROM quote WHERE id = ?").get(quoteId) as { data_ref: string; coverage: string } | null;
+  if (!quote) throw new KernelError(`Market investigation Quote not found: ${quoteId}`);
+  const artifact = db.query("SELECT id, content_hash, storage_ref FROM artifact WHERE id = ?").get(quote.data_ref) as { id: string; content_hash: string; storage_ref: string } | null;
+  if (!artifact || artifact.id !== artifact.content_hash) throw new KernelError("Market investigation Quote source Artifact identity is invalid");
+  const coverage = parsedObject(quote.coverage, "Market investigation Quote coverage");
+  if (coverage.source_hash !== artifact.content_hash) throw new KernelError("Market investigation Quote coverage source hash differs from its source Artifact");
+  if (requireContinuationLineage && parsedObject(coverage.market_menu, "Market investigation complete menu").contract !== "qf.market.menu.v1") throw new KernelError("Market investigation continuation requires complete-menu source lineage");
+  const instrumentId = exactTarget(db, quoteId, "quotes", "Market investigation Quote quotes");
+  const instrument = db.query("SELECT params, sides FROM instrument WHERE id = ?").get(instrumentId) as { params: string; sides: string } | null;
+  if (!instrument) throw new KernelError("Market investigation Instrument not found");
+  const params = parsedObject(instrument.params, "Market investigation Instrument params");
+  let sides: unknown;
+  try { sides = JSON.parse(instrument.sides); } catch { throw new KernelError("Market investigation Instrument sides are invalid"); }
+  if (!Array.isArray(sides)) throw new KernelError("Market investigation Instrument sides are invalid");
+  const eventId = exactTarget(db, instrumentId, "offered_on", "Market investigation Instrument offered_on");
+  const venueId = exactSource(db, instrumentId, "lists", "Market investigation Instrument lists");
+  const event = db.query("SELECT starts_at FROM market_event WHERE id = ?").get(eventId) as { starts_at: string } | null;
+  if (!event) throw new KernelError("Market investigation event not found");
+  let sourceCutoff = event.starts_at;
+  if (requireContinuationLineage) {
+    let source: unknown;
+    try {
+      const bytes = new Uint8Array(readFileSync(artifact.storage_ref));
+      if (contentHash(bytes) !== artifact.content_hash) throw new Error();
+      source = JSON.parse(new TextDecoder().decode(bytes));
+    } catch { throw new KernelError("Market investigation Quote source bytes are unavailable or changed"); }
+    if (!Array.isArray(source)) throw new KernelError("Market investigation source must be an event-list response");
+    const providerEventId = coverage.provider_event_id;
+    const events = source.flatMap((coupon) => {
+      const row = parsedObject(coupon, "Market investigation source coupon");
+      return Array.isArray(row.events) ? row.events : [];
+    }).map((value) => parsedObject(value, "Market investigation source event")).filter((value) => value.id === providerEventId);
+    const sourceStart = events.length === 1 ? Number(events[0]!.startTime) : Number.NaN;
+    if (!Number.isFinite(sourceStart)) throw new KernelError("Market investigation source event cutoff is missing or ambiguous");
+    sourceCutoff = new Date(sourceStart).toISOString();
+  }
+  return {
+    starting_quote_id: quoteId, quote_id: quoteId, instrument_id: instrumentId,
+    market_event_id: eventId, venue_id: venueId, observed_at: String(coverage.observed_at ?? ""),
+    event_cutoff: sourceCutoff, source_artifact_id: artifact.id, coverage, params, sides,
+  };
+}
+
+/** Accept the immutable starting Quote or one fresh, exact-identity continuation for a new Run. */
+export function assertMarketInvestigationQuote(
+  db: KernelDb,
+  missionId: string,
+  quoteId: string,
+  options: { allowAgedQuote?: boolean; now?: number } = {},
+): void {
+  const startingQuoteId = exactTarget(db, missionId, "investigates", "Market investigation Mission investigates");
+  const continuation = quoteId !== startingQuoteId;
+  if (!continuation) return;
+  const starting = quoteContext(db, startingQuoteId, continuation);
+  const selected = quoteContext(db, quoteId, true);
+  const identity = (value: MarketInvestigationQuoteContext) => ({
+    venue_id: value.venue_id,
+    market_event_id: value.market_event_id,
+    instrument_id: value.instrument_id,
+    provider_event_id: value.coverage.provider_event_id,
+    provider_market_id: value.coverage.provider_market_id,
+    competitor_ids: value.params.competitor_ids,
+    selection_ids: value.params.selection_ids,
+    selections: Array.isArray(value.coverage.selections) ? value.coverage.selections.map((selection) => {
+      const row = parsedObject(selection, "Market investigation selection identity");
+      return { competitor_id: row.competitor_id, selection_id: row.selection_id, label: row.label };
+    }) : value.coverage.selections,
+    sides: value.sides,
+    event_cutoff: value.event_cutoff,
+  });
+  if (stableCanonical(identity(selected)) !== stableCanonical(identity(starting))) {
+    throw new KernelError("Continuation Quote differs from the starting market identity or cutoff");
+  }
+  const request = (value: MarketInvestigationQuoteContext) => {
+    const menu = parsedObject(value.coverage.market_menu, "Market investigation complete menu");
+    const requested = parsedObject(menu.requested_expression, "Market investigation requested expression");
+    return { expression: requested.expression, market_description: requested.market_description, outcome_description: requested.outcome_description };
+  };
+  if (stableCanonical(request(selected)) !== stableCanonical(request(starting))) {
+    throw new KernelError("Continuation Quote differs from the original requested expression");
+  }
+  const observedAt = Date.parse(selected.observed_at);
+  const cutoff = Date.parse(selected.event_cutoff);
+  const now = options.now ?? Date.now();
+  if (!Number.isFinite(observedAt) || !Number.isFinite(cutoff) || observedAt >= cutoff || (!options.allowAgedQuote && (cutoff <= now || observedAt > now + 60_000 || now - observedAt > 15 * 60_000))) {
+    throw new KernelError("Market investigation requires a fresh pre-cutoff Quote");
+  }
+  if (!options.allowAgedQuote) {
+    const event = db.query("SELECT starts_at FROM market_event WHERE id = ?").get(selected.market_event_id) as { starts_at: string } | null;
+    if (!event || event.starts_at !== selected.event_cutoff) throw new KernelError("Market investigation event cutoff differs from the selected Quote source");
+    const peers = db.query(`SELECT q.id, q.coverage FROM quote q JOIN links l ON l.from_id = q.id AND l.kind = 'quotes' WHERE l.to_id = ?`).all(selected.instrument_id) as Array<{ id: string; coverage: string }>;
+    if (peers.some((peer) => Date.parse(String(parsedObject(peer.coverage, "Market investigation peer Quote coverage").observed_at ?? "")) > observedAt)) {
+      throw new KernelError("Market investigation Quote is superseded");
+    }
+  }
 }
 
 function rowDigest(value: JsonRecord): string {

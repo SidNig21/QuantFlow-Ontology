@@ -54,6 +54,7 @@ describe("market desk one-Canvas projection", () => {
     expect(styles).not.toContain('#panel-viewer[data-qf-research-projection-active="true"] #tile-layer > .canvas-tile:not([data-qf-world-type])');
 		expect(marketDesk).toContain('rowsHost.addEventListener("wheel", (event) => event.stopPropagation())');
 		expect(marketDesk).toContain('element("details", "market-research-details")');
+		expect(marketDesk).toContain("reopen.dataset.missionId = missionId");
 		expect(marketDesk).toContain('open.removeAttribute("open")');
 		expect(marketDesk).toContain('tileManager.openCapabilityTile(');
 		expect(marketDesk).not.toMatch(/root\.hidden|setPointerCapture|root\.style\.(left|top)/);

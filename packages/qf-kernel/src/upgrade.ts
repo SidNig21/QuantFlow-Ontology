@@ -19,6 +19,7 @@ export const TASK_COMPOSITION_UPGRADE = "task-composition" as const;
 export const TASK_STEERING_UPGRADE = "task-steering" as const;
 export const GOVERNED_REVIEW_UPGRADE = "governed-review" as const;
 export const MARKET_RESCHEDULE_UPGRADE = "market-reschedule" as const;
+export const TASK_COORDINATION_UPGRADE = "task-coordination" as const;
 
 export type KernelShapeState =
   | "uninitialized"
@@ -37,6 +38,7 @@ export type KernelShapeState =
   | "pre_market_desk"
   | "pre_wave1_evidence"
   | "pre_market_reschedule"
+  | "pre_task_coordination"
   | "current"
   | "partial";
 
@@ -186,6 +188,7 @@ let currentSnapshot: StructureSnapshot | null = null;
 let preR17CurrentSnapshot: StructureSnapshot | null = null;
 let preMarketDeskSnapshot: StructureSnapshot | null = null;
 let preWave1EvidenceSnapshot: StructureSnapshot | null = null;
+let preTaskCoordinationSnapshot: StructureSnapshot | null = null;
 let preMarketRescheduleSnapshot: StructureSnapshot | null = null;
 
 function expectedPreMarketReschedule(): StructureSnapshot {
@@ -239,6 +242,22 @@ function expectedCurrent(): StructureSnapshot {
     currentSnapshot = snapshotFromMigrationFile(resolveCurrentMigrationPath());
   }
   return currentSnapshot;
+}
+
+/** Exact immediately preceding authority before resumable Task coordination. */
+function expectedPreTaskCoordination(): StructureSnapshot {
+  if (!preTaskCoordinationSnapshot) {
+    const current = expectedCurrent();
+    const tables = new Map(current.tables);
+    const links = tables.get("links")?.replace(/,'coordinated_by'/gi, "").replace(/'coordinated_by',/gi, "");
+    if (links) tables.set("links", links);
+    preTaskCoordinationSnapshot = {
+      tables,
+      linkKinds: current.linkKinds.filter((kind) => kind !== "coordinated_by"),
+      schemaMeta: current.schemaMeta.filter(([name]) => name !== "coordinated_by" && name !== "resume_interrupted_market_task"),
+    };
+  }
+  return preTaskCoordinationSnapshot;
 }
 
 const PRE_W1_EVIDENCE_DESCRIPTIONS = new Map<string, string>([
@@ -951,7 +970,7 @@ function applyCurrentR16SchemaAdditions(db: KernelDb): void {
     db.exec(`
       CREATE TABLE links__r16_upgrade (
         id TEXT PRIMARY KEY NOT NULL,
-        kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'belongs_to', 'grades_ticket', 'grades_run', 'grades_strategy', 'grades_run_result', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from', 'investigates')),
+        kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'belongs_to', 'grades_ticket', 'grades_run', 'grades_strategy', 'grades_run_result', 'assigned_to', 'delegated_by', 'coordinated_by', 'delegates_to', 'spawned_from', 'investigates')),
         from_id TEXT NOT NULL,
         to_id TEXT NOT NULL,
         created_at TEXT NOT NULL
@@ -966,7 +985,7 @@ function applyCurrentR16SchemaAdditions(db: KernelDb): void {
   const currentMeta = new Map(
     expectedCurrent().schemaMeta.map((row) => [row[0], row] as const),
   );
-  for (const name of ["belongs_to", "governed_review_task", "grades_ticket", "grades_run", "grades_strategy", "grades_run_result", "record_strategy_outcome", "investigates", "register_tool", "create_market_investigation"] as const) {
+  for (const name of ["belongs_to", "governed_review_task", "grades_ticket", "grades_run", "grades_strategy", "grades_run_result", "record_strategy_outcome", "investigates", "register_tool", "create_market_investigation", "coordinated_by", "resume_interrupted_market_task"] as const) {
     const row = currentMeta.get(name);
     if (!row) continue;
     const present = db
@@ -1096,6 +1115,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedPreMarketDesk())) return "pre_market_desk";
   if (snapshotsEqual(live, expectedPreWave1Evidence())) return "pre_wave1_evidence";
   if (snapshotsEqual(live, expectedPreMarketReschedule())) return "pre_market_reschedule";
+  if (snapshotsEqual(live, expectedPreTaskCoordination())) return "pre_task_coordination";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -1162,6 +1182,11 @@ export function applyKernelUpgradeChain(
   if (state === "uninitialized") return;
 
   const tx = db.transaction(() => {
+    if (state === "pre_task_coordination") {
+      applyCurrentR16SchemaAdditions(db);
+      if (classifyKernelShape(db) !== "current") throw new KernelUpgradeShapeError(TASK_COORDINATION_UPGRADE, "Task coordination additions did not produce the exact current shape");
+      return;
+    }
     if (state === "pre_market_reschedule") {
       db.exec(upgrades.marketRescheduleSql);
       if (classifyKernelShape(db) !== "current") throw new KernelUpgradeShapeError(MARKET_RESCHEDULE_UPGRADE, "0013 did not produce the exact current shape");

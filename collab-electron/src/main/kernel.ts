@@ -32,6 +32,8 @@ import {
   resolveGovernedWorkerEvidence,
   type SourceWork,
   isMarketExpressionComparison,
+  currentTaskCoordinator,
+  requireRunningTaskCoordinator,
 } from "qf-kernel/portable";
 import { schema } from "qf-kernel-schema";
 import {
@@ -913,7 +915,22 @@ export function kernelSessionFailureReason(sessionId: string): string | null {
   if (kernelGetObject("agent_session", sessionId)?.status !== "failed") return null;
   const row = getKernelDb().query("SELECT payload FROM events WHERE object_type = 'agent_session' AND object_id = ? AND type = 'agent_session.failed' ORDER BY rowid DESC LIMIT 1").get(sessionId) as { payload: string } | null;
   const reason = row ? jsonRecord(jsonRecord(row.payload).input).reason : null;
-  return reason === "provider_stream_interrupted" || reason === "provider_unavailable" ? reason : null;
+  return ["provider_stream_interrupted", "provider_unavailable", "app_terminated", "market_resume_setup_failed", "market_resume_dispatch_failed"].includes(String(reason)) ? String(reason) : null;
+}
+
+export function kernelCurrentTaskCoordinator(taskId: string, requireRunning = false): string {
+  return requireRunning ? requireRunningTaskCoordinator(getKernelDb(), taskId) : currentTaskCoordinator(getKernelDb(), taskId);
+}
+
+export function kernelSessionCoordinatesOtherOpenTask(sessionId: string, excludedTaskId: string): boolean {
+  const candidates = getKernelDb().query(`SELECT DISTINCT task.id
+    FROM task JOIN links ON links.from_id = task.id
+    WHERE task.status = 'open' AND task.id <> ? AND links.kind IN ('coordinated_by', 'delegated_by') AND links.to_id = ?`).all(excludedTaskId, sessionId) as Array<{ id: string }>;
+  return candidates.some((task) => currentTaskCoordinator(getKernelDb(), task.id) === sessionId);
+}
+
+export function kernelTaskHasFrozenSourceWork(taskId: string): boolean {
+  return Boolean(getKernelDb().query("SELECT 1 AS ok FROM qf_review_source_work WHERE source_task_id = ? LIMIT 1").get(taskId));
 }
 
 export function kernelDecisionReadScope(sessionId: string): { run: Record<string, unknown>; allowed: string[] } | null {

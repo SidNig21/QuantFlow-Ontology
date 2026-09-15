@@ -6,6 +6,7 @@ import { cancelTaskInTransaction, writeTaskInTransaction } from "./create.ts";
 import { execute } from "./execute.ts";
 import { appendEvent } from "./events.ts";
 import { KernelError } from "./errors.ts";
+import { requireRunningTaskCoordinator } from "./task-coordination.ts";
 import { contentHash } from "./hash.ts";
 import { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
 import { resolveArtifactRoot } from "./resolve-artifact-root.ts";
@@ -708,7 +709,8 @@ function admitGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput, t
       }
     }
 
-    const delegatorSessionId = exactSourceTaskDelegator(db, sourceTaskId);
+    exactSourceTaskDelegator(db, sourceTaskId);
+    const delegatorSessionId = requireRunningTaskCoordinator(db, sourceTaskId);
     const kind = action === "request_review" ? "review" : action === "request_revision" ? "revision" : "second_critic";
     const taskId = `review-task-${crypto.randomUUID()}`;
     const taskDescription = `Review the immutable source work ${work.source_task_id} using the governed critic contract.`;

@@ -425,6 +425,14 @@ Task provenance: which admitted agent session delegated a task. It is written on
 - **from:** `task`
 - **to:** `agent_session`
 
+### `coordinated_by`
+
+Current Task responsibility: which admitted session directs unfinished work, receives its result, and arranges its next handoff. Absence preserves legacy routing through delegated_by; replacement never changes the original delegator.
+
+- **lifecycle:** `experimental`
+- **from:** `task`
+- **to:** `agent_session`
+
 ### `delegates_to`
 
 Hire provenance: which admitted orchestrator created an agent session. It authorizes worker ownership only; task cables must use task delegated_by and assigned_to links.
@@ -757,6 +765,19 @@ Move an open task to a different running agent_session while preserving its trus
 - **input:**
 - `task_id` — Open task id to move.
 - `assignee_session_id` — Different running agent_session that will own the task.
+
+### `resume_interrupted_market_task`
+
+Resume one unfinished market Task after a recognized runtime interruption. The operator atomically transfers current coordination and assignment while preserving the original delegator, Mission, prior attempts, and result boundary.
+
+- **lifecycle:** `experimental`
+- **operator-only:** `true`
+- **internal-only:** `true`
+- **input:**
+- `task_id` — Exact open market Task whose interrupted execution is being resumed.
+- `coordinator_session_id` — Running admitted orchestrator that now directs the Task and receives its result.
+- `assignee_session_id` — Different running admitted market worker that owns the resumed execution.
+- `attempt_id` — Unique app-minted identity for this explicit resume handoff.
 
 ### `cancel_task`
 

@@ -44,6 +44,7 @@ export type ResearchWorld = {
   missing_lineage: MissingLineageFact[];
   current_report_id: string | null;
   report_ids: string[];
+  current_attempt_run_id?: string | null;
 };
 
 export type ResearchWorldProjectionResult =
@@ -52,7 +53,7 @@ export type ResearchWorldProjectionResult =
 
 const TRAVERSAL_KINDS = new Set([
   "belongs_to", "tests", "uses", "produces", "evaluated_by", "performed_by",
-  "gates", "assigned_to", "delegated_by", "delegates_to", "grades_ticket", "grades_run", "grades_strategy", "grades_run_result",
+  "gates", "assigned_to", "delegated_by", "coordinated_by", "delegates_to", "grades_ticket", "grades_run", "grades_strategy", "grades_run_result",
   "spawned_from", "investigates", "quotes", "offered_on", "lists",
 ]);
 const OBJECT_TYPES = [
@@ -166,7 +167,7 @@ function relationalSnapshot(db: KernelDb): RelationalSnapshot {
       if (row.status !== "failed") continue;
       const event = db.query("SELECT payload FROM events WHERE object_type = 'agent_session' AND object_id = ? AND type = 'agent_session.failed' ORDER BY rowid DESC LIMIT 1").get(String(row.id)) as { payload: string } | null;
       const reason = event && ((parseJson(event.payload) as Record<string, unknown>)?.input as Record<string, unknown>)?.reason;
-      if (reason === "provider_stream_interrupted" || reason === "provider_unavailable") row.failure_reason = reason;
+      if (["provider_stream_interrupted", "provider_unavailable", "app_terminated", "market_resume_setup_failed", "market_resume_dispatch_failed"].includes(String(reason))) row.failure_reason = reason;
     }
     const sourceWork = new Map<string, Array<Record<string, unknown>>>();
     if (tableExists(db, "qf_review_task")) for (const review of db.query("SELECT task_id, source_task_id, source_work FROM qf_review_task").all() as Array<{ task_id: string; source_task_id: string; source_work: string }>) {
@@ -451,7 +452,9 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
   }
   if (type === "task") {
     fields.assignee_session_id = outgoing.find((link) => link.kind === "assigned_to")?.to_id ?? null;
-    fields.delegator_session_id = outgoing.find((link) => link.kind === "delegated_by")?.to_id ?? null;
+    fields.original_delegator_session_id = outgoing.find((link) => link.kind === "delegated_by")?.to_id ?? null;
+    fields.current_coordinator_session_id = outgoing.find((link) => link.kind === "coordinated_by")?.to_id ?? fields.original_delegator_session_id;
+    fields.delegator_session_id = fields.original_delegator_session_id;
     fields.mission_id = outgoing.find((link) => link.kind === "belongs_to")?.to_id ?? null;
     fields.steering_state = row.status;
     fields.review_state = row.status;
@@ -504,8 +507,11 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string, c
     fields.dataset_id = outgoing.find((link) => link.kind === "uses" && objectType(snapshot, link.to_id) === "dataset")?.to_id ?? null;
     fields.hypothesis_id = outgoing.find((link) => link.kind === "tests")?.to_id ?? null;
     fields.result_artifact_id = outgoing.find((link) => link.kind === "produces")?.to_id ?? null;
-    fields.executor_session_id = parseJson(row.params) && typeof parseJson(row.params) === "object"
-      ? (parseJson(row.params) as Record<string, unknown>).executor_session_id ?? null : null;
+    const identityParams = parseJson(row.params) && typeof parseJson(row.params) === "object" ? parseJson(row.params) as Record<string, unknown> : {};
+    const decisionContext = identityParams.decision_context && typeof identityParams.decision_context === "object" ? identityParams.decision_context as Record<string, unknown> : {};
+    const callParams = identityParams.params && typeof identityParams.params === "object" ? identityParams.params as Record<string, unknown> : {};
+    fields.executor_session_id = decisionContext.worker_session_id ?? identityParams.executor_session_id ?? null;
+    fields.source_task_id = decisionContext.task_id ?? callParams.task_id ?? null;
     const strategyId = outgoing.find((link) => link.kind === "uses" && objectType(snapshot, link.to_id) === "strategy")?.to_id;
     fields.strategy_id = isNamedTechnique(snapshot, strategyId) ? strategyId : null;
     fields.technique = fields.strategy_id ? "selected" : "none selected";
@@ -572,6 +578,25 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   addId(ids, request.root_type, request.root_id);
   let selectedTaskId: string | undefined;
   let sourceRows: Array<Record<string, unknown>> = [];
+  const taskAttemptRuns = (taskId: string) => [...(snapshot.rows.get("run")?.values() ?? [])].filter((candidate) => {
+    const params = parseJson(candidate.params);
+    if (!params || typeof params !== "object" || Array.isArray(params)) return false;
+    const row = params as Record<string, unknown>;
+    const decision = row.decision_context && typeof row.decision_context === "object" ? row.decision_context as Record<string, unknown> : {};
+    const call = row.params && typeof row.params === "object" ? row.params as Record<string, unknown> : {};
+    return decision.task_id === taskId || call.task_id === taskId;
+  });
+  const currentAttemptRunId = (taskId: string, frozenRunId?: string): string | null => {
+    if (frozenRunId) return frozenRunId;
+    const assigned = allLinks.filter((link) => link.from_id === taskId && link.kind === "assigned_to");
+    if (assigned.length !== 1) return null;
+    const matching = taskAttemptRuns(taskId).filter((candidate) => {
+      const params = parseJson(candidate.params) as Record<string, unknown> | null;
+      const decision = params?.decision_context && typeof params.decision_context === "object" ? params.decision_context as Record<string, unknown> : {};
+      return decision.worker_session_id === assigned[0]!.to_id;
+    });
+    return matching.length === 1 ? String(matching[0]!.id) : null;
+  };
   if (request.root_type === "mission") {
     const marketLinks = addMarketLineage(snapshot, request.root_id, ids);
     const tasks = allLinks.filter((link) =>
@@ -629,17 +654,27 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
     return { ok: false, code: "WORLD_ROOT_INELIGIBLE", message: `Task has ${sourceRows.length} duplicate R15 source-work bindings.` };
   }
   if (sourceRows.length === 0) {
-    if (request.root_type === "mission" && ids.get("quote")?.size) {
+    const inFlightMissionId = request.root_type === "mission" ? request.root_id : (() => {
+      const missions = allLinks.filter((link) => link.from_id === selectedTaskId && link.kind === "belongs_to" && objectType(snapshot, link.to_id) === "mission");
+      return missions.length === 1 ? missions[0]!.to_id : undefined;
+    })();
+    if (inFlightMissionId) {
+      addId(ids, "mission", inFlightMissionId);
+      addMarketLineage(snapshot, inFlightMissionId, ids);
+    }
+    if (inFlightMissionId && ids.get("quote")?.size) {
       // In-flight market work is already Kernel truth before the worker publishes.
       // Keep its exact Task, participants and Run inputs visible without inventing review authority.
-      for (const link of allLinks.filter((link) => link.from_id === selectedTaskId && ["belongs_to", "assigned_to", "delegated_by"].includes(link.kind))) {
+      for (const link of allLinks.filter((link) => link.from_id === selectedTaskId && ["belongs_to", "assigned_to", "delegated_by", "coordinated_by"].includes(link.kind))) {
         addId(ids, objectType(snapshot, link.to_id), link.to_id);
       }
-      for (const link of allLinks.filter((link) => link.kind === "belongs_to" && link.to_id === request.root_id && objectType(snapshot, link.from_id) === "run")) {
+      for (const link of allLinks.filter((link) => link.kind === "belongs_to" && link.to_id === inFlightMissionId && objectType(snapshot, link.from_id) === "run")) {
         const run = snapshot.rows.get("run")?.get(link.from_id);
         const params = parseJson(run?.params) as Record<string, unknown> | null;
         if ((params?.params as Record<string, unknown> | undefined)?.task_id !== selectedTaskId) continue;
         addId(ids, "run", link.from_id);
+        const decision = params?.decision_context && typeof params.decision_context === "object" ? params.decision_context as Record<string, unknown> : {};
+        addId(ids, "agent_session", decision.worker_session_id);
         for (const input of allLinks.filter((candidate) => candidate.from_id === link.from_id && ["uses", "tests", "produces", "executes_in"].includes(candidate.kind))) {
           addId(ids, objectType(snapshot, input.to_id), input.to_id);
         }
@@ -652,7 +687,7 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
       objects.sort((a, b) => a.type.localeCompare(b.type) || a.id.localeCompare(b.id));
       return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects,
         links: [...allLinks, ...snapshot.derivedLinks].filter((link) => idsContain(ids, link.from_id) && idsContain(ids, link.to_id)),
-        missing_lineage: [{ owning_type: "task", owning_id: selectedTaskId, kind: "source_work", message: "Research is in progress; no reviewed decision yet." }], current_report_id: null, report_ids: [] }) };
+        missing_lineage: [{ owning_type: "task", owning_id: selectedTaskId, kind: "source_work", message: "Research is in progress; no reviewed decision yet." }], current_report_id: null, report_ids: [], current_attempt_run_id: currentAttemptRunId(selectedTaskId) }) };
     }
     return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects: [projectObject(snapshot, request.root_type, request.root_id)], links: allLinks.filter((link) => idsContain(ids, link.from_id) && idsContain(ids, link.to_id)), missing_lineage: [{ owning_type: "task", owning_id: selectedTaskId, kind: "source_work", message: "This Task has no completed research lineage yet." }], current_report_id: null, report_ids: [] }) };
   }
@@ -671,9 +706,17 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   addId(ids, "dataset", runFields.dataset_id);
   addId(ids, "artifact", runFields.result_artifact_id);
 
+  for (const attempt of taskAttemptRuns(selectedTaskId)) {
+    addId(ids, "run", attempt.id);
+    const attemptParams = parseJson(attempt.params) as Record<string, unknown> | null;
+    const decision = attemptParams?.decision_context && typeof attemptParams.decision_context === "object" ? attemptParams.decision_context as Record<string, unknown> : {};
+    addId(ids, "agent_session", decision.worker_session_id);
+    for (const link of allLinks.filter((candidate) => candidate.from_id === attempt.id && ["belongs_to", "uses", "tests", "produces", "executes_in"].includes(candidate.kind))) addId(ids, objectType(snapshot, link.to_id), link.to_id);
+  }
+
   for (const link of allLinks) {
     if (link.from_id !== selectedTaskId) continue;
-    if (link.kind === "belongs_to" || link.kind === "assigned_to" || link.kind === "delegated_by") {
+    if (link.kind === "belongs_to" || link.kind === "assigned_to" || link.kind === "delegated_by" || link.kind === "coordinated_by") {
       addId(ids, objectType(snapshot, link.to_id), link.to_id);
     }
   }
@@ -732,13 +775,15 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   const missionId = sourceTaskLinks.find((link) => link.kind === "belongs_to")?.to_id;
   const executorId = source.executor_session_id;
   const directorId = sourceTaskLinks.find((link) => link.kind === "delegated_by")?.to_id;
+  const coordinatorId = sourceTaskLinks.find((link) => link.kind === "coordinated_by")?.to_id ?? directorId;
   addSelectedLink("belongs_to", selectedTaskId, missionId);
   if (missionId) {
     for (const link of addMarketLineage(snapshot, missionId, ids)) addSelectedLink(link.kind, link.from_id, link.to_id);
   }
   addSelectedLink("assigned_to", selectedTaskId, executorId);
   addSelectedLink("delegated_by", selectedTaskId, directorId);
-  addSelectedLink("delegates_to", directorId, executorId);
+  addSelectedLink("coordinated_by", selectedTaskId, sourceTaskLinks.find((link) => link.kind === "coordinated_by")?.to_id);
+  addSelectedLink("delegates_to", coordinatorId, executorId);
   addSelectedLink("tests", source.run_id, source.hypothesis_id);
   addSelectedLink("uses", source.run_id, runFields.dataset_id);
   addSelectedLink("uses", source.run_id, selectedStrategyId);
@@ -780,5 +825,5 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   for (const type of OBJECT_TYPES) for (const id of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, id, projectionContext));
   objects.sort((a, b) => a.type.localeCompare(b.type) || a.id.localeCompare(b.id));
   missing.sort((a, b) => a.owning_type.localeCompare(b.owning_type) || a.owning_id.localeCompare(b.owning_id) || a.kind.localeCompare(b.kind));
-  return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects, links: worldLinks, missing_lineage: missing, current_report_id: reports.currentReportId, report_ids: reports.reportIds }) };
+  return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects, links: worldLinks, missing_lineage: missing, current_report_id: reports.currentReportId, report_ids: reports.reportIds, current_attempt_run_id: currentAttemptRunId(selectedTaskId, String(source.run_id)) }) };
 }

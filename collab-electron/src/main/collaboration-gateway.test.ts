@@ -15,6 +15,7 @@ function fixture() {
   const notices: Array<Record<string, unknown>> = [];
   const objects = new Map<string, Record<string, unknown>>([
     ["task:task-1", { id: "task-1", status: "open" }],
+    ["agent_session:orch-1", { id: "orch-1", status: "running" }],
   ]);
   const links = new Map<string, Array<{ from_id: string; to_id: string }>>([
     ["task-1:assigned_to", [{ from_id: "task-1", to_id: "worker-1" }]],
@@ -44,9 +45,17 @@ function fixture() {
       return { sessionId: "worker-1", role: "worker" };
     },
     identityForSession(sessionId) {
-      if (sessionId !== "orch-1") throw new Error("unknown delegator");
+      if (!sessionId.startsWith("orch-")) throw new Error("unknown delegator");
       return { sessionId, role: "orchestrator" };
     },
+    currentCoordinatorForTask(taskId) {
+      const coordinated = links.get(`${taskId}:coordinated_by`) ?? [];
+      const delegated = links.get(`${taskId}:delegated_by`) ?? [];
+      const selected = coordinated.length ? coordinated : delegated;
+      if (selected.length !== 1) throw new Error("ambiguous coordinator");
+      return selected[0]!.to_id;
+    },
+    isLiveSession(sessionId) { return sessionId.startsWith("orch-"); },
     getObject(type, id) {
       return objects.get(`${type}:${id}`) ?? null;
     },
@@ -367,6 +376,27 @@ describe("collaboration gateway", () => {
     });
   });
 
+  test("send_result routes a resumed Task to current coordination and refuses a stopped coordinator", () => {
+    const f = fixture();
+    f.links.set("task-1:coordinated_by", [{ from_id: "task-1", to_id: "orch-2" }]);
+    f.objects.set("agent_session:orch-2", { id: "orch-2", status: "running" });
+    createCollaborationService(f.deps).sendResult(
+      { sessionId: "worker-1", role: "worker" },
+      { taskId: "task-1", result: "Current result", citedMarketIds: ["venue-1"], readTrajectoryArtifactIds: ["read-1"] },
+    );
+    expect(f.published[0]).toMatchObject({ delegatorSessionId: "orch-2" });
+    expect(f.notices[0]).toMatchObject({ toSessionId: "orch-2", toRole: "orchestrator" });
+
+    const stopped = fixture();
+    stopped.links.set("task-1:coordinated_by", [{ from_id: "task-1", to_id: "orch-2" }]);
+    stopped.objects.set("agent_session:orch-2", { id: "orch-2", status: "failed" });
+    expect(() => createCollaborationService(stopped.deps).sendResult(
+      { sessionId: "worker-1", role: "worker" },
+      { taskId: "task-1", result: "Late result", citedMarketIds: ["venue-1"], readTrajectoryArtifactIds: ["read-1"] },
+    )).toThrow("live current Task coordinator");
+    expect(stopped.published).toHaveLength(0);
+  });
+
   test("registered result route reports the founder-visible artifact and worker", () => {
     const f = fixture();
     const changes: CollaborationChange[] = [];
@@ -387,7 +417,7 @@ describe("collaboration gateway", () => {
       taskId: "task-1",
       artifactId: "result-artifact-1",
       workerSessionId: "worker-1",
-      delegatorSessionId: "orch-1",
+      coordinatorSessionId: "orch-1",
     }]);
   });
 });

@@ -246,7 +246,7 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 		const analyze = document.createElement("button");
 		analyze.type = "button";
 		analyze.className = "qf-investigation-surface__analyze";
-		analyze.textContent = reviewActive ? "Independent review in progress" : researchActive ? "Research in progress" : runtimeFailed ? "Retry analysis" : "Analyze and independently review";
+		analyze.textContent = reviewActive ? "Independent review in progress" : researchActive ? "Research in progress" : runtimeFailed ? "Resume with current market" : "Analyze and independently review";
 		analyze.disabled = researchActive;
 		analyze.addEventListener("click", async (event) => {
 			event.stopPropagation();
@@ -264,7 +264,7 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 				const message = error?.message ?? String(error);
 				analysisErrors.set(mission.id, message);
 				analyze.disabled = false;
-				analyze.textContent = "Retry analysis";
+				analyze.textContent = runtimeFailed ? "Resume with current market" : "Analyze and independently review";
 				showStatus?.(message);
 				await reveal("mission", mission.id);
 			}

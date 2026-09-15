@@ -37,6 +37,11 @@ The actual desktop shortcut also recovered its original process. The saved inqui
 refuses its expired observation after the board is refreshed. Continue the active order by repairing saved-work
 continuation with fresh exact evidence, then the unfinished revision/control loop; W1-03 remains unaccepted.
 
+Saved-work repair, 2026-09-14: fresh Sol Reader returned ORDER SEMANTIC YES / BUILDER DOOR YES for the
+active order's "Resume an unfinished saved investigation" amendment. Build the explicit coordinator handoff,
+fresh exact Run inputs, recovery controls, and the named saved-resume mode of the real decision gate. Original
+question, delegation, inputs, and attempts remain intact. This amendment is open for implementation, not accepted.
+
 - [Active order](active/WO-W1-03-UFC-RESEARCH-DECISION.md)
 - [W1-02 acceptance](evidence/w1-02/ACCEPTANCE.md)
 - [W1-01 acceptance](evidence/w1-01/ACCEPTANCE.md)

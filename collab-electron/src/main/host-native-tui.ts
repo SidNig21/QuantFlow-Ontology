@@ -435,14 +435,18 @@ export async function cancelNativeTuiSession(
   console.log(`agent-host: native_tui cancel ${sessionId}`);
 }
 
-export async function tearDownNativeTui(entry: NativeTuiLive): Promise<void> {
+export async function tearDownNativeTui(entry: NativeTuiLive, requireConfirmedStop = false): Promise<void> {
   if (entry.peerRole) {
     unregisterSeatPty(entry.peerRole, entry.ptySessionId);
   }
   const sessionId = kernelSessionIdForNativePty(entry.ptySessionId);
   revokeLiveSeatCapability(entry.seatCapability);
+  try {
+    await killSession(entry.ptySessionId);
+  } catch (error) {
+    if (requireConfirmedStop) throw error;
+  }
   ptyToKernel.delete(entry.ptySessionId);
   ptyToCapability.delete(entry.ptySessionId);
   if (sessionId) agentActivity.sessionEnd({ session_id: sessionId });
-  await killSession(entry.ptySessionId).catch(() => {});
 }

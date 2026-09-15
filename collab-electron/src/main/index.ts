@@ -69,6 +69,8 @@ import {
   kernelMarketObjectExists,
   kernelReadMarketTrajectoryResult,
   kernelCompleteMarketAssessment,
+  kernelCurrentTaskCoordinator,
+  kernelSessionCoordinatesOtherOpenTask,
   peerBusReadInbox,
   peerBusNotify,
   commitCollaborationResult,
@@ -132,6 +134,7 @@ import { captureProofPage } from "./ui-proof-capture";
 import {
   bootstrapPackagedDockProfiles,
   closeAgentSessionRow,
+  hasLiveAgentSession,
   captureAgentSessionOutput,
   disposeAgentHost,
   submitAgentSessionInstruction,
@@ -159,6 +162,10 @@ function closeAdmittedSession(sessionId: string): void {
   closeAgentSessionRow(sessionId);
   clearMissionForDirectorSession(sessionId);
   clearResearchHypothesis(sessionId);
+}
+
+function closeTaskCoordinatorIfIdle(taskId: string, sessionId: string): void {
+  if (!kernelSessionCoordinatesOtherOpenTask(sessionId, taskId)) closeAdmittedSession(sessionId);
 }
 
 function getKernelAgentDefinitionIds(): string[] {
@@ -1285,6 +1292,8 @@ app.whenReady().then(async () => {
       capabilityGroups: kernelCapabilityGroupsForSession,
       liveRecipientForRole: requireLivePeerSession,
       identityForSession: peerIdentityForSession,
+      currentCoordinatorForTask: (taskId) => kernelCurrentTaskCoordinator(taskId, true),
+      isLiveSession: hasLiveAgentSession,
       getObject: kernelGetObject,
       getLinks: kernelGetLinks,
       execute: kernelExecute,
@@ -1342,7 +1351,7 @@ app.whenReady().then(async () => {
         // Evaluation truth, not another worker-result cycle.
         if (peerIdentityForSession(change.workerSessionId).role !== "worker") {
           closeAdmittedSession(change.workerSessionId);
-          closeAdmittedSession(change.delegatorSessionId);
+          closeTaskCoordinatorIfIdle(change.taskId, change.coordinatorSessionId);
           return;
         }
         // When a settled Dataset is available, continue through deterministic
@@ -1351,6 +1360,10 @@ app.whenReady().then(async () => {
         setTimeout(() => {
           void (async () => {
             try {
+              const currentCoordinator = kernelCurrentTaskCoordinator(change.taskId, true);
+              if (currentCoordinator !== change.coordinatorSessionId || !hasLiveAgentSession(currentCoordinator)) {
+                throw new Error("research continuation requires the live current Task coordinator");
+              }
               const sourceWork = kernelFreezeSourceWork(change.taskId);
               if (sourceWork.result_artifact_id !== change.artifactId) {
                 throw new Error("research result Artifact does not match the frozen source work");
@@ -1377,7 +1390,7 @@ app.whenReady().then(async () => {
                   sessionId: criticSessionId,
                   definitionId: criticDefinitionId,
                   label: "Independent research critic",
-                  actorSessionId: change.delegatorSessionId,
+                  actorSessionId: change.coordinatorSessionId,
                 },
                 {
                   execute: kernelExecute,
@@ -1388,7 +1401,7 @@ app.whenReady().then(async () => {
                 },
               );
               await startPrecreatedSessionWithTile(
-                { sessionId: change.delegatorSessionId, role: "orchestrator" },
+                { sessionId: change.coordinatorSessionId, role: "orchestrator" },
                 criticSessionId,
               );
               const continuation = await kernelContinueGovernedResearchResult({
@@ -1444,7 +1457,7 @@ app.whenReady().then(async () => {
               }).then((result) => {
                 if (result !== "failed") return;
                 closeAdmittedSession(criticSessionId);
-                closeAdmittedSession(change.delegatorSessionId);
+                closeTaskCoordinatorIfIdle(change.taskId, change.coordinatorSessionId);
                 mainWindow?.webContents.send("qf:dock:invalidate");
                 mainWindow?.webContents.send("qf:events:invalidate");
               }).catch((error) => {
@@ -1454,7 +1467,7 @@ app.whenReady().then(async () => {
               mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
             } catch (error) {
               console.error("research continuation failed", error);
-              closeAdmittedSession(change.delegatorSessionId);
+              closeTaskCoordinatorIfIdle(change.taskId, change.coordinatorSessionId);
             }
           })();
         }, 250);

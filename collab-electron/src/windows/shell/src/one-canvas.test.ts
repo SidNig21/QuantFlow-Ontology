@@ -70,6 +70,7 @@ test("rendered shell has no alternate Canvas mode controls or persisted Canvas r
 	expect(oneCanvas).toContain('appendText(surface, "qf-investigation-surface__error", priorError)');
 	expect(oneCanvas).toContain("runtimeFailed");
 	expect(oneCanvas).toContain("retry_task_id");
+	expect(oneCanvas).toContain('"Resume with current market"');
 	expect(oneCanvas).toContain("Your saved evidence is intact; retry after service returns.");
 	expect(css).toContain('.canvas-tile[data-qf-surface-kind="investigation"] .tile-content-overlay');
 	expect(css).toContain(".qf-investigation-surface__error");

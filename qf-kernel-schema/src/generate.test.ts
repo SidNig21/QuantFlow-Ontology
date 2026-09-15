@@ -207,7 +207,7 @@ describe("mcp tool descriptions", () => {
     expect(complete.some((tool) => tool.name === "qf_ingest_market_batch")).toBe(true);
     expect(served.some((tool) => tool.name === "qf_ingest_market_batch")).toBe(false);
     const restrictedActions = schema.actions.filter(
-      (action) => action.operatorOnly === true || action.pipelineOnly === true,
+      (action) => action.internalOnly !== true && (action.operatorOnly === true || action.pipelineOnly === true),
     );
     expect(served).toHaveLength(complete.length - restrictedActions.length);
   });

@@ -9,7 +9,7 @@ export type CollaborationChange =
     taskId: string;
     artifactId: string;
     workerSessionId: string;
-    delegatorSessionId: string;
+    coordinatorSessionId: string;
   };
 
 type Link = { from_id: string; to_id: string; kind?: string };
@@ -23,6 +23,8 @@ export type CollaborationDependencies = {
   capabilityGroups: (sessionId: string) => string[];
   liveRecipientForRole: (role: string) => CollaborationIdentity;
   identityForSession: (sessionId: string) => CollaborationIdentity;
+  currentCoordinatorForTask: (taskId: string) => string;
+  isLiveSession: (sessionId: string) => boolean;
   getObject: (type: string, id: string) => Record<string, unknown> | null;
   getLinks: (
     id: string,
@@ -267,8 +269,12 @@ export function createCollaborationService(deps: CollaborationDependencies) {
       if (assignedWorker !== identity.sessionId) {
         throw new Error("send_result caller is not the assigned worker");
       }
-      const delegatorSessionId = exactOutgoingLink(deps, taskId, "delegated_by");
-      const delegator = deps.identityForSession(delegatorSessionId);
+      const coordinatorSessionId = deps.currentCoordinatorForTask(taskId);
+      const coordinatorRow = deps.getObject("agent_session", coordinatorSessionId);
+      if (coordinatorRow?.status !== "running" || !deps.isLiveSession(coordinatorSessionId)) {
+        throw new Error("send_result requires the live current Task coordinator");
+      }
+      const coordinator = deps.identityForSession(coordinatorSessionId);
 
       const observedIds = new Set<string>();
       for (const trajectoryId of readTrajectoryArtifactIds) {
@@ -296,8 +302,8 @@ export function createCollaborationService(deps: CollaborationDependencies) {
         taskId,
         workerSessionId: identity.sessionId,
         workerRole: identity.role,
-        delegatorSessionId,
-        delegatorRole: delegator.role,
+        delegatorSessionId: coordinatorSessionId,
+        delegatorRole: coordinator.role,
         result: resultText,
         citedMarketIds,
         readTrajectoryArtifactIds,
@@ -305,8 +311,8 @@ export function createCollaborationService(deps: CollaborationDependencies) {
       const notification = bestEffortNotification(() => deps.notify({
         fromSessionId: identity.sessionId,
         fromRole: identity.role,
-        toSessionId: delegator.sessionId,
-        toRole: delegator.role,
+        toSessionId: coordinator.sessionId,
+        toRole: coordinator.role,
         body: resultText,
         kind: "result",
         taskId,
@@ -388,11 +394,7 @@ export function registerCollaborationGatewayRpc(
         taskId: result.taskId,
         artifactId: result.artifactId,
         workerSessionId: identity.sessionId,
-        delegatorSessionId: exactOutgoingLink(
-          deps,
-          result.taskId,
-          "delegated_by",
-        ),
+        coordinatorSessionId: deps.currentCoordinatorForTask(result.taskId),
       });
       return result;
     },

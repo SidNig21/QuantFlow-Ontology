@@ -96,6 +96,105 @@ Canvas still said research was in progress. The next bounded repair is:
 This extends the existing desktop-launch/lifecycle acceptance, not the product's domain or acquisition
 scope. The same existing checkout, Sol delegation, independent verification, and batched-check rules apply.
 
+### Resume an unfinished saved investigation — 2026-09-14
+
+After reopening the real app, Ryan can resume the same interrupted question with current evidence and new
+participants, then receive its first independent review and report without losing the earlier attempt.
+
+Native observation at `8f15e6e5` proved retrieval but exposed a dead end: even after the board refreshed, the
+saved inquiry still passed its historical starting Quote to Retry. Its old Director was also closed and its
+unfinished worker was failed. Merely changing the button or supplying a fresh Quote bypasses neither the
+Kernel's exact-observation checks nor the original-delegator restriction. ADR-0006 records the scoped decision.
+
+- Preserve the same Mission, open Task, original `delegated_by`, starting `investigates` edge, Hypothesis,
+  and previous Runs/Artifacts. A resume is permitted only before the Task has any result or frozen source work.
+  Completed, cancelled, review, and revision Tasks cannot use this path. A changed result remains a revision.
+- Authorize the narrowly necessary schema additions: one `coordinated_by` Task-to-session link and one
+  operator-only `resume_interrupted_market_task` action. No new object, dependency, service, or truth store.
+  Regenerate the schema goldens and supply the existing saved-database upgrade path without rewriting history.
+- The action runs only through `execute()`. It requires one exact market Mission, assignee, original delegator,
+  and at most one current coordinator; an open Task with no result; a stopped failed prior worker with a named
+  recognized interruption; and genuinely admitted running participants with the correct roles/grants. The
+  replacement worker differs from the prior worker and from the coordinator; an eligible live coordinator may
+  continue coordinating. Recognize actual app termination and existing provider interruption/unavailability.
+  Preserve original delegation, atomically establish current coordination/assignment, and record prior/current
+  identities and the actual reason. Refuse unknown/ambiguous provenance, live prior ownership, a replacement
+  worker already assigned other open work, result-present work, and participant invocation of the operator action.
+  An open Task with `qf_review_source_work` is separately refused even if it has no `produces` link.
+- Use one authoritative Kernel current-coordinator resolver. Absence of `coordinated_by` falls back to the
+  original delegator; malformed or multiple links fail closed. Result delivery, worker completion, independent
+  Critic admission, governed review, current-task steering, and cleanup must follow that current responsibility.
+  Keep original delegation separately inspectable; never relabel the replacement as the original requester.
+  The resolver checks identity/cardinality only: the new resume role/liveness requirements do not restrict
+  legacy authorized non-orchestrator downstream delegation or historical inspection of closed sessions.
+  Explicit compatibility controls cover those paths. Resumed controls cover result commit, notification and
+  change payload, Critic admission/delivery, governed review Task delegation, steering, and final cleanup;
+  all use the current coordinator while retaining the original delegator as immutable provenance.
+- Keep the original starting Quote immutable. A new Run may use a fresh continuation Quote only after the
+  Kernel verifies the same venue, provider event, primary market, ordered competitor/selection identities,
+  cutoff, and exact original research/requested-expression fields. Require current/latest/pre-cutoff input
+  and complete-menu source lineage. Changed or ambiguous identity/intent is refused, never approximated.
+  Centralize this predicate for calculation and market-decision validation; preserve exact Run-bound reads.
+- The normal saved-inquiry control explicitly resumes with current evidence. Reuse a matching current complete
+  menu or perform the existing targeted Bovada capture with the original event and requested expression; an
+  ordinary board refresh cannot silently change that intent. No new capture vendor or broader acquisition.
+  The new Run binds the fresh Quote/Dataset to the same Task/Hypothesis and the actual current worker. Select
+  an active Run by exact current assignment, not a newest timestamp; preserve ambiguity refusals and old Runs.
+- The normal result handoff must reach a different live Critic and an Evaluation-gated report under the same
+  inquiry. Inspect distinguishes initial observation, current attempt inputs, original delegator, and current
+  participants. Before the resume action commits, failure leaves the prior Task, assignment, and coordination
+  unchanged and stops only participants newly admitted by this request. After it commits, a failure before
+  a recorded result preserves the open Task, new assignment/coordinator, and any newly created Run. Record
+  the worker as failed through `fail_agent_session`, with `market_resume_setup_failed` for input/Run setup
+  or `market_resume_dispatch_failed` for uncertain/failed instruction delivery. These two app-owned reasons
+  are recognized by resume; neither means the app terminated. After the handoff commits, this request owns
+  execution of the exact replacement worker even when it reused an idle admitted participant; before the
+  handoff, that participant remains ambient and must be preserved. Stop the assigned replacement worker
+  without closing its durable row or cancelling its Task, revoke its runtime authority, and reject late
+  submissions. Keep it runtime-live/unavailable for retry until termination is confirmed; a teardown failure
+  must remain visible and must not permit a concurrent replacement. The existing session failure event and
+  resume event retain the exact failure and handoff identities. Do not roll back a recorded result if delivery
+  raced with completion: its existing review/delivery path remains authoritative.
+  A coordinator reused from earlier work stays available; a newly admitted coordinator with no other work
+  is stopped/closed on failure, leaving its coordination link as history for the next explicit handoff. Do
+  not close a coordinator needed by a result that already committed. Runtime exit handling must preserve
+  the failed worker's open assignment rather than trying to close its row. A focused injected failure after
+  transfer and another after Run creation must prove this state, safe retry, no late result, and no runtime leak.
+
+Relevant owners are schema/upgrade, `execute.ts`, market context and deterministic execution, Kernel read
+scope, market analysis/evidence acquisition, collaboration result routing, governed review, and the one-Canvas
+projection/controls. Extend existing tests for one real saved-Kernel continuation control: closed original
+Director, failed worker, stale starting Quote, retained old Run, fresh matching capture, replacement ownership,
+first result, distinct Critic, exact publication, reopen, and old/new lineage. Pair critical guards with focused
+foreign identity/request, live/busy ownership, forged coordinator, existing-result, frozen-source-work,
+stale-input, and stale-read refusals. Verify schema generation/upgrade and typecheck once with the integrated
+batch, then independent verification and the following named native gate. No repeated historical matrices or
+provider calls solely for screenshots. Synthetic tests stay explicitly synthetic; they cannot close live acceptance.
+
+Extend `bun qa/run.ts wave1-critic-decision` with `QF_W1_SAVED_RESUME_PROOF=1`, an explicit
+`QF_W1_RESUME_SOURCE_DB` and `QF_W1_RESUME_MISSION_ID`, reusing `QF_G12_PACKAGE_ROOT`. The gate takes a
+consistent read-only SQLite snapshot of the named saved Kernel into its disposable root; it never edits the
+source profile or its artifacts. Historical artifact bytes may be read from their existing references, and new
+artifacts belong to the isolated root. Require the specified inquiry to contain a stale starting Quote, one
+unfinished source Task, a closed original Director, a failed stopped worker, and an old exact Run; fail with
+an honest precondition diagnostic if it does not. This is an actual saved-state precondition, not fabricated
+provider work. The selected event must still be upcoming and available for exact targeted capture.
+
+From a clean native cold-open, deliberately retrieve that inquiry through the normal saved-work controls,
+assert a visible operable Resume action, and invoke it. Require a matching fresh targeted complete-menu
+capture carrying the original request, the same Mission/Task/Hypothesis/starting Quote/original delegation,
+the unchanged old Run, one exact new Run and replacement worker, and the explicit current coordinator.
+Require actual result routing to that coordinator, a different real Critic with real inference receipts, the
+exact frozen source-work Evaluation, a hash-bound published report, and nonempty rendered decision evidence.
+Close and reopen, deliberately retrieve again, and assert both attempts and their distinct inputs/participants,
+the same report lineage, and zero resurrected agents or leaked processes. Retain the existing real provider,
+exact-source, publication, PNG-validation, and cleanup assertions; fresh-investigation-only or synthetic
+execution cannot pass this saved-resume mode.
+
+This amendment explicitly permits the one link/action and necessary exact-observation guard replacement above,
+superseding the general no-new-link restriction only for this repair. It does not authorize redesigning the
+runtime, general messaging, new prediction methods, or the separate post-result revision implementation.
+
 ## Binding product meaning
 
 W1-02 proved trustworthy point-in-time history and a transparent calculation, but its two records and

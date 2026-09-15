@@ -206,6 +206,15 @@ export const delegated_by = defineLink({
   to: agent_session,
 });
 
+export const coordinated_by = defineLink({
+  name: "coordinated_by",
+  description:
+    "Current Task responsibility: which admitted session directs unfinished work, receives its result, and arranges its next handoff. Absence preserves legacy routing through delegated_by; replacement never changes the original delegator.",
+  lifecycle: "experimental",
+  from: task,
+  to: agent_session,
+});
+
 export const delegates_to = defineLink({
   name: "delegates_to",
   description:
@@ -395,6 +404,21 @@ export const reassign_task = defineAction({
     assignee_session_id: z
       .string()
       .describe("Different running agent_session that will own the task."),
+  }),
+});
+
+export const resume_interrupted_market_task = defineAction({
+  name: "resume_interrupted_market_task",
+  description:
+    "Resume one unfinished market Task after a recognized runtime interruption. The operator atomically transfers current coordination and assignment while preserving the original delegator, Mission, prior attempts, and result boundary.",
+  lifecycle: "experimental",
+  operatorOnly: true,
+  internalOnly: true,
+  input: z.object({
+    task_id: z.string().min(1).describe("Exact open market Task whose interrupted execution is being resumed."),
+    coordinator_session_id: z.string().min(1).describe("Running admitted orchestrator that now directs the Task and receives its result."),
+    assignee_session_id: z.string().min(1).describe("Different running admitted market worker that owns the resumed execution."),
+    attempt_id: z.string().min(1).describe("Unique app-minted identity for this explicit resume handoff."),
   }),
 });
 

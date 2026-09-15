@@ -42,6 +42,7 @@ import {
   kernelGovernedAttemptExists,
   kernelGetResearchWorldProjection,
   kernelListStrategyVersions,
+  kernelCurrentTaskCoordinator,
 } from "./kernel";
 import {
   getDockDefinitionAvailability,
@@ -128,8 +129,10 @@ function trace(actorSessionId?: string): { trace_id: string; span_id: string; ac
 }
 
 function directorForTask(taskId: string): string | null {
-  const links = kernelGetLinks(taskId, { kind: "delegated_by" }).filter((link) => link.from_id === taskId);
-  return links.length === 1 && links[0]?.to_id ? links[0].to_id : null;
+  try {
+    const coordinator = kernelCurrentTaskCoordinator(taskId, true);
+    return hasLiveAgentSession(coordinator) ? coordinator : null;
+  } catch { return null; }
 }
 
 function refusalCode(error: unknown, action: TaskActionName): TaskRefusalCode {

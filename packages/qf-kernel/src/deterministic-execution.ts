@@ -21,6 +21,7 @@ import type { ObjectExecuteResult } from "./results.ts";
 import type { TraceContext, TrustedExecutionContext } from "./trace.ts";
 import { readStrategySpec } from "./strategy-outcome.ts";
 import { buildDecisionContext, decisionComparisonRows } from "./market-decision.ts";
+import { assertMarketInvestigationQuote } from "./market-context.ts";
 
 export const DETERMINISTIC_EXECUTION_VERSION = "qf-deterministic-v1";
 const EXECUTION_ENVIRONMENT_ID =
@@ -592,8 +593,7 @@ function exactOne(rows: Array<{ from_id: string; to_id: string }>, label: string
 
 function validateMarketCalculationContext(db: KernelDb, missionId: string, quoteId: string, dataset: ReturnType<typeof loadDataset>, toolId: string): { context: JsonRecord; selections: JsonRecord[]; toolVersion: string } {
   if (dataset.purpose !== "evidence" || !dataset.marketContext) throw new KernelError("technique-free calculation requires an evidence-purpose Dataset with market_context");
-  const investigation = db.query("SELECT from_id, to_id FROM links WHERE kind = 'investigates' AND from_id = ?").all(missionId) as Array<{ from_id: string; to_id: string }>;
-  if (exactOne(investigation, "calculation Mission investigates").to_id !== quoteId) throw new KernelError("calculation Mission does not investigate the exact starting Quote");
+  assertMarketInvestigationQuote(db, missionId, quoteId);
   const quote = db.query("SELECT id, created_at, data_ref, coverage FROM quote WHERE id = ?").get(quoteId) as { id: string; created_at: string; data_ref: string; coverage: string } | null;
   if (!quote) throw new KernelError(`calculation Quote not found: ${quoteId}`);
   const quoteSource = db.query("SELECT id, content_hash FROM artifact WHERE id = ?").get(quote.data_ref) as { id: string; content_hash: string } | null;

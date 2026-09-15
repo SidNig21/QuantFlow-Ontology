@@ -94,6 +94,7 @@ export function createMarketDesk({ tileManager, onOpen, onResearch, showStatus }
 				if (!missionId) continue;
 				const reopen = element("button", "market-reopen-investigation", "Open saved investigation");
 				reopen.type = "button";
+				reopen.dataset.missionId = missionId;
 				reopen.addEventListener("click", () => void onResearch?.(missionId));
 				card.appendChild(reopen);
 			}

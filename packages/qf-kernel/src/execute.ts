@@ -26,6 +26,7 @@ import { requireTrace, type TrustedExecutionContext } from "./trace.ts";
 import { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
 import { executeGovernedReviewTask } from "./governed-review.ts";
 import { recordStrategyOutcome } from "./strategy-outcome.ts";
+import { executeResumeInterruptedMarketTask, requireRunningTaskCoordinator } from "./task-coordination.ts";
 
 
 const CONTROL_BYTES = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/u;
@@ -75,7 +76,7 @@ function requireOpen(row: TaskRow): void {
 
 function requireDirector(db: KernelDb, taskId: string, actor: string | undefined, allowInterruptedReassignment = false): { directorId: string; assigneeId: string } {
   if (!actor) throw new TaskRefusalError("ACTOR_NOT_DELEGATOR");
-  const directorId = exactLink(db, taskId, "delegated_by").to_id;
+  const directorId = requireRunningTaskCoordinator(db, taskId);
   if (directorId !== actor) throw new TaskRefusalError("ACTOR_NOT_DELEGATOR");
   const assigneeId = exactLink(db, taskId, "assigned_to").to_id;
   const row = db.query("SELECT status FROM agent_session WHERE id = ?").get(assigneeId) as { status: string } | null;
@@ -286,6 +287,7 @@ export const internalTaskActionHandlers: Readonly<Record<string, InternalTaskAct
 /** Runtime implementations for every schema action marked internal and app-owned. */
 export const internalAppActionHandlers: Readonly<Record<string, InternalAppActionHandler>> = {
   record_strategy_outcome: (db, input, trace) => recordStrategyOutcome(db, { action: "record_strategy_outcome", object_type: "artifact", event: "ticket.observed" }, input, trace),
+  resume_interrupted_market_task: (db, input, trace) => executeResumeInterruptedMarketTask(db, input, trace) as ObjectExecuteResult,
 };
 
 /** The complete internal command handler surface used by the G8 completeness proof. */

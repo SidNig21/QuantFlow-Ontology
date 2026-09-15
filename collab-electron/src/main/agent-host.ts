@@ -872,6 +872,28 @@ export function closeAgentSessionRow(sessionId: string): void {
   console.log(`agent-host: close ${sessionId}`);
 }
 
+/** Stop one request-owned resume participant and report failure until its runtime is confirmed gone. */
+export async function stopResumeParticipantRuntime(sessionId: string, closeRow: boolean): Promise<void> {
+  const entry = live.get(sessionId);
+  if (!entry) {
+    if (closeRow) closeAgentSessionRow(sessionId);
+    return;
+  }
+  entry.cancelled = true;
+  if (entry.kind === "native_tui") {
+    await tearDownNativeTui(entry as NativeTuiLive, true);
+    live.delete(sessionId);
+    nativeTuiPeerDeliveryBySession.delete(sessionId);
+  } else if (entry.kind === "host_acp" && entry.hostAcp) {
+    cancelPendingPermissions(sessionId);
+    await tearDownHostAcp(entry.hostAcp);
+    live.delete(sessionId);
+  } else {
+    throw new Error(`agent-host: unsupported resume participant runtime ${sessionId}`);
+  }
+  if (closeRow) closeAgentSessionRow(sessionId);
+}
+
 export async function disposeAgentHost(): Promise<void> {
   const teardowns: Promise<unknown>[] = [];
   const openTaskOwners = new Set(kernelListTaskAssignments()
@@ -907,5 +929,13 @@ export async function disposeAgentHost(): Promise<void> {
   await awaitRuntimeTeardownsForShutdown(teardowns);
 }
 installNativeTuiPtyExitHook((sessionId) => {
+  const assignedOpenTask = kernelGetLinks(sessionId, { kind: "assigned_to" })
+    .some((link) => link.to_id === sessionId && kernelGetObject("task", link.from_id)?.status === "open");
+  if (kernelGetObject("agent_session", sessionId)?.status === "failed" && assignedOpenTask) {
+    live.delete(sessionId);
+    nativeTuiPeerDeliveryBySession.delete(sessionId);
+    for (const listener of doneListeners) listener(sessionId, { status: "failed", text: "" });
+    return;
+  }
   closeAgentSessionRow(sessionId);
 });

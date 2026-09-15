@@ -4,8 +4,9 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { deflateSync } from "node:zlib";
 import { createHash } from "node:crypto";
+import { Database } from "bun:sqlite";
 import { closeKernel, execute, openKernel } from "../../packages/qf-kernel/src/index.ts";
-import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, sanitizeLiveFailureError, validateLiveDecisionProof, validateUiCaptureReceipt, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
+import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, sanitizeLiveFailureError, snapshotSavedKernel, validateLiveDecisionProof, validateSavedResumeProof, validateUiCaptureReceipt, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
 
 function png(width = 1, height = 1): Buffer {
   const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
@@ -131,6 +132,21 @@ test("live screenshot receipt requires exact nonempty decodable PNG bytes", () =
   expect(() => validateUiCaptureReceipt({ outputPath: "decision.png", width: 2, height: 1, bytes: 7, sha256: createHash("sha256").update("invalid").digest("hex") }, Buffer.from("invalid"), "decision.png")).toThrow(/PNG/);
 });
 
+test("saved-resume receipt refuses fresh-only, substituted, or incomplete continuation proof", () => {
+  const proof = positiveProof();
+  proof.saved_resume = { mode: "real_saved_kernel", snapshot_hash: "b".repeat(64), mission_id: "mission-1", task_id: "task-1", hypothesis_id: "hypothesis-1", original_quote_id: "old-quote", original_director_id: "old-director", old_worker_id: "old-worker", old_run_id: "old-run", new_run_id: "run-1", new_quote_id: "quote-1", coordinator_id: "new-director", resume_visible: true, fresh_targeted_capture: true, history_unchanged: true, result_to_coordinator: true, notification_to_coordinator: true, review_by_coordinator: true, projection_exact: true, reopen_lineage_exact: true };
+  proof.saved_resume.handoff_event_id = "resume-event-1";
+  expect(() => validateSavedResumeProof(proof)).not.toThrow();
+  expect(() => validateSavedResumeProof(positiveProof())).toThrow();
+  const changes = [
+    { mode: "synthetic" }, { task_id: "another-task" }, { hypothesis_id: "another-claim" }, { handoff_event_id: "" },
+    { old_run_id: "run-1" }, { old_worker_id: "worker-1" }, { original_quote_id: "quote-1" },
+    { coordinator_id: "old-director" }, { coordinator_id: "worker-1" },
+    ...["resume_visible", "fresh_targeted_capture", "history_unchanged", "result_to_coordinator", "notification_to_coordinator", "review_by_coordinator", "projection_exact", "reopen_lineage_exact"].map((field) => ({ [field]: false })),
+  ];
+  for (const change of changes) expect(() => validateSavedResumeProof({ ...proof, saved_resume: { ...proof.saved_resume, ...change } })).toThrow();
+});
+
 test("Hermes identity is read only from the bounded model block", () => {
   expect(parseHermesModelIdentity("model:\n  default: gpt-5.6-luna\n  provider: openai-codex\nagent:\n  reasoning_effort: none\n")).toEqual({ provider: "openai-codex", model: "gpt-5.6-luna" });
   expect(() => parseHermesModelIdentity("model:\n  default: fallback\n  provider: openai-codex\n")).toThrow();
@@ -150,7 +166,7 @@ test("Critic observation receives a fresh window after sequential Worker complet
   expect(workerCompletedAt + CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS).toBeGreaterThan(productCriticDeadline);
 });
 
-test("real Kernel schema resolves the canonical worker assignment and distinguishes a missing trajectory", async () => {
+test("real Kernel WAL snapshot preserves committed work and observer distinguishes a missing trajectory", async () => {
   const root = mkdtempSync(join(tmpdir(), "qf-w1-observer-schema-"));
   const dbPath = join(root, "kernel.sqlite");
   const db = openKernel(dbPath, { create: true });
@@ -164,6 +180,13 @@ test("real Kernel schema resolves the canonical worker assignment and distinguis
     session("director-1", "observer-director", "orchestrator", "Research Director");
     session("worker-1", "observer-worker", "worker", "Market Researcher");
     execute(db, "create_task", { task_id: "task-1", title: "Analyze requested expression", description: "Compare every exact offered selection for independent review.", assignee_session_id: "worker-1" }, { ...trace, actor_session_id: "director-1" });
+    const snapshotPath = join(root, "saved-copy.sqlite");
+    expect(snapshotSavedKernel(dbPath, snapshotPath)).toMatch(/^[a-f0-9]{64}$/);
+    const copy = new Database(snapshotPath, { readonly: true });
+    try { expect(copy.query("SELECT id,status FROM task WHERE id='task-1'").get()).toEqual({ id: "task-1", status: "open" }); }
+    finally { copy.close(true); }
+    expect(() => snapshotSavedKernel(dbPath, dbPath)).toThrow(/isolated/);
+    expect(() => snapshotSavedKernel(dbPath, snapshotPath)).toThrow(/isolated/);
   } finally {
     closeKernel(db);
     // Bun retains finalized prepared statements until a forced collection on

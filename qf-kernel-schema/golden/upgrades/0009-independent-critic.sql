@@ -3,7 +3,7 @@
 
 CREATE TABLE links__upgrade (
   id TEXT PRIMARY KEY NOT NULL,
-  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from')),
+  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'assigned_to', 'delegated_by', 'coordinated_by', 'delegates_to', 'spawned_from')),
   from_id TEXT NOT NULL,
   to_id TEXT NOT NULL,
   created_at TEXT NOT NULL

@@ -25,6 +25,7 @@ import {
   TASK_COMPOSITION_UPGRADE,
   TASK_STEERING_UPGRADE,
   GOVERNED_REVIEW_UPGRADE,
+  TASK_COORDINATION_UPGRADE,
 } from "./upgrade.ts";
 import {
   detectObjectTypeRegistryDrift,
@@ -359,7 +360,8 @@ export function attachKernel(
       shape === "task_composition" ||
       shape === "task_steering" ||
       shape === "pre_r17_current" ||
-      shape === "pre_market_desk")
+      shape === "pre_market_desk" ||
+      shape === "pre_task_coordination")
   ) {
     const upgradeOrder = [
       PROFILE_IDENTITY_UPGRADE,
@@ -374,6 +376,7 @@ export function attachKernel(
       TASK_COMPOSITION_UPGRADE,
       TASK_STEERING_UPGRADE,
       GOVERNED_REVIEW_UPGRADE,
+      TASK_COORDINATION_UPGRADE,
     ];
     const completedByShape = {
       pre_d1: 0,
@@ -389,6 +392,7 @@ export function attachKernel(
       task_steering: 10,
       pre_r17_current: 12,
       pre_market_desk: 12,
+      pre_task_coordination: 13,
     } as const;
     const required = upgradeOrder.slice(completedByShape[shape]).join(",");
     process.stderr.write(
@@ -440,7 +444,8 @@ export function attachKernel(
       shape === "pre_r17_current" ||
       shape === "pre_market_desk" ||
       shape === "pre_wave1_evidence" ||
-      shape === "pre_market_reschedule"
+      shape === "pre_market_reschedule" ||
+      shape === "pre_task_coordination"
     ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",

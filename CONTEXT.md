@@ -94,6 +94,14 @@ _Avoid_: silent prompt change, erased history
 One exact durable assignment owned by one Participant at a time. The Director delegates by default; an authorized Participant may create a downstream Task while the Director remains able to observe and steer it.
 _Avoid_: prompt, terminal message
 
+**Task coordinator**:
+The Participant currently authorized to direct an assignment, receive its result, and arrange the next work. Replacing the coordinator does not change who originally delegated the Task.
+_Avoid_: original delegator by default, interchangeable session, hidden owner
+
+**Resume Task**:
+Continue the same unfinished assignment after its execution was interrupted, preserving the question and earlier attempts while explicitly establishing its current participants and inputs. Changing an already recorded result requires a Revision instead.
+_Avoid_: new unrelated inquiry, revived closed participant, overwritten attempt
+
 **Dependency**:
 Recorded work that another Task needs before it can proceed or finish. The dependency names the relevant version and its readiness instead of assuming that a nearby participant has completed it.
 _Avoid_: cable, assumed ordering, shared transcript

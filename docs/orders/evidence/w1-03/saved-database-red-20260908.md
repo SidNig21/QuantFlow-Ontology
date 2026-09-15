@@ -234,3 +234,51 @@ Opening QuantFlow twice now recovers the original window and leaves one owner of
   is independently verified, while saved-work continuation after freshness expiry is the next concrete product
   gap. Preserve old observations/Runs; do not weaken freshness or silently start an unrelated inquiry as proof
   of continuation. A bounded source investigation is determining the existing action path before implementation.
+
+### Saved-work implementation preflight — 2026-09-14 (not acceptance)
+
+The saved investigation is intact, and its real database exposed an upgrade defect before any live inference.
+
+- `bun test qa/gates/wave1-critic-decision.test.ts`: 9 passed, 0 failed, 87 assertions. This covers the
+  consistent WAL snapshot and continuation receipt guards; it does not prove a running Resume workflow.
+  An earlier attempt stopped at schema-import lint during in-flight command wiring; no assertions ran then.
+- Provider-free QA helpers copied the actual `C:/Users/rybow/.quantflow/kernel.db` read-only into a disposable
+  root. Mission `e254cf08-73e5-41ed-9453-136435d8cd29`, Task `task-7fc97c34-f03f-451b-a70d-9458be7f308e`,
+  and old Run `analysis:79d6b3bb-8ded-4563-a459-57133d8904e2` satisfied the saved-resume preconditions.
+  The failed worker's actual reason is `app_terminated`; the original coordinator is closed. Seven original
+  rows and the prior calculation Artifact bytes matched. Snapshot SHA-256:
+  `c2c0f9235b9e36606419d77adff3e90daca17a58d4521261f82ef74b3007ffc1`.
+- Opening that disposable copy with the new Kernel initially failed with `KernelUpgradeShapeError` before
+  runtime admission. After the exact `pre_task_coordination` predecessor was added, the real copy opened
+  at schema_meta=95 and retained all seven historical rows/Artifact hashes.
+- On the upgraded copy, the actual `buildDecisionContext` boundary refused new work using the old inputs
+  with `decision Quote is stale`. Historical validation with `allowAgedQuote: true` initially returned
+  `decision Quote is superseded` after the real board refresh. After the historical-read correction, the same
+  actual saved-data probe succeeded: historical context readable, new-work error still `decision Quote is stale`,
+  schema_meta=95, and all seven original rows/Artifact hashes preserved.
+  A preceding helper-only probe assumed a broader freshness/return contract than the now-narrow continuation
+  helper provides; it was not evidence of stale-input acceptance at the real decision boundary.
+- These probes started no app, made no provider calls, left the source profile unchanged, and removed their
+  disposable roots. No saved-resume native acceptance or full W1-03 completion is claimed by this section.
+
+### Saved-work implementation candidate — 2026-09-14 (awaiting independent native proof)
+
+The ordinary saved investigation now has a real Resume action that refreshes its exact market and continues the same work.
+
+- The candidate adds explicit current coordination while retaining the original delegator, transfers the same
+  open Task to a replacement worker, captures a distinct fresh Quote for the same provider event and ordered
+  market identity, creates a new Run against the existing Hypothesis, and routes the result and Critic through
+  the current coordinator. The Canvas labels this action `Resume with current market` and projects both attempts.
+- Setup and dispatch failures leave the Task open, mark the exact replacement attempt with a recognized reason,
+  stop its runtime, refuse late results, and permit a later explicit retry. A coordinator with other open work
+  is preserved. Completed, cancelled, review, revised, or identity-changed work remains outside this action.
+- The Sol builder reported focused checks green: Kernel predecessor upgrade **2/0/11**, Electron resume/routing
+  batch **24/0/465**, final market resume/projection **1/0/291**, Canvas **11/0/71**, and schema
+  **180/0/616**. Schema goldens were regenerated; direct `packages/qf-kernel` TypeScript passed.
+- Root reran the saved-proof model: **9 pass / 0 fail / 87 assertions**. The first cross-package TypeScript
+  attempt exposed only empty generated local-package destinations left by a failed Bun relink. Root removed
+  those exact generated directories, restored them with the frozen lockfile, and `bunx tsc --noEmit` in the
+  Bovada/app closure then exited zero with no diagnostics.
+- Atlas was regenerated from the candidate: 433 files, 119 channels, 108 live wires, zero unreached wires,
+  zero dead wires. These are candidate checks. They do not replace independent packaged execution against the
+  isolated copy of the founder's saved profile.

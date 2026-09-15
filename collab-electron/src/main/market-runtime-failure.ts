@@ -3,6 +3,9 @@ import { stripTerminalControls } from "./launcher-readiness";
 
 export const MARKET_STREAM_FAILURE = "provider_stream_interrupted";
 export const MARKET_PROVIDER_UNAVAILABLE = "provider_unavailable";
+export const MARKET_RESUME_SETUP_FAILED = "market_resume_setup_failed";
+export const MARKET_RESUME_DISPATCH_FAILED = "market_resume_dispatch_failed";
+export const MARKET_RESUME_FAILURE_REASONS = [MARKET_STREAM_FAILURE, MARKET_PROVIDER_UNAVAILABLE, "app_terminated", MARKET_RESUME_SETUP_FAILED, MARKET_RESUME_DISPATCH_FAILED] as const;
 
 /** One app-bound runtime frame, not terminal prose, ends an unfinished attempt. */
 export function createMarketFailureReceiver(nonce: string, onFailure: () => void): (data: Buffer) => void {
@@ -44,9 +47,7 @@ export function recordMarketRuntimeFailure(sessionId: string, reason: typeof MAR
 
 export function assertMarketRetryTask(taskId: string, isLive: (id: string) => boolean): string {
   const owners = kernelGetLinks(taskId, { kind: "assigned_to" }).filter((link) => link.from_id === taskId);
-  const delegators = kernelGetLinks(taskId, { kind: "delegated_by" }).filter((link) => link.from_id === taskId);
   const failureReason = owners.length === 1 ? kernelSessionFailureReason(owners[0]!.to_id) : null;
-  if (kernelGetObject("task", taskId)?.status !== "open" || owners.length !== 1 || ![MARKET_STREAM_FAILURE, MARKET_PROVIDER_UNAVAILABLE].includes(String(failureReason)) || isLive(owners[0]!.to_id) || kernelGetLinks(taskId, { kind: "produces" }).some((link) => link.from_id === taskId)) throw new Error("Retry refused: the prior attempt must be stopped with no recorded result.");
-  if (delegators.length !== 1 || !isLive(delegators[0]!.to_id) || kernelGetObject("agent_session", delegators[0]!.to_id)?.status !== "running") throw new Error("Retry needs the original Research Director. Refresh markets and open a new investigation after reopening the app.");
-  return delegators[0]!.to_id;
+  if (kernelGetObject("task", taskId)?.status !== "open" || owners.length !== 1 || !MARKET_RESUME_FAILURE_REASONS.includes(String(failureReason) as (typeof MARKET_RESUME_FAILURE_REASONS)[number]) || isLive(owners[0]!.to_id) || kernelGetLinks(taskId, { kind: "produces" }).some((link) => link.from_id === taskId)) throw new Error("Resume refused: the prior attempt must be stopped with no recorded result.");
+  return owners[0]!.to_id;
 }

@@ -78,3 +78,32 @@ test("openKernel upgrades the exact pre-W1 evidence shape before a Dataset write
     closeKernel(upgraded);
   }
 });
+
+test("openKernel upgrades only the exact pre-coordination authority and preserves rows", () => {
+  root = mkdtempSync(join(tmpdir(), "qf-w1-evidence-upgrade-"));
+  const path = join(root, "kernel.db");
+  const created = openKernel(path, { create: true });
+  try {
+    created.query("INSERT INTO mission (id, created_at, name, objective) VALUES ('saved-mission', '2026-09-14T00:00:00.000Z', 'Saved', 'Preserve me')").run();
+  } finally {
+    closeKernel(created);
+  }
+
+  const predecessor = new Database(path);
+  const currentSql = (predecessor.query("SELECT sql FROM sqlite_master WHERE type='table' AND name='links'").get() as { sql: string }).sql;
+  const priorSql = currentSql
+    .replace(/CREATE TABLE links/i, "CREATE TABLE links__pre_coordination")
+    .replace(/,'coordinated_by'/i, "")
+    .replace(/'coordinated_by',/i, "");
+  predecessor.exec(`${priorSql}; INSERT INTO links__pre_coordination SELECT * FROM links; DROP TABLE links; ALTER TABLE links__pre_coordination RENAME TO links; DELETE FROM schema_meta WHERE type_name IN ('coordinated_by','resume_interrupted_market_task');`);
+  expect(classifyKernelShape(predecessor)).toBe("pre_task_coordination");
+  predecessor.close();
+
+  const upgraded = openKernel(path);
+  expect(classifyKernelShape(upgraded)).toBe("current");
+  expect(upgraded.query("SELECT objective FROM mission WHERE id='saved-mission'").get()).toEqual({ objective: "Preserve me" });
+  expect(upgraded.query("SELECT type_name FROM schema_meta WHERE type_name IN ('coordinated_by','resume_interrupted_market_task') ORDER BY type_name").all()).toEqual([
+    { type_name: "coordinated_by" }, { type_name: "resume_interrupted_market_task" },
+  ]);
+  closeKernel(upgraded);
+});
