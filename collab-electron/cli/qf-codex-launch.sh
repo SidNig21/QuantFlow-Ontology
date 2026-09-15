@@ -21,7 +21,9 @@ case "$bridge_path$ontology_path" in
   *"'"*) echo "QuantFlow Codex bridge path cannot contain an apostrophe." >&2; exit 2 ;;
 esac
 
-# One full map replaces ambient MCP entries without reading the operator's config.
+# Codex merges CLI table overrides with the operator's config. Define QuantFlow's
+# required servers, then disable the ambient servers observed in the supported
+# Codex installation without reading or changing the operator's config.
 mcp_config="mcp_servers={quantflow-collaboration={command='node.exe',args=['$bridge_path'],required=true},quantflow-ontology={command='node.exe',args=['$ontology_path'],required=true}}"
 
 printf '\nQF_LAUNCH_READY %s\n\nQF_LAUNCH_COMMIT %s\n' \
@@ -32,6 +34,9 @@ exec "$codex_command" \
   --ask-for-approval never \
   --sandbox read-only \
   -c "$mcp_config" \
+  -c "mcp_servers.node_repl.enabled=false" \
+  -c "mcp_servers.codex_apps.enabled=false" \
+  -c "check_for_update_on_startup=false" \
   -c "features.shell_tool=false" \
   -c "web_search='disabled'" \
   -c "apps._default.enabled=false" \
