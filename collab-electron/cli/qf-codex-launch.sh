@@ -36,7 +36,6 @@ exec "$codex_command" \
   -c "$mcp_config" \
   -c "mcp_servers.node_repl.enabled=false" \
   -c "mcp_servers.codex_apps.enabled=false" \
-  -c "check_for_update_on_startup=false" \
   -c "features.shell_tool=false" \
   -c "web_search='disabled'" \
   -c "apps._default.enabled=false" \
