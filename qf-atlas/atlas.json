@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "codex/wo-w2-01-codex-admission",
-    "commit": "0aae5ecd",
+    "commit": "8a511932",
     "generatedAt": "2026-09-15",
     "filesScanned": 434,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -60677,13 +60677,13 @@
   ],
   "diffVsHead": {
     "from": {
-      "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "3fd42b17",
+      "branch": "codex/wo-w2-01-codex-admission",
+      "commit": "0aae5ecd",
       "generatedAt": "2026-09-15"
     },
     "to": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "0aae5ecd",
+      "commit": "8a511932",
       "generatedAt": "2026-09-15"
     },
     "verdict": "better",
