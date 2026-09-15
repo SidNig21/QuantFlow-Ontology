@@ -42,7 +42,7 @@ function fixture(deliver = true, admit = true) {
   process.env.QF_ARTIFACT_ROOT = root;
   db = openKernel(":memory:");
   session("director", "director-definition", "orchestrator", ["desk.orchestrate"]);
-  session("executor", "executor-definition", "worker", ["desk.orchestrate"]);
+  session("executor", "executor-definition", "worker", ["market.read"]);
   session("critic", "independent-critic", "critic", ["research.evaluate"]);
   const hypothesis = execute(db, "create_hypothesis", { claim: "Fixture evidence supports the claim.", success_criteria: "All four critic scores support." }, trace);
   const mission = execute(db, "create_mission", { mission_id: "r15-mission", name: "R15 fixture mission", objective: "Provide the bounded authority context." }, trace);
@@ -188,9 +188,12 @@ describe("R15 governed review", () => {
     const replay = requestGovernedReview(db!, "source-task", "attempt-1", "critic", trace);
     expect(replay.kind).toBe("replayed");
     sessionFromExistingDefinition("critic-2");
-    const revision = requestRevision(db!, f.work, evaluationId, "revision-1", trace);
+    const revision = requestRevision(db!, f.work, evaluationId, "revision-1", "executor", "director", { ...trace, mission_id: "r15-mission" });
+    const duplicateRevision = requestRevision(db!, f.work, evaluationId, "revision-2", "executor", "director", { ...trace, mission_id: "r15-mission" });
     const second = requestSecondCritic(db!, f.work, evaluationId, "second-1", "critic-2", trace);
     expect(revision.kind).toBe("admitted");
+    expect(duplicateRevision.kind).toBe("refused");
+    expect(duplicateRevision.receipt?.reason_code).toBe("REVISION_IN_PROGRESS");
     expect(second.kind).toBe("admitted");
     const taskIds = db!.query("SELECT id FROM task WHERE id LIKE 'review-task-%' ORDER BY id").all() as Array<{ id: string }>;
     expect(taskIds).toHaveLength(3);

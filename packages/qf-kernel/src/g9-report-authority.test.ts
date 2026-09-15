@@ -206,7 +206,12 @@ describe("G9 Report authority", () => {
   test("publishes one current row with explicit superseded history for one full key", () => {
     const { missionId, datasetId } = base();
     const first = supportWorld("g9-first", missionId, datasetId, "g9-technique", "worker-a", "critic-a");
-    const second = supportWorld("g9-second", missionId, datasetId, "g9-technique", "worker-b", "critic-b");
+    const rejected = supportWorld("g9-rejected-revision", missionId, datasetId, "g9-technique", "worker-b", "critic-b", false);
+    completeWorkerTask(rejected.sourceTaskId, "worker-b", "g9-rejected-revision");
+    expect(recordOutcome(rejected, "rejects").state.report_artifact_id).toBeNull();
+    expect(db!.query("SELECT report_artifact_id FROM qf_review_publication WHERE is_current = 1").get()).toEqual({ report_artifact_id: first.reportId });
+
+    const second = supportWorld("g9-second", missionId, datasetId, "g9-technique", "worker-a", "critic-a");
     const rows = db!.query("SELECT * FROM qf_review_publication ORDER BY created_at ASC, source_work_key ASC").all() as Array<Record<string, unknown>>;
     expect(rows).toHaveLength(2);
     expect(rows.filter((row) => Number(row.is_current) === 1).map((row) => row.report_artifact_id)).toEqual([second.reportId]);

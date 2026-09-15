@@ -31,11 +31,11 @@ export function deriveResearchWorkflow(world) {
 	const activeMissionTask = unique(openMissionTasks.filter((entry) => typeof entry.fields?.review_source_task_id !== "string"));
 	const projectedEvaluations = objects.filter((entry) => entry.type === "evaluation" && sourceWorkOf(entry));
 	const evaluatedSourceTask = unique(projectedEvaluations.map((entry) => object(sourceWorkOf(entry)?.source_task_id)).filter(Boolean));
+	const latestRevisionSourceTask = objects.filter((entry) => entry.type === "task" && entry.fields?.review_kind === "revision" && projectedEvaluations.some((evaluation) => sourceWorkOf(evaluation)?.source_task_id === entry.id))
+		.sort((left, right) => String(left.fields?.review_created_at ?? "").localeCompare(String(right.fields?.review_created_at ?? "")) || String(left.id).localeCompare(String(right.id))).at(-1) ?? null;
 	const missionSourceTask = rootedMission ? unique(objects.filter((entry) => entry.type === "task" && typeof entry.fields?.review_source_task_id !== "string" && links.some((link) => link.kind === "belongs_to" && link.from_id === entry.id && link.to_id === rootedMission.id))) : null;
 	const reportSourceWork = sourceWorkOf(reportEvaluation);
-	const sourceTask = reportSourceWork
-		? object(reportSourceWork.source_task_id)
-		: (rootedSourceTask ?? object(missionReviewTask?.fields?.review_source_task_id) ?? activeMissionTask ?? evaluatedSourceTask ?? missionSourceTask);
+	const sourceTask = rootedSourceTask ?? object(missionReviewTask?.fields?.review_source_task_id) ?? activeMissionTask ?? latestRevisionSourceTask ?? evaluatedSourceTask ?? (reportSourceWork ? object(reportSourceWork.source_task_id) : null) ?? missionSourceTask;
 	const mission = rootedMission ?? object(unique(linksFrom(sourceTask?.id, "belongs_to"))?.to_id);
 	const activeReviewTask = unique(objects.filter((entry) => entry.type === "task" && entry.fields?.status === "open" && entry.fields?.review_source_task_id === sourceTask?.id));
 	const exactEvaluations = projectedEvaluations.filter((entry) => sourceWorkOf(entry)?.source_task_id === sourceTask?.id);
@@ -46,16 +46,26 @@ export function deriveResearchWorkflow(world) {
 		const triggeringId = object(entry.fields?.review_task_id)?.fields?.review_triggering_evaluation_id;
 		return triggeringId && evaluationById.has(triggeringId) ? 1 + evaluationDepth(evaluationById.get(triggeringId), seen) : 0;
 	};
-	const evaluations = exactEvaluations
+	const orderedExactEvaluations = exactEvaluations
 		.sort((left, right) => {
 			const leftTask = object(left.fields?.review_task_id);
 			const rightTask = object(right.fields?.review_task_id);
 			return evaluationDepth(left) - evaluationDepth(right) || String(leftTask?.fields?.review_created_at ?? "").localeCompare(String(rightTask?.fields?.review_created_at ?? "")) || String(left.id).localeCompare(String(right.id));
 		});
+	const selectedHypothesisId = sourceWorkOf(orderedExactEvaluations.at(-1))?.hypothesis_id ?? reportSourceWork?.hypothesis_id;
+	const evaluations = projectedEvaluations.filter((entry) => !selectedHypothesisId || sourceWorkOf(entry)?.hypothesis_id === selectedHypothesisId)
+		.sort((left, right) => {
+			const observedAt = (entry) => {
+				const run = object(sourceWorkOf(entry)?.run_id);
+				const quote = object(run?.fields?.params?.quote_id);
+				return String(quote?.fields?.coverage?.observed_at ?? object(entry.fields?.review_task_id)?.fields?.review_created_at ?? "");
+			};
+			return observedAt(left).localeCompare(observedAt(right)) || String(left.id).localeCompare(String(right.id));
+		});
 	const triggeringEvaluation = object(activeReviewTask?.fields?.review_triggering_evaluation_id);
 	const triggeredIds = new Set(objects.filter((entry) => entry.type === "task" && entry.fields?.review_source_task_id === sourceTask?.id).map((entry) => entry.fields?.review_triggering_evaluation_id).filter(Boolean));
-	const terminalEvaluation = unique(evaluations.filter((entry) => !triggeredIds.has(entry.id)));
-	const evaluation = reportEvaluation ?? (triggeringEvaluation?.type === "evaluation" ? triggeringEvaluation : null) ?? terminalEvaluation ?? evaluations.at(-1) ?? null;
+	const terminalEvaluation = unique(orderedExactEvaluations.filter((entry) => !triggeredIds.has(entry.id)));
+	const evaluation = (triggeringEvaluation?.type === "evaluation" ? triggeringEvaluation : null) ?? terminalEvaluation ?? orderedExactEvaluations.at(-1) ?? reportEvaluation ?? null;
 	const sourceWork = sourceWorkOf(evaluation);
 	const exactTaskRuns = sourceTask ? objects.filter((entry) => entry.type === "run" && entry.fields?.source_task_id === sourceTask.id) : [];
 	const run = object(world?.current_attempt_run_id) ?? (sourceWork ? object(sourceWork.run_id) : unique(exactTaskRuns));
@@ -70,7 +80,7 @@ export function deriveResearchWorkflow(world) {
 	const marketInstrument = object(unique(linksFrom(marketQuote?.id, "quotes"))?.to_id);
 	const marketEvent = object(unique(linksFrom(marketInstrument?.id, "offered_on"))?.to_id);
 	const marketVenue = object(unique(linksTo(marketInstrument?.id, "lists"))?.from_id);
-	return { objects, links, byId, mission, sourceTask, sourceWork, executor, director, originalDelegator, run, attemptRuns: exactTaskRuns, rawArtifact, evaluations, evaluation, reviewTask, critic, currentReport, marketQuote, marketInstrument, marketEvent, marketVenue, reportIds: Array.isArray(world?.report_ids) ? world.report_ids : [] };
+	return { objects, links, byId, mission, sourceTask, sourceWork, executor, director, originalDelegator, run, attemptRuns: exactTaskRuns, rawArtifact, evaluations, evaluation, reportEvaluation, reviewTask, critic, currentReport, marketQuote, marketInstrument, marketEvent, marketVenue, reportIds: Array.isArray(world?.report_ids) ? world.report_ids : [] };
 }
 
 export function criticMaterialAttack(workflow, evaluation = workflow?.evaluation) {
@@ -90,7 +100,7 @@ export function criticMaterialAttack(workflow, evaluation = workflow?.evaluation
 }
 
 export function blockedReviewPresentation(workflow) {
-	if (!workflow || workflow.currentReport || !workflow.evaluation || !["rejects", "inconclusive"].includes(workflow.evaluation.fields?.verdict)) return null;
+	if (!workflow || !workflow.evaluation || !["rejects", "inconclusive"].includes(workflow.evaluation.fields?.verdict)) return null;
 	const evaluations = Array.isArray(workflow.evaluations) && workflow.evaluations.length ? workflow.evaluations : [workflow.evaluation];
 	return {
 		state: "Publication blocked",
@@ -101,8 +111,29 @@ export function blockedReviewPresentation(workflow) {
 			attack: criticMaterialAttack(workflow, evaluation) ?? (typeof evaluation.fields?.rationale === "string" && evaluation.fields.rationale.trim() ? evaluation.fields.rationale.trim() : null) ?? (typeof evaluation.fields?.block_reason?.message === "string" && evaluation.fields.block_reason.message.trim() ? evaluation.fields.block_reason.message.trim() : null),
 		})),
 		reviewInProgress: workflow.reviewTask?.fields?.status === "open",
+		revisionInProgress: workflow.reviewTask?.fields?.status === "open" && workflow.reviewTask?.fields?.review_kind === "revision",
 		secondCriticInProgress: workflow.reviewTask?.fields?.status === "open" && workflow.reviewTask?.fields?.review_kind === "second_critic",
 	};
+}
+
+export function researchDecisionHistory(workflow) {
+	return (workflow?.evaluations ?? []).map((evaluation, index) => {
+		const work = sourceWorkOf(evaluation);
+		const run = workflow.byId?.get?.(String(work?.run_id));
+		const quote = workflow.byId?.get?.(String(run?.fields?.params?.quote_id));
+		const reportId = evaluation.fields?.report_artifact_id ?? null;
+		return {
+			version: index + 1,
+			quoteId: quote?.id ?? run?.fields?.params?.quote_id ?? null,
+			observedAt: quote?.fields?.coverage?.observed_at ?? null,
+			runId: work?.run_id ?? null,
+			resultArtifactId: work?.result_artifact_id ?? null,
+			verdict: evaluation.fields?.verdict ?? null,
+			finding: criticMaterialAttack(workflow, evaluation) ?? evaluation.fields?.rationale ?? null,
+			reportId,
+			reportStatus: reportId ? (reportId === workflow.currentReport?.id ? "Current report" : "Historical report") : "Publication blocked",
+		};
+	});
 }
 
 /** Exact context for Inspect; never a claim that a field dump is lineage. */
@@ -119,6 +150,7 @@ export function contextualInspectReceipt(workflow, selected) {
 		evaluations: workflow.evaluations?.map((entry) => ({ type: entry.type, id: entry.id, fields: entry.fields })) ?? [],
 		source_work: workflow.sourceWork,
 		attempts: workflow.attemptRuns?.map((entry) => ({ type: entry.type, id: entry.id, fields: entry.fields })) ?? [],
+		history: researchDecisionHistory(workflow),
 		original_delegator: workflow.originalDelegator ? { type: workflow.originalDelegator.type, id: workflow.originalDelegator.id, fields: workflow.originalDelegator.fields } : null,
 		current_coordinator: workflow.director ? { type: workflow.director.type, id: workflow.director.id, fields: workflow.director.fields } : null,
 		revisions: workflow.reportIds,

@@ -175,10 +175,13 @@ export function renderTaskFoot(dom, tile, {
 			foot.appendChild(reviewFacts);
 			if (Array.isArray(review.actions) && review.actions.length > 0) {
 				const nextActions = node("div", "governed-review-actions");
-				const revision = node("button", "task-action governed-review-revision", "Request revision unavailable");
+				const revision = node("button", "task-action governed-review-revision", "Request revision");
 				const second = node("button", "task-action governed-review-second", "Second critic");
-				revision.disabled = true;
-				revision.title = "Revision will be available when QuantFlow can create and review a new result version.";
+				revision.addEventListener("click", async (event) => {
+					event.stopPropagation();
+					try { await onRequestRevision?.(fact.task.taskId, String(review.evaluation_id), crypto.randomUUID()); }
+					catch (error) { errorLine(foot, error?.message ?? String(error)); }
+				});
 				second.addEventListener("click", async (event) => {
 					event.stopPropagation();
 					try { await onSecondCritic?.(fact.task.taskId, String(review.evaluation_id), crypto.randomUUID()); }
@@ -187,7 +190,7 @@ export function renderTaskFoot(dom, tile, {
 				nextActions.appendChild(revision);
 				nextActions.appendChild(second);
 				foot.appendChild(nextActions);
-				foot.appendChild(node("div", "governed-review-revision-note", "Revision is unavailable until QuantFlow can create a new result version and send it through independent review."));
+				foot.appendChild(node("div", "governed-review-revision-note", "Revision captures a newer exact market observation and sends the new result through independent review."));
 			}
 		}
 		const reviewButton = node("button", "task-action governed-review-request", "Request review");

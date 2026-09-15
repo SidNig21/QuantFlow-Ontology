@@ -1,6 +1,6 @@
 import { admitAndStartSession, getDockDefinitionAvailability, hasLiveAgentSession, stopResumeParticipantRuntime, submitAgentSessionInstruction } from "./agent-host";
 import { addOfficialEvidence, RESEARCH_LAB_TOOL_ID } from "./evidence-computation";
-import { getKernelDb, kernelExecute, kernelGetLinks, kernelGetObject, kernelListAgentDefinitions, kernelListAgentSessions, kernelQueryObjects, kernelDecisionReadScope, kernelDecisionModelReadView, kernelSessionCoordinatesOtherOpenTask, kernelTaskHasFrozenSourceWork } from "./kernel";
+import { getKernelDb, kernelExecute, kernelGetLinks, kernelGetObject, kernelListAgentDefinitions, kernelListAgentSessions, kernelQueryObjects, kernelDecisionReadScope, kernelDecisionModelReadView, kernelSessionCoordinatesOtherOpenTask, kernelTaskHasFrozenSourceWork, kernelFreezeSourceWork, kernelMarkGovernedDelivery, kernelRequestRevision } from "./kernel";
 import { assertMarketRetryTask } from "./market-runtime-failure";
 import { captureBovadaMarketDesk, listBovadaMarketDeskRows, type MarketDeskRow } from "./market-desk";
 import { selectEligibleDefinition } from "./participant-selection";
@@ -56,6 +56,71 @@ function exactCurrentContinuation(missionId: string, rows: MarketDeskRow[]): Mar
   });
   if (matches.length > 1) throw new Error("The saved investigation has ambiguous current market observations.");
   return matches[0] ?? null;
+}
+
+function marketResearchInstruction(taskId: string, resultArtifactId: string, allowed: string[], availability: string): string {
+  return [
+    `You are the Market Researcher assigned Task ${taskId}.`,
+    `Read each of these exact generated ontology tools once, passing only its id: ${JSON.stringify(allowed)}. Preserve every returned read Artifact id. No other reads or actions are authorized.`,
+    `The calculation result Artifact ${resultArtifactId} contains shared context, exact official evidence, market availability, and the complete ordered comparison_manifest. Each required qf_quote_get returns all deterministic comparisons for that exact Quote with their global comparison_indices. Combine each row with its comparison_context and assess every offered expression; do not invent a probability or skip a market. QuantFlow copies the exact numeric comparisons into the stored decision. Do not reproduce those tables or raw inputs in your judgment fields; explain the material evidence, counterevidence, uncertainty, and conclusion concisely.`,
+    `The exact Kernel-held requested-market status is ${JSON.stringify(availability)}. If it is selection_unavailable or availability_unknown, classification must be WATCH with selection_id null while research_assessment separately states whether the evidence supports, challenges, or cannot resolve the claim.`,
+    'Call collaboration send_result once with the exact task_id, every Quote id as cited_market_ids, and every read receipt as read_trajectory_artifact_ids. The result string is only your bounded judgment JSON with exactly: contract="qf.market.assessment.v1"; research_assessment="SUPPORTED", "CHALLENGED", "INCONCLUSIVE", or "INSUFFICIENT_EVIDENCE"; classification="CANDIDATE", "WATCH", or "PASS"; selection_id (or null); and nonempty selection_reason, change_condition, rationale, limitations, invalidation. QuantFlow supplies immutable identities, comparisons, evidence references, and runtime metadata. Analyze the requested mechanism, counterevidence, source limits, every offered expression, and availability. Never recruit or delegate. If the first send_result is refused, make only the stated correction and try once more; after a second refusal, stop and report the failure. No stake, wagering, arbitrary confidence, or fabricated facts. This is research advice only.',
+  ].join("\n");
+}
+
+/** A blocked result becomes a new attributed Task and Run against a fresh exact Quote. */
+export async function reviseMarketAndReview(input: { source_task_id: string; evaluation_id: string; attempt_id: string }, onStarted?: Started): Promise<Record<string, unknown>> {
+  const work = kernelFreezeSourceWork(input.source_task_id);
+  const sourceRun = kernelGetObject("run", work.run_id);
+  const runParams = jsonObject(sourceRun?.params);
+  const sourceQuoteId = String(runParams.quote_id ?? "");
+  const datasetId = String(runParams.dataset_id ?? "");
+  const missionIds = kernelGetLinks(input.source_task_id, { kind: "belongs_to" }).filter((link) => link.from_id === input.source_task_id).map((link) => link.to_id);
+  if (missionIds.length !== 1 || !sourceQuoteId || !datasetId) throw new Error("The blocked result has no exact Mission, Quote, and evidence partition for revision.");
+  const missionId = missionIds[0]!;
+  if (active.has(missionId)) throw new Error("A revision is already starting for this investigation.");
+  active.add(missionId);
+  let reviewTaskId: string | null = null;
+  try {
+    const target = exactRequestedExpression(sourceQuoteId);
+    const rows = await captureBovadaMarketDesk(
+      { sport: "ufc", competition: "ufc", market_class: "moneyline" },
+      { provider_event_id: target.providerEventId, requested_expression: target.requested },
+    );
+    const quote = exactCurrentContinuation(missionId, rows);
+    if (!quote || quote.quote_id === sourceQuoteId) throw new Error("Bovada did not return a newer exact observation for this investigation.");
+    assertMarketInvestigationQuote(getKernelDb(), missionId, quote.quote_id);
+    const oldObservedAt = Date.parse(String(jsonObject(kernelGetObject("quote", sourceQuoteId)?.coverage).observed_at ?? ""));
+    const newObservedAt = Date.parse(String(quote.observed_at ?? ""));
+    if (!Number.isFinite(oldObservedAt) || !Number.isFinite(newObservedAt) || newObservedAt <= oldObservedAt) throw new Error("The captured Bovada observation is not newer than the result being revised.");
+    const coordinator = await acquireParticipant("orchestrator", "desk.orchestrate", onStarted);
+    const worker = await acquireParticipant("worker", "market.read", onStarted);
+    const admission = kernelRequestRevision(work, input.evaluation_id, input.attempt_id, worker.sessionId, coordinator.sessionId, missionId);
+    if (admission.kind !== "admitted" || !admission.review_task_id) return admission as unknown as Record<string, unknown>;
+    reviewTaskId = admission.review_task_id;
+    const coverage = jsonObject(kernelGetObject("quote", quote.quote_id)?.coverage);
+    const requested = jsonObject(jsonObject(coverage.market_menu).requested_expression);
+    const availability = typeof requested.status === "string" ? requested.status : "availability_unknown";
+    const runId = `analysis:${crypto.randomUUID()}`;
+    const run = kernelExecute("execute_deterministic_run", {
+      run_id: runId, dataset_id: datasetId, mission_id: missionId, quote_id: quote.quote_id, tool_id: RESEARCH_LAB_TOOL_ID,
+      hypothesis_id: work.hypothesis_id,
+      calculation: { contract: "qf.calculation.v1", operation: MARKET_EXPRESSION_COMPARISON_OPERATION, version: 1, formula_version: 1, implementation_version: MARKET_EXPRESSION_COMPARISON_IMPLEMENTATION },
+      params: { task_id: reviewTaskId },
+    }, trace(worker.sessionId)) as { state: Record<string, unknown> };
+    const scope = kernelDecisionReadScope(worker.sessionId);
+    if (!scope) throw new Error("Revision input scope did not persist.");
+    kernelDecisionModelReadView("qf_artifact_get", String(run.state.result_artifact_id), scope.run, null);
+    for (const key of scope.allowed.filter((entry) => entry.startsWith("qf_quote_get:"))) kernelDecisionModelReadView("qf_quote_get", key.slice("qf_quote_get:".length), scope.run, null);
+    await submitAgentSessionInstruction(worker.sessionId, `${marketResearchInstruction(reviewTaskId, String(run.state.result_artifact_id), scope.allowed, availability)}\r`);
+    kernelMarkGovernedDelivery(reviewTaskId, "delivered");
+    return { ...admission, mission_id: missionId, starting_quote_id: sourceQuoteId, quote_id: quote.quote_id, run_id: runId, worker_session_id: worker.sessionId, coordinator_session_id: coordinator.sessionId, state: "Revision research is running; independent review follows its new durable result." };
+  } catch (error) {
+    if (reviewTaskId) {
+      try { kernelMarkGovernedDelivery(reviewTaskId, "failed"); } catch { /* the durable Task already reports its actual state */ }
+    }
+    throw error;
+  } finally { active.delete(missionId); }
 }
 
 async function resolveRunQuote(input: { mission_id: string; quote_id: string }, retry: boolean): Promise<MarketDeskRow> {

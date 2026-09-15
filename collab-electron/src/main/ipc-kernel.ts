@@ -36,7 +36,6 @@ import {
   kernelFreezeSourceWork,
   kernelRequestGovernedReview,
   kernelMarkGovernedDelivery,
-  kernelRequestRevision,
   kernelRequestSecondCritic,
   kernelGovernedReviewProjection,
   kernelGovernedAttemptExists,
@@ -49,7 +48,7 @@ import {
   getHermesDockDiagnostic,
 } from "./agent-host";
 import { QF_EXECUTE_ALLOWLIST } from "./qf-execute-allowlist";
-import { acquireEligibleParticipant, analyzeMarketAndReview } from "./market-analysis";
+import { acquireEligibleParticipant, analyzeMarketAndReview, reviseMarketAndReview } from "./market-analysis";
 import { isTrustedSender } from "./trusted-sender";
 import { parseDefinitionLaunchRequest } from "./definition-runtime";
 import { buildMissionActivationInstruction } from "./mission-activation";
@@ -604,7 +603,7 @@ export function registerKernelHandlers(): void {
     }
   });
 
-  ipcMain.handle("qf:review:revision", (event, args?: unknown) => {
+  ipcMain.handle("qf:review:revision", async (event, args?: unknown) => {
     try {
       assertTrustedSender(event);
       if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Request revision requires sourceTaskId, evaluationId, and attemptId");
@@ -612,8 +611,15 @@ export function registerKernelHandlers(): void {
       const sourceTaskId = String(input.sourceTaskId ?? "");
       const evaluationId = String(input.evaluationId ?? "");
       const attemptId = String(input.attemptId ?? "");
-      const work = kernelFreezeSourceWork(sourceTaskId);
-      const result = kernelRequestRevision(work, evaluationId, attemptId);
+      if (!sourceTaskId || !evaluationId || !attemptId) throw new Error("Request revision requires sourceTaskId, evaluationId, and attemptId");
+      const result = await reviseMarketAndReview({ source_task_id: sourceTaskId, evaluation_id: evaluationId, attempt_id: attemptId }, (sessionId, definitionId, info) => {
+        invalidateDock();
+        sendToShell("shell:forward", "canvas", "sessions-changed");
+        if (info?.surface === "native_tui" && info.ptySessionId) {
+          sendToShell("shell:forward", "canvas", "create-term-tile", info.ptySessionId, sessionId, definitionId, info.role,
+            String(kernelGetObject("agent_definition", definitionId)?.display_name ?? definitionId));
+        }
+      });
       invalidateDock();
       return { ok: true as const, result };
     } catch (err) {

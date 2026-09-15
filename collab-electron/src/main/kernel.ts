@@ -1244,8 +1244,8 @@ export function kernelRecordGovernedEvaluation(input: Record<string, unknown>, a
   return kernelExecute("record_evaluation", input, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: actorSessionId }).state;
 }
 
-export function kernelRequestRevision(work: SourceWork, evaluationId: string, attemptId: string) {
-  return kernelExecute("governed_review_task", { operation: "admit", action_kind: "request_revision", source_task_id: work.source_task_id, source_work: work, triggering_evaluation_id: evaluationId, attempt_id: attemptId }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) as unknown as GovernedReviewAdmission;
+export function kernelRequestRevision(work: SourceWork, evaluationId: string, attemptId: string, assigneeSessionId: string, coordinatorSessionId: string, missionId: string) {
+  return kernelExecute("governed_review_task", { operation: "admit", action_kind: "request_revision", source_task_id: work.source_task_id, source_work: work, triggering_evaluation_id: evaluationId, attempt_id: attemptId, critic_session_id: assigneeSessionId }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: coordinatorSessionId, mission_id: missionId }) as unknown as GovernedReviewAdmission;
 }
 
 export function kernelRequestSecondCritic(work: SourceWork, evaluationId: string, attemptId: string, criticSessionId: string | null) {

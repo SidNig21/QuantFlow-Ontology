@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { hasLiveDirectorSurface, oneCanvasSurfaceObjects, readyDirectorDefinitions, requireSecondCriticAdmission } from "./one-canvas.js";
-import { blockedReviewPresentation, contextualInspectReceipt, criticMaterialAttack, deriveResearchWorkflow } from "./research-workflow.js";
+import { hasLiveDirectorSurface, oneCanvasSurfaceObjects, readyDirectorDefinitions, requireRevisionAdmission, requireSecondCriticAdmission } from "./one-canvas.js";
+import { blockedReviewPresentation, contextualInspectReceipt, criticMaterialAttack, deriveResearchWorkflow, researchDecisionHistory } from "./research-workflow.js";
 
 test("one Canvas exposes one purposeful investigation surface instead of Kernel-card inventory", () => {
   const mission = { type: "mission", id: "mission-1", fields: {} };
@@ -75,8 +75,8 @@ test("rendered shell has no alternate Canvas mode controls or persisted Canvas r
 	expect(oneCanvas).toContain("Your saved evidence is intact; retry after service returns.");
 	expect(researchWorkflow).toContain('state: "Publication blocked"');
 	expect(oneCanvas).toContain('second.textContent = blocked.secondCriticInProgress ? "Second critic in progress" : "Second critic"');
-	expect(oneCanvas).toContain('revision.textContent = "Request revision unavailable"');
-	expect(oneCanvas).toContain("Revision is unavailable until QuantFlow can create a new result version and send it through independent review.");
+	expect(oneCanvas).toContain('blocked.revisionInProgress ? "Revision in progress" : "Request revision"');
+	expect(oneCanvas).toContain("Revision captures a newer exact Bovada observation, creates a new result, and sends it through independent review.");
 	expect(renderer).toContain("requireSecondCriticAdmission(response)");
 	expect(css).toContain('.canvas-tile[data-qf-surface-kind="investigation"] .tile-content-overlay');
 	expect(css).toContain(".qf-investigation-surface__error");
@@ -93,6 +93,11 @@ test("an ok transport envelope still surfaces a Kernel second-Critic refusal as 
   expect(() => requireSecondCriticAdmission(refusal)).toThrow("No new independent Critic is available. Make an eligible Critic available, then try again.");
   const admission = { kind: "admitted", review_task_id: "review-2", critic_session_id: "critic-2" };
   expect(requireSecondCriticAdmission({ ok: true, result: admission })).toEqual(admission);
+});
+
+test("revision transport surfaces Kernel refusal and accepts one Run-backed assignment", () => {
+  expect(() => requireRevisionAdmission({ ok: true, result: { kind: "refused", receipt: { message: "A revision is already in progress." } } })).toThrow("A revision is already in progress.");
+  expect(requireRevisionAdmission({ ok: true, result: { kind: "admitted", review_task_id: "revision-1", run_id: "run-2" } })).toMatchObject({ review_task_id: "revision-1", run_id: "run-2" });
 });
 
 test("current report resolves only its exact hash-bound Task Run Artifact and Evaluation", () => {
@@ -120,6 +125,39 @@ test("current report resolves only its exact hash-bound Task Run Artifact and Ev
   expect(receipt?.evaluation?.id).toBe("eval-z");
   expect(receipt?.source_work).toEqual(source_work);
   expect(receipt?.revisions).toEqual(["report-z"]);
+});
+
+test("a rejected fresh revision stays visible in history while the prior supported report remains current", () => {
+  const originalWork = { source_task_id: "task-original", hypothesis_id: "hyp-1", run_id: "run-original", result_artifact_id: "result-original", executor_session_id: "worker-1" };
+  const revisionWork = { source_task_id: "task-revision", hypothesis_id: "hyp-1", run_id: "run-revision", result_artifact_id: "result-revision", executor_session_id: "worker-2" };
+  const objects = [
+    { type: "mission", id: "mission-1", fields: {} },
+    { type: "task", id: "task-original", fields: { status: "done" } },
+    { type: "task", id: "task-revision", fields: { status: "done", review_kind: "revision", review_source_task_id: "task-original", review_created_at: "2026-09-14T02:00:00.000Z" } },
+    { type: "run", id: "run-original", fields: { params: { quote_id: "quote-original" } } },
+    { type: "run", id: "run-revision", fields: { params: { quote_id: "quote-revision" } } },
+    { type: "quote", id: "quote-original", fields: { coverage: { observed_at: "2026-09-14T01:00:00.000Z" } } },
+    { type: "quote", id: "quote-revision", fields: { coverage: { observed_at: "2026-09-14T02:00:00.000Z" } } },
+    { type: "artifact", id: "result-original", fields: {} },
+    { type: "artifact", id: "result-revision", fields: {} },
+    { type: "artifact", id: "report-original", fields: { kind: "report" } },
+    { type: "evaluation", id: "eval-original", fields: { verdict: "supports", report_artifact_id: "report-original", source_work: originalWork, rationale: "The original decision is supported." } },
+    { type: "evaluation", id: "eval-revision", fields: { verdict: "rejects", source_work: revisionWork, rationale: "The newer quote does not support publication." } },
+  ];
+  const links = [
+    { kind: "belongs_to", from_id: "task-original", to_id: "mission-1" },
+    { kind: "belongs_to", from_id: "task-revision", to_id: "mission-1" },
+    { kind: "gates", from_id: "eval-original", to_id: "report-original" },
+  ];
+  const workflow = deriveResearchWorkflow({ root: { type: "mission", id: "mission-1" }, current_report_id: "report-original", report_ids: ["report-original"], objects, links });
+  expect(workflow.sourceTask?.id).toBe("task-revision");
+  expect(workflow.evaluation?.id).toBe("eval-revision");
+  expect(workflow.reportEvaluation?.id).toBe("eval-original");
+  expect(workflow.currentReport?.id).toBe("report-original");
+  expect(researchDecisionHistory(workflow)).toEqual([
+    expect.objectContaining({ version: 1, quoteId: "quote-original", verdict: "supports", reportStatus: "Current report" }),
+    expect.objectContaining({ version: 2, quoteId: "quote-revision", verdict: "rejects", reportStatus: "Publication blocked" }),
+  ]);
 });
 
 test("active Critic remains part of the same investigation and its material attack is readable", () => {
@@ -180,7 +218,9 @@ test("blocked publication keeps both exact Critic verdicts and strongest finding
       { index: 2, id: "eval-2", verdict: "inconclusive", attack: "The second Critic found a missing comparison." },
     ],
     reviewInProgress: true,
+    revisionInProgress: false,
     secondCriticInProgress: true,
   });
   expect(contextualInspectReceipt(workflow, workflow.mission)?.evaluations.map((evaluation) => evaluation.id)).toEqual(["eval-1", "eval-2"]);
+  expect(researchDecisionHistory(workflow).map((entry) => entry.verdict)).toEqual(["rejects", "inconclusive"]);
 });

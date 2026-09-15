@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-w1-03-one-canvas @ 3959ce85` on 2026-09-15 by
+> Generated from `codex/wo-w1-03-one-canvas @ d01053d2` on 2026-09-15 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -511,7 +511,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/execute.ts** — UPDATE task at line 129
 - **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 644
-- **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 1077
+- **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 1107
 - `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 777
 - `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 85
 
@@ -519,12 +519,12 @@ discovered from the AST.
 
 2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 1018
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 1048
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1330
 - `collab-electron/src/main/kernel.ts` — exports kernelMarketReviewArtifactView() at line 963
-- `collab-electron/src/main/market-analysis.ts` — exports analyzeMarketAndReview() at line 81
+- `collab-electron/src/main/market-analysis.ts` — exports reviseMarketAndReview() at line 72
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
-- `collab-electron/src/windows/shell/src/research-workflow.js` — exports blockedReviewPresentation() at line 91
+- `collab-electron/src/windows/shell/src/research-workflow.js` — exports blockedReviewPresentation() at line 102
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 236
 
@@ -534,7 +534,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 363
 - **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 544
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 943
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 973
 - **packages/qf-kernel/src/strategy-outcome.ts** — INSERT INTO artifact at line 195
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentTrajectoryArtifact() at line 32
 - `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 343

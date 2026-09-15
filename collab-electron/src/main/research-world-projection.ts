@@ -584,6 +584,7 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   const ids = new Map<string, Set<string>>();
   addId(ids, request.root_type, request.root_id);
   let selectedTaskId: string | undefined;
+  let missionTaskIds: string[] = [];
   let sourceRows: Array<Record<string, unknown>> = [];
   const taskAttemptRuns = (taskId: string) => [...(snapshot.rows.get("run")?.values() ?? [])].filter((candidate) => {
     const params = parseJson(candidate.params);
@@ -613,8 +614,12 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
     ).map((link) => link.from_id).filter((taskId) =>
       snapshot.rows.get("task")?.get(taskId)?.status !== "cancelled"
     );
-    if (tasks.length > 1) return { ok: false, code: "WORLD_ROOT_INELIGIBLE", message: `Mission has ${tasks.length} linked research Tasks; choose one before revealing the world.` };
-    selectedTaskId = tasks[0];
+    missionTaskIds = tasks;
+    const originalTasks = tasks.filter((taskId) => snapshot.rows.get("task")?.get(taskId)?.review_kind !== "revision");
+    if (originalTasks.length > 1) return { ok: false, code: "WORLD_ROOT_INELIGIBLE", message: `Mission has ${originalTasks.length} linked research Tasks; choose one before revealing the world.` };
+    const completedRevisions = tasks.filter((taskId) => snapshot.rows.get("task")?.get(taskId)?.review_kind === "revision" && (snapshot.sourceWork.get(taskId)?.length ?? 0) === 1)
+      .sort((left, right) => String(snapshot.rows.get("task")?.get(left)?.review_created_at ?? "").localeCompare(String(snapshot.rows.get("task")?.get(right)?.review_created_at ?? "")) || left.localeCompare(right));
+    selectedTaskId = completedRevisions.at(-1) ?? originalTasks[0];
     if (!selectedTaskId) {
       const directRuns = allLinks.filter((link) => link.kind === "belongs_to" && link.to_id === request.root_id && objectType(snapshot, link.from_id) === "run").map((link) => link.from_id).sort();
       const evidenceDatasets = evidenceDatasetsForMission(snapshot, request.root_id);
@@ -712,6 +717,15 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   const projectionContext = { ...reports, runId: String(source.run_id), sourceTaskId: selectedTaskId, runResultArtifactId: String(runFields.result_artifact_id), sourceResultArtifactId: String(source.result_artifact_id) };
   addId(ids, "dataset", runFields.dataset_id);
   addId(ids, "artifact", runFields.result_artifact_id);
+  addId(ids, "quote", runFields.quote_id);
+  if (typeof runFields.quote_id === "string") {
+    const observedQuote = objectRow(snapshot, "quote", runFields.quote_id);
+    addId(ids, "artifact", observedQuote.data_ref);
+    const observedInstrument = allLinks.find((link) => link.kind === "quotes" && link.from_id === runFields.quote_id)?.to_id;
+    addId(ids, "market_instrument", observedInstrument);
+    addId(ids, "market_event", allLinks.find((link) => link.kind === "offered_on" && link.from_id === observedInstrument)?.to_id);
+    addId(ids, "market_venue", allLinks.find((link) => link.kind === "lists" && link.to_id === observedInstrument)?.from_id);
+  }
 
   for (const attempt of taskAttemptRuns(selectedTaskId)) {
     addId(ids, "run", attempt.id);
@@ -760,6 +774,35 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
     }
   }
 
+  const historicalSources = missionTaskIds.flatMap((taskId) => snapshot.sourceWork.get(taskId) ?? [])
+    .filter((candidate) => candidate.hypothesis_id === source.hypothesis_id && !sourceWorkMatches({ source_work: candidate }, source));
+  for (const historical of historicalSources) {
+    for (const [type, key] of [["task", "source_task_id"], ["hypothesis", "hypothesis_id"], ["run", "run_id"], ["artifact", "result_artifact_id"], ["agent_session", "executor_session_id"]] as const) addId(ids, type, historical[key]);
+    const historicalRun = objectRow(snapshot, "run", String(historical.run_id));
+    const historicalParams = parseJson(historicalRun.params) as Record<string, unknown> | null;
+    addId(ids, "dataset", historicalParams?.dataset_id);
+    addId(ids, "artifact", historicalParams?.result_artifact_id);
+    addId(ids, "quote", historicalParams?.quote_id);
+    const quoteId = typeof historicalParams?.quote_id === "string" ? historicalParams.quote_id : null;
+    if (quoteId) {
+      const quote = objectRow(snapshot, "quote", quoteId);
+      addId(ids, "artifact", quote.data_ref);
+      const instrumentId = allLinks.find((link) => link.kind === "quotes" && link.from_id === quoteId)?.to_id;
+      addId(ids, "market_instrument", instrumentId);
+      addId(ids, "market_event", allLinks.find((link) => link.kind === "offered_on" && link.from_id === instrumentId)?.to_id);
+      addId(ids, "market_venue", allLinks.find((link) => link.kind === "lists" && link.to_id === instrumentId)?.from_id);
+    }
+    for (const evaluation of snapshot.rows.get("evaluation")?.values() ?? []) {
+      if (!sourceWorkMatches(evaluation, historical)) continue;
+      addId(ids, "evaluation", evaluation.id);
+      addId(ids, "task", evaluation.review_task_id);
+      addId(ids, "artifact", evaluation.findings_artifact_id);
+      addId(ids, "artifact", evaluation.publication_report_id);
+      const criticId = allLinks.find((link) => link.kind === "performed_by" && link.from_id === evaluation.id)?.to_id;
+      addId(ids, "agent_session", criticId);
+    }
+  }
+
   for (const reviewTaskId of ids.get("task") ?? []) {
     if (reviewTaskId === selectedTaskId) continue;
     for (const link of allLinks) {
@@ -778,6 +821,10 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
       selectedLinkKeys.add(`${kind}\u0000${fromId}\u0000${toId}`);
     }
   };
+  if (historicalSources.length) {
+    const allowedHistoryKinds = new Set(["belongs_to", "assigned_to", "delegated_by", "tests", "uses", "produces", "quotes", "offered_on", "lists", "evaluated_by", "performed_by", "gates"]);
+    for (const link of allLinks) if (allowedHistoryKinds.has(link.kind) && idsContain(ids, link.from_id) && idsContain(ids, link.to_id)) selectedLinkKeys.add(`${link.kind}\u0000${link.from_id}\u0000${link.to_id}`);
+  }
   const sourceTaskLinks = allLinks.filter((link) => link.from_id === selectedTaskId);
   const missionId = sourceTaskLinks.find((link) => link.kind === "belongs_to")?.to_id;
   const executorId = source.executor_session_id;

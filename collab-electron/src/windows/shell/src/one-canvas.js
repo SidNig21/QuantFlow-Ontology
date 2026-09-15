@@ -4,6 +4,7 @@ import {
 	criticMaterialAttack,
 	deriveResearchWorkflow,
 	contextualInspectReceipt,
+	researchDecisionHistory,
 } from "./research-workflow.js";
 
 const RESULT_WIDTH = 460;
@@ -66,8 +67,14 @@ export function requireSecondCriticAdmission(response) {
 	return response.result;
 }
 
+export function requireRevisionAdmission(response) {
+	if (!response?.ok) throw new Error(response?.error?.message ?? "Revision failed");
+	if (response.result?.kind === "refused") throw new Error(response.result?.receipt?.message ?? "Revision could not start.");
+	return response.result;
+}
+
 /** One persistent desk: deliberate surfaces in front, exact Kernel detail in Inspect. */
-export function createOneCanvasController({ tileManager, getTileDOMs, onCables, onClearCableSelection, showStatus, getParticipantView, onSecondCritic }) {
+export function createOneCanvasController({ tileManager, getTileDOMs, onCables, onClearCableSelection, showStatus, getParticipantView, onRevision, onSecondCritic }) {
 	let lastRoot = null;
 	let lastWorld = null;
 	let lastWorkflow = null;
@@ -112,6 +119,20 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 			appendText(pane, "dock-inspect-link", humanize(receipt.evaluation.fields?.verdict));
 		}
 		if (receipt?.revisions.length) appendText(pane, "dock-inspect-link", `${receipt.revisions.length} durable decision revision${receipt.revisions.length === 1 ? "" : "s"}`);
+		const history = researchDecisionHistory(lastWorkflow);
+		if (history.length) {
+			appendText(pane, "dock-inspect-subheading", "Decision history");
+			for (const entry of history) {
+				const card = document.createElement("div");
+				card.className = "qf-decision-history";
+				appendText(card, "qf-decision-history__title", `Version ${entry.version} · ${entry.reportStatus}`);
+				appendText(card, "qf-decision-history__quote", `Quote observed: ${entry.observedAt ?? "time unavailable"} · ${entry.quoteId ?? "Quote unavailable"}`);
+				appendText(card, "qf-decision-history__run", `Run ${entry.runId ?? "unavailable"} · result ${entry.resultArtifactId ?? "unavailable"}`);
+				appendText(card, "qf-decision-history__verdict", `Critic verdict: ${humanize(entry.verdict)}`);
+				if (entry.finding) appendText(card, "qf-decision-history__finding", `Strongest finding: ${entry.finding}`);
+				pane.appendChild(card);
+			}
+		}
 		const technical = document.createElement("details");
 		technical.className = "dock-inspect-technical";
 		const summary = document.createElement("summary");
@@ -214,10 +235,45 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 		actionability.dataset.actionability = String(decision.classification ?? "");
 		appendText(surface, "qf-decision-surface__reason", String(decision.selection_reason ?? decision.rationale ?? "No reason recorded"));
 		appendText(surface, "qf-decision-surface__condition", `Next condition: ${String(decision.change_condition ?? "No change condition recorded")}`);
-		if (lastWorkflow?.evaluation) {
-			appendText(surface, "qf-decision-surface__critic", `Critic: ${humanize(lastWorkflow.evaluation.fields?.verdict)} · independently reviewed`);
-			const attack = criticMaterialAttack(lastWorkflow);
+		const publishedEvaluation = lastWorkflow?.reportEvaluation ?? lastWorkflow?.evaluation;
+		if (publishedEvaluation) {
+			appendText(surface, "qf-decision-surface__critic", `Published Critic: ${humanize(publishedEvaluation.fields?.verdict)} · independently reviewed`);
+			const attack = criticMaterialAttack(lastWorkflow, publishedEvaluation);
 			if (attack) appendText(surface, "qf-decision-surface__attack", `Strongest challenge: ${attack}`);
+		}
+		const blocked = blockedReviewPresentation(lastWorkflow);
+		if (blocked) {
+			appendText(surface, "qf-decision-surface__history-state", blocked.revisionInProgress ? "Revision research is in progress. The published decision remains current." : `Latest revision ${humanize(lastWorkflow.evaluation.fields?.verdict)}. The published decision remains current.`);
+			const actions = document.createElement("div");
+			actions.className = "qf-investigation-surface__review-actions";
+			const revision = document.createElement("button");
+			revision.type = "button";
+			revision.textContent = blocked.revisionInProgress ? "Revision in progress" : "Request revision";
+			revision.disabled = blocked.reviewInProgress;
+			revision.addEventListener("click", async (event) => {
+				event.stopPropagation();
+				if (revision.disabled) return;
+				revision.disabled = true;
+				try {
+					await onRevision?.(lastWorkflow.sourceTask.id, lastWorkflow.evaluation.id, crypto.randomUUID());
+					showStatus?.("A current Researcher is revising the result from a new exact Bovada observation.");
+					await reveal("mission", lastWorkflow.mission.id);
+				} catch (error) { showStatus?.(error?.message ?? String(error)); await reveal("mission", lastWorkflow.mission.id); }
+			});
+			actions.appendChild(revision);
+			const second = document.createElement("button");
+			second.type = "button";
+			second.textContent = blocked.secondCriticInProgress ? "Second critic in progress" : "Second critic";
+			second.disabled = blocked.reviewInProgress;
+			second.addEventListener("click", async (event) => {
+				event.stopPropagation();
+				if (second.disabled) return;
+				second.disabled = true;
+				try { await onSecondCritic?.(lastWorkflow.sourceTask.id, lastWorkflow.evaluation.id, crypto.randomUUID()); await reveal("mission", lastWorkflow.mission.id); }
+				catch (error) { showStatus?.(error?.message ?? String(error)); await reveal("mission", lastWorkflow.mission.id); }
+			});
+			actions.appendChild(second);
+			surface.appendChild(actions);
 		}
 		const button = document.createElement("button");
 		button.type = "button";
@@ -244,7 +300,8 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 		const runtimeFailed = lastWorkflow.executor?.fields?.status === "failed";
 		const reviewActive = lastWorkflow.reviewTask?.fields?.status === "open";
 		const researchActive = (lastWorkflow.sourceTask?.fields?.status === "open" || reviewActive) && !runtimeFailed;
-		const stateText = blocked?.secondCriticInProgress ? "Second independent review is in progress"
+		const stateText = blocked?.revisionInProgress ? "Revision research is in progress"
+			: blocked?.secondCriticInProgress ? "Second independent review is in progress"
 			: blocked ? "Publication blocked"
 				: runtimeFailed ? "The research provider became unavailable. Your saved evidence is intact; retry after service returns."
 				: reviewActive ? "Independent review is in progress"
@@ -292,9 +349,25 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 			const revision = document.createElement("button");
 			revision.type = "button";
 			revision.className = "qf-investigation-surface__revision";
-			revision.textContent = "Request revision unavailable";
-			revision.disabled = true;
-			revision.title = "Revision will be available when QuantFlow can create and review a new result version.";
+			revision.textContent = blocked.revisionInProgress ? "Revision in progress" : "Request revision";
+			revision.disabled = blocked.reviewInProgress;
+			revision.addEventListener("click", async (event) => {
+				event.stopPropagation();
+				if (revision.disabled) return;
+				analysisErrors.delete(mission.id);
+				revision.disabled = true;
+				revision.textContent = "Capturing current market…";
+				try {
+					await onRevision?.(lastWorkflow.sourceTask.id, lastWorkflow.evaluation.id, crypto.randomUUID());
+					showStatus?.("A current Researcher is revising the result from a new exact Bovada observation.");
+					await reveal("mission", mission.id);
+				} catch (error) {
+					const message = error?.message ?? String(error);
+					analysisErrors.set(mission.id, message);
+					showStatus?.(message);
+					await reveal("mission", mission.id);
+				}
+			});
 			actions.appendChild(revision);
 			const second = document.createElement("button");
 			second.type = "button";
@@ -320,7 +393,7 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 			});
 			actions.appendChild(second);
 			surface.appendChild(actions);
-			appendText(surface, "qf-investigation-surface__revision-note", "Revision is unavailable until QuantFlow can create a new result version and send it through independent review.");
+			appendText(surface, "qf-investigation-surface__revision-note", "Revision captures a newer exact Bovada observation, creates a new result, and sends it through independent review.");
 		}
 		const inspectButton = document.createElement("button");
 		inspectButton.type = "button";

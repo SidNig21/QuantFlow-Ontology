@@ -581,6 +581,9 @@ export function execute<C extends string>(
 
   const tx = db.transaction(() => {
     db.query(`UPDATE ${cmd.type} SET ${field} = ? WHERE id = ?`).run(cmd.to, id);
+    if (command === "complete_task" && db.query("SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = 'qf_review_task'").get()) {
+      db.query("UPDATE qf_review_task SET lifecycle = 'completed' WHERE task_id = ? AND kind = 'revision' AND lifecycle = 'running'").run(id);
+    }
     appendEvent(db, {
       type: cmd.event,
       object_type: cmd.type,

@@ -47,7 +47,7 @@ export type Finding = {
   evidence_refs: string[];
 };
 
-export type GovernedReviewTrace = { trace_id: string; span_id: string };
+export type GovernedReviewTrace = { trace_id: string; span_id: string; actor_session_id?: string; mission_id?: string };
 
 export type GovernedActionKind = "request_review" | "request_revision" | "second_critic";
 
@@ -586,6 +586,21 @@ function criticIsAdmitted(db: KernelDb, sessionId: string): boolean {
   return Array.isArray(groups) && groups.length === 1 && groups[0] === "research.evaluate";
 }
 
+function participantIsAdmitted(db: KernelDb, sessionId: string, role: string, capability: string): boolean {
+  const row = db.query(`
+    SELECT s.status, d.role, d.capability_groups
+      FROM agent_session s
+      JOIN links l ON l.from_id = s.id AND l.kind = 'spawned_from'
+      JOIN agent_definition d ON d.id = l.to_id
+     WHERE s.id = ?
+  `).get(sessionId) as { status: string; role: string; capability_groups: string } | null;
+  if (!row || row.status !== "running" || row.role !== role) return false;
+  try {
+    const groups = JSON.parse(row.capability_groups) as unknown;
+    return Array.isArray(groups) && groups.includes(capability);
+  } catch { return false; }
+}
+
 function existingAttempt(db: KernelDb, action: GovernedActionKind, sourceTaskId: string, attemptId: string): GovernedReviewAdmission | null {
   const row = db.query("SELECT outcome, result FROM qf_review_attempt WHERE action_kind = ? AND source_task_id = ? AND attempt_id = ?").get(action, sourceTaskId, attemptId) as { outcome: string; result: string } | null;
   if (!row) return null;
@@ -681,11 +696,17 @@ function admitGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput, t
       return result;
     }
 
-    const assigneeSessionId = action === "request_revision" ? work.executor_session_id : input.critic_session_id ?? "";
+    const assigneeSessionId = input.critic_session_id ?? "";
     if (action === "request_revision") {
-      const executor = db.query("SELECT status FROM agent_session WHERE id = ?").get(work.executor_session_id) as { status: string } | null;
-      if (!executor || executor.status !== "running") {
-        const refusal = refusalFor(action, sourceTaskId, work, evaluationId, attemptId, "ORIGINAL_EXECUTOR_NOT_RUNNING", REVISION_EXECUTOR_NOT_RUNNING_MESSAGE);
+      const activeRevisions = db.query("SELECT qf_review_task.source_work FROM qf_review_task JOIN task ON task.id = qf_review_task.task_id WHERE qf_review_task.kind = 'revision' AND task.status = 'open'").all() as Array<{ source_work: string }>;
+      if (activeRevisions.some((row) => sameJson(JSON.parse(row.source_work), work))) {
+        const refusal = refusalFor(action, sourceTaskId, work, evaluationId, attemptId, "REVISION_IN_PROGRESS", "A revision is already in progress for this exact source work.");
+        const result = persistRefusal(db, refusal, trace);
+        persistAttempt(db, action, sourceTaskId, attemptId, result);
+        return result;
+      }
+      if (!participantIsAdmitted(db, assigneeSessionId, "worker", "market.read") || !participantIsAdmitted(db, trace.actor_session_id ?? "", "orchestrator", "desk.orchestrate") || assigneeSessionId === trace.actor_session_id) {
+        const refusal = refusalFor(action, sourceTaskId, work, evaluationId, attemptId, "REVISION_ADMISSION_FAILED", "A current eligible Researcher and Research Director are required to start this revision.");
         const result = persistRefusal(db, refusal, trace);
         persistAttempt(db, action, sourceTaskId, attemptId, result);
         return result;
@@ -717,10 +738,12 @@ function admitGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput, t
     }
 
     exactSourceTaskDelegator(db, sourceTaskId);
-    const delegatorSessionId = requireRunningTaskCoordinator(db, sourceTaskId);
+    const delegatorSessionId = action === "request_revision" ? trace.actor_session_id! : requireRunningTaskCoordinator(db, sourceTaskId);
     const kind = action === "request_review" ? "review" : action === "request_revision" ? "revision" : "second_critic";
     const taskId = `review-task-${crypto.randomUUID()}`;
-    const taskDescription = `Review the immutable source work ${work.source_task_id} using the governed critic contract.`;
+    const taskDescription = kind === "revision"
+      ? `Reassess the inquiry from a newer exact market observation, preserve ${work.source_task_id}, and submit one new result for independent review.`
+      : `Review the immutable source work ${work.source_task_id} using the governed critic contract.`;
     writeTaskInTransaction(db, {
       task_id: taskId,
       title: reviewTaskTitle(kind),
@@ -1094,12 +1117,12 @@ function refusalFor(action: GovernedActionKind, sourceTaskId: string, work: Sour
   return { action_kind: action, selected_source_task_id: sourceTaskId, source_work: work, triggering_evaluation_id: evalId, attempt_id: attemptId, reason_code: code, message, task_id: null };
 }
 
-export function requestRevision(db: KernelDb, work: SourceWork, evaluationId: string, attemptId: string, trace: GovernedReviewTrace): GovernedReviewAdmission {
+export function requestRevision(db: KernelDb, work: SourceWork, evaluationId: string, attemptId: string, assigneeSessionId: string, coordinatorSessionId: string, trace: GovernedReviewTrace): GovernedReviewAdmission {
   ensureGovernedReviewSchema(db);
   const prior = existingAttempt(db, "request_revision", work.source_task_id, attemptId);
   if (prior) return prior;
   freezeSourceWork(db, work.source_task_id);
-  return execute(db, "governed_review_task", { operation: "admit", action_kind: "request_revision", source_task_id: work.source_task_id, source_work: work, triggering_evaluation_id: evaluationId, attempt_id: attemptId }, trace) as unknown as GovernedReviewAdmission;
+  return execute(db, "governed_review_task", { operation: "admit", action_kind: "request_revision", source_task_id: work.source_task_id, source_work: work, triggering_evaluation_id: evaluationId, attempt_id: attemptId, critic_session_id: assigneeSessionId }, { ...trace, actor_session_id: coordinatorSessionId }) as unknown as GovernedReviewAdmission;
 }
 
 export function requestSecondCritic(db: KernelDb, work: SourceWork, evaluationId: string, attemptId: string, criticSessionId: string | null, trace: GovernedReviewTrace): GovernedReviewAdmission {

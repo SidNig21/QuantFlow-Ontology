@@ -306,7 +306,7 @@ describe("Task footer projection", () => {
 		});
 	});
 
-	test("blocked review keeps revision disabled while Second critic remains operable", async () => {
+	test("blocked review keeps revision and Second critic operable", async () => {
 		await withDocument(async () => {
 			const foot = new FakeElement();
 			const calls: string[] = [];
@@ -325,16 +325,17 @@ describe("Task footer projection", () => {
 							actions: ["Request revision", "Second critic"],
 						},
 					}],
+					onRequestRevision: async (taskId, evaluationId) => { calls.push(`revision:${taskId}:${evaluationId}`); },
 					onSecondCritic: async (taskId, evaluationId) => { calls.push(`${taskId}:${evaluationId}`); },
 				},
 			);
 			const revision = foot.querySelector(".governed-review-revision");
-			expect(revision?.disabled).toBe(true);
-			expect(revision?.textContent).toBe("Request revision unavailable");
-			expect(revision?.listeners.has("click")).toBe(false);
-			expect(foot.querySelector(".governed-review-revision-note")?.textContent).toContain("new result version");
+			expect(revision?.disabled).toBe(false);
+			expect(revision?.textContent).toBe("Request revision");
+			await revision?.listeners.get("click")?.({ stopPropagation() {} });
+			expect(foot.querySelector(".governed-review-revision-note")?.textContent).toContain("newer exact market observation");
 			await foot.querySelector(".governed-review-second")?.listeners.get("click")?.({ stopPropagation() {} });
-			expect(calls).toEqual(["task-1:evaluation-1"]);
+			expect(calls).toEqual(["revision:task-1:evaluation-1", "task-1:evaluation-1"]);
 		});
 	});
 

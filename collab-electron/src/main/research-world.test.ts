@@ -539,6 +539,27 @@ describe("Main research-world projection", () => {
           `tests:${run.object_id}:${hypothesis.object_id}`,
           `uses:${run.object_id}:${dataset.object_id}`,
         ].sort());
+
+        const revisionTask = execute(db, "create_task", {
+          task_id: "task-normal-world-revision",
+          title: "Revise research after critic review",
+          description: "Reassess the same inquiry from a fresh market observation.",
+          assignee_session_id: "worker-world",
+        }, { ...localTrace, actor_session_id: "director-world", mission_id: mission.object_id });
+        db.query("INSERT INTO qf_review_task (task_id, kind, source_task_id, source_work, critic_session_id, assignee_session_id, attempt_id, triggering_evaluation_id, lifecycle, created_at) VALUES (?, 'revision', ?, ?, NULL, ?, ?, ?, 'running', ?)").run(
+          revisionTask.object_id, sourceTask.object_id, JSON.stringify(sourceWork), "worker-world", "normal-world-revision-attempt", String(evaluation.state.id), "2026-09-14T02:00:00.000Z",
+        );
+        const revising = getResearchWorldProjection(db, { root_type: "mission", root_id: mission.object_id });
+        expect(revising.ok).toBe(true);
+        if (revising.ok) {
+          expect(revising.world.current_report_id).toBe(String(evaluation.state.report_artifact_id));
+          expect(revising.world.objects.find((object) => object.type === "task" && object.id === revisionTask.object_id)?.fields).toMatchObject({
+            status: "open",
+            review_kind: "revision",
+            review_source_task_id: sourceTask.object_id,
+            review_lifecycle: "running",
+          });
+        }
       }
     } finally {
       closeKernel(db);

@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "3959ce85",
+    "commit": "d01053d2",
     "generatedAt": "2026-09-15",
     "filesScanned": 433,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "97f50a57ca87db83"
+    "fingerprint": "8070d0cb6df5b8d4"
   },
   "stats": {
     "live": 108,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 119,
-      "indexed": 1299,
+      "indexed": 1302,
       "downgradedFromCheats": 27,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 21,
@@ -617,8 +617,8 @@
       "layer": 4,
       "name": "monaco-react-shim.d.ts",
       "kb": 10,
-      "x": -1.27,
-      "z": -3.75,
+      "x": 0.96,
+      "z": -3.84,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -645,8 +645,8 @@
       "layer": 4,
       "name": "Editor.tsx",
       "kb": 23.7,
-      "x": 0.45,
-      "z": 2.6,
+      "x": -0.91,
+      "z": 2.48,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -673,8 +673,8 @@
       "layer": 4,
       "name": "ItemDetailView.tsx",
       "kb": 9.7,
-      "x": 0.96,
-      "z": -3.84,
+      "x": 2.88,
+      "z": -2.72,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -701,8 +701,8 @@
       "layer": 4,
       "name": "TerminalTab.tsx",
       "kb": 11.7,
-      "x": -3.53,
-      "z": 1.79,
+      "x": -3.94,
+      "z": -0.4,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -785,8 +785,8 @@
       "layer": 4,
       "name": "WorkspaceTree.tsx",
       "kb": 11.1,
-      "x": -3.1,
-      "z": -2.47,
+      "x": -1.27,
+      "z": -3.75,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -925,8 +925,8 @@
       "layer": 4,
       "name": "window-api.d.ts",
       "kb": 11.4,
-      "x": -3.94,
-      "z": -0.4,
+      "x": -3.1,
+      "z": -2.47,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1077,8 +1077,8 @@
       "layer": 2,
       "name": "agent*",
       "kb": 34.5,
-      "x": -0.91,
-      "z": 2.48,
+      "x": -2.03,
+      "z": 1.69,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
@@ -1499,7 +1499,7 @@
       "id": "2:collab-electron/src/main::ipc",
       "layer": 2,
       "name": "ipc*",
-      "kb": 81.1,
+      "kb": 81.7,
       "x": -0.23,
       "z": 1.3,
       "status": "ok",
@@ -1510,7 +1510,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/ipc-kernel.ts",
-          "kb": 44.8,
+          "kb": 45.4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1694,7 +1694,7 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 92,
+      "kb": 92.2,
       "x": 1.01,
       "z": 0.85,
       "status": "gray",
@@ -1705,7 +1705,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 92,
+          "kb": 92.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 8,
@@ -1821,9 +1821,9 @@
       "id": "2:collab-electron/src/main::market",
       "layer": 2,
       "name": "main/market*",
-      "kb": 33.4,
-      "x": -2.03,
-      "z": 1.69,
+      "kb": 40.3,
+      "x": 1.24,
+      "z": -0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1832,7 +1832,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/market-analysis.ts",
-          "kb": 15,
+          "kb": 21.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2049,8 +2049,8 @@
       "layer": 2,
       "name": "pty*",
       "kb": 37.3,
-      "x": 1.24,
-      "z": -0.45,
+      "x": 0.45,
+      "z": 2.6,
       "status": "ok",
       "spawns": 2,
       "writes": 4,
@@ -2086,7 +2086,7 @@
       "id": "2:collab-electron/src/main::research",
       "layer": 2,
       "name": "research*",
-      "kb": 50.4,
+      "kb": 54.2,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -2097,7 +2097,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/research-world-projection.ts",
-          "kb": 49.3,
+          "kb": 53.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2173,8 +2173,8 @@
       "layer": 2,
       "name": "sidecar/",
       "kb": 35.5,
-      "x": 0.45,
-      "z": 2.6,
+      "x": -0.91,
+      "z": 2.48,
       "status": "ok",
       "spawns": 4,
       "writes": 2,
@@ -2545,8 +2545,8 @@
       "layer": 4,
       "name": "universal.ts",
       "kb": 21.1,
-      "x": -0.91,
-      "z": 2.48,
+      "x": -2.03,
+      "z": 1.69,
       "status": "warn",
       "spawns": 0,
       "writes": 0,
@@ -2610,8 +2610,8 @@
       "layer": 4,
       "name": "settings/src/App.tsx",
       "kb": 20.1,
-      "x": -2.03,
-      "z": 1.69,
+      "x": -2.6,
+      "z": 0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2847,9 +2847,9 @@
       "id": "4:collab-electron/src/windows/shell/src::one",
       "layer": 4,
       "name": "one-canvas.js",
-      "kb": 19.9,
-      "x": -2.6,
-      "z": 0.45,
+      "kb": 23.9,
+      "x": 0.45,
+      "z": 2.6,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2858,7 +2858,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/one-canvas.js",
-          "kb": 19.9,
+          "kb": 23.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2903,7 +2903,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 59.9,
+      "kb": 60.2,
       "x": 1.01,
       "z": 0.85,
       "status": "ice",
@@ -2914,7 +2914,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 59.9,
+          "kb": 60.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2931,9 +2931,9 @@
       "id": "4:collab-electron/src/windows/shell/src::research",
       "layer": 4,
       "name": "research-workflow.js",
-      "kb": 9.7,
-      "x": 2.88,
-      "z": -2.72,
+      "kb": 12.1,
+      "x": -3.53,
+      "z": 1.79,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2942,7 +2942,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/research-workflow.js",
-          "kb": 9.7,
+          "kb": 12.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2959,7 +2959,7 @@
       "id": "4:collab-electron/src/windows/shell/src::task",
       "layer": 4,
       "name": "task-composition.js",
-      "kb": 14.9,
+      "kb": 15,
       "x": 2.03,
       "z": -1.69,
       "status": "ok",
@@ -2970,7 +2970,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/task-composition.js",
-          "kb": 14.9,
+          "kb": 15,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3217,22 +3217,22 @@
       "id": "0:packages/qf-kernel/src::execute",
       "layer": 0,
       "name": "execute.ts",
-      "kb": 36.3,
+      "kb": 36.5,
       "x": 1.24,
       "z": -0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
-      "dml": 7,
+      "dml": 8,
       "executes": 0,
       "files": [
         {
           "path": "packages/qf-kernel/src/execute.ts",
-          "kb": 36.3,
+          "kb": 36.5,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
-          "dml": 7,
+          "dml": 8,
           "dmlLines": [
             129,
             164,
@@ -3252,7 +3252,7 @@
       "id": "0:packages/qf-kernel/src::governed",
       "layer": 0,
       "name": "governed-review.ts",
-      "kb": 66.8,
+      "kb": 69.2,
       "x": 1.01,
       "z": 0.85,
       "status": "alert",
@@ -3263,7 +3263,7 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/governed-review.ts",
-          "kb": 66.8,
+          "kb": 69.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
@@ -7963,7 +7963,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:383"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:382"
             },
             {
               "layer": "kernel",
@@ -8005,7 +8005,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:658"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:664"
             },
             {
               "layer": "kernel",
@@ -8048,7 +8048,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:702"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:708"
             },
             {
               "layer": "kernel",
@@ -8076,7 +8076,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:806"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:812"
             },
             {
               "layer": "kernel",
@@ -8155,7 +8155,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:933"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:939"
             },
             {
               "layer": "kernel",
@@ -8199,7 +8199,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:779"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:785"
             },
             {
               "layer": "kernel",
@@ -8227,7 +8227,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:739"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:745"
             },
             {
               "layer": "kernel",
@@ -8255,7 +8255,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:974"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:980"
             },
             {
               "layer": "kernel",
@@ -8300,7 +8300,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:569"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:568"
             },
             {
               "layer": "kernel",
@@ -8328,7 +8328,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:607"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:606"
             },
             {
               "layer": "kernel",
@@ -8356,7 +8356,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:624"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:630"
             },
             {
               "layer": "kernel",
@@ -8384,7 +8384,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:557"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:556"
             },
             {
               "layer": "kernel",
@@ -8431,7 +8431,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:489"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:488"
             },
             {
               "layer": "kernel",
@@ -8459,7 +8459,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:548"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:547"
             },
             {
               "layer": "kernel",
@@ -8487,7 +8487,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:475"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:474"
             },
             {
               "layer": "kernel",
@@ -8515,7 +8515,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:1025"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:1031"
             },
             {
               "layer": "kernel",
@@ -8571,7 +8571,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:539"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:538"
             },
             {
               "layer": "kernel",
@@ -8718,7 +8718,7 @@
     {
       "path": "packages/qf-kernel/src/governed-review.ts",
       "status": "partial",
-      "indexedFns": 51,
+      "indexedFns": 52,
       "sqlInText": 36,
       "sqlIndexed": 35,
       "sqlUnrecognised": 0,
@@ -9240,7 +9240,7 @@
     {
       "path": "collab-electron/src/main/market-analysis.ts",
       "status": "indexed",
-      "indexedFns": 13,
+      "indexedFns": 15,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9689,8 +9689,8 @@
       "path": "packages/qf-kernel/src/execute.ts",
       "status": "indexed",
       "indexedFns": 38,
-      "sqlInText": 7,
-      "sqlIndexed": 7,
+      "sqlInText": 8,
+      "sqlIndexed": 8,
       "sqlUnrecognised": 0
     },
     {
@@ -11606,7 +11606,7 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "UPDATE task at line 1077"
+            "UPDATE task at line 1107"
           ],
           "weight": "strong"
         },
@@ -11728,12 +11728,12 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [
             "exports ensureGovernedReviewSchema() at line 364",
-            "exports executeGovernedReviewTask() at line 793",
-            "exports requestGovernedReview() at line 820"
+            "exports executeGovernedReviewTask() at line 823",
+            "exports requestGovernedReview() at line 850"
           ],
           "strong": [
-            "INSERT INTO evaluation at line 1018",
-            "UPDATE evaluation at line 1069"
+            "INSERT INTO evaluation at line 1048",
+            "UPDATE evaluation at line 1099"
           ],
           "weight": "strong"
         },
@@ -11758,7 +11758,8 @@
         {
           "file": "collab-electron/src/main/market-analysis.ts",
           "weak": [
-            "exports analyzeMarketAndReview() at line 81"
+            "exports reviseMarketAndReview() at line 72",
+            "exports analyzeMarketAndReview() at line 146"
           ],
           "strong": [],
           "weight": "weak"
@@ -11774,7 +11775,7 @@
         {
           "file": "collab-electron/src/windows/shell/src/research-workflow.js",
           "weak": [
-            "exports blockedReviewPresentation() at line 91"
+            "exports blockedReviewPresentation() at line 102"
           ],
           "strong": [],
           "weight": "weak"
@@ -11831,7 +11832,7 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "INSERT INTO artifact at line 943"
+            "INSERT INTO artifact at line 973"
           ],
           "weight": "strong"
         },
@@ -15589,7 +15590,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "ipcRequest": "1 channel name(s) built from a variable or template (line 102)",
+        "ipcRequest": "1 channel name(s) built from a variable or template (line 101)",
         "ipcPush": "1 push channel name(s) built from a variable or template",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -17031,7 +17032,7 @@
       "reasons": {
         "reach": "no reach row was produced for this path",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "16 of 29 SQL site(s) are not inside a named function, so no call path can be traced",
+        "persistence": "17 of 30 SQL site(s) are not inside a named function, so no call path can be traced",
         "lifetime": "starts no long-lived child process",
         "packaging": "test or QA code does not ship",
         "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
@@ -41205,7 +41206,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:475"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:474"
         },
         {
           "layer": "kernel",
@@ -41215,7 +41216,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 475,
+        "line": 474,
         "kind": "handle"
       },
       "calledAt": {
@@ -41310,7 +41311,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:213"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:212"
         },
         {
           "layer": "kernel",
@@ -41320,7 +41321,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 213,
+        "line": 212,
         "kind": "handle"
       },
       "calledAt": {
@@ -42409,7 +42410,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:840"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:846"
         },
         {
           "layer": "kernel",
@@ -42419,7 +42420,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 840,
+        "line": 846,
         "kind": "handle"
       },
       "calledAt": {
@@ -42596,7 +42597,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:1025"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:1031"
         },
         {
           "layer": "kernel",
@@ -42606,7 +42607,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 1025,
+        "line": 1031,
         "kind": "handle"
       },
       "calledAt": {
@@ -42656,7 +42657,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:371"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:370"
         },
         {
           "layer": "kernel",
@@ -42666,7 +42667,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 371,
+        "line": 370,
         "kind": "handle"
       },
       "calledAt": {
@@ -43061,7 +43062,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:348"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:347"
         },
         {
           "layer": "kernel",
@@ -43071,7 +43072,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 348,
+        "line": 347,
         "kind": "handle"
       },
       "calledAt": {
@@ -43233,7 +43234,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:241"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:240"
         },
         {
           "layer": "kernel",
@@ -43243,7 +43244,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 241,
+        "line": 240,
         "kind": "handle"
       },
       "calledAt": {
@@ -43555,7 +43556,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:539"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:538"
         },
         {
           "layer": "kernel",
@@ -43565,7 +43566,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 539,
+        "line": 538,
         "kind": "handle"
       },
       "calledAt": {
@@ -43653,7 +43654,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:352"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:351"
         },
         {
           "layer": "kernel",
@@ -43663,7 +43664,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 352,
+        "line": 351,
         "kind": "handle"
       },
       "calledAt": {
@@ -44410,7 +44411,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:271"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:270"
         },
         {
           "layer": "kernel",
@@ -44420,7 +44421,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 271,
+        "line": 270,
         "kind": "handle"
       },
       "calledAt": {
@@ -44498,7 +44499,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:289"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:288"
         },
         {
           "layer": "kernel",
@@ -44508,7 +44509,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 289,
+        "line": 288,
         "kind": "handle"
       },
       "calledAt": {
@@ -44976,7 +44977,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:310"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:309"
         },
         {
           "layer": "kernel",
@@ -44986,7 +44987,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 310,
+        "line": 309,
         "kind": "handle"
       },
       "calledAt": {
@@ -45466,7 +45467,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:280"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:279"
         },
         {
           "layer": "kernel",
@@ -45476,7 +45477,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 280,
+        "line": 279,
         "kind": "handle"
       },
       "calledAt": {
@@ -45638,7 +45639,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:498"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:497"
         },
         {
           "layer": "kernel",
@@ -45648,7 +45649,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 498,
+        "line": 497,
         "kind": "handle"
       },
       "calledAt": {
@@ -46314,7 +46315,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:489"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:488"
         },
         {
           "layer": "kernel",
@@ -46324,7 +46325,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 489,
+        "line": 488,
         "kind": "handle"
       },
       "calledAt": {
@@ -46437,7 +46438,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:528"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:527"
         },
         {
           "layer": "kernel",
@@ -46447,7 +46448,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 528,
+        "line": 527,
         "kind": "handle"
       },
       "calledAt": {
@@ -46747,7 +46748,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:518"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:517"
         },
         {
           "layer": "kernel",
@@ -46757,7 +46758,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 518,
+        "line": 517,
         "kind": "handle"
       },
       "calledAt": {
@@ -47071,7 +47072,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:484"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:483"
         },
         {
           "layer": "kernel",
@@ -47081,7 +47082,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 484,
+        "line": 483,
         "kind": "handle"
       },
       "calledAt": {
@@ -47151,7 +47152,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:383"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:382"
         },
         {
           "layer": "kernel",
@@ -47161,7 +47162,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 383,
+        "line": 382,
         "kind": "handle"
       },
       "calledAt": {
@@ -47592,7 +47593,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:557"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:556"
         },
         {
           "layer": "kernel",
@@ -47602,7 +47603,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 557,
+        "line": 556,
         "kind": "handle"
       },
       "calledAt": {
@@ -47897,7 +47898,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:569"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:568"
         },
         {
           "layer": "kernel",
@@ -47907,7 +47908,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 569,
+        "line": 568,
         "kind": "handle"
       },
       "calledAt": {
@@ -48586,7 +48587,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:607"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:606"
         },
         {
           "layer": "kernel",
@@ -48596,7 +48597,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 607,
+        "line": 606,
         "kind": "handle"
       },
       "calledAt": {
@@ -48615,13 +48616,13 @@
           {
             "fn": "ensureGovernedReviewSchema",
             "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 3,
+            "hops": 4,
             "inline": false
           },
           {
             "fn": "migrateLegacyPublicationTable",
             "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 4,
+            "hops": 5,
             "inline": false
           }
         ],
@@ -48634,8 +48635,9 @@
           "if",
           "invalidateDock",
           "isArray",
-          "kernelFreezeSourceWork",
-          "kernelRequestRevision",
+          "kernelGetObject",
+          "reviseMarketAndReview",
+          "sendToShell",
           "serializeError"
         ],
         "inlineDml": false,
@@ -48645,10 +48647,365 @@
         ],
         "unresolvedCallees": [
           {
+            "name": "parse",
+            "from": "collab-electron/src/main/market-analysis.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/read.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/read.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "collab-electron/src/main/market-analysis.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "setTimeout",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "candidates": [
+              "collab-electron/src/main/bovada-capture-rpc.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/read.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "transaction",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/read.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/read.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parseBovadaFightMenu",
+            "from": "tools/qf-bovada-football/src/live-markets.ts",
+            "candidates": [
+              "tools/qf-bovada-football/src/parser.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "artifactPathForHash",
+            "from": "tools/qf-bovada-football/src/live-markets.ts",
+            "candidates": [
+              "tools/qf-bovada-football/src/artifact-store.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "ensureArtifactFile",
+            "from": "tools/qf-bovada-football/src/live-markets.ts",
+            "candidates": [
+              "tools/qf-bovada-football/src/artifact-store.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "removeOwnedArtifactFile",
+            "from": "tools/qf-bovada-football/src/live-markets.ts",
+            "candidates": [
+              "tools/qf-bovada-football/src/artifact-store.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "push",
+            "from": "tools/qf-bovada-football/src/live-markets.ts",
+            "candidates": [
+              "collab-electron/src/main/launcher-readiness.ts",
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "push",
+            "from": "collab-electron/src/main/market-desk.ts",
+            "candidates": [
+              "collab-electron/src/main/launcher-readiness.ts",
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "collab-electron/src/main/market-desk.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "contentHash",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "packages/qf-kernel/src/hash.ts",
+              "tools/qf-ufc-history/src/index.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "decode",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "tools/qf-ufc-history/src/index.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "keys",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "packages/qf-kernel/src/market-decision.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/market-context.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "requireTrace",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/trace.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "extractCreationEnvelope",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/links.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeCreation",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/create.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executePipeline",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/pipeline.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "handler",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/bovada-capture-rpc.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "transaction",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "run",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "appendEvent",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/events.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "collab-electron/src/main/kernel.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parse",
+            "from": "collab-electron/src/main/kernel.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "collab-electron/src/main/pty.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "write",
+            "from": "collab-electron/src/main/pty.ts",
+            "candidates": [
+              "collab-electron/src/main/sidecar/ring-buffer.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -48760,73 +49117,59 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "requireTrace",
-            "from": "packages/qf-kernel/src/execute.ts",
+            "name": "createBovadaLiveMarketsTransport",
+            "from": "tools/qf-bovada-football/src/live-markets.ts",
             "candidates": [
-              "packages/qf-kernel/src/trace.ts"
+              "tools/qf-bovada-football/src/transport.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "get",
-            "from": "packages/qf-kernel/src/execute.ts",
+            "name": "assertBovadaResponse",
+            "from": "tools/qf-bovada-football/src/live-markets.ts",
             "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
+              "tools/qf-bovada-football/src/transport.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "extractCreationEnvelope",
-            "from": "packages/qf-kernel/src/execute.ts",
+            "name": "readBoundedResponseBody",
+            "from": "tools/qf-bovada-football/src/live-markets.ts",
             "candidates": [
-              "packages/qf-kernel/src/links.ts"
+              "tools/qf-bovada-football/src/transport.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "parseBovadaLiveMarketsResponse",
+            "from": "tools/qf-bovada-football/src/live-markets.ts",
+            "candidates": [
+              "tools/qf-bovada-football/src/parser.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "resolve",
+            "from": "packages/qf-kernel/src/resolve-artifact-root.ts",
+            "candidates": [
+              "collab-electron/src/main/sidecar/client.ts",
+              "collab-electron/src/main/wikilink-index.ts",
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
             "name": "parse",
-            "from": "packages/qf-kernel/src/execute.ts",
+            "from": "collab-electron/src/main/market-desk.ts",
             "candidates": [
               "collab-electron/src/main/updater/update-manager.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "executeCreation",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/create.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "executePipeline",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "packages/qf-kernel/src/pipeline.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "handler",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/bovada-capture-rpc.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/execute.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/execute.ts",
+            "name": "all",
+            "from": "packages/qf-kernel/src/market-context.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
             ],
@@ -48834,23 +49177,41 @@
           },
           {
             "name": "query",
-            "from": "packages/qf-kernel/src/execute.ts",
+            "from": "packages/qf-kernel/src/market-context.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/execute.ts",
+            "name": "push",
+            "from": "packages/qf-kernel/src/read.ts",
             "candidates": [
-              "packages/qf-kernel/src/events.ts"
+              "collab-electron/src/main/launcher-readiness.ts",
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/read.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/read.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
             "name": "get",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "from": "packages/qf-kernel/src/task-coordination.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts",
               "collab-electron/src/main/peer-role-registry.ts"
@@ -48859,7 +49220,7 @@
           },
           {
             "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "from": "packages/qf-kernel/src/task-coordination.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
             ],
@@ -48867,106 +49228,25 @@
           },
           {
             "name": "all",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "from": "packages/qf-kernel/src/task-coordination.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "name": "native_tui",
+            "from": "collab-electron/src/main/runtime-route-dispatch.ts",
             "candidates": [
-              "collab-electron/src/main/kernel.ts"
+              "collab-electron/src/main/agent-host.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/governed-review.ts",
+            "name": "host_acp",
+            "from": "collab-electron/src/main/runtime-route-dispatch.ts",
             "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "exec",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "keys",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/market-decision.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "isMarketExpressionComparison",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/market-context.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "readDecisionArtifact",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/market-decision.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "parse",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
+              "collab-electron/src/main/agent-host.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -49150,7 +49430,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:624"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:630"
         },
         {
           "layer": "kernel",
@@ -49160,7 +49440,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 624,
+        "line": 630,
         "kind": "handle"
       },
       "calledAt": {
@@ -50101,7 +50381,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:974"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:980"
         },
         {
           "layer": "kernel",
@@ -50111,7 +50391,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 974,
+        "line": 980,
         "kind": "handle"
       },
       "calledAt": {
@@ -50502,7 +50782,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:988"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:994"
         },
         {
           "layer": "kernel",
@@ -50512,7 +50792,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 988,
+        "line": 994,
         "kind": "handle"
       },
       "calledAt": {
@@ -50703,7 +50983,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:1003"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:1009"
         },
         {
           "layer": "kernel",
@@ -50713,7 +50993,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 1003,
+        "line": 1009,
         "kind": "handle"
       },
       "calledAt": {
@@ -50905,7 +51185,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:1012"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:1018"
         },
         {
           "layer": "kernel",
@@ -50915,7 +51195,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 1012,
+        "line": 1018,
         "kind": "handle"
       },
       "calledAt": {
@@ -51021,7 +51301,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:933"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:939"
         },
         {
           "layer": "kernel",
@@ -51031,7 +51311,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 933,
+        "line": 939,
         "kind": "handle"
       },
       "calledAt": {
@@ -51388,7 +51668,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:869"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:875"
         },
         {
           "layer": "kernel",
@@ -51398,7 +51678,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 869,
+        "line": 875,
         "kind": "handle"
       },
       "calledAt": {
@@ -51569,7 +51849,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:739"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:745"
         },
         {
           "layer": "kernel",
@@ -51579,7 +51859,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 739,
+        "line": 745,
         "kind": "handle"
       },
       "calledAt": {
@@ -52133,7 +52413,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:658"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:664"
         },
         {
           "layer": "kernel",
@@ -52143,7 +52423,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 658,
+        "line": 664,
         "kind": "handle"
       },
       "calledAt": {
@@ -52494,7 +52774,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:702"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:708"
         },
         {
           "layer": "kernel",
@@ -52504,7 +52784,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 702,
+        "line": 708,
         "kind": "handle"
       },
       "calledAt": {
@@ -52926,7 +53206,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:806"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:812"
         },
         {
           "layer": "kernel",
@@ -52936,7 +53216,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 806,
+        "line": 812,
         "kind": "handle"
       },
       "calledAt": {
@@ -53477,7 +53757,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:779"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:785"
         },
         {
           "layer": "kernel",
@@ -53487,7 +53767,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 779,
+        "line": 785,
         "kind": "handle"
       },
       "calledAt": {
@@ -53908,7 +54188,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:548"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:547"
         },
         {
           "layer": "kernel",
@@ -53918,7 +54198,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 548,
+        "line": 547,
         "kind": "handle"
       },
       "calledAt": {
@@ -56895,7 +57175,7 @@
         },
         {
           "file": "collab-electron/src/main/ipc-kernel.ts",
-          "line": 1041,
+          "line": 1047,
           "kind": "helper"
         }
       ],
@@ -56920,7 +57200,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/ipc-kernel.ts",
-          "line": 226,
+          "line": 225,
           "kind": "helper"
         }
       ],
@@ -56945,7 +57225,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/ipc-kernel.ts",
-          "line": 229,
+          "line": 228,
           "kind": "helper"
         }
       ],
@@ -57302,13 +57582,13 @@
     },
     {
       "file": "collab-electron/src/main/ipc-kernel.ts",
-      "line": 102,
+      "line": 101,
       "why": "push channel name is a variable or template literal, not resolvable from text",
       "coverage": "dynamic"
     },
     {
       "file": "collab-electron/src/main/ipc-kernel.ts",
-      "line": 111,
+      "line": 110,
       "why": "push channel name is a variable or template literal, not resolvable from text",
       "coverage": "dynamic"
     },
@@ -58677,6 +58957,31 @@
       ]
     },
     {
+      "id": "persistence:packages/qf-kernel/src/execute.ts:execute:qf_review_task:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "execute",
+      "table": "qf_review_task",
+      "verb": "UPDATE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/execute.ts",
+          "lines": [
+            585
+          ]
+        }
+      ]
+    },
+    {
       "id": "persistence:packages/qf-kernel/src/execute.ts:executeSecondOpinion:links:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
@@ -58897,7 +59202,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            725
+            755
           ]
         }
       ]
@@ -58947,7 +59252,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            748
+            778
           ]
         }
       ]
@@ -58972,7 +59277,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            744
+            774
           ]
         }
       ]
@@ -58997,7 +59302,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            785
+            815
           ]
         }
       ]
@@ -59022,7 +59327,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            769
+            799
           ]
         }
       ]
@@ -59047,7 +59352,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            943
+            973
           ]
         }
       ]
@@ -59072,7 +59377,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            604
+            619
           ]
         }
       ]
@@ -59097,7 +59402,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            598
+            613
           ]
         }
       ]
@@ -59122,7 +59427,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1018
+            1048
           ]
         }
       ]
@@ -59147,7 +59452,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1069
+            1099
           ]
         }
       ]
@@ -59172,9 +59477,9 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1020,
-            1021,
-            1071
+            1050,
+            1051,
+            1101
           ]
         }
       ]
@@ -59199,7 +59504,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1014
+            1044
           ]
         }
       ]
@@ -59224,7 +59529,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1074
+            1104
           ]
         }
       ]
@@ -59249,7 +59554,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1049
+            1079
           ]
         }
       ]
@@ -59274,8 +59579,8 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1046,
-            1064
+            1076,
+            1094
           ]
         }
       ]
@@ -59300,7 +59605,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1079
+            1109
           ]
         }
       ]
@@ -59325,7 +59630,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1076
+            1106
           ]
         }
       ]
@@ -59350,7 +59655,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            1077
+            1107
           ]
         }
       ]
@@ -59375,7 +59680,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            851
+            881
           ]
         }
       ]
@@ -60334,16 +60639,16 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "501348ea",
+      "commit": "3959ce85",
       "generatedAt": "2026-09-15"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "3959ce85",
+      "commit": "d01053d2",
       "generatedAt": "2026-09-15"
     },
     "verdict": "better",
-    "why": "38 improvement(s), nothing added or hidden",
+    "why": "37 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -60609,34 +60914,17 @@
     ],
     "regressed": [],
     "changedConfidence": [],
-    "changedOwner": [
-      {
-        "id": "ownership:review-publication",
-        "gained": [
-          "collab-electron/src/windows/shell/src/research-workflow.js"
-        ],
-        "lost": []
-      }
-    ],
-    "changedCoverage": [
-      {
-        "path": "collab-electron/src/windows/shell/src/research-workflow.js",
-        "analyzer": "ownership",
-        "from": "unsupported",
-        "to": "indexed",
-        "direction": "better",
-        "reason": null
-      }
-    ],
+    "changedOwner": [],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
       "resolved": 37,
       "regressed": 0,
       "changedConfidence": 0,
-      "changedOwner": 1,
+      "changedOwner": 0,
       "coverageWorse": 0,
-      "coverageBetter": 1,
+      "coverageBetter": 0,
       "undecidedFrom": 37,
       "undecidedTo": null
     }

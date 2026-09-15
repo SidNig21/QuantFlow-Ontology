@@ -2931,6 +2931,12 @@ button.task-fact:focus-visible {
 .dock-inspect-technical { margin-top: 14px; font: 10px/1.35 var(--qf-mono); color: var(--qf-gl-dim); }
 .dock-inspect-technical summary { cursor: pointer; color: var(--qf-accent); }
 .dock-inspect-technical-body { margin-top: 8px; overflow-wrap: anywhere; }
+.qf-decision-history { margin-top: 10px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--qf-accent) 24%, transparent); border-radius: 8px; background: color-mix(in srgb, var(--qf-surface) 88%, transparent); }
+.qf-decision-history__title { color: var(--qf-accent); font-weight: 650; }
+.qf-decision-history__quote,
+.qf-decision-history__run,
+.qf-decision-history__verdict,
+.qf-decision-history__finding { margin-top: 5px; color: var(--qf-gl-dim); overflow-wrap: anywhere; }
 
 /* ── Selection, dragging, marquee ── */
 
