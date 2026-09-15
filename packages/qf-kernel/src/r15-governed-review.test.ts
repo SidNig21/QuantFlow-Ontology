@@ -203,6 +203,63 @@ describe("R15 governed review", () => {
     expect((db!.query("SELECT COUNT(*) AS n FROM qf_review_task WHERE kind IN ('revision','second_critic') AND lifecycle = 'pending'").get() as { n: number }).n).toBe(2);
   });
 
+  test("second critic refuses reuse before Task creation and publishes once from a distinct Critic over the same frozen work", () => {
+    const f = fixture();
+    completeWorkerTask("source-task", f.work);
+    const firstEvaluationId = recordRejectingEvaluation(f);
+    const before = {
+      tasks: (db!.query("SELECT COUNT(*) AS n FROM qf_review_task").get() as { n: number }).n,
+      evaluations: (db!.query("SELECT COUNT(*) AS n FROM evaluation").get() as { n: number }).n,
+      reports: (db!.query("SELECT COUNT(*) AS n FROM artifact WHERE kind = 'report'").get() as { n: number }).n,
+    };
+
+    const reused = requestSecondCritic(db!, f.work, firstEvaluationId, "second-reuse", "critic", trace);
+    expect(reused.kind).toBe("refused");
+    expect(reused.receipt?.reason_code).toBe("CRITIC_ALREADY_REVIEWED");
+    expect((db!.query("SELECT COUNT(*) AS n FROM qf_review_task").get() as { n: number }).n).toBe(before.tasks);
+    expect((db!.query("SELECT COUNT(*) AS n FROM evaluation").get() as { n: number }).n).toBe(before.evaluations);
+    expect((db!.query("SELECT COUNT(*) AS n FROM artifact WHERE kind = 'report'").get() as { n: number }).n).toBe(before.reports);
+
+    sessionFromExistingDefinition("critic-2");
+    const second = requestSecondCritic(db!, f.work, firstEvaluationId, "second-distinct", "critic-2", trace);
+    expect(second.kind).toBe("admitted");
+    expect(second.source_work).toEqual(f.work);
+    markGovernedDelivery(db!, String(second.review_task_id), "delivered", trace);
+    const reads = [
+      ["qf_hypothesis_get", { id: f.hypothesisId }],
+      ["qf_run_get", { id: f.runId }],
+      ["qf_artifact_get", { id: f.artifactId }],
+      ["qf_record_evaluation", { verdict: "supports" }],
+    ] as const;
+    reads.forEach(([tool, args], index) => recordGovernedToolReceipt(db!, {
+      invocation_id: `critic-2-${tool}-${index + 1}`,
+      session_id: "critic-2",
+      task_id: String(second.review_task_id),
+      tool_name: tool,
+      arguments: args,
+      result: { ok: true },
+      broker_sequence: index + 1,
+    }, trace));
+    const supported = execute(db!, "record_evaluation", {
+      hypothesis_id: f.hypothesisId,
+      run_id: f.runId,
+      artifact_id: f.artifactId,
+      review_task_id: second.review_task_id,
+      source_work: f.work,
+      broker_invocation_id: "critic-2-qf_record_evaluation-4",
+      verdict: "supports",
+      rubric: { faithfulness: 0.9, answer_relevancy: 0.9, context_precision: 0.9, context_recall: 0.9 },
+      confidence: 0.9,
+      rationale: "The exact frozen work survives the material attack.",
+      findings: [{ code: "material_attack", severity: "info", message: "The source limits were checked against the exact result.", evidence_refs: [f.artifactId] }],
+    }, { ...trace, actor_session_id: "critic-2" });
+    expect((db!.query("SELECT COUNT(*) AS n FROM qf_review_task").get() as { n: number }).n).toBe(before.tasks + 1);
+    expect((db!.query("SELECT COUNT(*) AS n FROM evaluation").get() as { n: number }).n).toBe(before.evaluations + 1);
+    expect((db!.query("SELECT COUNT(*) AS n FROM artifact WHERE kind = 'report'").get() as { n: number }).n).toBe(before.reports + 1);
+    expect(supported.state.report_artifact_id).toBeString();
+    expect((db!.query("SELECT to_id FROM links WHERE kind = 'performed_by' AND from_id = ?").get(String(supported.state.id)) as { to_id: string }).to_id).toBe("critic-2");
+  });
+
   test("successful delivery keeps the ontology Task open and stopped-critic failure cancels only its matching Task", () => {
     const success = fixture(false);
     markGovernedDelivery(db!, success.taskId, "delivered", trace);

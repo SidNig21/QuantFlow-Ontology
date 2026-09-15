@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { hasLiveDirectorSurface, oneCanvasSurfaceObjects, readyDirectorDefinitions } from "./one-canvas.js";
-import { contextualInspectReceipt, criticMaterialAttack, deriveResearchWorkflow } from "./research-workflow.js";
+import { hasLiveDirectorSurface, oneCanvasSurfaceObjects, readyDirectorDefinitions, requireSecondCriticAdmission } from "./one-canvas.js";
+import { blockedReviewPresentation, contextualInspectReceipt, criticMaterialAttack, deriveResearchWorkflow } from "./research-workflow.js";
 
 test("one Canvas exposes one purposeful investigation surface instead of Kernel-card inventory", () => {
   const mission = { type: "mission", id: "mission-1", fields: {} };
@@ -63,6 +63,7 @@ test("rendered shell has no alternate Canvas mode controls or persisted Canvas r
 	expect(renderer).toContain('panelManager.initPrefs(prefNavWidth, "closed")');
 	expect(renderer).toContain('channel === "market-decision-settled"');
 	const oneCanvas = await Bun.file(new URL("./one-canvas.js", import.meta.url)).text();
+	const researchWorkflow = await Bun.file(new URL("./research-workflow.js", import.meta.url)).text();
 	const css = await Bun.file(new URL("./shell.css", import.meta.url)).text();
 	expect(oneCanvas).toContain('dom.idSpan.textContent = "DIRECTOR"');
 	expect(oneCanvas).toContain('summary.textContent = "Technical details"');
@@ -72,8 +73,26 @@ test("rendered shell has no alternate Canvas mode controls or persisted Canvas r
 	expect(oneCanvas).toContain("retry_task_id");
 	expect(oneCanvas).toContain('"Resume with current market"');
 	expect(oneCanvas).toContain("Your saved evidence is intact; retry after service returns.");
+	expect(researchWorkflow).toContain('state: "Publication blocked"');
+	expect(oneCanvas).toContain('second.textContent = blocked.secondCriticInProgress ? "Second critic in progress" : "Second critic"');
+	expect(oneCanvas).toContain('revision.textContent = "Request revision unavailable"');
+	expect(oneCanvas).toContain("Revision is unavailable until QuantFlow can create a new result version and send it through independent review.");
+	expect(renderer).toContain("requireSecondCriticAdmission(response)");
 	expect(css).toContain('.canvas-tile[data-qf-surface-kind="investigation"] .tile-content-overlay');
 	expect(css).toContain(".qf-investigation-surface__error");
+});
+
+test("an ok transport envelope still surfaces a Kernel second-Critic refusal as an error", () => {
+  const refusal = {
+    ok: true,
+    result: {
+      kind: "refused",
+      receipt: { message: "No new independent Critic is available. Make an eligible Critic available, then try again." },
+    },
+  };
+  expect(() => requireSecondCriticAdmission(refusal)).toThrow("No new independent Critic is available. Make an eligible Critic available, then try again.");
+  const admission = { kind: "admitted", review_task_id: "review-2", critic_session_id: "critic-2" };
+  expect(requireSecondCriticAdmission({ ok: true, result: admission })).toEqual(admission);
 });
 
 test("current report resolves only its exact hash-bound Task Run Artifact and Evaluation", () => {
@@ -129,4 +148,41 @@ test("active Critic remains part of the same investigation and its material atta
     objects: [findings],
   };
   expect(criticMaterialAttack(settled)).toBe("The submission probability is not established.");
+});
+
+test("blocked publication keeps both exact Critic verdicts and strongest findings on the investigation surface", () => {
+  const sourceWork = { source_task_id: "task-source", hypothesis_id: "hyp-1", run_id: "run-1", result_artifact_id: "artifact-1", executor_session_id: "worker-1" };
+  const findings1 = { type: "artifact", id: "findings-1", fields: { receipt: { preview: JSON.stringify([{ code: "material_attack", message: "The first material attack remains unresolved." }]) } } };
+  const findings2 = { type: "artifact", id: "findings-2", fields: { receipt: { preview: JSON.stringify([{ code: "evidence_gap", message: "The second Critic found a missing comparison." }]) } } };
+  const objects = [
+    { type: "mission", id: "mission-1", fields: {} },
+    { type: "task", id: "task-source", fields: { status: "done" } },
+    { type: "task", id: "review-1", fields: { status: "done", review_source_task_id: "task-source", review_kind: "review", review_created_at: "2026-09-14T01:00:00.000Z" } },
+    { type: "task", id: "review-2", fields: { status: "done", review_source_task_id: "task-source", review_kind: "second_critic", review_triggering_evaluation_id: "eval-1", review_created_at: "2026-09-14T02:00:00.000Z" } },
+    { type: "task", id: "review-3", fields: { status: "open", review_source_task_id: "task-source", review_kind: "second_critic", review_triggering_evaluation_id: "eval-2", review_created_at: "2026-09-14T03:00:00.000Z" } },
+    { type: "evaluation", id: "eval-1", fields: { verdict: "rejects", review_task_id: "review-1", findings_artifact_id: "findings-1", source_work: sourceWork } },
+    { type: "evaluation", id: "eval-2", fields: { verdict: "inconclusive", review_task_id: "review-2", findings_artifact_id: "findings-2", source_work: sourceWork } },
+    findings1,
+    findings2,
+  ];
+  const links = [
+    { kind: "belongs_to", from_id: "task-source", to_id: "mission-1" },
+    { kind: "belongs_to", from_id: "review-1", to_id: "mission-1" },
+    { kind: "belongs_to", from_id: "review-2", to_id: "mission-1" },
+    { kind: "belongs_to", from_id: "review-3", to_id: "mission-1" },
+  ];
+  const workflow = deriveResearchWorkflow({ root: { type: "mission", id: "mission-1" }, current_report_id: null, objects, links });
+  const blocked = blockedReviewPresentation(workflow);
+  expect(workflow.sourceTask?.id).toBe("task-source");
+  expect(workflow.evaluation?.id).toBe("eval-2");
+  expect(blocked).toEqual({
+    state: "Publication blocked",
+    evaluations: [
+      { index: 1, id: "eval-1", verdict: "rejects", attack: "The first material attack remains unresolved." },
+      { index: 2, id: "eval-2", verdict: "inconclusive", attack: "The second Critic found a missing comparison." },
+    ],
+    reviewInProgress: true,
+    secondCriticInProgress: true,
+  });
+  expect(contextualInspectReceipt(workflow, workflow.mission)?.evaluations.map((evaluation) => evaluation.id)).toEqual(["eval-1", "eval-2"]);
 });

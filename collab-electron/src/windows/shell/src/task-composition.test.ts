@@ -306,6 +306,38 @@ describe("Task footer projection", () => {
 		});
 	});
 
+	test("blocked review keeps revision disabled while Second critic remains operable", async () => {
+		await withDocument(async () => {
+			const foot = new FakeElement();
+			const calls: string[] = [];
+			renderTaskFoot(
+				{ taskFoot: foot },
+				{ id: "tile-worker", sessionId: "worker-1" },
+				{
+					assignments: [{
+						...assigned,
+						status: "done" as const,
+						reviewable: true,
+						reviewProjection: {
+							evaluation_id: "evaluation-1",
+							state: "PUBLICATION BLOCKED",
+							verdict: "rejects",
+							actions: ["Request revision", "Second critic"],
+						},
+					}],
+					onSecondCritic: async (taskId, evaluationId) => { calls.push(`${taskId}:${evaluationId}`); },
+				},
+			);
+			const revision = foot.querySelector(".governed-review-revision");
+			expect(revision?.disabled).toBe(true);
+			expect(revision?.textContent).toBe("Request revision unavailable");
+			expect(revision?.listeners.has("click")).toBe(false);
+			expect(foot.querySelector(".governed-review-revision-note")?.textContent).toContain("new result version");
+			await foot.querySelector(".governed-review-second")?.listeners.get("click")?.({ stopPropagation() {} });
+			expect(calls).toEqual(["task-1:evaluation-1"]);
+		});
+	});
+
   test("renders four separate Kernel-backed facts for the exact specialist tile", () => {
     withDocument(() => {
       const foot = new FakeElement();

@@ -79,6 +79,13 @@ function serializeError(err: unknown): { name: string; message: string } {
   return { name: "Error", message: String(err) };
 }
 
+function priorCriticSessionIds(sourceTaskId: string): Set<string> {
+  const projection = kernelGetResearchWorldProjection({ root_type: "task", root_id: sourceTaskId });
+  if (!projection.ok) throw new Error(projection.message);
+  const evaluationIds = new Set(projection.world.objects.filter((object) => object.type === "evaluation").map((object) => object.id));
+  return new Set(projection.world.links.filter((link) => link.kind === "performed_by" && evaluationIds.has(link.from_id)).map((link) => link.to_id));
+}
+
 function knownWebContentsIds(): Set<number> {
   return new Set(webContents.getAllWebContents().map((wc) => wc.id));
 }
@@ -626,7 +633,16 @@ export function registerKernelHandlers(): void {
       if (kernelGovernedAttemptExists("second_critic", sourceTaskId, attemptId)) {
         return { ok: true as const, result: kernelRequestSecondCritic(work, evaluationId, attemptId, null) };
       }
-      const criticSessionId = await acquireEligibleParticipant("critic", "research.evaluate");
+      const excludedSessionIds = priorCriticSessionIds(sourceTaskId);
+      excludedSessionIds.add(work.executor_session_id);
+      let criticSessionId: string | null = null;
+      try {
+        criticSessionId = await acquireEligibleParticipant("critic", "research.evaluate", undefined, excludedSessionIds);
+      } catch {
+        const result = kernelRequestSecondCritic(work, evaluationId, attemptId, null);
+        invalidateDock();
+        return { ok: true as const, result };
+      }
       const result = kernelRequestSecondCritic(work, evaluationId, attemptId, criticSessionId);
       if (result.kind === "admitted" && result.review_task_id && result.critic_session_id) {
         const delivered = deliverToAgentSession(result.critic_session_id, `${JSON.stringify({ contract: "qf.governed_review.v1", review_task_id: result.review_task_id, source_work: result.source_work })}\r`);

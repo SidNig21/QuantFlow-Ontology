@@ -20,14 +20,14 @@ export function eligibleDefinition(role: string, capability: string): string {
   );
 }
 type AcquiredParticipant = ResumeParticipant;
-async function acquireParticipant(role: string, capability: string, onStarted?: Started): Promise<AcquiredParticipant> {
+async function acquireParticipant(role: string, capability: string, onStarted?: Started, excludedSessionIds: ReadonlySet<string> = new Set()): Promise<AcquiredParticipant> {
   const definitionId = eligibleDefinition(role, capability);
-  const available = kernelListAgentSessions().filter((session) => session.status === "running" && hasLiveAgentSession(String(session.id)) && kernelGetLinks(String(session.id), { kind: "spawned_from" }).some((link) => link.to_id === definitionId) && !kernelGetLinks(String(session.id), { kind: "assigned_to" }).some((link) => kernelGetObject("task", link.from_id)?.status === "open") && (role !== "orchestrator" || !kernelSessionCoordinatesOtherOpenTask(String(session.id), "")));
+  const available = kernelListAgentSessions().filter((session) => session.status === "running" && !excludedSessionIds.has(String(session.id)) && hasLiveAgentSession(String(session.id)) && kernelGetLinks(String(session.id), { kind: "spawned_from" }).some((link) => link.to_id === definitionId) && !kernelGetLinks(String(session.id), { kind: "assigned_to" }).some((link) => kernelGetObject("task", link.from_id)?.status === "open") && (role !== "orchestrator" || !kernelSessionCoordinatesOtherOpenTask(String(session.id), "")));
   if (available.length > 1) throw new Error("Multiple idle participants match this role; close the extra seat before analyzing.");
   return available.length ? { sessionId: String(available[0]!.id), requestOwned: false } : { sessionId: (await admitAndStartSession(definitionId, { onStarted })).sessionId, requestOwned: true };
 }
-export async function acquireEligibleParticipant(role: string, capability: string, onStarted?: Started): Promise<string> {
-  return (await acquireParticipant(role, capability, onStarted)).sessionId;
+export async function acquireEligibleParticipant(role: string, capability: string, onStarted?: Started, excludedSessionIds: ReadonlySet<string> = new Set()): Promise<string> {
+  return (await acquireParticipant(role, capability, onStarted, excludedSessionIds)).sessionId;
 }
 
 function jsonObject(value: unknown): Record<string, unknown> {

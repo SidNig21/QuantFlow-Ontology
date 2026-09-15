@@ -512,6 +512,12 @@ describe("Main research-world projection", () => {
         expect(projection.world.report_ids).toContain(String(evaluation.state.report_artifact_id));
         expect(projection.world.objects.filter((object) => object.type === "agent_session").map((object) => object.fields.species)).toEqual(["Hermes", "Hermes", "Hermes"]);
         expect(projection.world.objects.find((object) => object.type === "evaluation")?.fields.semantic_markers).toEqual(["EVALUATION"]);
+        expect(projection.world.objects.find((object) => object.type === "task" && object.id === reviewTaskId)?.fields).toMatchObject({
+          review_kind: "review",
+          review_source_task_id: sourceTask.object_id,
+          review_lifecycle: "completed",
+        });
+        expect(projection.world.objects.find((object) => object.type === "task" && object.id === reviewTaskId)?.fields.review_created_at).toBeString();
          expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === runResultArtifactId)?.fields.semantic_markers).toContain("RAW ARTIFACT");
          expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === workerResultArtifactId)?.fields.semantic_markers).toContain("RAW ARTIFACT");
         expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === String(evaluation.state.report_artifact_id))?.fields.semantic_markers).toContain("PUBLISHED REPORT");

@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-w1-03-one-canvas @ 501348ea` on 2026-09-15 by
+> Generated from `codex/wo-w1-03-one-canvas @ 3959ce85` on 2026-09-15 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -31,7 +31,7 @@ and it can die or cheat at any one of them:
 
 ```mermaid
 flowchart TD
-  R["<b>1 · renderer</b><br/>29 surface subsystems<br/>calls a bridge method"]
+  R["<b>1 · renderer</b><br/>30 surface subsystems<br/>calls a bridge method"]
   P["<b>2 · preload</b><br/>3 bridges · 123 methods<br/>110 of them called"]
   M["<b>3 · main</b><br/>119 IPC channels<br/>108 live · 11 unused · 0 dead"]
   H{"<b>4 · is it governed?</b>"}
@@ -447,7 +447,7 @@ mechanism behind the invariant below, not a promise about it.
 | `persistence` | 26 | 32 | 0 | 0 | 525 |
 | `lifetime` | 5 | 64 | 0 | 0 | 514 |
 | `packaging` | 234 | 0 | 0 | 106 | 243 |
-| `ownership` | 21 | 0 | 0 | 373 | 189 |
+| `ownership` | 22 | 0 | 0 | 372 | 189 |
 | `reach` | 232 | 4 | 0 | 347 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
@@ -492,7 +492,7 @@ discovered from the AST.
 | Canvas domain projection | 2 | 1 | medium |
 | Layout / cache persistence | 0 | 0 | — *unclaimed* |
 | Process cleanup | 3 | 0 | medium |
-| Research review / publication | 7 | 2 | high |
+| Research review / publication | 8 | 2 | high |
 | Artifact storage | 7 | 4 | high |
 
 ### Session lifecycle
@@ -524,6 +524,7 @@ discovered from the AST.
 - `collab-electron/src/main/kernel.ts` — exports kernelMarketReviewArtifactView() at line 963
 - `collab-electron/src/main/market-analysis.ts` — exports analyzeMarketAndReview() at line 81
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
+- `collab-electron/src/windows/shell/src/research-workflow.js` — exports blockedReviewPresentation() at line 91
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 236
 

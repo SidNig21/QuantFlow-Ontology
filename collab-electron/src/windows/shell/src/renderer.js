@@ -27,7 +27,7 @@ import { createCableOverlay } from "./cable-overlay.js";
 import { createCableInspector } from "./cable-inspector.js";
 import { fitViewportToTiles } from "./glacier-feel.js";
 import { renderTaskFoot } from "./task-composition.js";
-import { createOneCanvasController } from "./one-canvas.js";
+import { createOneCanvasController, requireSecondCriticAdmission } from "./one-canvas.js";
 import { participantViewForSession } from "./participant-projection.js";
 import { createMarketDesk } from "./market-desk.js";
 
@@ -560,6 +560,10 @@ async function init() {
 		onClearCableSelection: () => cableOverlay?.setSelectedId?.(null),
 		showStatus: (message) => showCanvasToast(message),
 		getParticipantView: participantViewFor,
+		onSecondCritic: async (taskId, evaluationId, attemptId) => {
+			const response = await window.shellApi.qf.requestSecondCritic({ sourceTaskId: taskId, evaluationId, attemptId });
+			return requireSecondCriticAdmission(response);
+		},
 	});
 	marketDeskController = createMarketDesk({
 		tileManager,
@@ -823,7 +827,8 @@ async function init() {
 				},
 				onSecondCritic: async (taskId, evaluationId, attemptId) => {
 					const result = await window.shellApi.qf.requestSecondCritic({ sourceTaskId: taskId, evaluationId, attemptId });
-					if (!result?.ok) { await refreshTaskSurface(); throw new Error(result?.error?.message ?? "Second critic failed"); }
+					try { requireSecondCriticAdmission(result); }
+					catch (error) { await refreshTaskSurface(); throw error; }
 					await refreshTaskSurface();
 				},
 				onSelectTask: (taskId) => dockController?.selectTask(taskId),

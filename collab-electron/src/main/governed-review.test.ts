@@ -118,8 +118,12 @@ describe("R15 production governed-review seams", () => {
     expect(main).toContain('ipcMain.handle("qf:review:request"');
     expect(main).toContain("kernelFreezeSourceWork");
     expect(main).toContain('acquireEligibleParticipant("critic", "research.evaluate")');
+		expect(main).toContain("priorCriticSessionIds(sourceTaskId)");
+		expect(main).toContain("excludedSessionIds.add(work.executor_session_id)");
+		expect(main).toContain('acquireEligibleParticipant("critic", "research.evaluate", undefined, excludedSessionIds)');
     expect(gateway).toContain("kernelRecordGovernedToolReceipt");
     expect(renderer).toContain("window.shellApi.qf.requestReview");
+		expect(renderer).toContain("requireSecondCriticAdmission(result)");
     expect(gateway).toContain("qf_record_evaluation");
   });
 

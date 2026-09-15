@@ -170,9 +170,16 @@ function relationalSnapshot(db: KernelDb): RelationalSnapshot {
       if (["provider_stream_interrupted", "provider_unavailable", "app_terminated", "market_resume_setup_failed", "market_resume_dispatch_failed"].includes(String(reason))) row.failure_reason = reason;
     }
     const sourceWork = new Map<string, Array<Record<string, unknown>>>();
-    if (tableExists(db, "qf_review_task")) for (const review of db.query("SELECT task_id, source_task_id, source_work FROM qf_review_task").all() as Array<{ task_id: string; source_task_id: string; source_work: string }>) {
+    if (tableExists(db, "qf_review_task")) for (const review of db.query("SELECT task_id, kind, source_task_id, source_work, triggering_evaluation_id, lifecycle, created_at FROM qf_review_task").all() as Array<{ task_id: string; kind: string; source_task_id: string; source_work: string; triggering_evaluation_id: string | null; lifecycle: string; created_at: string }>) {
       const task = rows.get("task")?.get(review.task_id);
-      if (task) { task.review_source_task_id = review.source_task_id; task.review_source_work = parseJson(review.source_work); }
+      if (task) {
+        task.review_kind = review.kind;
+        task.review_source_task_id = review.source_task_id;
+        task.review_source_work = parseJson(review.source_work);
+        task.review_triggering_evaluation_id = review.triggering_evaluation_id;
+        task.review_lifecycle = review.lifecycle;
+        task.review_created_at = review.created_at;
+      }
     }
     if (tableExists(db, "qf_review_source_work")) {
       for (const row of db.query(

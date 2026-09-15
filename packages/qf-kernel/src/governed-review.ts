@@ -692,7 +692,7 @@ function admitGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput, t
       }
     } else {
       if (!input.critic_session_id || !criticIsAdmitted(db, input.critic_session_id) || (action === "second_critic" && input.critic_session_id === work.executor_session_id)) {
-        const refusal = refusalFor(action, sourceTaskId, work, evaluationId, attemptId, "CRITIC_ADMISSION_FAILED", action === "second_critic" ? "A new independent critic with research.evaluate capability could not be admitted." : "An independent critic with research.evaluate capability could not be admitted.");
+        const refusal = refusalFor(action, sourceTaskId, work, evaluationId, attemptId, "CRITIC_ADMISSION_FAILED", action === "second_critic" ? "No new independent Critic is available. Make an eligible Critic with research evaluation capability available, then try again." : "An independent critic with research.evaluate capability could not be admitted.");
         const result = persistRefusal(db, refusal, trace);
         persistAttempt(db, action, sourceTaskId, attemptId, result);
         return result;
@@ -700,8 +700,8 @@ function admitGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput, t
     }
 
     if (action === "second_critic") {
-      const priorCritics = db.query("SELECT to_id FROM links WHERE kind = 'performed_by' AND from_id IN (SELECT id FROM evaluation WHERE source_work IS NOT NULL)").all() as Array<{ to_id: string }>;
-      if (priorCritics.some((row) => row.to_id === input.critic_session_id)) {
+      const priorCritics = db.query("SELECT links.to_id, evaluation.source_work FROM links JOIN evaluation ON evaluation.id = links.from_id WHERE links.kind = 'performed_by' AND evaluation.source_work IS NOT NULL").all() as Array<{ to_id: string; source_work: string }>;
+      if (priorCritics.some((row) => sameJson(JSON.parse(row.source_work), work) && row.to_id === input.critic_session_id)) {
         const refusal = refusalFor(action, sourceTaskId, work, evaluationId, attemptId, "CRITIC_ALREADY_REVIEWED", "A second critic must be a new independent production session.");
         const result = persistRefusal(db, refusal, trace);
         persistAttempt(db, action, sourceTaskId, attemptId, result);

@@ -1,5 +1,6 @@
 import { tiles } from "./canvas-state.js";
 import {
+	blockedReviewPresentation,
 	criticMaterialAttack,
 	deriveResearchWorkflow,
 	contextualInspectReceipt,
@@ -59,8 +60,14 @@ export function oneCanvasSurfaceObjects(workflow) {
 	return workflow.mission ? [workflow.mission] : [];
 }
 
+export function requireSecondCriticAdmission(response) {
+	if (!response?.ok) throw new Error(response?.error?.message ?? "Second critic failed");
+	if (response.result?.kind === "refused") throw new Error(response.result?.receipt?.message ?? "A new independent Critic is not available.");
+	return response.result;
+}
+
 /** One persistent desk: deliberate surfaces in front, exact Kernel detail in Inspect. */
-export function createOneCanvasController({ tileManager, getTileDOMs, onCables, onClearCableSelection, showStatus, getParticipantView }) {
+export function createOneCanvasController({ tileManager, getTileDOMs, onCables, onClearCableSelection, showStatus, getParticipantView, onSecondCritic }) {
 	let lastRoot = null;
 	let lastWorld = null;
 	let lastWorkflow = null;
@@ -224,10 +231,11 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 
 	function renderInvestigation(dom, tile, mission) {
 		if (!dom?.contentArea || !lastWorkflow?.marketQuote) return;
+		const blocked = blockedReviewPresentation(lastWorkflow);
 		dom.container.dataset.qfSurfaceKind = "investigation";
 		dom.titleText.textContent = "UFC market investigation";
 		tile.width = INVESTIGATION_WIDTH;
-		tile.height = INVESTIGATION_HEIGHT;
+		tile.height = blocked ? 500 : INVESTIGATION_HEIGHT;
 		dom.contentArea.replaceChildren();
 		const surface = document.createElement("section");
 		surface.className = "qf-investigation-surface";
@@ -236,18 +244,26 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 		const runtimeFailed = lastWorkflow.executor?.fields?.status === "failed";
 		const reviewActive = lastWorkflow.reviewTask?.fields?.status === "open";
 		const researchActive = (lastWorkflow.sourceTask?.fields?.status === "open" || reviewActive) && !runtimeFailed;
-		const stateText = runtimeFailed
-			? "The research provider became unavailable. Your saved evidence is intact; retry after service returns."
-			: reviewActive ? "Independent review is in progress"
+		const stateText = blocked?.secondCriticInProgress ? "Second independent review is in progress"
+			: blocked ? "Publication blocked"
+				: runtimeFailed ? "The research provider became unavailable. Your saved evidence is intact; retry after service returns."
+				: reviewActive ? "Independent review is in progress"
 				: researchActive ? "Research is in progress" : "Ready for evidence, calculation, and independent review";
 		appendText(surface, "qf-investigation-surface__state", stateText);
+		if (blocked) {
+			appendText(surface, "qf-investigation-surface__blocked", blocked.state);
+			for (const evaluation of blocked.evaluations) {
+				appendText(surface, "qf-investigation-surface__critic", `Critic ${evaluation.index} verdict: ${evaluation.verdict}`);
+				if (evaluation.attack) appendText(surface, "qf-investigation-surface__attack", `Strongest material finding: ${evaluation.attack}`);
+			}
+		}
 		const priorError = analysisErrors.get(mission.id);
 		if (priorError) appendText(surface, "qf-investigation-surface__error", priorError);
 		const analyze = document.createElement("button");
 		analyze.type = "button";
 		analyze.className = "qf-investigation-surface__analyze";
 		analyze.textContent = reviewActive ? "Independent review in progress" : researchActive ? "Research in progress" : runtimeFailed ? "Resume with current market" : "Analyze and independently review";
-		analyze.disabled = researchActive;
+		analyze.disabled = researchActive || Boolean(blocked);
 		analyze.addEventListener("click", async (event) => {
 			event.stopPropagation();
 			analysisErrors.delete(mission.id);
@@ -269,7 +285,43 @@ export function createOneCanvasController({ tileManager, getTileDOMs, onCables, 
 				await reveal("mission", mission.id);
 			}
 		});
-		surface.appendChild(analyze);
+		if (!blocked) surface.appendChild(analyze);
+		if (blocked) {
+			const actions = document.createElement("div");
+			actions.className = "qf-investigation-surface__review-actions";
+			const revision = document.createElement("button");
+			revision.type = "button";
+			revision.className = "qf-investigation-surface__revision";
+			revision.textContent = "Request revision unavailable";
+			revision.disabled = true;
+			revision.title = "Revision will be available when QuantFlow can create and review a new result version.";
+			actions.appendChild(revision);
+			const second = document.createElement("button");
+			second.type = "button";
+			second.className = "qf-investigation-surface__second-critic";
+			second.textContent = blocked.secondCriticInProgress ? "Second critic in progress" : "Second critic";
+			second.disabled = blocked.reviewInProgress;
+			second.addEventListener("click", async (event) => {
+				event.stopPropagation();
+				if (second.disabled) return;
+				analysisErrors.delete(mission.id);
+				second.disabled = true;
+				second.textContent = "Starting second critic…";
+				try {
+					await onSecondCritic?.(lastWorkflow.sourceTask.id, lastWorkflow.evaluation.id, crypto.randomUUID());
+					showStatus?.("A new independent Critic is reviewing the same frozen work.");
+					await reveal("mission", mission.id);
+				} catch (error) {
+					const message = error?.message ?? String(error);
+					analysisErrors.set(mission.id, message);
+					showStatus?.(message);
+					await reveal("mission", mission.id);
+				}
+			});
+			actions.appendChild(second);
+			surface.appendChild(actions);
+			appendText(surface, "qf-investigation-surface__revision-note", "Revision is unavailable until QuantFlow can create a new result version and send it through independent review.");
+		}
 		const inspectButton = document.createElement("button");
 		inspectButton.type = "button";
 		inspectButton.className = "qf-investigation-surface__inspect";

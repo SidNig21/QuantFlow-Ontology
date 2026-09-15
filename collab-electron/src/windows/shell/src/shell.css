@@ -2876,6 +2876,8 @@ button.task-fact:focus-visible {
 .qf-ready-director__body,
 .qf-investigation-surface__state,
 .qf-investigation-surface__error,
+.qf-investigation-surface__critic,
+.qf-investigation-surface__revision-note,
 .qf-decision-surface__reason,
 .qf-decision-surface__condition,
 .qf-decision-surface__critic,
@@ -2886,6 +2888,21 @@ button.task-fact:focus-visible {
 	background: color-mix(in srgb, var(--qf-gl-alert) 7%, transparent);
 	color: var(--qf-gl-text);
 }
+.qf-investigation-surface__blocked {
+	padding: 9px 11px;
+	border: 1px solid color-mix(in srgb, var(--qf-gl-alert) 70%, var(--qf-gl-rule));
+	border-radius: 6px;
+	background: color-mix(in srgb, var(--qf-gl-alert) 11%, var(--qf-gl-panel-3));
+	color: var(--qf-gl-ice);
+	font: 700 12px/1.2 var(--qf-mono);
+}
+.qf-investigation-surface__attack {
+	padding: 8px 10px;
+	border-left: 2px solid color-mix(in srgb, var(--qf-gl-alert) 70%, var(--qf-gl-rule));
+	color: var(--qf-gl-text);
+	font: 12px/1.4 var(--qf-sans);
+}
+.qf-investigation-surface__review-actions { display: flex; gap: 8px; margin-top: auto; }
 .qf-investigation-surface__error {
 	padding: 9px 11px;
 	border: 1px solid color-mix(in srgb, var(--qf-gl-alert) 55%, var(--qf-gl-rule));
@@ -2896,13 +2913,17 @@ button.task-fact:focus-visible {
 .qf-ready-director__start,
 .qf-investigation-surface__analyze,
 .qf-investigation-surface__inspect,
+.qf-investigation-surface__revision,
+.qf-investigation-surface__second-critic,
 .qf-decision-surface__inspect {
 	padding: 10px 12px; border: 1px solid var(--qf-gl-rule); border-radius: 6px;
 	background: var(--qf-gl-panel-3); color: var(--qf-gl-ice); font: 600 12px/1.2 var(--qf-sans); cursor: pointer;
 }
 .qf-ready-director__start,
 .qf-investigation-surface__analyze { margin-top: auto; border-color: color-mix(in srgb, var(--qf-accent) 60%, var(--qf-gl-rule)); }
-.qf-investigation-surface__analyze:disabled { cursor: default; opacity: .58; }
+.qf-investigation-surface__analyze:disabled,
+.qf-investigation-surface__revision:disabled,
+.qf-investigation-surface__second-critic:disabled { cursor: default; opacity: .58; }
 .qf-decision-surface__assessment,
 .qf-decision-surface__actionability { padding: 9px 11px; border-radius: 6px; font: 700 12px/1.2 var(--qf-mono); letter-spacing: .04em; }
 .qf-decision-surface__assessment { background: color-mix(in srgb, var(--qf-gl-panel-3) 90%, transparent); color: var(--qf-gl-ice); }
