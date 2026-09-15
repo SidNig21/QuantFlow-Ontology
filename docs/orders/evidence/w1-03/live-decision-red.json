@@ -8,9 +8,9 @@
     "analyze_and_review_dispatched": true
   },
   "worker": {
-    "session_id": "55b0c3fd-6286-4f75-aada-6f55f9be1756",
+    "session_id": "092a1b46-42fc-46e9-b9d3-b636d89b4470",
     "session_status": "running",
-    "task_id": "task-e3efd69f-77ad-4daa-9066-60a934f4bd54",
+    "task_id": "task-4a65713e-728c-4610-a963-c07976017ce1",
     "task_status": "open",
     "assigned": true,
     "assignment_ambiguous": false,
@@ -22,45 +22,45 @@
       },
       "api_rows": [
         {
-          "session_id": "20260914_200752_27800e",
+          "session_id": "20260914_203759_384026",
           "provider": "openai-codex",
           "model": "gpt-5.6-luna",
-          "input_tokens": 2461,
-          "output_tokens": 622,
-          "total_tokens": 3083,
-          "latency_seconds": 14.1
+          "input_tokens": 2476,
+          "output_tokens": 591,
+          "total_tokens": 3067,
+          "latency_seconds": 11.9
         },
         {
-          "session_id": "20260914_200752_27800e",
+          "session_id": "20260914_203759_384026",
           "provider": "openai-codex",
           "model": "gpt-5.6-luna",
-          "input_tokens": 3728,
-          "output_tokens": 995,
-          "total_tokens": 4723,
-          "latency_seconds": 26.9
+          "input_tokens": 8550,
+          "output_tokens": 1076,
+          "total_tokens": 9626,
+          "latency_seconds": 22.9
         },
         {
-          "session_id": "20260914_200752_27800e",
+          "session_id": "20260914_203759_384026",
           "provider": "openai-codex",
           "model": "gpt-5.6-luna",
-          "input_tokens": 4760,
-          "output_tokens": 536,
-          "total_tokens": 5296,
-          "latency_seconds": 17
+          "input_tokens": 9663,
+          "output_tokens": 1864,
+          "total_tokens": 11527,
+          "latency_seconds": 35.6
         },
         {
-          "session_id": "20260914_200752_27800e",
+          "session_id": "20260914_203759_384026",
           "provider": "openai-codex",
           "model": "gpt-5.6-luna",
-          "input_tokens": 5333,
-          "output_tokens": 60,
-          "total_tokens": 5393,
-          "latency_seconds": 9
+          "input_tokens": 11557,
+          "output_tokens": 51,
+          "total_tokens": 11608,
+          "latency_seconds": 2.6
         }
       ],
       "turn_rows": [
         {
-          "session_id": "20260914_200752_27800e",
+          "session_id": "20260914_203759_384026",
           "model": "gpt-5.6-luna",
           "api_calls": 4,
           "successful": true
