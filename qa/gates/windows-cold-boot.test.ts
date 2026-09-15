@@ -2,6 +2,8 @@ import { describe, expect, test } from "bun:test";
 import {
   collectOwnedPids,
   ownedProcessRows,
+  ownedProcessRowsByIdentity,
+  processIdentityKey,
   processOwnershipReceipt,
   type ProcessInfo,
 } from "./windows-cold-boot.ts";
@@ -12,8 +14,9 @@ function process(
   name: string,
   executablePath = "C:\\Windows\\System32\\" + name,
   commandLine = name,
+  creationDate = `2026-09-14T00:00:00.000Z#${pid}`,
 ): ProcessInfo {
-  return { pid, parentPid, name, executablePath, commandLine };
+  return { pid, parentPid, name, executablePath, commandLine, creationDate };
 }
 
 describe("windows-cold-boot process ownership", () => {
@@ -62,5 +65,14 @@ describe("windows-cold-boot process ownership", () => {
       [500, "bun.exe"],
       [501, "electron.exe"],
     ]);
+  });
+
+  test("does not claim a reused PID as the process recorded at launch", () => {
+    const launched = process(700, 1, "QuantFlow.exe", "C:\\tmp\\QuantFlow.exe", "QuantFlow.exe", "2026-09-14T01:00:00.000Z");
+    const identities = new Set([processIdentityKey(launched)]);
+    const reused = process(700, 1, "unrelated.exe", "C:\\other\\unrelated.exe", "unrelated.exe", "2026-09-14T01:01:00.000Z");
+
+    expect(ownedProcessRowsByIdentity([reused], identities)).toEqual([]);
+    expect(ownedProcessRowsByIdentity([launched], identities).map((row) => row.pid)).toEqual([700]);
   });
 });

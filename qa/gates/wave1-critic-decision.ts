@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { Database } from "bun:sqlite";
-import { buildWindowsPackage, isolatedEnvironment, rpcCall, waitForReady, waitForExit, processSnapshot, collectOwnedPids, terminateOwnedProcessTree, wait } from "./windows-cold-boot.ts";
+import { buildWindowsPackage, isolatedEnvironment, rpcCall, waitForReady, waitForExit, processSnapshot, collectOwnedPids, ownedProcessRowsByIdentity, processIdentityKey, terminateOwnedProcessTree, wait, type ProcessInfo } from "./windows-cold-boot.ts";
 import { parseTrustedHermesLog } from "./hermes-production-inference.ts";
 import { validateProofPngHeader } from "../../collab-electron/src/main/ui-proof-capture.ts";
 
@@ -272,6 +272,39 @@ export function cleanupDisposableProofRoot(root: string, processReferences: numb
   assert(processReferences === 0, "QuantFlow-owned process remains; root retained for exact cleanup");
   rmSync(target, { recursive: true, force: true });
 }
+
+function referencesDisposableRoot(row: ProcessInfo, root: string): boolean {
+  const marker = resolve(root).toLowerCase();
+  return row.executablePath.toLowerCase().includes(marker) || row.commandLine.toLowerCase().includes(marker);
+}
+
+export function remainingProofProcesses(
+  snapshot: readonly ProcessInfo[],
+  ownedIdentities: ReadonlySet<string>,
+  root: string,
+): ProcessInfo[] {
+  const rows = new Map<number, ProcessInfo>();
+  for (const row of ownedProcessRowsByIdentity(snapshot, ownedIdentities)) rows.set(row.pid, row);
+  for (const row of snapshot) if (referencesDisposableRoot(row, root)) rows.set(row.pid, row);
+  return [...rows.values()].sort((a, b) => a.pid - b.pid);
+}
+
+async function waitForProofProcessesToExit(
+  ownedIdentities: ReadonlySet<string>,
+  root: string,
+  timeoutMs = 10_000,
+): Promise<ProcessInfo[]> {
+  const deadline = Date.now() + timeoutMs;
+  while (true) {
+    const remaining = remainingProofProcesses(await processSnapshot(), ownedIdentities, root);
+    if (remaining.length === 0 || Date.now() >= deadline) return remaining;
+    await wait(Math.min(250, Math.max(1, deadline - Date.now())));
+  }
+}
+
+function safeProcessReceipt(row: ProcessInfo): Row {
+  return { pid: row.pid, parent_pid: row.parentPid, name: row.name, creation_date: row.creationDate };
+}
 export function observeLiveFailure(dbPath: string, appDir: string, stage: string, marketReached: boolean, analysisDispatched: boolean, error: unknown, sourceTaskId?: string): LiveFailureDiagnostic {
   const read = (sql: string, ...args: string[]) => { try { return query(dbPath, sql, ...args); } catch { return []; } };
   const workerTask = (sourceTaskId ? read("SELECT id,status FROM task WHERE id=?", sourceTaskId) : read("SELECT id,status FROM task WHERE description LIKE 'Compare every exact offered selection%' ORDER BY created_at DESC,id DESC LIMIT 1"))[0] ?? null;
@@ -360,7 +393,7 @@ export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
   const evidenceDir = join(REPO, "docs/orders/evidence/w1-03"); mkdirSync(evidenceDir, { recursive: true });
   const receiptName = savedResumeMode ? "saved-resume" : "live-decision";
   const failureReceiptPath = join(evidenceDir, `${receiptName}-red.json`);
-  let child: ChildProcess | null = null, endpoint = "", owned = new Set<number>(); let proof: Row | null = null; let failure: unknown = null;
+  let child: ChildProcess | null = null, endpoint = "", ownedIdentities = new Set<string>(); let proof: Row | null = null; let failure: unknown = null;
   let saved: SavedResumeBaseline | null = null;
   let resumeVisible = false;
   let resumedAttempt: Row | null = null;
@@ -393,8 +426,12 @@ export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
       assert(child.pid, "packaged app PID missing");
       endpoint = (await waitForReady(child, join(runRoot, "socket-path"))).endpoint;
       const rootPid = child.pid;
-      rememberOwnedProcesses = async () => { for (const pid of collectOwnedPids(before, await processSnapshot(), rootPid, packageRoot)) owned.add(pid); };
-      await rememberOwnedProcesses(); owned.add(rootPid);
+      rememberOwnedProcesses = async () => {
+        const current = await processSnapshot();
+        const ownedPids = collectOwnedPids(before, current, rootPid, packageRoot);
+        for (const row of current) if (ownedPids.has(row.pid)) ownedIdentities.add(processIdentityKey(row));
+      };
+      await rememberOwnedProcesses();
     };
     await launch();
     stage = "packaged_app_ready";
@@ -540,7 +577,7 @@ export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
     let shutdownAttempted = false, exitCode: number | null = child?.exitCode ?? null;
     if (child?.pid) await rememberOwnedProcesses();
     if (child?.pid) { try { if (endpoint) { shutdownAttempted = true; await rpcCall(endpoint, "app.shutdown", {}, 2000); } } catch {} if (child.exitCode === null) await terminateOwnedProcessTree(child.pid); exitCode = await waitForExit(child, 5000).catch(() => null); }
-    const remaining = (await processSnapshot()).filter((row) => owned.has(row.pid) || JSON.stringify(row).toLowerCase().includes(root.toLowerCase()));
+    const remaining = await waitForProofProcessesToExit(ownedIdentities, root);
     if (remaining.length) failure ??= new Error("QuantFlow-owned process remains; root retained for exact cleanup");
     else cleanupDisposableProofRoot(root, remaining.length);
     if (diagnostic) {
@@ -551,7 +588,7 @@ export async function runWave1CriticDecisionGate(): Promise<{ ok: boolean }> {
       proof.lifecycle.processes = remaining.length; proof.lifecycle.roots_remaining = existsSync(root) ? 1 : 0;
       if (!failure) try { validateLiveDecisionProof(proof); if (savedResumeMode) validateSavedResumeProof(proof); } catch (error) { failure = error; }
     }
-    if (proof) writeFileSync(join(evidenceDir, `${receiptName}.json`), JSON.stringify({ ...proof, result: failure ? "RED" : "PASS", cleanup: { processes: remaining.length, roots_remaining: existsSync(root) ? 1 : 0 } }, null, 2) + "\n");
+    if (proof) writeFileSync(join(evidenceDir, `${receiptName}.json`), JSON.stringify({ ...proof, result: failure ? "RED" : "PASS", cleanup: { processes: remaining.length, roots_remaining: existsSync(root) ? 1 : 0, survivors: remaining.map(safeProcessReceipt) } }, null, 2) + "\n");
   }
   if (failure) { console.error("wave1-critic-decision FAILED:", failure instanceof Error ? failure.message : "unknown failure"); return { ok: false }; }
   if (providerFreePreflight) { console.log("wave1-critic-decision PASS: provider-free rendered choreography and zero cleanup"); return { ok: true }; }

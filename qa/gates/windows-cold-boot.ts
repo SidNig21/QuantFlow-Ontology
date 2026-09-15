@@ -39,6 +39,7 @@ export type ProcessInfo = {
   name: string;
   executablePath: string;
   commandLine: string;
+  creationDate: string;
 };
 
 type TreeSnapshot = {
@@ -254,7 +255,8 @@ export async function processSnapshot(): Promise<ProcessInfo[]> {
     "parentPid=[int]$_.ParentProcessId; " +
     "name=[string]$_.Name; " +
     "executablePath=if ($_.ExecutablePath) {[string]$_.ExecutablePath} else {''}; " +
-    "commandLine=if ($_.CommandLine) {[string]$_.CommandLine} else {''} " +
+    "commandLine=if ($_.CommandLine) {[string]$_.CommandLine} else {''}; " +
+    "creationDate=if ($_.CreationDate) {$_.CreationDate.ToUniversalTime().ToString('o')} else {''} " +
     "} }) | ConvertTo-Json -Compress";
   const raw = (await runPowerShell(command)).trim();
   if (!raw) return [];
@@ -272,8 +274,25 @@ export async function processSnapshot(): Promise<ProcessInfo[]> {
       name: String(row.name ?? ""),
       executablePath: String(row.executablePath ?? ""),
       commandLine: String(row.commandLine ?? ""),
+      creationDate: String(row.creationDate ?? ""),
     }];
   });
+}
+
+/** Bind a Windows PID to the process lifetime that owned it. PIDs alone are
+ * unsafe receipts because Windows may reuse them after the original exits. */
+export function processIdentityKey(row: ProcessInfo): string {
+  if (!row.creationDate) throw new Error(`Windows process ${row.pid} has no creation timestamp`);
+  return `${row.pid}\u0000${row.creationDate}`;
+}
+
+export function ownedProcessRowsByIdentity(
+  snapshot: readonly ProcessInfo[],
+  ownedIdentities: ReadonlySet<string>,
+): ProcessInfo[] {
+  return snapshot
+    .filter((row) => ownedIdentities.has(processIdentityKey(row)))
+    .sort((a, b) => a.pid - b.pid);
 }
 
 function descendants(snapshot: readonly ProcessInfo[], rootPid: number): Set<number> {

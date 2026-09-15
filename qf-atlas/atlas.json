@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "c521cb4e",
+    "commit": "f25b8a5b",
     "generatedAt": "2026-09-15",
     "filesScanned": 433,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "d12610f571e15109"
+    "fingerprint": "a54324a32089e22c"
   },
   "stats": {
     "live": 108,
@@ -3529,7 +3529,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1005,
+      "kb": 1007.2,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3550,7 +3550,7 @@
         },
         {
           "path": "qa/gates/wave1-critic-decision.ts",
-          "kb": 61.5,
+          "kb": 62.9,
           "spawns": 2,
           "spawnsLive": 1,
           "writes": 4,
@@ -3599,6 +3599,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/windows-cold-boot.ts",
+          "kb": 37.9,
+          "spawns": 7,
+          "spawnsLive": 7,
+          "writes": 4,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/hermes-production-inference-receipt.ts",
           "kb": 37.8,
           "spawns": 4,
@@ -3614,16 +3624,6 @@
           "spawns": 2,
           "spawnsLive": 1,
           "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/windows-cold-boot.ts",
-          "kb": 37.1,
-          "spawns": 7,
-          "spawnsLive": 7,
-          "writes": 4,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -60047,16 +60047,16 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "c88def2d",
+      "commit": "c521cb4e",
       "generatedAt": "2026-09-15"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "c521cb4e",
+      "commit": "f25b8a5b",
       "generatedAt": "2026-09-15"
     },
-    "verdict": "worse",
-    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
+    "verdict": "better",
+    "why": "37 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -60323,16 +60323,7 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [
-      {
-        "path": "packages/qf-kernel/src/market-desk.test.ts",
-        "analyzer": "persistence",
-        "from": "not-applicable",
-        "to": "partial",
-        "direction": "worse",
-        "reason": "3 of 3 SQL site(s) are not inside a named function, so no call path can be traced"
-      }
-    ],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -60340,7 +60331,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 1,
+      "coverageWorse": 0,
       "coverageBetter": 0,
       "undecidedFrom": 37,
       "undecidedTo": null

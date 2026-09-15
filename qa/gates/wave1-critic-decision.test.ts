@@ -6,7 +6,8 @@ import { deflateSync } from "node:zlib";
 import { createHash } from "node:crypto";
 import { Database } from "bun:sqlite";
 import { closeKernel, execute, openKernel } from "../../packages/qf-kernel/src/index.ts";
-import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, sanitizeLiveFailureError, snapshotSavedKernel, validateLiveDecisionProof, validateSavedResumeProof, validateUiCaptureReceipt, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
+import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, remainingProofProcesses, sanitizeLiveFailureError, snapshotSavedKernel, validateLiveDecisionProof, validateSavedResumeProof, validateUiCaptureReceipt, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
+import { processIdentityKey, type ProcessInfo } from "./windows-cold-boot.ts";
 
 function png(width = 1, height = 1): Buffer {
   const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
@@ -211,4 +212,15 @@ test("exact disposable failure root is removed after the receipt model is built"
   buildLiveFailureDiagnostic(red());
   cleanupDisposableProofRoot(root, 0);
   expect(existsSync(root)).toBe(false);
+});
+
+test("saved-resume cleanup distinguishes a surviving process from a reused PID", () => {
+  const root = "C:\\Temp\\qf-w1-decision-live-proof";
+  const launched: ProcessInfo = { pid: 700, parentPid: 1, name: "QuantFlow.exe", executablePath: "C:\\package\\QuantFlow.exe", commandLine: "QuantFlow.exe", creationDate: "2026-09-14T01:00:00.000Z" };
+  const reused: ProcessInfo = { ...launched, name: "unrelated.exe", executablePath: "C:\\other\\unrelated.exe", commandLine: "unrelated.exe", creationDate: "2026-09-14T01:01:00.000Z" };
+  const rootChild: ProcessInfo = { pid: 701, parentPid: 1, name: "helper.exe", executablePath: "C:\\Windows\\helper.exe", commandLine: `helper.exe --profile ${root}`, creationDate: "2026-09-14T01:01:00.000Z" };
+  const identities = new Set([processIdentityKey(launched)]);
+
+  expect(remainingProofProcesses([reused], identities, root)).toEqual([]);
+  expect(remainingProofProcesses([launched, rootChild], identities, root).map((row) => row.pid)).toEqual([700, 701]);
 });
