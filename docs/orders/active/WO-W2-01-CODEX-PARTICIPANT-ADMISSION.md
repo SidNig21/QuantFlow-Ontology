@@ -1,6 +1,6 @@
 # WO-W2-01 — Admit Codex as a real QuantFlow participant
 
-status: OPEN — founder-specified WSL Codex amendment received fresh Reader semantic YES / builder-door YES
+status: OPEN — attached WSL lifecycle amendment received fresh Reader semantic YES / builder-door YES
 assignee: Builder — use `gpt-5.6-sol`; the root architect remains the only Astra seat
 depends: WO-W1-03 accepted at candidate `665ddcd2783a9e218cb5095b51943d026d17f70a`
 
@@ -58,9 +58,14 @@ failure.
 4. Prove that shell, web, apps, and foreign MCP tools are unavailable. A malformed or wrong seat capability
    must be denied. QuantFlow may pass the names of its session, role, RPC, and seat-capability variables to
    the child; secret or capability values must never appear in argv, diagnostics, logs, or evidence.
-5. Exercise normal one-task completion and cancellation separately. Both must confirm the owned WSL child
-   process tree exits without terminating unrelated WSL processes, and remove the app-owned temporary
-   directory.
+5. Keep the Windows `wsl.exe` parent attached until the exact Codex process group exits. The measured
+   correction is a waiting WSL session leader (`setsid --wait`) or an equivalently proved non-detaching
+   launch; plain detaching `setsid` is prohibited because it returns false success before Codex readiness.
+   Give each probe a non-secret run nonce, record its exact owned Windows/WSL descendants, and take a
+   baseline before launch so pre-existing QuantFlow MCP children are never credited to or killed by this
+   run. Exercise normal one-task completion and cancellation separately. Both must confirm only that run's
+   owned WSL child process tree exits without terminating unrelated WSL processes, and remove the app-owned
+   temporary directory.
 
 An authentication prompt, unsupported safety control, ambient tool, MCP startup failure, security-value
 leak, or uncertain cleanup is a red result. D0 is runtime evidence; it does not by itself claim product
@@ -74,9 +79,10 @@ Add the smallest current declaration under `species/codex/` that the measured D0
   capability group;
 - package and launch metadata accepted by the existing runtime definition contract;
 - the bounded role instruction and declared tool surface needed for this seat;
-- a species-owned WSL launcher only if D0 proves translation from the generic QuantFlow bridge environment
-  to Codex CLI arguments is required. Production metadata selects the WSL adapter and command; it must not
-  hard-code the measured operator home path.
+- a species-owned WSL launcher that translates the generic QuantFlow bridge environment to Codex CLI
+  arguments, holds the Windows wrapper open until the exact WSL process group exits, and emits readiness
+  only after Codex and both required MCP servers are alive. Production metadata selects the WSL adapter and
+  command; it must not hard-code the measured operator home path or detach the process group.
 
 The launcher may translate WSL transport details and emit the existing readiness marker. It must not decide
 institutional roles, grants, Task meaning, review authority, or Kernel state. Do not add a Codex branch to

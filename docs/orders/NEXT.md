@@ -4,9 +4,9 @@ status: OPEN
 active-order: docs/orders/active/WO-W2-01-CODEX-PARTICIPANT-ADMISSION.md
 builder-authority: OPEN
 router-authority: OPEN
-builder-condition: OPEN — execute the isolated one-task Codex runtime through the founder-specified WSL route
+builder-condition: OPEN — execute D0 with the attached WSL process contract, then continue on green
 w1-status: ACCEPTED — live packaged candidate `665ddcd2783a9e218cb5095b51943d026d17f70a`
-reader-status: ORDER SEMANTIC YES / BUILDER DOOR YES — WSL amendment independently accepted before product edits
+reader-status: ORDER SEMANTIC YES / BUILDER DOOR YES — attached WSL ownership amendment independently accepted
 
 Wave 1 is accepted and archived. In the normal packaged Windows app, one real current UFC inquiry now
 crosses the Canvas, Dock, Director, and Kernel: a real Researcher uses exact evidence, a different Critic
