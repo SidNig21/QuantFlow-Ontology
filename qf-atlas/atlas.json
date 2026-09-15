@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "b1a0172c",
+    "commit": "072c7858",
     "generatedAt": "2026-09-15",
     "filesScanned": 433,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "0b18548a83258a01"
+    "fingerprint": "907dc7c2eb8501a1"
   },
   "stats": {
     "live": 108,
@@ -1927,7 +1927,7 @@
       "id": "2:collab-electron/src/main::ontology",
       "layer": 2,
       "name": "ontology*",
-      "kb": 13.1,
+      "kb": 13.3,
       "x": 1.69,
       "z": 2.03,
       "status": "ok",
@@ -1938,7 +1938,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/ontology-gateway.ts",
-          "kb": 11.7,
+          "kb": 11.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
@@ -60639,12 +60639,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "d01053d2",
+      "commit": "b1a0172c",
       "generatedAt": "2026-09-15"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "b1a0172c",
+      "commit": "072c7858",
       "generatedAt": "2026-09-15"
     },
     "verdict": "better",

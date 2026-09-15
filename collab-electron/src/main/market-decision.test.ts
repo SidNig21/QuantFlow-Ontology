@@ -157,7 +157,12 @@ test("synthetic provider-count gap → bounded evidence → Run → broker reads
   expect(() => callOntologyReadTool({ sessionId: "worker", role: "worker" }, "qf_dataset_query", {})).toThrow("exact Hypothesis");
   expect(() => callOntologyReadTool({ sessionId: "worker", role: "worker" }, "qf_dataset_get", { id: evidence.dataset_id, extra: true })).toThrow("exact Hypothesis");
   expect(getKernelDb().query("SELECT count(*) AS n FROM events").get()).toEqual(before);
-  const receipts = scope.allowed.map((key) => { const colon = key.indexOf(":"); return callOntologyReadTool({ sessionId: "worker", role: "worker" }, key.slice(0, colon), { id: key.slice(colon + 1) }).artifactId; });
+  const readResponses = scope.allowed.map((key) => { const colon = key.indexOf(":"); return callOntologyReadTool({ sessionId: "worker", role: "worker" }, key.slice(0, colon), { id: key.slice(colon + 1) }); });
+  const receipts = readResponses.map((response) => response.artifactId);
+  const largestRead = readResponses.toSorted((left, right) => JSON.stringify(right.result).length - JSON.stringify(left.result).length)[0]!;
+  expect(JSON.stringify(largestRead.result).length).toBeGreaterThan(1_000);
+  expect(JSON.stringify(largestRead).slice(0, 128)).toContain(largestRead.artifactId);
+  expect(JSON.stringify({ result: largestRead.result, artifactId: largestRead.artifactId }).slice(0, 128)).not.toContain(largestRead.artifactId);
   for (const receipt of receipts) {
     expect(() => kernelReadMarketTrajectoryResult(receipt, "worker")).not.toThrow();
     expect(() => kernelReadMarketTrajectoryResult(receipt, "director")).toThrow("assigned worker");

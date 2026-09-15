@@ -194,7 +194,10 @@ export function callOntologyReadTool(
     result,
     Boolean(decisionScope) || ontologyReadReceiptEligible(toolName, kernelCapabilityGroupForTool(toolName)),
   );
-  return { result, artifactId };
+  // The trajectory id must lead the model-facing JSON. Bounded evidence packets can
+  // fill the tool-output window; placing this id last made a successful read
+  // unusable as cited send_result lineage when the tail was truncated.
+  return { artifactId, result };
 }
 
 const EXPOSED_ACTIONS = new Set([
