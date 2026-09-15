@@ -19,9 +19,17 @@ const collabRoot = normalizeWindowsPath(
 const exe = join(collabRoot, "dist", "win-unpacked", "QuantFlow.exe");
 const workDir = join(collabRoot, "dist", "win-unpacked");
 
-const shortcut =
-  process.env.QF_DESKTOP_SHORTCUT?.trim() ||
-  join(homedir(), "Desktop", "QuantFlow Ontology.lnk");
+export function defaultDesktopShortcut(repoRoot) {
+  const override = process.env.QF_DESKTOP_SHORTCUT?.trim();
+  if (override) return override;
+
+  // Packaging can run under a service account even though the checkout belongs
+  // to the signed-in founder. In that case os.homedir() points at the service
+  // Desktop and updating it leaves the founder's existing shortcut stale.
+  const normalizedRepoRoot = normalizeWindowsPath(repoRoot);
+  const checkoutOwner = normalizedRepoRoot.match(/^([A-Za-z]:\\Users\\[^\\]+)(?:\\|$)/i)?.[1];
+  return join(checkoutOwner || homedir(), "Desktop", "QuantFlow Ontology.lnk");
+}
 
 function gitDescribe(repoRoot) {
   const r = spawnSync("git", ["rev-parse", "--short", "HEAD"], {
@@ -41,12 +49,11 @@ function packageVersion() {
   }
 }
 
-export function refreshDesktopShortcut({
-  exePath = exe,
-  shortcutPath = shortcut,
-  workingDirectory = workDir,
-  repoRoot = join(collabRoot, ".."),
-} = {}) {
+export function refreshDesktopShortcut(options = {}) {
+  const repoRoot = options.repoRoot ?? join(collabRoot, "..");
+  const exePath = options.exePath ?? exe;
+  const workingDirectory = options.workingDirectory ?? workDir;
+  const shortcutPath = options.shortcutPath ?? defaultDesktopShortcut(repoRoot);
   if (process.platform !== "win32") {
     return { ok: false, reason: "windows-only" };
   }

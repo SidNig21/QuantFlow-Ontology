@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w1-03-one-canvas",
-    "commit": "d01053d2",
+    "commit": "b1a0172c",
     "generatedAt": "2026-09-15",
     "filesScanned": 433,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "8070d0cb6df5b8d4"
+    "fingerprint": "0b18548a83258a01"
   },
   "stats": {
     "live": 108,
@@ -6199,7 +6199,7 @@
       "id": "2:residue",
       "layer": 2,
       "name": "47 small modules*",
-      "kb": 119.4,
+      "kb": 120,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6269,6 +6269,16 @@
           "executes": 0
         },
         {
+          "path": "collab-electron/scripts/refresh-desktop-shortcut.mjs",
+          "kb": 5.1,
+          "spawns": 2,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "collab-electron/src/main/integrations.ts",
           "kb": 4.7,
           "spawns": 1,
@@ -6284,16 +6294,6 @@
           "spawns": 3,
           "spawnsLive": 1,
           "writes": 1,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/scripts/refresh-desktop-shortcut.mjs",
-          "kb": 4.5,
-          "spawns": 2,
-          "spawnsLive": 0,
-          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -60639,12 +60639,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "3959ce85",
+      "commit": "d01053d2",
       "generatedAt": "2026-09-15"
     },
     "to": {
       "branch": "codex/wo-w1-03-one-canvas",
-      "commit": "d01053d2",
+      "commit": "b1a0172c",
       "generatedAt": "2026-09-15"
     },
     "verdict": "better",

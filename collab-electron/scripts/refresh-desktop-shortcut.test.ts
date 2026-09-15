@@ -2,7 +2,13 @@ import { expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { refreshDesktopShortcut } from "./refresh-desktop-shortcut.mjs";
+import { defaultDesktopShortcut, refreshDesktopShortcut } from "./refresh-desktop-shortcut.mjs";
+
+test.skipIf(process.platform !== "win32")("desktop shortcut follows the checkout owner when packaging runs as another account", () => {
+  expect(defaultDesktopShortcut("C:\\Users\\rybow\\QuantFlow-Ontology")).toBe(
+    "C:\\Users\\rybow\\Desktop\\QuantFlow Ontology.lnk",
+  );
+});
 
 test.skipIf(process.platform !== "win32")("desktop shortcut preserves literal Windows paths on COM read-back", async () => {
   const root = mkdtempSync(join(tmpdir(), "qf-shortcut-literal-"));
