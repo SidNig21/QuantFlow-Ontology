@@ -18,6 +18,7 @@ import {
 } from "./pty";
 import {
   createLauncherReadinessWaiter,
+  stripTerminalControls,
   type LauncherReadinessWaiter,
 } from "./launcher-readiness";
 import {
@@ -98,6 +99,7 @@ export async function admitNativeTuiDefinition(opts: {
   command?: string | null;
   entrypointPath?: string | null;
   terminalTarget?: TerminalTarget | null;
+  readinessText?: string | null;
   role?: string;
   env?: Record<string, string>;
   corruptId?: string;
@@ -363,11 +365,23 @@ export async function admitNativeTuiDefinition(opts: {
     peerStart: startPeerDelivery,
     seatCapabilityBind: bindLiveSeatCapability,
     seatCapabilityRevoke: revokeLiveSeatCapability,
-    awaitLauncherReady: async () => {
+    awaitLauncherReady: async (ptySessionId) => {
       if (!readinessWaiter) {
         throw new Error("native-TUI launcher readiness waiter was not registered");
       }
       await readinessWaiter.wait();
+      if (opts.readinessText) {
+        const deadline = Date.now() + 30_000;
+        while (Date.now() < deadline) {
+          const screen = await captureSession(ptySessionId, 80).catch(() => "");
+          if (
+            screen.includes(opts.readinessText)
+            || stripTerminalControls(screen).includes(opts.readinessText)
+          ) return;
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        throw new Error("native-TUI declared readiness text timed out");
+      }
     },
     cancelLauncherReadiness: () => readinessWaiter?.cancel(),
     activateMission: opts.missionActivation

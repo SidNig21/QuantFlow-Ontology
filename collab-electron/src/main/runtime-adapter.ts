@@ -30,6 +30,7 @@ export type RuntimeAdapterMetadata = {
   profileArgv: string[] | null;
   tools: string[];
   peerDelivery: PeerDeliveryContract | null;
+  readinessText: string | null;
 };
 
 export type ResolvedRuntimeAdapter = {
@@ -162,6 +163,7 @@ export function parseRuntimeAdapterMetadata(
       "profile_argv",
       "tools",
       "peer_delivery",
+      "readiness_text",
     ],
     source,
   );
@@ -221,6 +223,14 @@ export function parseRuntimeAdapterMetadata(
       `${source}.peer_delivery requires route=native_tui`,
     );
   }
+  const readinessText = doc.readiness_text === undefined || doc.readiness_text === null
+    ? null
+    : trimmedString(doc.readiness_text, `${source}.readiness_text`);
+  if (readinessText && route !== "native_tui") {
+    throw new RuntimeAdapterContractError(
+      `${source}.readiness_text requires route=native_tui`,
+    );
+  }
 
   return {
     adapterId,
@@ -233,6 +243,7 @@ export function parseRuntimeAdapterMetadata(
     profileArgv,
     tools,
     peerDelivery,
+    readinessText,
   };
 }
 

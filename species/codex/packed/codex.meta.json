@@ -6,6 +6,7 @@
   "argv": [
     "--no-alt-screen"
   ],
+  "readiness_text": "Ask Codex to do anything",
   "peer_delivery": {
     "mode": "pty_role",
     "runtime_profiles": [

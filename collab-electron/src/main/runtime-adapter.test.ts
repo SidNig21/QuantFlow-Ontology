@@ -93,6 +93,19 @@ describe("runtime adapter metadata", () => {
     expect(allowsPtyRoleDelivery(metadata, "default")).toBe(true);
   });
 
+  test("declares a native TUI readiness boundary without naming it in shared admission", () => {
+    const metadata = parseRuntimeAdapterMetadata({
+      ...defaultProfileHermesMetadata(),
+      readiness_text: "Ask runtime to do anything",
+    });
+    expect(metadata.readinessText).toBe("Ask runtime to do anything");
+    const { peer_delivery: _peerDelivery, ...base } = defaultProfileHermesMetadata();
+    const nonTui = { ...base, route: "host_acp", readiness_text: "ready" };
+    expect(() => parseRuntimeAdapterMetadata(nonTui)).toThrow(
+      "readiness_text requires route=native_tui",
+    );
+  });
+
   test("resolves sibling metadata and binds it to the package filename", () => {
     const root = mkdtempSync(join(tmpdir(), "qf-runtime-adapter-"));
     roots.push(root);

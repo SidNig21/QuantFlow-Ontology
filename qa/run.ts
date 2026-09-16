@@ -624,6 +624,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "windows-dock-species",
+    description:
+      "W2-01: packaged app admits real WSL Codex as a governed worker, records its market read, proves role parity, denial controls, and cleanup",
+    run: async () => {
+      const { runWindowsDockSpeciesGate } = await import(
+        "./gates/windows-dock-species.ts"
+      );
+      const { ok } = await runWindowsDockSpeciesGate();
+      return ok;
+    },
+  },
+  {
     name: "windows-dock-capability",
     description:
       "R2: capability groups grant desk tools to orchestrator and refuse them for worker",
