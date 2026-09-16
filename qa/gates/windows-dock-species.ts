@@ -12,6 +12,7 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   statSync,
@@ -99,6 +100,16 @@ async function removeTempRoot(root: string): Promise<void> {
     }
   }
   throw lastError instanceof Error ? lastError : new Error(`could not remove ${root}`);
+}
+
+function sidecarExitTail(run: Launch): string[] {
+  const logDir = join(run.runRoot, "app-root", "app", "logs");
+  if (!existsSync(logDir)) return [];
+  return readdirSync(logDir)
+    .filter((name) => name.startsWith("sidecar-") && name.endsWith(".log"))
+    .flatMap((name) => readFileSync(join(logDir, name), "utf8").split(/\r?\n/))
+    .filter((line) => line.includes("session.exited"))
+    .slice(-4);
 }
 
 function runChild(executable: string, cwd: string, env: NodeJS.ProcessEnv): ChildProcess {
@@ -487,6 +498,9 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
         } catch (diagnosticError) {
           console.error(`windows-dock-species: PTY diagnostic unavailable ${diagnosticError instanceof Error ? diagnosticError.message : String(diagnosticError)}`);
         }
+      }
+      for (const line of sidecarExitTail(run)) {
+        console.error(`windows-dock-species: sidecar-exit=${line}`);
       }
       try {
         const surface = await evaluate<unknown>(run, `([...document.querySelectorAll('.canvas-tile[data-session-id]')].map((tile) => ({definition_id:tile.dataset.definitionId,session_id:tile.dataset.sessionId,text:tile.textContent?.slice(-1500) ?? '',history:[...tile.querySelectorAll('.task-history-fact')].map((row)=>({kind:row.dataset.kind,outcome:row.dataset.outcome,text:row.dataset.text}))})))`);
