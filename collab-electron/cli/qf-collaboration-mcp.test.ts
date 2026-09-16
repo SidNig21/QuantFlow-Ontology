@@ -5,6 +5,15 @@ import { readFileSync } from "node:fs";
 import { validateToolArguments } from "./qf-collaboration-mcp.mjs";
 
 test("collaboration bridge rejects missing and malicious extra fields", () => {
+  expect(validateToolArguments("use_data_capability", {
+    capability_id: "bovada-live-markets",
+    sport: "ufc",
+  })).toBeTruthy();
+  expect(() => validateToolArguments("use_data_capability", {
+    capability_id: "bovada-live-markets",
+    sport: "ufc",
+    execute: true,
+  })).toThrow(/extra field: execute/);
   expect(validateToolArguments("send_task", {
     to_role: "worker",
     task: "Read venue-1",
@@ -43,6 +52,7 @@ test("collaboration bridge rejects missing and malicious extra fields", () => {
 test("packaged collaboration bridge has no generic peer-send bypass", () => {
   const source = readFileSync(new URL("./qf-collaboration-mcp.mjs", import.meta.url), "utf8");
   expect(source).not.toContain("qf.peer-bus.send_to_peer");
+  expect(source).toContain("qf.collaboration.use_data_capability");
   expect(source).toContain("qf.collaboration.send_task");
   expect(source).toContain("qf.collaboration.send_result");
 });

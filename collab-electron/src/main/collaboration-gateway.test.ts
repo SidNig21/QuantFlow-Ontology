@@ -13,6 +13,7 @@ function fixture() {
   const effects: Array<{ command: string; input: Record<string, unknown>; context: unknown }> = [];
   const published: Array<Record<string, unknown>> = [];
   const notices: Array<Record<string, unknown>> = [];
+  const capabilityUses: Array<Record<string, unknown>> = [];
   const objects = new Map<string, Record<string, unknown>>([
     ["task:task-1", { id: "task-1", status: "open" }],
     ["agent_session:orch-1", { id: "orch-1", status: "running" }],
@@ -86,6 +87,13 @@ function fixture() {
       }
       return { command };
     },
+    missionForSession(sessionId) {
+      return sessionId === "orch-1" ? "mission-1" : undefined;
+    },
+    async useDataCapability(input) {
+      capabilityUses.push(input);
+      return { capability_id: input.capabilityId, mission_id: input.missionId, events: [] };
+    },
     marketObjectExists(id) {
       return id === "venue-1" || id === "venue-2";
     },
@@ -125,6 +133,7 @@ function fixture() {
     effects,
     published,
     notices,
+    capabilityUses,
     objects,
     links,
     revoked,
@@ -167,12 +176,13 @@ describe("collaboration gateway", () => {
     expect(source).toContain("qf.peer-notification.v1");
   });
 
-  test("publishes only dedicated task/result routes and rejects malformed extras", () => {
+  test("publishes only dedicated capability/task/result routes and rejects malformed extras", () => {
     const f = fixture();
     const handlers = registerHandlers(f);
     expect([...handlers.keys()].sort()).toEqual([
       "qf.collaboration.send_result",
       "qf.collaboration.send_task",
+      "qf.collaboration.use_data_capability",
     ]);
     expect(handlers.has("qf.peer-bus.send_to_peer")).toBe(false);
     expect(() => handlers.get("qf.collaboration.send_task")!({
@@ -194,6 +204,30 @@ describe("collaboration gateway", () => {
     })).toThrow(/extra field: links/);
     expect(f.effects).toHaveLength(0);
     expect(f.published).toHaveLength(0);
+  });
+
+  test("the Director can use admitted data while a worker is refused", async () => {
+    const f = fixture();
+    const service = createCollaborationService(f.deps);
+    await expect(service.useDataCapability(
+      { sessionId: "worker-1", role: "worker" },
+      { capabilityId: "bovada-live-markets", sport: "ufc" },
+    )).rejects.toThrow(/desk\.orchestrate/);
+    expect(f.capabilityUses).toHaveLength(0);
+
+    await expect(service.useDataCapability(
+      { sessionId: "orch-1", role: "orchestrator" },
+      { capabilityId: "bovada-live-markets", sport: "ufc" },
+    )).resolves.toMatchObject({
+      capability_id: "bovada-live-markets",
+      mission_id: "mission-1",
+    });
+    expect(f.capabilityUses).toEqual([{
+      capabilityId: "bovada-live-markets",
+      sport: "ufc",
+      actorSessionId: "orch-1",
+      missionId: "mission-1",
+    }]);
   });
 
   test("missing task/result grants fail before effects", () => {

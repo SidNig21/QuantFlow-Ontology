@@ -1605,6 +1605,9 @@ async function init() {
 						});
 					}
 				}
+				if (channel === "open-market-desk") {
+					void marketDeskController?.open();
+				}
 				if (channel === "create-session-tile") {
 					const size = defaultSize("session");
 					const { cx, cy } = centerCanvasCoords(

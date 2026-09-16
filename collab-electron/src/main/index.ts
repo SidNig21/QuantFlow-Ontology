@@ -31,6 +31,7 @@ import {
 import { registerIpcHandlers, setMainWindow } from "./ipc";
 import { registerCanvasRpc } from "./canvas-rpc";
 import {
+  BOVADA_LIVE_MARKETS_TOOL_ID,
   runBovadaFootballCapture,
   type BovadaKernelAccess,
 } from "qf-bovada-football";
@@ -123,7 +124,7 @@ import { installCli } from "./cli-installer";
 import { listTerminalTargets } from "./terminal-target";
 import { readSessionMeta } from "./tmux";
 import { registerBrowserIpc } from "./ipc-browser";
-import { cancelBovadaMarketDeskCaptures } from "./market-desk";
+import { cancelBovadaMarketDeskCaptures, captureBovadaMarketDesk } from "./market-desk";
 import { cancelEvidenceComputation } from "./evidence-computation";
 import { runShutdownLifecycle } from "./shutdown-lifecycle";
 import { acquireProfileInstance } from "./single-instance-profile";
@@ -1322,6 +1323,38 @@ app.whenReady().then(async () => {
       getLinks: kernelGetLinks,
       execute: kernelExecute,
       missionForSession: missionForDirectorSession,
+      useDataCapability: async ({ capabilityId, sport, missionId }) => {
+        if (capabilityId !== BOVADA_LIVE_MARKETS_TOOL_ID) {
+          throw new Error(`unknown admitted data capability: ${capabilityId}`);
+        }
+        if (sport.toLowerCase() !== "ufc") {
+          throw new Error("Bovada Live Markets currently supports the governed UFC slice");
+        }
+        const rows = await captureBovadaMarketDesk({
+          sport: "ufc",
+          competition: "ufc",
+          market_class: "moneyline",
+        });
+        const events = new Map<string, Record<string, unknown>>();
+        for (const row of rows.filter((candidate) => candidate.current)) {
+          if (!events.has(row.market_event_id)) {
+            events.set(row.market_event_id, {
+              market_event_id: row.market_event_id,
+              event: row.event,
+              competition: row.competition,
+              starts_at: row.starts_at,
+              observed_at: row.observed_at,
+            });
+          }
+        }
+        return {
+          contract: "qf.data-capability.result.v1",
+          capability_id: capabilityId,
+          mission_id: missionId,
+          current_market_count: rows.filter((candidate) => candidate.current).length,
+          events: [...events.values()],
+        };
+      },
       marketObjectExists: kernelMarketObjectExists,
       resolveReadTrajectoryArtifactIds: kernelResolveDecisionReadTrajectories,
       readMarketTrajectoryResult: kernelReadMarketTrajectoryResult,
@@ -1363,6 +1396,10 @@ app.whenReady().then(async () => {
     (change) => {
       mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
       mainWindow?.webContents.send("qf:dock:invalidate");
+      if (change.kind === "capability") {
+        mainWindow?.webContents.send("shell:forward", "canvas", "open-market-desk");
+        return;
+      }
       if (change.kind === "result") {
         const decisionRun = kernelDecisionRunForTask(change.taskId);
         // A market result belongs to the investigation surface. Its exact raw

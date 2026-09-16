@@ -8,14 +8,17 @@ depends: WO-W1-03 accepted at candidate `665ddcd2783a9e218cb5095b51943d026d17f70
 
 Admit one real Codex Market Researcher through QuantFlow's existing Participant contract and prove that
 the packaged Windows app can launch it as an interactive WSL terminal tile, connect QuantFlow's governed
-MCP tools, assign exact work, receive governed work, and close it cleanly while Hermes retains the same
-meaning and behavior.
+MCP tools, and use it through the intended product flow: the founder asks the Research Director, the
+Director inspects admitted Bovada market data, recruits Codex, assigns exact work, receives the governed
+result, and closes cleanly while Hermes retains the same meaning and behavior.
 
 ## In plain terms
 
-Codex must work like the existing Hermes seat: Ryan adds it from the Dock, a live Codex terminal opens on
-the Canvas through WSL, QuantFlow's tools are connected, recorded assignments reach that exact seat, and
-closing it leaves no hidden process or separate private version of the workspace.
+Codex must work like the existing Hermes seat, but the normal investigation does not make Ryan manually
+act as the dispatcher. Ryan asks the Research Director to use Codex. The Director can inspect the same
+governed Bovada market data available to the worker, starts the eligible Codex seat, and sends it a
+recorded assignment. A live Codex terminal opens on the Canvas through WSL, its result returns to the
+Director through the shared Task, and closing it leaves no hidden process or private version of the workspace.
 
 ## Context pack
 
@@ -137,12 +140,17 @@ pre-seeded result, or substituted model cannot satisfy it.
 2. Adding Codex launches exactly one interactive WSL Codex process, creates exactly one running governed
    Kernel `agent_session`, records the exact `spawned_from` relation, and opens the ordinary terminal
    participant tile on the same Canvas.
-3. Launch the retained Hermes Research Director. From the existing Canvas Task composer, create one exact
-   Task assigned to the live Codex session and use the existing Redirect/steer path to deliver that Task
-   envelope to the exact Codex PTY. This order does not build a second delegation UI.
-4. Real Codex receives the exact Task envelope and invokes one non-hard-coded allowed `market.read` tool,
-   such as `qf_market_event_query`, through the real ontology MCP. Its real tool result and Kernel-published
-   trajectory Artifact are linked by `produces` to that exact Codex session.
+3. Ask the retained Hermes Research Director, through the normal Start inquiry, to use Codex for one
+   bounded UFC market question. The Director invokes the admitted Bovada Live Markets data capability;
+   QuantFlow captures current governed data and opens its normal Canvas surface. The Director then queries
+   eligible worker definitions, creates and starts the requested Codex worker, and calls collaboration
+   `send_task`. The Canvas Task composer and Redirect remain direct founder steering and recovery controls;
+   they are not the primary proof.
+4. Real Codex receives the exact Task envelope, invokes one non-hard-coded allowed `market.read` tool such
+   as `qf_market_event_query` through the real ontology MCP, and calls collaboration `send_result` with the
+   exact Task and cited Kernel evidence. Its tool result and Kernel-published trajectory Artifact are linked
+   by `produces` to that exact Codex session, the Task completes, and the result notification reaches the
+   Research Director.
 5. Control: the allowed market read succeeds. Falsifiers: a `desk.orchestrate` or `research.evaluate` tool
    is absent or denied, and the wrong session, role, or seat capability is denied.
 6. For identical worker roles and Kernel grants, Hermes and Codex receive set-equal QuantFlow `tools/list`
@@ -165,7 +173,9 @@ The Task identity is checked from Kernel/Canvas truth and delivered in the exist
   declared role and grants authorize. A genuine runtime limitation is shown honestly and never hidden by a
   species-specific product branch or fake parity.
 - The Kernel remains the only durable truth and `execute()` remains the only write path.
-- Do not add a schema entity, role, capability group, dependency, service, or persistent store.
+- Do not add a schema entity, role, capability group, dependency, service, or persistent store. The Director
+  invokes the admitted Bovada data capability through its existing orchestration grant; the worker reads the
+  resulting Kernel evidence through its existing `market.read` grant. Do not rewrite a durable definition.
 - Private runtime context stays private. Shared Task, tool use, result, session, and lineage facts are Kernel truth.
 - Runtime identity is provenance and transport selection; it does not determine institutional authority.
 - Codex keeps its private interactive conversation inside its own WSL seat. QuantFlow retains only the
@@ -229,10 +239,12 @@ full W1 live investigation or whole release suite unless a changed shared bounda
 
 ## Out of scope
 
-- Automatic Mission worker selection and the complete Demo B collaboration story.
-- Hermes/Codex question-and-answer, result handoff, cross-runtime Critic/Evaluation, revision, second round,
+- General autonomous worker routing when the founder does not name a participant, and the complete Demo B
+  collaboration story. This order must honor an explicit founder request for Codex without hard-coding
+  Codex as the only worker QuantFlow can use.
+- Hermes/Codex participant question-and-answer beyond this Task result, cross-runtime Critic/Evaluation, revision, second round,
   interactive analytical surface, founder replacement flow, and broader same-role concurrency.
-- Cleanup of exact-Hermes Director labels or selection that this direct Task proof does not encounter.
+- Broader cleanup of exact-Hermes labels outside the Director selection path exercised by this order.
 - `host_acp`, one-task `codex exec`, Codex App Server integration, Claude or any later runtime, general
   model routing, or a runtime marketplace.
 - New credential storage/UI, schema changes, new truth stores, Canvas redesign, and unrelated Hermes refactors.

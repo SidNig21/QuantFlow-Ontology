@@ -15,10 +15,12 @@ and deliberate retrieval restores the work. The acceptance receipt records the i
 and verification YES.
 
 W2-01 is the next product step. It admits one real Codex Market Researcher through the same Participant
-contract as Hermes and proves a visible Dock launch, Canvas seat, exact Kernel assignment, governed tool
-result, role-equal tool surface, packaged resources, and clean shutdown. It removes only the Hermes-specific
-assumptions encountered by that real consumer. Cross-runtime question/answer, exact result handoff,
-interactive analysis, revision, and replacement remain the next Wave-2 delivery after admission works.
+contract as Hermes, then proves the real product path: the founder asks the Research Director, the Director
+uses the admitted Bovada market capability, recruits the requested eligible worker, assigns exact Kernel
+work, receives the worker's governed result, and keeps the whole exchange on one Canvas. Visible Dock
+launch, the interactive Canvas seat, role-equal worker tools, packaged resources, and clean shutdown remain
+part of that proof. Broader participant question/answer, criticism, revision, and replacement follow after
+this Director-led assignment and exact result handoff work.
 
 The founder authorized continuous execution toward the agreed QuantFlow product. The root architect is the
 only Astra seat; every delegated Reader, Builder, and Verifier uses `gpt-5.6-sol`. Use focused checks for the

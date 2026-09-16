@@ -10,7 +10,7 @@ const role = process.env.QF_PEER_ROLE;
 const sessionId = process.env.QF_AGENT_SESSION_ID;
 const seatCapability = process.env.QF_LIVE_SEAT_CAPABILITY;
 
-function rpcCall(method, params) {
+function rpcCall(method, params, timeoutMs = 10_000) {
   return new Promise((resolve, reject) => {
     const socketPath = process.env.QF_APP_RPC_ENDPOINT
       || readFileSync(socketFile, "utf8").trim();
@@ -19,7 +19,7 @@ function rpcCall(method, params) {
     const timer = setTimeout(() => {
       socket.destroy();
       reject(new Error("QuantFlow RPC timed out"));
-    }, 10_000);
+    }, timeoutMs);
     socket.on("connect", () => socket.write(
       JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) + "\n",
     ));
@@ -41,6 +41,19 @@ function rpcCall(method, params) {
 }
 
 const tools = [
+  {
+    name: "use_data_capability",
+    description: "Use an admitted QuantFlow Dock data capability for the active Mission. This makes governed source evidence available to assigned participants.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        capability_id: { type: "string", description: "Exact Dock capability id, for example bovada-live-markets." },
+        sport: { type: "string", description: "Bounded sport requested by the Mission, currently ufc." },
+      },
+      required: ["capability_id", "sport"],
+      additionalProperties: false,
+    },
+  },
   {
     name: "send_task",
     description: "Send a concrete task to another live QuantFlow Dock role. The task is durably recorded and shown on the canvas.",
@@ -80,6 +93,7 @@ const tools = [
 ];
 
 const TOOL_KEYS = {
+  use_data_capability: ["capability_id", "sport"],
   send_task: ["to_role", "task"],
   send_result: ["task_id", "result", "cited_market_ids", "read_trajectory_artifact_ids"],
 };
@@ -95,7 +109,10 @@ export function validateToolArguments(name, args) {
   for (const key of keys) {
     if (!(key in args)) throw new Error(`${name} requires ${key}`);
   }
-  if (name === "send_task") {
+  if (name === "use_data_capability") {
+    if (typeof args.capability_id !== "string" || !args.capability_id.trim()) throw new Error("use_data_capability requires capability_id");
+    if (typeof args.sport !== "string" || !args.sport.trim()) throw new Error("use_data_capability requires sport");
+  } else if (name === "send_task") {
     if (typeof args.to_role !== "string" || !args.to_role.trim()) throw new Error("send_task requires to_role");
     if (typeof args.task !== "string" || !args.task.trim()) throw new Error("send_task requires task");
   } else {
@@ -116,6 +133,15 @@ async function callTool(name, rawArgs) {
     throw new Error("QuantFlow did not provide this seat's collaboration identity");
   }
   const args = validateToolArguments(name, rawArgs);
+  if (name === "use_data_capability") {
+    return rpcCall("qf.collaboration.use_data_capability", {
+      session_id: sessionId,
+      from_role: role,
+      seat_capability: seatCapability,
+      capability_id: args.capability_id,
+      sport: args.sport,
+    }, 30_000);
+  }
   if (name === "send_task") {
     return rpcCall("qf.collaboration.send_task", {
       session_id: sessionId,

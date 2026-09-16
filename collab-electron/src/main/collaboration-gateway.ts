@@ -3,6 +3,7 @@ import type { registerMethod } from "./json-rpc-server";
 export type CollaborationIdentity = { sessionId: string; role: string };
 
 export type CollaborationChange =
+  | { kind: "capability"; capabilityId: string; missionId: string }
   | { kind: "task"; taskId: string }
   | {
     kind: "result";
@@ -36,6 +37,12 @@ export type CollaborationDependencies = {
     context: { trace_id: string; span_id: string; actor_session_id: string; mission_id?: string },
   ) => unknown;
   missionForSession?: (sessionId: string) => string | undefined;
+  useDataCapability?: (input: {
+    capabilityId: string;
+    sport: string;
+    actorSessionId: string;
+    missionId: string;
+  }) => Promise<unknown>;
   marketObjectExists: (id: string) => boolean;
   resolveReadTrajectoryArtifactIds: (
     taskId: string,
@@ -214,6 +221,36 @@ export function sanitizeResultRefusal(error: unknown): string {
 export function createCollaborationService(deps: CollaborationDependencies) {
   const resultAttempts = new Map<string, number>();
   return {
+    async useDataCapability(
+      identity: CollaborationIdentity,
+      input: { capabilityId: string; sport: string },
+    ) {
+      requireCapability(deps, identity, "desk.orchestrate");
+      const capabilityId = boundedString(
+        nonEmptyString(input.capabilityId, "capability_id"),
+        "capability_id",
+        ID_MAX_BYTES,
+      );
+      const sport = boundedString(
+        nonEmptyString(input.sport, "sport"),
+        "sport",
+        ID_MAX_BYTES,
+      );
+      const missionId = deps.missionForSession?.(identity.sessionId);
+      if (!missionId) {
+        throw new Error("use_data_capability requires the active Research Director Mission");
+      }
+      if (!deps.useDataCapability) {
+        throw new Error("data capability invocation is unavailable");
+      }
+      return await deps.useDataCapability({
+        capabilityId,
+        sport,
+        actorSessionId: identity.sessionId,
+        missionId,
+      });
+    },
+
     sendTask(
       identity: CollaborationIdentity,
       input: { toRole: string; task: string },
@@ -359,6 +396,33 @@ export function registerCollaborationGatewayRpc(
   onChanged: (change: CollaborationChange) => void,
 ): void {
   const service = createCollaborationService(deps);
+  register(
+    "qf.collaboration.use_data_capability",
+    async (params) => {
+      const input = exactRecord(params, "use_data_capability", [
+        "seat_capability",
+        "session_id",
+        "from_role",
+        "capability_id",
+        "sport",
+      ]);
+      const identity = deps.authenticate(
+        input.seat_capability,
+        input.session_id,
+        input.from_role,
+      );
+      const missionId = deps.missionForSession?.(identity.sessionId);
+      const capabilityId = nonEmptyString(input.capability_id, "capability_id");
+      const result = await service.useDataCapability(identity, {
+        capabilityId,
+        sport: nonEmptyString(input.sport, "sport"),
+      });
+      if (!missionId) throw new Error("data capability invocation lost its Mission binding");
+      onChanged({ kind: "capability", capabilityId, missionId });
+      return result;
+    },
+    { description: "Invoke one admitted Dock data capability for the active Research Director Mission." },
+  );
   register(
     "qf.collaboration.send_task",
     (params) => {

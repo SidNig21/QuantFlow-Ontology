@@ -126,6 +126,8 @@ test("native research roles receive a focused generated ontology surface", () =>
     "qf_task_query",
     "qf_task_links",
   ]);
+  expect(ontologyToolsForRole("orchestrator", tools).map((tool) => tool.name))
+    .not.toContain("qf_market_event_query");
   expect(ontologyToolsForRole("critic", tools).map((tool) => tool.name)).toEqual([
     "qf_hypothesis_get",
     "qf_run_get",
