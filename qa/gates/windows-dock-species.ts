@@ -326,6 +326,38 @@ function completedResultArtifact(run: Launch, taskId: string, workerSessionId: s
   });
 }
 
+function pushedResultNotification(
+  run: Launch,
+  taskId: string,
+  artifactId: string,
+  workerSessionId: string,
+  directorSessionId: string,
+): boolean {
+  const peerBus = join(run.runRoot, "stores", "peer-bus.db");
+  if (!existsSync(peerBus)) return false;
+  return withDb(peerBus, (db) => {
+    const row = db.query(`SELECT body FROM messages
+      WHERE message_kind = 'result'
+        AND artifact_id = ?
+        AND from_session_id = ?
+        AND to_session_id = ?
+        AND from_role = 'worker'
+        AND to_role = 'orchestrator'
+        AND pushed_at IS NOT NULL
+      ORDER BY created_at DESC LIMIT 1`).get(
+        artifactId,
+        workerSessionId,
+        directorSessionId,
+      ) as { body?: string } | null;
+    if (!row?.body) return false;
+    const envelope = JSON.parse(row.body) as Record<string, unknown>;
+    return envelope.contract === "qf.peer-notification.v1"
+      && envelope.task_id === taskId
+      && typeof envelope.body === "string"
+      && envelope.body.trim().length > 0;
+  });
+}
+
 function verifyAdmission(run: Launch, seat: ParticipantSession, definitionId: string): void {
   withDb(run.kernelDb, (db) => {
     const session = db.query("SELECT status, label FROM agent_session WHERE id = ?").get(seat.sessionId) as { status?: string; label?: string } | null;
@@ -457,10 +489,14 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
     });
     assert(terminalText.includes("gpt-5.6-sol"), "real Codex model identity was not visible in its terminal");
     assert(!terminalText.includes("approval policy is never"), "Codex market read was blocked by MCP approval policy");
-    await waitFor("result notification delivered to Director", async () => {
-      const output = await sessionOutput(run!, director.sessionId);
-      return output.includes(`QuantFlow RESULT for ${task.id} from worker`) ? true : null;
-    });
+    await waitFor("exact result notification pushed to Director", () =>
+      pushedResultNotification(
+        run!,
+        task.id,
+        resultArtifact.id,
+        codex.sessionId,
+        director.sessionId,
+      ) ? true : null);
     await waitFor("returned Artifact visible on Canvas", async () => {
       return await evaluate<boolean>(run!, `(() => [...document.querySelectorAll('.canvas-tile[data-tile-type="artifact"]')].some((tile) => tile.textContent?.includes('Artifact')))()`)
         ? true

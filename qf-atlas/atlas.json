@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w2-01-codex-admission",
-    "commit": "46f842f2",
+    "commit": "4845406b",
     "generatedAt": "2026-09-16",
     "filesScanned": 436,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "2e04e748f01ab67f"
+    "fingerprint": "e47fa497b861f564"
   },
   "stats": {
     "live": 108,
@@ -3567,7 +3567,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1036.6,
+      "kb": 1037.6,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3678,7 +3678,7 @@
         },
         {
           "path": "qa/gates/windows-dock-species.ts",
-          "kb": 27.5,
+          "kb": 28.5,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 1,
@@ -60842,12 +60842,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "aa7c6274",
+      "commit": "46f842f2",
       "generatedAt": "2026-09-16"
     },
     "to": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "46f842f2",
+      "commit": "4845406b",
       "generatedAt": "2026-09-16"
     },
     "verdict": "better",
