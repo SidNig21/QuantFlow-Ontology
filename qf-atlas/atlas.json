@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w2-01-codex-admission",
-    "commit": "4845406b",
+    "commit": "3ee42435",
     "generatedAt": "2026-09-16",
     "filesScanned": 436,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "e47fa497b861f564"
+    "fingerprint": "41454c6177c519c4"
   },
   "stats": {
     "live": 108,
@@ -2182,7 +2182,7 @@
       "id": "2:collab-electron/src/main/sidecar",
       "layer": 2,
       "name": "sidecar/",
-      "kb": 35.5,
+      "kb": 35.6,
       "x": -0.91,
       "z": 2.48,
       "status": "ok",
@@ -2193,7 +2193,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/sidecar/server.ts",
-          "kb": 22.8,
+          "kb": 22.9,
           "spawns": 4,
           "spawnsLive": 1,
           "writes": 1,
@@ -3567,12 +3567,12 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1037.6,
+      "kb": 1050.8,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 101,
-      "writes": 57,
+      "spawns": 105,
+      "writes": 58,
       "dml": 19,
       "executes": 55,
       "files": [
@@ -3637,6 +3637,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/windows-dock-species.ts",
+          "kb": 41.7,
+          "spawns": 5,
+          "spawnsLive": 3,
+          "writes": 2,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/windows-cold-boot.ts",
           "kb": 37.9,
           "spawns": 7,
@@ -3671,16 +3681,6 @@
           "kb": 36.4,
           "spawns": 4,
           "spawnsLive": 3,
-          "writes": 1,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/windows-dock-species.ts",
-          "kb": 28.5,
-          "spawns": 1,
-          "spawnsLive": 1,
           "writes": 1,
           "dml": 0,
           "dmlLines": [],
@@ -23576,7 +23576,7 @@
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
+        "lifetime": "3 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
@@ -60842,12 +60842,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "46f842f2",
+      "commit": "4845406b",
       "generatedAt": "2026-09-16"
     },
     "to": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "4845406b",
+      "commit": "3ee42435",
       "generatedAt": "2026-09-16"
     },
     "verdict": "better",

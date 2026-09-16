@@ -37,6 +37,9 @@ export const WINDOWS_WSL_LAUNCH_ENV_KEYS = [
   "QF_QUANTFLOW_HERMES_PROFILE_ROOT",
   "QF_LAUNCH_READY_NONCE",
   "QF_RUNTIME_FAILURE_NONCE",
+  // Non-secret run ownership marker used to identify only this launch's WSL
+  // descendants during packaged lifecycle qualification.
+  "QF_PROOF_NONCE",
   "QF_LIVE_SEAT_CAPABILITY",
   // Explicitly test-only: lets the packaged Hermes wrapper select the
   // deterministic responder without changing ordinary provider launches.

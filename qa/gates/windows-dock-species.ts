@@ -5,7 +5,7 @@
  * substitute a responder, pre-seed a result, or call the successful market read
  * on Codex's behalf.
  */
-import { spawn, type ChildProcess } from "node:child_process";
+import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { createHash } from "node:crypto";
 import { Database } from "bun:sqlite";
 import {
@@ -25,6 +25,8 @@ import {
   collectOwnedPids,
   isolatedEnvironment,
   processSnapshot,
+  processIdentityKey,
+  ownedProcessRowsByIdentity,
   rpcCall,
   SHUTDOWN_TIMEOUT_MS,
   terminateOwnedProcessTree,
@@ -58,10 +60,23 @@ type Launch = {
   runRoot: string;
   beforeProcesses: ProcessInfo[];
   ownedPids: Set<number>;
+  proofNonce: string;
+  evidenceRoot: string;
   output: string[];
 };
 
-type ToolList = { tools?: Array<{ name?: string }> };
+type WslProcessInfo = {
+  pid: number;
+  parentPid: number;
+  startTicks: string;
+  command: string;
+};
+
+type TrackedSeat = {
+  seat: Seat;
+  windows: Set<string>;
+  wsl: Set<string>;
+};
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -120,7 +135,7 @@ function runChild(executable: string, cwd: string, env: NodeJS.ProcessEnv): Chil
   });
 }
 
-async function launch(packageRoot: string, runRoot: string): Promise<Launch> {
+async function launch(packageRoot: string, runRoot: string, evidenceRoot: string): Promise<Launch> {
   const storeRoot = join(runRoot, "stores");
   const kernelDb = join(storeRoot, "kernel.db");
   const artifactRoot = join(storeRoot, "artifacts");
@@ -146,7 +161,11 @@ async function launch(packageRoot: string, runRoot: string): Promise<Launch> {
   env.QF_PEER_BUS_DB = join(storeRoot, "peer-bus.db");
   env.QF_UI_PROOF = "1";
   env.QF_R17_GATE = "1";
-  env.QF_PROOF_NONCE = crypto.randomUUID();
+  const proofNonce = crypto.randomUUID();
+  env.QF_PROOF_NONCE = proofNonce;
+
+  const wslBaseline = await wslSessionProcesses(proofNonce);
+  assert(wslBaseline.length === 0, "proof nonce already identifies a WSL process before launch");
 
   const beforeProcesses = await processSnapshot();
   const child = runChild(join(packageRoot, "QuantFlow.exe"), packageRoot, env);
@@ -171,6 +190,8 @@ async function launch(packageRoot: string, runRoot: string): Promise<Launch> {
       runRoot,
       beforeProcesses,
       ownedPids: collectOwnedPids(beforeProcesses, afterProcesses, child.pid, packageRoot),
+      proofNonce,
+      evidenceRoot,
       output,
     };
   } catch (error) {
@@ -188,17 +209,191 @@ async function spawnSeat(run: Launch, definitionId: string): Promise<Seat> {
   return value as Seat;
 }
 
+async function captureChild(command: string, args: string[], env: NodeJS.ProcessEnv = process.env): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const child = spawn(command, args, { env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
+    const timer = setTimeout(() => {
+      child.kill();
+      reject(new Error(`${command} timed out`));
+    }, 15_000);
+    child.stdout?.on("data", (chunk: Buffer) => { stdout += chunk.toString("utf8"); });
+    child.stderr?.on("data", (chunk: Buffer) => { stderr += chunk.toString("utf8"); });
+    child.on("error", (error) => { clearTimeout(timer); reject(error); });
+    child.on("exit", (code) => {
+      clearTimeout(timer);
+      if (code === 0) resolve(stdout);
+      else reject(new Error(`${command} exited ${code}: ${stderr.trim()}`));
+    });
+  });
+}
+
+async function wslSessionProcesses(nonce: string, sessionId = ""): Promise<WslProcessInfo[]> {
+  const script = [
+    "nonce=\"$1\"; session=\"$2\"",
+    "for p in /proc/[0-9]*; do",
+    "  [ -r \"$p/environ\" ] || continue",
+    "  env_lines=$(tr '\\0' '\\n' < \"$p/environ\" 2>/dev/null) || continue",
+    "  printf '%s\\n' \"$env_lines\" | grep -Fqx \"QF_PROOF_NONCE=$nonce\" || continue",
+    "  if [ -n \"$session\" ]; then printf '%s\\n' \"$env_lines\" | grep -Fqx \"QF_AGENT_SESSION_ID=$session\" || continue; fi",
+    "  pid=${p##*/}",
+    "  ppid=$(awk '/^PPid:/ {print $2}' \"$p/status\")",
+    "  start=$(awk '{print $22}' \"$p/stat\")",
+    "  cmd=$(tr '\\0' ' ' < \"$p/cmdline\" 2>/dev/null | tr '\\t\\r\\n' '   ')",
+    "  printf '%s\\t%s\\t%s\\t%s\\n' \"$pid\" \"$ppid\" \"$start\" \"$cmd\"",
+    "done",
+  ].join("\n");
+  const raw = await captureChild("wsl.exe", ["--exec", "bash", "-lc", script, "qf-proof", nonce, sessionId]);
+  return raw.split(/\r?\n/).filter(Boolean).map((line) => {
+    const [pid, parentPid, startTicks, ...command] = line.split("\t");
+    return { pid: Number(pid), parentPid: Number(parentPid), startTicks: String(startTicks), command: command.join("\t") };
+  }).filter((row) => Number.isInteger(row.pid) && Number.isInteger(row.parentPid) && row.startTicks.length > 0);
+}
+
+function wslIdentity(row: WslProcessInfo): string {
+  return `${row.pid}\u0000${row.startTicks}`;
+}
+
+async function snapshotTrackedSeat(run: Launch, seat: Seat, beforeWindows: readonly ProcessInfo[]): Promise<TrackedSeat> {
+  const afterWindows = await processSnapshot();
+  const pids = collectOwnedPids(beforeWindows, afterWindows, run.child.pid!);
+  const seatRows = afterWindows.filter((row) => {
+    if (!pids.has(row.pid)) return false;
+    const identity = `${row.name} ${row.executablePath} ${row.commandLine}`.toLowerCase();
+    return identity.includes("wsl")
+      || identity.includes("qf-codex-launch")
+      || identity.includes("qf-hermes-launch")
+      || identity.includes("qf-collaboration-mcp")
+      || identity.includes("qf-ontology-mcp");
+  });
+  for (const row of seatRows) run.ownedPids.add(row.pid);
+  const windows = new Set(seatRows.map(processIdentityKey));
+  const wslRows = await waitFor(`WSL process ownership for ${seat.sessionId}`, async () => {
+    const rows = await wslSessionProcesses(run.proofNonce, seat.sessionId);
+    return rows.length > 0 ? rows : null;
+  }, 20_000);
+  return { seat, windows, wsl: new Set(wslRows.map(wslIdentity)) };
+}
+
+async function spawnTrackedSeat(run: Launch, definitionId: string): Promise<TrackedSeat> {
+  const beforeWindows = await processSnapshot();
+  const seat = await spawnSeat(run, definitionId);
+  return await snapshotTrackedSeat(run, seat, beforeWindows);
+}
+
+async function assertTrackedSeatExited(run: Launch, tracked: TrackedSeat, label: string): Promise<void> {
+  await waitFor(`${label} Windows/WSL process cleanup`, async () => {
+    const windows = ownedProcessRowsByIdentity(await processSnapshot(), tracked.windows);
+    const wsl = (await wslSessionProcesses(run.proofNonce, tracked.seat.sessionId))
+      .filter((row) => tracked.wsl.has(wslIdentity(row)));
+    return windows.length === 0 && wsl.length === 0 ? true : null;
+  }, 20_000);
+}
+
 async function evaluate<T>(run: Launch, expression: string): Promise<T> {
   return await rpcCall(run.endpoint, "app.ui.evaluate", { expression }, 15_000) as T;
 }
 
 async function captureEvidence(run: Launch, name: string): Promise<string> {
-  const root = process.env.QF_WINDOWS_DOCK_SPECIES_EVIDENCE_DIR || run.runRoot;
+  const root = run.evidenceRoot;
   mkdirSync(root, { recursive: true });
   const outputPath = join(root, name);
   await rpcCall(run.endpoint, "app.ui.capturePage", { outputPath }, 20_000);
   assert(existsSync(outputPath) && statSync(outputPath).size > 0, `${name} was not captured`);
   return outputPath;
+}
+
+async function mcpToolsList(run: Launch, seat: Seat, bridgeName: string): Promise<string[]> {
+  const bridgePath = join(run.packageRoot, "resources", bridgeName);
+  assert(existsSync(bridgePath), `packaged MCP bridge missing: ${bridgeName}`);
+  const env = {
+    ...process.env,
+    QF_APP_RPC_ENDPOINT: run.endpoint,
+    QF_KERNEL_DB: run.kernelDb,
+    QF_ARTIFACT_ROOT: run.artifactRoot,
+    QF_PEER_BUS_DB: join(run.runRoot, "stores", "peer-bus.db"),
+    QF_AGENT_SESSION_ID: seat.sessionId,
+    QF_PEER_ROLE: "worker",
+    QF_LIVE_SEAT_CAPABILITY: seat.seatCapability,
+  };
+  return await new Promise((resolve, reject) => {
+    const child = spawn("node.exe", [bridgePath], { env, windowsHide: true, stdio: ["pipe", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
+    let settled = false;
+    const finish = (error?: Error, tools?: string[]) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      child.kill();
+      if (error) reject(error); else resolve(tools ?? []);
+    };
+    const timer = setTimeout(() => finish(new Error(`${bridgeName} tools/list timed out: ${stderr.trim()}`)), 15_000);
+    child.stderr?.on("data", (chunk: Buffer) => { stderr += chunk.toString("utf8"); });
+    child.on("error", (error) => finish(error));
+    child.stdout?.on("data", (chunk: Buffer) => {
+      stdout += chunk.toString("utf8");
+      let newline = stdout.indexOf("\n");
+      while (newline >= 0) {
+        const line = stdout.slice(0, newline).trim();
+        stdout = stdout.slice(newline + 1);
+        if (line) {
+          const response = JSON.parse(line) as { id?: number; error?: { message?: string }; result?: { tools?: Array<{ name?: string }> } };
+          if (response.id === 2) {
+            if (response.error) finish(new Error(`${bridgeName} tools/list failed: ${response.error.message ?? "unknown error"}`));
+            else finish(undefined, (response.result?.tools ?? []).map((tool) => String(tool.name ?? "")).filter(Boolean).sort());
+            return;
+          }
+        }
+        newline = stdout.indexOf("\n");
+      }
+    });
+    child.stdin?.write(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-03-26", capabilities: {}, clientInfo: { name: "qf-w2-proof", version: "1.0.0" } } }) + "\n");
+    child.stdin?.write(JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }) + "\n");
+  });
+}
+
+async function participantMcpSurface(run: Launch, seat: Seat): Promise<string[]> {
+  const [collaboration, ontology] = await Promise.all([
+    mcpToolsList(run, seat, "qf-collaboration-mcp.mjs"),
+    mcpToolsList(run, seat, "qf-ontology-mcp.mjs"),
+  ]);
+  return [...new Set([...collaboration, ...ontology])].sort();
+}
+
+async function assertCodexRuntimeIsolation(run: Launch, seat: ParticipantSession, terminalText: string): Promise<{ version: string; model: string; processes: WslProcessInfo[] }> {
+  const processes = await wslSessionProcesses(run.proofNonce, seat.sessionId);
+  assert(processes.length > 0, "real Codex WSL process group was not observable");
+  const codex = processes.find((row) => /(^|\s|\/)codex(\s|$)/.test(row.command));
+  assert(codex, "real Codex process was not present in its nonce/session-owned WSL group");
+  const required = [
+    "--ask-for-approval never",
+    "--sandbox read-only",
+    "features.shell_tool=false",
+    "web_search=disabled",
+    "features.apps=false",
+    "features.plugins=false",
+    "features.browser_use=false",
+    "features.computer_use=false",
+    "features.image_generation=false",
+    "features.multi_agent=false",
+    "features.hooks=false",
+    "features.workspace_dependencies=false",
+    "history.persistence=none",
+    "memories.use_memories=false",
+    "memories.generate_memories=false",
+  ];
+  const normalized = codex.command.replaceAll("'", "");
+  for (const value of required) assert(normalized.includes(value), `live Codex argv omitted isolation control ${value}`);
+  assert(normalized.includes("mcp_servers={quantflow-collaboration=") && normalized.includes("quantflow-ontology="), "live Codex argv omitted the exact QuantFlow MCP replacement map");
+  assert((normalized.match(/mcp_servers=/g) ?? []).length === 1, "live Codex argv contained more than one MCP server map");
+  const versionOutput = await captureChild("wsl.exe", ["--exec", "bash", "-lc", "codex --version"]);
+  const version = versionOutput.match(/codex-cli\s+([^\s]+)/i)?.[1] ?? "";
+  const model = terminalText.match(/gpt-[0-9][A-Za-z0-9._-]*/)?.[0] ?? "";
+  assert(version.length > 0, `installed Codex CLI did not report its version: ${versionOutput.trim()}`);
+  assert(model === "gpt-5.6-sol", `unexpected Codex model identity: ${model || "missing"}`);
+  return { version, model, processes };
 }
 
 async function sessionOutput(run: Launch, sessionId: string): Promise<string> {
@@ -367,17 +562,6 @@ function verifyAdmission(run: Launch, seat: ParticipantSession, definitionId: st
   });
 }
 
-async function listTools(run: Launch, seat: Seat, role = "worker"): Promise<string[]> {
-  const result = await rpcCall(run.endpoint, "qf.ontology.list_tools", {
-    seat_capability: seat.seatCapability,
-    session_id: seat.sessionId,
-    role,
-    kernel_db: run.kernelDb,
-  }) as ToolList;
-  assert(Array.isArray(result.tools), "ontology tools/list returned no tools");
-  return result.tools.map((tool) => String(tool.name ?? "")).filter(Boolean).sort();
-}
-
 async function expectRefusal(label: string, action: () => Promise<unknown>, fragment: string): Promise<void> {
   let message = "";
   try {
@@ -432,11 +616,13 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
   }
   const packageTemp = mkdtempSync(join(tmpdir(), "qf-windows-dock-species-package-"));
   const runTemp = mkdtempSync(join(tmpdir(), "qf-windows-dock-species-run-"));
+  const evidenceRoot = process.env.QF_WINDOWS_DOCK_SPECIES_EVIDENCE_DIR
+    || mkdtempSync(join(tmpdir(), "qf-w2-01-evidence-"));
   let run: Launch | null = null;
   let codexSeat: Seat | null = null;
   try {
     const packageRoot = await buildWindowsPackage(packageTemp);
-    run = await launch(packageRoot, runTemp);
+    run = await launch(packageRoot, runTemp, evidenceRoot);
     const packageHash = createHash("sha256").update(readFileSync(join(packageRoot, "QuantFlow.exe"))).digest("hex");
 
     await startDirectorInquiry(run);
@@ -460,10 +646,10 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
         ? true
         : null;
     }, 30_000);
-    await captureEvidence(run, "01-director-bovada-codex.png");
+    const startCapture = await captureEvidence(run, "01-director-bovada-codex.png");
 
     const task = await waitFor("Director-created exact Codex Task", () => exactTask(run!, director.sessionId, codex.sessionId));
-    await captureEvidence(run, "02-director-task-delivered.png");
+    const taskCapture = await captureEvidence(run, "02-director-task-delivered.png");
     const trajectory = await waitFor("real Codex market read trajectory", () => producedReadTrajectory(run!, codex.sessionId));
     assert((trajectory.payload.arguments as Record<string, unknown> | undefined)?.sport === "ufc", "Codex market read did not query UFC");
     assert(Array.isArray(trajectory.payload.result), "Codex market read did not return the real result array");
@@ -485,10 +671,16 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
 
     const terminalText = await waitFor("real Codex completed answer", async () => {
       const output = await sessionOutput(run!, codex.sessionId);
-      return output.includes(String(resultArtifact.id).slice(0, 12)) ? output : null;
+      return output.includes(String(resultArtifact.id).slice(0, 12)) && output.includes("gpt-5.6-sol") ? output : null;
     });
     assert(terminalText.includes("gpt-5.6-sol"), "real Codex model identity was not visible in its terminal");
     assert(!terminalText.includes("approval policy is never"), "Codex market read was blocked by MCP approval policy");
+    const runtimeIdentity = await assertCodexRuntimeIsolation(run, codex, terminalText);
+    const runtimeMcpCommands = runtimeIdentity.processes.filter((row) => /qf-(collaboration|ontology)-mcp\.mjs/.test(row.command));
+    const runtimeMcpServerIds = [...new Set(runtimeMcpCommands.flatMap((row) =>
+      [...row.command.matchAll(/qf-(collaboration|ontology)-mcp\.mjs/g)].map((match) => match[1]!),
+    ))].sort();
+    assert(JSON.stringify(runtimeMcpServerIds) === JSON.stringify(["collaboration", "ontology"]), `live Codex MCP children differ from the two governed servers: ${JSON.stringify(runtimeMcpServerIds)}`);
     await waitFor("exact result notification pushed to Director", () =>
       pushedResultNotification(
         run!,
@@ -498,21 +690,27 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
         director.sessionId,
       ) ? true : null);
     await waitFor("returned Artifact visible on Canvas", async () => {
-      return await evaluate<boolean>(run!, `(() => [...document.querySelectorAll('.canvas-tile[data-tile-type="artifact"]')].some((tile) => tile.textContent?.includes('Artifact')))()`)
+      return await evaluate<boolean>(run!, `(() => [...document.querySelectorAll('.canvas-tile[data-tile-type="artifact"]')].some((tile) => {
+        const src = tile.querySelector('webview')?.getAttribute('src');
+        if (!src) return false;
+        try { return new URL(src).searchParams.get('artifactId') === ${JSON.stringify(resultArtifact.id)}; }
+        catch { return false; }
+      }))()`)
         ? true
         : null;
     });
-    await captureEvidence(run, "03-codex-result-returned.png");
+    const resultCapture = await captureEvidence(run, "03-codex-result-returned.png");
     console.log(`windows-dock-species: FALSIFY GREEN Director task=${task.id} read=${trajectory.id} result=${resultArtifact.id}`);
 
     // Capability equivalence and revocation are checked on a fresh Codex seat
     // after the Director-led product scenario has completed.
     await closeTile(run, codex);
-    const codexProof = await spawnSeat(run, CODEX_ID);
+    const codexTracked = await spawnTrackedSeat(run, CODEX_ID);
+    const codexProof = codexTracked.seat;
     codexSeat = codexProof;
     verifyAdmission(run, codexProof, CODEX_ID);
     await waitForCanvasSeat(run, codexProof, CODEX_ID);
-    const codexTools = await listTools(run, codexProof);
+    const codexTools = await participantMcpSurface(run, codexProof);
     assert(codexTools.includes("qf_market_event_query"), "Codex worker is missing market event query");
     assert(!codexTools.includes("qf_agent_definition_query"), "Codex worker received desk.orchestrate tools");
     assert(!codexTools.some((name) => name.includes("evaluation")), "Codex worker received research.evaluate tools");
@@ -539,6 +737,7 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
     }), "capability grant denied");
 
     await normalExit(run, codexProof);
+    await assertTrackedSeatExited(run, codexTracked, "normal Codex exit");
     await expectRefusal("closed Codex capability revoked", () => rpcCall(run!.endpoint, "qf.ontology.list_tools", {
       seat_capability: codexProof.seatCapability,
       session_id: codexProof.sessionId,
@@ -546,18 +745,83 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
       kernel_db: run!.kernelDb,
     }), "live seat capability is invalid");
 
-    const hermesWorker = await spawnSeat(run, HERMES_WORKER_ID);
+    const codexStop = await spawnTrackedSeat(run, CODEX_ID);
+    verifyAdmission(run, codexStop.seat, CODEX_ID);
+    await waitForCanvasSeat(run, codexStop.seat, CODEX_ID);
+    await closeTile(run, codexStop.seat);
+    await assertTrackedSeatExited(run, codexStop, "explicit Codex stop");
+    await expectRefusal("stopped Codex capability revoked", () => rpcCall(run!.endpoint, "qf.ontology.list_tools", {
+      seat_capability: codexStop.seat.seatCapability,
+      session_id: codexStop.seat.sessionId,
+      role: "worker",
+      kernel_db: run!.kernelDb,
+    }), "live seat capability is invalid");
+
+    const hermesTracked = await spawnTrackedSeat(run, HERMES_WORKER_ID);
+    const hermesWorker = hermesTracked.seat;
     verifyAdmission(run, hermesWorker, HERMES_WORKER_ID);
-    const hermesTools = await listTools(run, hermesWorker);
-    assert(JSON.stringify(hermesTools) === JSON.stringify(codexTools), "Hermes and Codex worker ontology tools/list surfaces differ");
+    const hermesTools = await participantMcpSurface(run, hermesWorker);
+    assert(JSON.stringify(hermesTools) === JSON.stringify(codexTools), "Hermes and Codex worker MCP tools/list surfaces differ");
     await closeTile(run, hermesWorker);
+    await assertTrackedSeatExited(run, hermesTracked, "explicit Hermes stop");
     await closeTile(run, director);
     await shutdown(run);
 
     const after = await processSnapshot();
     const liveOwned = after.filter((row) => run!.ownedPids.has(row.pid));
     assert(liveOwned.length === 0, `owned process ids remained: ${liveOwned.map((row) => row.pid).join(",")}`);
+    const lingeringWsl = await waitFor("all nonce-owned WSL process cleanup", async () => {
+      const rows = await wslSessionProcesses(run!.proofNonce);
+      return rows.length === 0 ? rows : null;
+    }, 30_000);
+    const candidate = spawnSync("git", ["rev-parse", "HEAD"], { cwd: process.cwd(), encoding: "utf8" }).stdout.trim();
+    const tree = spawnSync("git", ["rev-parse", "HEAD^{tree}"], { cwd: process.cwd(), encoding: "utf8" }).stdout.trim();
+    const receipt = {
+      contract: "qf.wo-w2-01.integrated-receipt.v1",
+      candidate,
+      tree,
+      package_sha256: packageHash,
+      runtime: { cli: "codex", version: runtimeIdentity.version, model: runtimeIdentity.model },
+      sessions: {
+        director: { id: director.sessionId, definition_id: DIRECTOR_ID },
+        codex: { id: codex.sessionId, definition_id: CODEX_ID },
+      },
+      task: { id: task.id, status: completedTask.status },
+      artifacts: { market_read: trajectory.id, result: resultArtifact.id },
+      mcp_tools_list: { codex: codexTools, hermes: hermesTools, set_equal: true },
+      isolation: {
+        approval: "never",
+        sandbox: "read-only",
+        quantflow_mcp_server_ids: runtimeMcpServerIds,
+        quantflow_mcp_children: runtimeMcpCommands.map((row) => ({ pid: row.pid, parent_pid: row.parentPid, command: row.command })),
+        shell: false,
+        web: false,
+        apps: false,
+        plugins: false,
+        foreign_mcp: false,
+      },
+      cleanup: {
+        normal_codex_windows_remaining: 0,
+        normal_codex_wsl_remaining: 0,
+        explicit_codex_windows_remaining: 0,
+        explicit_codex_wsl_remaining: 0,
+        explicit_hermes_windows_remaining: 0,
+        explicit_hermes_wsl_remaining: 0,
+        all_owned_windows_remaining: liveOwned.length,
+        all_nonce_wsl_remaining: lingeringWsl.length,
+        run_root_removed_by_finalizer: true,
+      },
+      captures: [startCapture, taskCapture, resultCapture],
+    };
+    const receiptPath = join(evidenceRoot, "receipt.json");
+    writeFileSync(receiptPath, JSON.stringify(receipt, null, 2) + "\n");
     console.log(`windows-dock-species: package_sha256=${packageHash}`);
+    console.log(`windows-dock-species: candidate=${candidate} tree=${tree}`);
+    console.log(`windows-dock-species: codex_cli=${runtimeIdentity.version} model=${runtimeIdentity.model}`);
+    console.log(`windows-dock-species: sessions=${JSON.stringify(receipt.sessions)}`);
+    console.log(`windows-dock-species: mcp_tools_list=${JSON.stringify(receipt.mcp_tools_list)}`);
+    console.log(`windows-dock-species: cleanup=${JSON.stringify(receipt.cleanup)}`);
+    console.log(`windows-dock-species: evidence=${receiptPath} captures=${JSON.stringify(receipt.captures)}`);
     console.log("windows-dock-species: PASS");
     return { ok: true };
   } catch (error) {
