@@ -387,7 +387,13 @@ export async function admitNativeTuiDefinition(opts: {
           await captureSession(ptySessionId, 120).catch(() => ""),
         ).slice(-4_000);
         console.error(`[runtime.mcp-readiness] ${screen || "terminal output unavailable"}`);
-        throw error;
+        const reason = error instanceof Error ? error.message : String(error);
+        throw new Error(
+          screen
+            ? `${reason}\n\nCodex startup output:\n${screen}`
+            : reason,
+          { cause: error },
+        );
       }
       if (opts.readinessText) {
         const deadline = Date.now() + 30_000;
