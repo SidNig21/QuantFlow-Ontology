@@ -259,12 +259,13 @@ async function startDirectorInquiry(run: Launch): Promise<void> {
     if (!(input instanceof HTMLTextAreaElement)) throw new Error('Dock inquiry input missing');
     if (!(technique instanceof HTMLSelectElement)) throw new Error('Dock Technique selector missing');
     if (!(submit instanceof HTMLButtonElement)) throw new Error('Dock submit missing');
-    const option = [...technique.options].find((candidate) => candidate.value);
-    if (!option) throw new Error('Dock has no governed Technique');
     input.value = ${JSON.stringify(RESEARCH_OBJECTIVE)};
     input.dispatchEvent(new Event('input', { bubbles: true }));
-    technique.value = option.value;
-    technique.dispatchEvent(new Event('change', { bubbles: true }));
+    const option = [...technique.options].find((candidate) => candidate.value);
+    if (option) {
+      technique.value = option.value;
+      technique.dispatchEvent(new Event('change', { bubbles: true }));
+    }
     submit.click();
     return true;
   })()`);

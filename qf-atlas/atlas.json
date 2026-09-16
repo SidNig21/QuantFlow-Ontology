@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w2-01-codex-admission",
-    "commit": "3ddd1a54",
+    "commit": "4b696edc",
     "generatedAt": "2026-09-16",
     "filesScanned": 436,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "5da5e8ae2a1bc503"
+    "fingerprint": "a039ea48343afcd2"
   },
   "stats": {
     "live": 108,
@@ -1450,7 +1450,7 @@
       "id": "2:collab-electron/src/main::index",
       "layer": 2,
       "name": "main/index.ts",
-      "kb": 72.5,
+      "kb": 72.4,
       "x": -1.24,
       "z": 0.45,
       "status": "ok",
@@ -1461,7 +1461,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/index.ts",
-          "kb": 72.5,
+          "kb": 72.4,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 3,
@@ -1694,7 +1694,7 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 95.5,
+      "kb": 96.2,
       "x": 1.01,
       "z": 0.85,
       "status": "gray",
@@ -1705,7 +1705,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 95.5,
+          "kb": 96.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 8,
@@ -57318,27 +57318,27 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1401,
+          "line": 1400,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1529,
+          "line": 1528,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1534,
+          "line": 1533,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1574,
+          "line": 1573,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1619,
+          "line": 1618,
           "kind": "direct"
         }
       ],
@@ -57363,17 +57363,17 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1530,
+          "line": 1529,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1575,
+          "line": 1574,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1646,
+          "line": 1645,
           "kind": "direct"
         },
         {
@@ -60842,12 +60842,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "93abd397",
+      "commit": "3ddd1a54",
       "generatedAt": "2026-09-16"
     },
     "to": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "3ddd1a54",
+      "commit": "4b696edc",
       "generatedAt": "2026-09-16"
     },
     "verdict": "better",

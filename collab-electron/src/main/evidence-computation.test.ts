@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { contentHash } from "qf-kernel/portable";
 import { athleteUrl, type HistoryTransport } from "qf-ufc-history";
-import { closeAppKernel, getKernelDb, kernelExecute, kernelGetLinks, kernelGetObject, kernelGetResearchWorldProjection, openAppKernel } from "./kernel";
+import { closeAppKernel, getKernelDb, kernelExecute, kernelGetLinks, kernelGetObject, kernelGetResearchWorldProjection, kernelRunR17DirectorResearch, openAppKernel } from "./kernel";
 import { addEvidenceAndCalculate, ensureEvidenceComputationCapabilities } from "./evidence-computation";
 import { createMarketDeskInvestigation } from "./market-desk";
 import { runEvidenceAction } from "../windows/shell/src/dock.js";
@@ -29,6 +29,37 @@ function actionSurface() {
 }
 
 describe("founder evidence and calculation service", () => {
+  test("allows a governed evidence-only result without a Technique but keeps the Dataset Technique guard", () => {
+    const readOnlyHypothesis = kernelExecute("create_hypothesis", {
+      claim: "Current governed market evidence contains two event names.",
+      success_criteria: "Return exact cited Kernel market evidence.",
+      sources: [],
+    }, trace) as { object_id: string };
+    expect(kernelRunR17DirectorResearch("worker-read-only", readOnlyHypothesis.object_id, "read-trajectory")).toBeNull();
+
+    const bytes = new TextEncoder().encode(JSON.stringify({
+      contract: "qf.dataset.v1",
+      observations: [{ id: "technique-guard-row", observed_at: "2026-09-15T00:00:00.000Z", edge: 0.25 }],
+    }));
+    const path = join(artifacts, "dataset-technique-guard.json");
+    writeFileSync(path, bytes);
+    const source = kernelExecute("publish_artifact", { kind: "result_set", bytes, storage_ref: path }, trace) as { object_id: string };
+    const dataset = kernelExecute("register_dataset_version", {
+      kind: "results",
+      purpose: "evaluation",
+      artifact_id: source.object_id,
+      content_hash: source.object_id,
+      as_of: "2026-09-15T00:00:00.000Z",
+      coverage: { deterministic_score_field: "edge" },
+    }, trace) as { object_id: string };
+    const calculationHypothesis = kernelExecute("create_hypothesis", {
+      claim: "A Dataset-backed calculation requires a named Technique.",
+      success_criteria: "Refuse the calculation when no Technique is selected.",
+      sources: [dataset.object_id],
+    }, trace) as { object_id: string };
+    expect(() => kernelRunR17DirectorResearch("worker-calculation", calculationHypothesis.object_id, "read-trajectory")).toThrow("TECHNIQUE COVERAGE REFUSED");
+  });
+
   test("binds live selected market context, durable evidence, and direct calculation without a participant", async () => {
     const sourceBytes = new TextEncoder().encode("quote-source"); const sourcePath = join(artifacts, "quote-source.json"); writeFileSync(sourcePath, sourceBytes); const sourceHash = contentHash(sourceBytes);
     kernelExecute("publish_artifact", { kind: "result_set", bytes: sourceBytes, storage_ref: sourcePath }, trace);

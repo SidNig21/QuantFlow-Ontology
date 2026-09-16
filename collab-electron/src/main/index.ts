@@ -1371,7 +1371,6 @@ app.whenReady().then(async () => {
         const hypothesisId = researchHypothesisForSession(input.delegatorSessionId);
         if (!hypothesisId) throw new Error(`research result has no exact Hypothesis binding for ${input.delegatorSessionId}`);
         const strategyId = researchStrategyForSession(input.delegatorSessionId);
-        if (!strategyId) throw new Error("TECHNIQUE COVERAGE REFUSED");
         const run = kernelRunR17DirectorResearch(input.workerSessionId, hypothesisId, artifactId, strategyId);
         // A bounded read of already-governed market evidence produces a Task result
         // and read trajectory, but no Dataset-backed calculation Run. Completion

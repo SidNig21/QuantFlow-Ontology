@@ -1782,17 +1782,31 @@ export function kernelOpenHypothesisForQuestion(question: string, datasetId?: st
   return result.object_id;
 }
 
-/** R17 Director path: named Technique is mandatory and legacy strategy synthesis is unreachable. */
+/**
+ * R17 Director path: Dataset-backed calculation requires a named Technique.
+ * A pure governed evidence read has no Dataset or deterministic Run to bind.
+ */
 export function kernelRunR17DirectorResearch(
   executorSessionId: string,
   hypothesisId: string,
   evidenceArtifactId: string,
-  strategyId: string,
+  strategyId?: string,
 ): ReturnType<typeof kernelRunGuidedResearch> {
+  const hypothesis = kernelGetObject("hypothesis", hypothesisId);
+  if (!hypothesis || String(hypothesis.status) !== "open") {
+    throw new Error("research result has no exact open Hypothesis");
+  }
+  let sources: unknown = [];
+  try { sources = JSON.parse(String(hypothesis.sources ?? "[]")); } catch { sources = []; }
+  const hasDataset = Array.isArray(sources)
+    && sources.some((source) => typeof source === "string" && source.startsWith("dataset:"));
+  if (!hasDataset) return null;
   if (typeof strategyId !== "string" || strategyId.trim() !== strategyId || strategyId.length === 0) {
     throw new Error("TECHNIQUE COVERAGE REFUSED");
   }
-  return kernelRunGuidedResearch(executorSessionId, hypothesisId, evidenceArtifactId, strategyId);
+  const run = kernelRunGuidedResearch(executorSessionId, hypothesisId, evidenceArtifactId, strategyId);
+  if (!run) throw new Error("research result could not create exact deterministic Run");
+  return run;
 }
 
 export function kernelRunGuidedResearch(
