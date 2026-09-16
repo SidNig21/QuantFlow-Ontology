@@ -26,10 +26,9 @@ export const tiles = [];
 let nextZIndex = 1;
 
 const DEFAULT_TILE_SIZES = {
-	// A Participant terminal must show the runtime TUI and its QuantFlow Task
-	// surface together. The former 500px height forced operators to resize every
-	// admitted seat before they could read or steer it.
-	term: { width: 400, height: 800 },
+	// A Participant terminal opens at a readable Canvas footprint. Dock spawns
+	// reconcile to this size instead of retaining the smaller loading card.
+	term: { width: 400, height: 500 },
 	note: { width: 440, height: 540 },
 	code: { width: 440, height: 540 },
 	image: { width: 280, height: 280 },

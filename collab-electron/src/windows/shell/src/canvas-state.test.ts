@@ -29,7 +29,7 @@ beforeEach(() => {
 
 describe("defaultSize", () => {
   test("returns correct size for each tile type", () => {
-    expect(defaultSize("term")).toEqual({ width: 400, height: 800 });
+    expect(defaultSize("term")).toEqual({ width: 400, height: 500 });
     expect(defaultSize("note")).toEqual({ width: 440, height: 540 });
     expect(defaultSize("code")).toEqual({ width: 440, height: 540 });
     expect(defaultSize("image")).toEqual({ width: 280, height: 280 });
