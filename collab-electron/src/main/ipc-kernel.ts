@@ -114,7 +114,7 @@ function broadcast(channel: string, ...args: unknown[]): void {
 }
 
 function invalidateDock(): void {
-  broadcast("qf:dock:invalidate");
+  sendToShell("qf:dock:invalidate");
 }
 
 const governedReviewInFlight = new Map<string, Promise<unknown>>();

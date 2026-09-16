@@ -273,7 +273,6 @@ async function createAndDeliverTask(run: Launch, director: Seat, codex: Seat): P
   await evaluate(run, `(() => {
     const tile = document.querySelector('.canvas-tile[data-session-id="${director.sessionId}"]');
     if (!(tile instanceof HTMLElement)) throw new Error('Director tile missing');
-    tile.click();
     const open = tile.querySelector('.task-create-button');
     if (!(open instanceof HTMLButtonElement)) throw new Error('Create Task button missing');
     open.click();
