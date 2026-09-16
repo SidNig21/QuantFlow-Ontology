@@ -11,6 +11,7 @@ import { resolveAdapterSessionEnv } from "./host-mounts";
 import { QF_APP_DIR } from "./paths";
 import { kernelExecute, type TraceContext } from "./kernel";
 import {
+  captureSession,
   createHostCommandSession,
   killSession,
   onPtySessionExit,
