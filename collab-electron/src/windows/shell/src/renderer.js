@@ -798,6 +798,12 @@ async function init() {
 				// Director can assign and steer exact work without a second UI.
 				participantView: null,
 				onCreate: async (args) => {
+					if (tile.sessionId) {
+						await window.shellApi.qf.selectAgentSurface?.({
+							tileId: tile.id,
+							sessionId: tile.sessionId,
+						});
+					}
 					const result = await window.shellApi.qf.createTask(args);
 					if (!result?.ok) throw new Error(result?.error?.message ?? "Create task failed");
 					await refreshTaskSurface();
