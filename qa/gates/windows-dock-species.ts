@@ -15,6 +15,7 @@ import {
   readFileSync,
   rmSync,
   statSync,
+  writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -117,6 +118,12 @@ async function launch(packageRoot: string, runRoot: string): Promise<Launch> {
   const appDir = join(appRoot, "app");
   mkdirSync(artifactRoot, { recursive: true });
   mkdirSync(appDir, { recursive: true });
+  writeFileSync(join(appDir, "config.json"), JSON.stringify({
+    workspaces: [],
+    expanded_workspaces: [],
+    window_state: { x: 0, y: 0, width: 1600, height: 1000, isMaximized: true },
+    ui: { terminalTarget: "auto" },
+  }, null, 2));
   const env = isolatedEnvironment(runRoot, kernelDb, artifactRoot);
   env.QF_APP_ROOT = appRoot;
   env.QF_APP_DIR = appDir;
