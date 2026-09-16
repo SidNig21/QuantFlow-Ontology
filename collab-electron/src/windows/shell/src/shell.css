@@ -2063,8 +2063,7 @@ button.task-fact:focus-visible {
 	box-shadow: none;
 }
 
-.canvas-tile[data-qf-world-type="agent_session"] .gl-tile__screen,
-.canvas-tile[data-qf-world-type="agent_session"] .tile-task-foot > :not(.qf-world-participant-card) {
+.canvas-tile[data-qf-world-type="agent_session"] .gl-tile__screen {
 	display: none !important;
 }
 

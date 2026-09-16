@@ -793,7 +793,10 @@ async function init() {
 				focused: tileManager.getFocusedTileId() === id,
 				sessions: taskSurface.sessions,
 				assignments: taskSurface.assignments,
-				participantView: tile.sessionId ? participantViewFor(tile.sessionId) : null,
+				// The terminal is the participant's working surface. Keep the
+				// existing Task composer attached to that same surface so a live
+				// Director can assign and steer exact work without a second UI.
+				participantView: null,
 				onCreate: async (args) => {
 					const result = await window.shellApi.qf.createTask(args);
 					if (!result?.ok) throw new Error(result?.error?.message ?? "Create task failed");
