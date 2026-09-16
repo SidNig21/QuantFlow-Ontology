@@ -377,10 +377,18 @@ export async function admitNativeTuiDefinition(opts: {
         throw new Error("native-TUI launcher readiness waiter was not registered");
       }
       await readinessWaiter.wait();
-      await waitForRuntimeMcpReadiness(
-        kernelSessionId,
-        opts.readinessMcpServers ?? [],
-      );
+      try {
+        await waitForRuntimeMcpReadiness(
+          kernelSessionId,
+          opts.readinessMcpServers ?? [],
+        );
+      } catch (error) {
+        const screen = stripTerminalControls(
+          await captureSession(ptySessionId, 120).catch(() => ""),
+        ).slice(-4_000);
+        console.error(`[runtime.mcp-readiness] ${screen || "terminal output unavailable"}`);
+        throw error;
+      }
       if (opts.readinessText) {
         const deadline = Date.now() + 30_000;
         while (Date.now() < deadline) {
