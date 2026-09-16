@@ -350,6 +350,7 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
   const packageTemp = mkdtempSync(join(tmpdir(), "qf-windows-dock-species-package-"));
   const runTemp = mkdtempSync(join(tmpdir(), "qf-windows-dock-species-run-"));
   let run: Launch | null = null;
+  let codexSeat: Seat | null = null;
   try {
     const packageRoot = await buildWindowsPackage(packageTemp);
     run = await launch(packageRoot, runTemp);
@@ -357,6 +358,7 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
 
     const director = await spawnSeat(run, DIRECTOR_ID);
     const codex = await spawnSeat(run, CODEX_ID);
+    codexSeat = codex;
     verifyAdmission(run, director, DIRECTOR_ID);
     verifyAdmission(run, codex, CODEX_ID);
     const codexTools = await listTools(run, codex);
@@ -429,18 +431,35 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
   } catch (error) {
     console.error(`windows-dock-species: FAIL ${error instanceof Error ? error.message : String(error)}`);
     if (run) {
+      const codexSession = withDb(run.kernelDb, (db) => db.query(`SELECT s.id, s.status FROM agent_session s
+        JOIN links l ON l.from_id = s.id AND l.kind = 'spawned_from'
+        WHERE l.to_id = ? ORDER BY s.created_at DESC LIMIT 1`).get(CODEX_ID) as { id?: string; status?: string } | null);
+      console.error(`windows-dock-species: codex-session=${JSON.stringify(codexSession)}`);
+      if (codexSession?.id) {
+        const events = withDb(run.kernelDb, (db) => db.query("SELECT type, payload FROM events WHERE object_type = 'agent_session' AND object_id = ? ORDER BY rowid DESC LIMIT 5").all(codexSession.id));
+        console.error(`windows-dock-species: codex-events=${JSON.stringify(events)}`);
+      }
       try {
-        const codexSession = withDb(run.kernelDb, (db) => db.query(`SELECT s.id FROM agent_session s
-          JOIN links l ON l.from_id = s.id AND l.kind = 'spawned_from'
-          WHERE l.to_id = ? ORDER BY s.created_at DESC LIMIT 1`).get(CODEX_ID) as { id?: string } | null);
         if (codexSession?.id) {
           const terminal = await rpcCall(run.endpoint, "qf.session.capture", { sessionId: codexSession.id }, 5_000) as { output?: string };
           console.error(`windows-dock-species: codex-terminal-tail=${JSON.stringify(String(terminal.output ?? "").slice(-4_000))}`);
         }
-        const surface = await evaluate<unknown>(run, `([...document.querySelectorAll('.canvas-tile[data-session-id]')].map((tile) => ({definition_id:tile.dataset.definitionId,session_id:tile.dataset.sessionId,text:tile.textContent?.slice(-1500) ?? ''})))`);
+      } catch (diagnosticError) {
+        console.error(`windows-dock-species: terminal diagnostic unavailable ${diagnosticError instanceof Error ? diagnosticError.message : String(diagnosticError)}`);
+      }
+      if (codexSeat) {
+        try {
+          const terminal = await rpcCall(run.endpoint, "qf.pty.capture", { sessionId: codexSeat.ptySessionId }, 5_000) as { output?: string };
+          console.error(`windows-dock-species: codex-pty-tail=${JSON.stringify(String(terminal.output ?? "").slice(-4_000))}`);
+        } catch (diagnosticError) {
+          console.error(`windows-dock-species: PTY diagnostic unavailable ${diagnosticError instanceof Error ? diagnosticError.message : String(diagnosticError)}`);
+        }
+      }
+      try {
+        const surface = await evaluate<unknown>(run, `([...document.querySelectorAll('.canvas-tile[data-session-id]')].map((tile) => ({definition_id:tile.dataset.definitionId,session_id:tile.dataset.sessionId,text:tile.textContent?.slice(-1500) ?? '',history:[...tile.querySelectorAll('.task-history-fact')].map((row)=>({kind:row.dataset.kind,outcome:row.dataset.outcome,text:row.dataset.text}))})))`);
         console.error(`windows-dock-species: canvas-tail=${JSON.stringify(surface)}`);
       } catch (diagnosticError) {
-        console.error(`windows-dock-species: diagnostic unavailable ${diagnosticError instanceof Error ? diagnosticError.message : String(diagnosticError)}`);
+        console.error(`windows-dock-species: Canvas diagnostic unavailable ${diagnosticError instanceof Error ? diagnosticError.message : String(diagnosticError)}`);
       }
     }
     if (run?.output.length) console.error(run.output.join("").slice(-4_000));
