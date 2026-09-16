@@ -86,6 +86,7 @@ import { resolveLivePeerRecipient } from "./live-peer-recipient";
 import { livePtyIdsForRole } from "./peer-delivery";
 import { kernelSessionIdForNativePty } from "./host-native-tui";
 import { requireLiveSeatCapability } from "./live-seat-capability";
+import { recordRuntimeMcpReady } from "./runtime-mcp-readiness";
 import * as agentActivity from "./agent-activity";
 import { buildMissionActivationInstruction } from "./mission-activation";
 import { isMarketExpressionComparison } from "qf-kernel/portable";
@@ -1224,6 +1225,28 @@ app.whenReady().then(async () => {
   }), {
     description: "Return the build identity displayed in the shell masthead",
   });
+  registerMethod(
+    "qf.runtime.mcp_ready",
+    (params) => {
+      if (!params || typeof params !== "object") throw new Error("runtime MCP readiness requires params");
+      const input = params as Record<string, unknown>;
+      const extras = Object.keys(input).filter(
+        (key) => !["seat_capability", "session_id", "role", "server_id"].includes(key),
+      );
+      if (extras.length > 0) throw new Error(`runtime MCP readiness rejects extra field: ${extras[0]}`);
+      const identity = requireAuthenticatedPeerSessionRole(
+        input.seat_capability,
+        input.session_id,
+        input.role,
+      );
+      if (typeof input.server_id !== "string" || input.server_id.length === 0) {
+        throw new Error("runtime MCP readiness requires server_id");
+      }
+      recordRuntimeMcpReady(identity.sessionId, input.server_id);
+      return { ready: true };
+    },
+    { description: "Record one authenticated runtime MCP initialization receipt." },
+  );
   registerMethod(
     "qf.dock.spawn",
     async (params) => {

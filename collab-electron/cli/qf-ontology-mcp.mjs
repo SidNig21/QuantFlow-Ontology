@@ -84,7 +84,16 @@ function reply(id, result) {
 }
 
 async function handle(message) {
-  if (message.method === "notifications/initialized") return;
+  if (message.method === "notifications/initialized") {
+    await listTools();
+    await rpcCall("qf.runtime.mcp_ready", {
+      session_id: sessionId,
+      role,
+      seat_capability: seatCapability,
+      server_id: "quantflow-ontology",
+    });
+    return;
+  }
   if (message.method === "initialize") {
     reply(message.id, {
       protocolVersion: message.params?.protocolVersion ?? "2025-03-26",
@@ -146,7 +155,10 @@ process.stdin.on("data", (chunk) => {
     input = input.slice(newline + 1);
     if (line) {
       try {
-        void handle(JSON.parse(line));
+        void handle(JSON.parse(line)).catch((error) => {
+          process.stderr.write(`quantflow-ontology: ${error instanceof Error ? error.message : error}\n`);
+          process.exit(1);
+        });
       } catch (error) {
         process.stderr.write(`quantflow-ontology: ${error instanceof Error ? error.message : error}\n`);
       }

@@ -513,6 +513,7 @@ export async function admitAndStartSession(
         entrypointPath: runtime.entrypointPath,
         terminalTarget: runtime.metadata.terminalTarget,
         readinessText: runtime.metadata.readinessText,
+        readinessMcpServers: runtime.metadata.readinessMcpServers,
         role: runtime.role,
         env: opts?.env,
         corruptId: opts?.corruptId,

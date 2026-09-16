@@ -97,13 +97,20 @@ describe("runtime adapter metadata", () => {
     const metadata = parseRuntimeAdapterMetadata({
       ...defaultProfileHermesMetadata(),
       readiness_text: "Ask runtime to do anything",
+      readiness_mcp_servers: ["quantflow-collaboration", "quantflow-ontology"],
     });
     expect(metadata.readinessText).toBe("Ask runtime to do anything");
+    expect(metadata.readinessMcpServers).toEqual(["quantflow-collaboration", "quantflow-ontology"]);
     const { peer_delivery: _peerDelivery, ...base } = defaultProfileHermesMetadata();
     const nonTui = { ...base, route: "host_acp", readiness_text: "ready" };
     expect(() => parseRuntimeAdapterMetadata(nonTui)).toThrow(
       "readiness_text requires route=native_tui",
     );
+    expect(() => parseRuntimeAdapterMetadata({
+      ...base,
+      route: "host_acp",
+      readiness_mcp_servers: ["quantflow-ontology"],
+    })).toThrow("readiness_mcp_servers requires route=native_tui");
   });
 
   test("resolves sibling metadata and binds it to the package filename", () => {

@@ -41,7 +41,7 @@ const TASK_TITLE = "Inspect current UFC market events";
 const TASK_DESCRIPTION =
   "Use only the QuantFlow ontology MCP. Call qf_event_query once for current UFC market events, report the exact result through QuantFlow, and do not use shell, web, apps, or foreign tools.";
 const TASK_INSTRUCTION =
-  "Start this Task now. Use only the QuantFlow ontology MCP. Call qf_event_query exactly once for current UFC market events. Report the exact tool result, then stop. Do not call send_result. Do not use shell, web, apps, or foreign tools.";
+  "Start this Task now. Use only the QuantFlow ontology MCP. Call qf_event_query exactly once for current UFC market events. Report the exact tool result, then end with a separate QF_TASK_COMPLETE line. Do not call send_result. Do not use shell, web, apps, or foreign tools.";
 const LIVE_TIMEOUT_MS = 180_000;
 
 type Seat = {
@@ -185,6 +185,29 @@ async function spawnSeat(run: Launch, definitionId: string): Promise<Seat> {
 
 async function evaluate<T>(run: Launch, expression: string): Promise<T> {
   return await rpcCall(run.endpoint, "app.ui.evaluate", { expression }, 15_000) as T;
+}
+
+async function captureEvidence(run: Launch, name: string): Promise<string> {
+  const root = process.env.QF_WINDOWS_DOCK_SPECIES_EVIDENCE_DIR || run.runRoot;
+  mkdirSync(root, { recursive: true });
+  const outputPath = join(root, name);
+  await rpcCall(run.endpoint, "app.ui.capturePage", { outputPath }, 20_000);
+  assert(existsSync(outputPath) && statSync(outputPath).size > 0, `${name} was not captured`);
+  return outputPath;
+}
+
+async function sessionOutput(run: Launch, sessionId: string): Promise<string> {
+  const terminal = await rpcCall(
+    run.endpoint,
+    "qf.session.capture",
+    { sessionId },
+    10_000,
+  ) as { output?: string };
+  return String(terminal.output ?? "");
+}
+
+function occurrenceCount(text: string, needle: string): number {
+  return text.split(needle).length - 1;
 }
 
 async function waitForCanvasSeat(run: Launch, seat: Seat, definitionId: string): Promise<void> {
@@ -405,6 +428,7 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
     verifyAdmission(run, codex, CODEX_ID);
     await waitForCanvasSeat(run, director, DIRECTOR_ID);
     await waitForCanvasSeat(run, codex, CODEX_ID);
+    await captureEvidence(run, "01-codex-ready.png");
     const codexTools = await listTools(run, codex);
     assert(codexTools.includes("qf_market_event_query"), "Codex worker is missing market event query");
     assert(!codexTools.includes("qf_agent_definition_query"), "Codex worker received desk.orchestrate tools");
@@ -432,6 +456,7 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
     }), "capability grant denied");
 
     const task = await createAndDeliverTask(run, director, codex);
+    await captureEvidence(run, "02-codex-task-delivered.png");
     const trajectory = await waitFor("real Codex market read trajectory", () => producedTrajectory(run!, codex.sessionId));
     assert(existsSync(trajectory.storage_ref) && statSync(trajectory.storage_ref).size > 0, "Codex trajectory payload is missing");
     const payload = JSON.parse(readFileSync(trajectory.storage_ref, "utf8")) as Record<string, unknown>;
@@ -440,13 +465,15 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
     assert(Array.isArray(payload.result), "Codex market read did not return the real result array");
     assert(payload.session_id === codex.sessionId && payload.role === "worker", "trajectory identity does not match Codex worker");
 
-    const terminal = await rpcCall(run.endpoint, "qf.session.capture", { sessionId: codex.sessionId }, 10_000) as { output?: string };
-    const terminalText = String(terminal.output ?? "");
+    const terminalText = await waitFor("real Codex final answer", async () => {
+      const output = await sessionOutput(run!, codex.sessionId);
+      // The Task instruction appears once in the terminal. A second occurrence
+      // proves the live model returned the requested completion line after its read.
+      return occurrenceCount(output, "QF_TASK_COMPLETE") >= 2 ? output : null;
+    });
     assert(terminalText.includes("gpt-5.6-sol"), "real Codex model identity was not visible in its terminal");
     assert(!terminalText.includes("approval policy is never"), "Codex market read was blocked by MCP approval policy");
-    const capturePath = join(runTemp, "codex-canvas.png");
-    await rpcCall(run.endpoint, "app.ui.capturePage", { outputPath: capturePath }, 20_000);
-    assert(existsSync(capturePath) && statSync(capturePath).size > 0, "legible Canvas capture was not produced");
+    await captureEvidence(run, "03-codex-result.png");
     console.log(`windows-dock-species: FALSIFY GREEN Codex task=${task.id} trajectory=${trajectory.id}`);
 
     await cancelTask(run, codex, task.id);
@@ -475,6 +502,7 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
   } catch (error) {
     console.error(`windows-dock-species: FAIL ${error instanceof Error ? error.message : String(error)}`);
     if (run) {
+      await captureEvidence(run, "99-failure.png").catch(() => null);
       const codexSession = withDb(run.kernelDb, (db) => db.query(`SELECT s.id, s.status FROM agent_session s
         JOIN links l ON l.from_id = s.id AND l.kind = 'spawned_from'
         WHERE l.to_id = ? ORDER BY s.created_at DESC LIMIT 1`).get(CODEX_ID) as { id?: string; status?: string } | null);

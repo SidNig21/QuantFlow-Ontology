@@ -6,7 +6,10 @@
   "argv": [
     "--no-alt-screen"
   ],
-  "readiness_text": "gpt-5.6-sol",
+  "readiness_mcp_servers": [
+    "quantflow-collaboration",
+    "quantflow-ontology"
+  ],
   "peer_delivery": {
     "mode": "pty_role",
     "runtime_profiles": [

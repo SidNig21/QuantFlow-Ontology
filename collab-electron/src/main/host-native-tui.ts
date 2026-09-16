@@ -51,6 +51,10 @@ import {
 import * as agentActivity from "./agent-activity";
 import { createMarketRuntimeReceiver, recordMarketRuntimeFailure } from "./market-runtime-failure";
 import { clearMarketRuntimeReceipt, recordMarketRuntimeReceipt } from "./market-runtime-receipt";
+import {
+  clearRuntimeMcpReadiness,
+  waitForRuntimeMcpReadiness,
+} from "./runtime-mcp-readiness";
 
 export type { NativeTuiLive } from "./native-tui-orchestration";
 
@@ -86,6 +90,7 @@ export function installNativeTuiPtyExitHook(
     revokeLiveSeatCapability(ptyToCapability.get(ptySessionId));
     ptyToCapability.delete(ptySessionId);
     agentActivity.sessionEnd({ session_id: kernelId });
+    clearRuntimeMcpReadiness(kernelId);
     console.log(
       `agent-host: native_tui pty exited pty=${ptySessionId} → close kernel=${kernelId}`,
     );
@@ -101,6 +106,7 @@ export async function admitNativeTuiDefinition(opts: {
   entrypointPath?: string | null;
   terminalTarget?: TerminalTarget | null;
   readinessText?: string | null;
+  readinessMcpServers?: string[];
   role?: string;
   env?: Record<string, string>;
   corruptId?: string;
@@ -371,6 +377,10 @@ export async function admitNativeTuiDefinition(opts: {
         throw new Error("native-TUI launcher readiness waiter was not registered");
       }
       await readinessWaiter.wait();
+      await waitForRuntimeMcpReadiness(
+        kernelSessionId,
+        opts.readinessMcpServers ?? [],
+      );
       if (opts.readinessText) {
         const deadline = Date.now() + 30_000;
         while (Date.now() < deadline) {
@@ -384,7 +394,10 @@ export async function admitNativeTuiDefinition(opts: {
         throw new Error("native-TUI declared readiness text timed out");
       }
     },
-    cancelLauncherReadiness: () => readinessWaiter?.cancel(),
+    cancelLauncherReadiness: () => {
+      readinessWaiter?.cancel();
+      clearRuntimeMcpReadiness(kernelSessionId);
+    },
     activateMission: opts.missionActivation
       ? async (ptySessionId) => {
           if (!usesHermesNativeTui) {

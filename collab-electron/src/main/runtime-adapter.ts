@@ -31,6 +31,7 @@ export type RuntimeAdapterMetadata = {
   tools: string[];
   peerDelivery: PeerDeliveryContract | null;
   readinessText: string | null;
+  readinessMcpServers: string[];
 };
 
 export type ResolvedRuntimeAdapter = {
@@ -164,6 +165,7 @@ export function parseRuntimeAdapterMetadata(
       "tools",
       "peer_delivery",
       "readiness_text",
+      "readiness_mcp_servers",
     ],
     source,
   );
@@ -231,6 +233,17 @@ export function parseRuntimeAdapterMetadata(
       `${source}.readiness_text requires route=native_tui`,
     );
   }
+  const readinessMcpServers = doc.readiness_mcp_servers === undefined
+    ? []
+    : stringArray(doc.readiness_mcp_servers, `${source}.readiness_mcp_servers`, { nonEmpty: true });
+  if (new Set(readinessMcpServers).size !== readinessMcpServers.length) {
+    throw new RuntimeAdapterContractError(`${source}.readiness_mcp_servers must be unique`);
+  }
+  if (readinessMcpServers.length > 0 && route !== "native_tui") {
+    throw new RuntimeAdapterContractError(
+      `${source}.readiness_mcp_servers requires route=native_tui`,
+    );
+  }
 
   return {
     adapterId,
@@ -244,6 +257,7 @@ export function parseRuntimeAdapterMetadata(
     tools,
     peerDelivery,
     readinessText,
+    readinessMcpServers,
   };
 }
 
