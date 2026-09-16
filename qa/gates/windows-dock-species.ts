@@ -249,14 +249,15 @@ async function createAndDeliverTask(run: Launch, director: Seat, codex: Seat): P
     const description = tile.querySelector('.task-description');
     const assignee = tile.querySelector('.task-assignee');
     const form = tile.querySelector('.task-create-form');
-    if (!(title instanceof HTMLInputElement) || !(description instanceof HTMLTextAreaElement) || !(assignee instanceof HTMLSelectElement) || !(form instanceof HTMLFormElement)) throw new Error('Task form missing');
+    const create = form?.querySelector('button[type="submit"]');
+    if (!(title instanceof HTMLInputElement) || !(description instanceof HTMLTextAreaElement) || !(assignee instanceof HTMLSelectElement) || !(form instanceof HTMLFormElement) || !(create instanceof HTMLButtonElement)) throw new Error('Task form missing');
     title.value = ${JSON.stringify(TASK_TITLE)};
     title.dispatchEvent(new Event('input', { bubbles: true }));
     description.value = ${JSON.stringify(TASK_DESCRIPTION)};
     description.dispatchEvent(new Event('input', { bubbles: true }));
     assignee.value = ${JSON.stringify(codex.sessionId)};
     assignee.dispatchEvent(new Event('change', { bubbles: true }));
-    form.requestSubmit();
+    create.click();
     return true;
   })()`);
   const task = await waitFor("exact Canvas Task", () => exactTask(run, director.sessionId, codex.sessionId), 20_000);
@@ -273,12 +274,21 @@ async function createAndDeliverTask(run: Launch, director: Seat, codex: Seat): P
     redirect.click();
     const input = tile?.querySelector('.task-steering-input');
     const form = tile?.querySelector('.task-steering-form');
-    if (!(input instanceof HTMLTextAreaElement) || !(form instanceof HTMLFormElement)) throw new Error('Redirect form missing');
+    const submit = form?.querySelector('button[type="submit"]');
+    if (!(input instanceof HTMLTextAreaElement) || !(form instanceof HTMLFormElement) || !(submit instanceof HTMLButtonElement)) throw new Error('Redirect form missing');
     input.value = ${JSON.stringify(TASK_INSTRUCTION)};
     input.dispatchEvent(new Event('input', { bubbles: true }));
-    form.requestSubmit();
+    submit.click();
     return true;
   })()`);
+  await waitFor("exact Task delivery", async () => {
+    return await evaluate<boolean>(run, `(() => {
+      const tile = document.querySelector('.canvas-tile[data-session-id="${codex.sessionId}"]');
+      return [...(tile?.querySelectorAll('.task-history-fact') ?? [])].some((row) => row.dataset.kind === 'task.steering_delivery' && row.dataset.outcome === 'delivered');
+    })()`)
+      ? true
+      : null;
+  }, 20_000);
   return task;
 }
 
@@ -418,6 +428,21 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
     return { ok: true };
   } catch (error) {
     console.error(`windows-dock-species: FAIL ${error instanceof Error ? error.message : String(error)}`);
+    if (run) {
+      try {
+        const codexSession = withDb(run.kernelDb, (db) => db.query(`SELECT s.id FROM agent_session s
+          JOIN links l ON l.from_id = s.id AND l.kind = 'spawned_from'
+          WHERE l.to_id = ? ORDER BY s.created_at DESC LIMIT 1`).get(CODEX_ID) as { id?: string } | null);
+        if (codexSession?.id) {
+          const terminal = await rpcCall(run.endpoint, "qf.session.capture", { sessionId: codexSession.id }, 5_000) as { output?: string };
+          console.error(`windows-dock-species: codex-terminal-tail=${JSON.stringify(String(terminal.output ?? "").slice(-4_000))}`);
+        }
+        const surface = await evaluate<unknown>(run, `([...document.querySelectorAll('.canvas-tile[data-session-id]')].map((tile) => ({definition_id:tile.dataset.definitionId,session_id:tile.dataset.sessionId,text:tile.textContent?.slice(-1500) ?? ''})))`);
+        console.error(`windows-dock-species: canvas-tail=${JSON.stringify(surface)}`);
+      } catch (diagnosticError) {
+        console.error(`windows-dock-species: diagnostic unavailable ${diagnosticError instanceof Error ? diagnosticError.message : String(diagnosticError)}`);
+      }
+    }
     if (run?.output.length) console.error(run.output.join("").slice(-4_000));
     return { ok: false };
   } finally {
