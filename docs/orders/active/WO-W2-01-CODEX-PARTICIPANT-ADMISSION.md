@@ -141,7 +141,7 @@ pre-seeded result, or substituted model cannot satisfy it.
    Task assigned to the live Codex session and use the existing Redirect/steer path to deliver that Task
    envelope to the exact Codex PTY. This order does not build a second delegation UI.
 4. Real Codex receives the exact Task envelope and invokes one non-hard-coded allowed `market.read` tool,
-   such as `qf_event_query`, through the real ontology MCP. Its real tool result and Kernel-published
+   such as `qf_market_event_query`, through the real ontology MCP. Its real tool result and Kernel-published
    trajectory Artifact are linked by `produces` to that exact Codex session.
 5. Control: the allowed market read succeeds. Falsifiers: a `desk.orchestrate` or `research.evaluate` tool
    is absent or denied, and the wrong session, role, or seat capability is denied.

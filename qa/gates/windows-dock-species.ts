@@ -39,9 +39,9 @@ const CODEX_ID = "codex-worker";
 const HERMES_WORKER_ID = "hermes-worker";
 const TASK_TITLE = "Inspect current UFC market events";
 const TASK_DESCRIPTION =
-  "Use only the QuantFlow ontology MCP. Call qf_event_query once for current UFC market events, report the exact result through QuantFlow, and do not use shell, web, apps, or foreign tools.";
+  "Use only the QuantFlow ontology MCP. Call qf_market_event_query once with sport ufc for current UFC market events, report the exact result through QuantFlow, and do not use shell, web, apps, or foreign tools.";
 const TASK_INSTRUCTION =
-  "Start this Task now. Use only the QuantFlow ontology MCP. Call qf_event_query exactly once for current UFC market events. Report the exact tool result, then end with a separate QF_TASK_COMPLETE line. Do not call send_result. Do not use shell, web, apps, or foreign tools.";
+  "Start this Task now. Use only the QuantFlow ontology MCP. Call qf_market_event_query exactly once with sport ufc for current UFC market events. Report the exact tool result, then end with a separate QF_TASK_COMPLETE line. Do not call send_result. Do not use shell, web, apps, or foreign tools.";
 const LIVE_TIMEOUT_MS = 180_000;
 
 type Seat = {
