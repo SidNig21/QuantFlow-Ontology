@@ -1373,7 +1373,10 @@ app.whenReady().then(async () => {
         const strategyId = researchStrategyForSession(input.delegatorSessionId);
         if (!strategyId) throw new Error("TECHNIQUE COVERAGE REFUSED");
         const run = kernelRunR17DirectorResearch(input.workerSessionId, hypothesisId, artifactId, strategyId);
-        if (!run) throw new Error("research result could not create exact deterministic Run");
+        // A bounded read of already-governed market evidence produces a Task result
+        // and read trajectory, but no Dataset-backed calculation Run. Completion
+        // lineage already requires that exact worker read and result Artifact.
+        if (!run) return;
         kernelBindSourceWork({
           source_task_id: input.taskId,
           hypothesis_id: run.hypothesisId,
