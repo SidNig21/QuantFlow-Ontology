@@ -4,6 +4,7 @@
   "command": "codex",
   "terminal_target": "wsl:auto",
   "argv": ["--no-alt-screen"],
+  "readiness_text": "gpt-5.6-sol",
   "peer_delivery": {
     "mode": "pty_role",
     "runtime_profiles": ["default"]
