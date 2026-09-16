@@ -101,7 +101,7 @@ async function removeTempRoot(root: string): Promise<void> {
 }
 
 function runChild(executable: string, cwd: string, env: NodeJS.ProcessEnv): ChildProcess {
-  return spawn(executable, ["--disable-gpu"], {
+  return spawn(executable, [], {
     cwd,
     env,
     windowsHide: true,
