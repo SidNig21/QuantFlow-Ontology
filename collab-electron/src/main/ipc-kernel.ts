@@ -14,6 +14,7 @@ import {
   onSessionChunk,
   onSessionDone,
   runTurn,
+  submitAgentSessionInstruction,
 } from "./agent-host";
 import { registerHostAcpPermissionHandlers } from "./host-acp-permission";
 import {
@@ -190,7 +191,13 @@ async function deliverAccepted(
   envelope: string,
   actorSessionId?: string,
 ): Promise<boolean> {
-  const delivered = deliverToAgentSession(targetSessionId, envelope);
+  let delivered = false;
+  try {
+    await submitAgentSessionInstruction(targetSessionId, envelope);
+    delivered = true;
+  } catch {
+    delivered = false;
+  }
   kernelExecute(
     "record_task_steering_delivery",
     { accepted_event_id: acceptedEventId, outcome: delivered ? "delivered" : "delivery_failed" },
