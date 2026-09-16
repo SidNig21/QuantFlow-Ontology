@@ -1,0 +1,119 @@
+{
+  "contract": "qf.wo-w2-01.integrated-receipt.v1",
+  "candidate": "e7b96e3b07eb87922932a4f3eaf2d0337360def3",
+  "tree": "4417bc47ae7bafa567e7290df4cf808b9acea8a1",
+  "package_sha256": "9b853268c03cec7c36d455b60013104bc35ba48b3a81806a0fdaca5700ae02f4",
+  "runtime": {
+    "cli": "codex",
+    "version": "0.154.0",
+    "model": "gpt-5.6-sol"
+  },
+  "sessions": {
+    "director": {
+      "id": "d9c8157b-3f0a-4943-a82e-b6c45445b67f",
+      "definition_id": "hermes-research-director"
+    },
+    "codex": {
+      "id": "acp-codex-worker-mission-r17-gate",
+      "definition_id": "codex-worker"
+    }
+  },
+  "task": {
+    "id": "task-r17-gate",
+    "status": "done"
+  },
+  "artifacts": {
+    "market_read": "a5489806196d8b1cefc131779ccdfba918d12b77522085ea5f4ecf572a7236d2",
+    "result": "6d4719c1b6b7a80b48fbff9120c7d479be6b087f1319f01e813f02a64181ea7f"
+  },
+  "mcp_tools_list": {
+    "codex": [
+      "qf_competitor_get",
+      "qf_competitor_links",
+      "qf_competitor_query",
+      "qf_instrument_get",
+      "qf_instrument_links",
+      "qf_instrument_query",
+      "qf_market_event_get",
+      "qf_market_event_links",
+      "qf_market_event_query",
+      "qf_quote_get",
+      "qf_quote_links",
+      "qf_quote_query",
+      "qf_result_get",
+      "qf_result_links",
+      "qf_result_query",
+      "qf_venue_get",
+      "qf_venue_links",
+      "qf_venue_query",
+      "send_result",
+      "send_task",
+      "use_data_capability"
+    ],
+    "hermes": [
+      "qf_competitor_get",
+      "qf_competitor_links",
+      "qf_competitor_query",
+      "qf_instrument_get",
+      "qf_instrument_links",
+      "qf_instrument_query",
+      "qf_market_event_get",
+      "qf_market_event_links",
+      "qf_market_event_query",
+      "qf_quote_get",
+      "qf_quote_links",
+      "qf_quote_query",
+      "qf_result_get",
+      "qf_result_links",
+      "qf_result_query",
+      "qf_venue_get",
+      "qf_venue_links",
+      "qf_venue_query",
+      "send_result",
+      "send_task",
+      "use_data_capability"
+    ],
+    "set_equal": true
+  },
+  "isolation": {
+    "approval": "never",
+    "sandbox": "read-only",
+    "quantflow_mcp_server_ids": [
+      "collaboration",
+      "ontology"
+    ],
+    "quantflow_mcp_children": [
+      {
+        "pid": 1111,
+        "parent_pid": 1110,
+        "command": "node /home/rybowen21/.local/bin/codex --ask-for-approval never --sandbox read-only -c mcp_servers={quantflow-collaboration={command='node.exe',args=['C:/Users/rybow/AppData/Local/Temp/qf-windows-dock-species-package-lnsOLH/dist/win-unpacked/resources/qf-collaboration-mcp.mjs'],required=true,default_tools_approval_mode='approve'},quantflow-ontology={command='node.exe',args=['C:/Users/rybow/AppData/Local/Temp/qf-windows-dock-species-package-lnsOLH/dist/win-unpacked/resources/qf-ontology-mcp.mjs'],required=true,default_tools_approval_mode='approve'}} -c features.shell_tool=false -c web_search='disabled' -c features.apps=false -c apps._default.enabled=false -c features.plugins=false -c features.browser_use=false -c features.browser_use_external=false -c features.browser_use_full_cdp_access=false -c features.in_app_browser=false -c features.computer_use=false -c features.image_generation=false -c features.multi_agent=false -c features.hooks=false -c features.workspace_dependencies=false -c features.tool_suggest=false -c history.persistence='none' -c memories.use_memories=false -c memories.generate_memories=false --no-alt-screen "
+      },
+      {
+        "pid": 1123,
+        "parent_pid": 1111,
+        "command": "/home/rybowen21/.hermes/node/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/bin/codex --ask-for-approval never --sandbox read-only -c mcp_servers={quantflow-collaboration={command='node.exe',args=['C:/Users/rybow/AppData/Local/Temp/qf-windows-dock-species-package-lnsOLH/dist/win-unpacked/resources/qf-collaboration-mcp.mjs'],required=true,default_tools_approval_mode='approve'},quantflow-ontology={command='node.exe',args=['C:/Users/rybow/AppData/Local/Temp/qf-windows-dock-species-package-lnsOLH/dist/win-unpacked/resources/qf-ontology-mcp.mjs'],required=true,default_tools_approval_mode='approve'}} -c features.shell_tool=false -c web_search='disabled' -c features.apps=false -c apps._default.enabled=false -c features.plugins=false -c features.browser_use=false -c features.browser_use_external=false -c features.browser_use_full_cdp_access=false -c features.in_app_browser=false -c features.computer_use=false -c features.image_generation=false -c features.multi_agent=false -c features.hooks=false -c features.workspace_dependencies=false -c features.tool_suggest=false -c history.persistence='none' -c memories.use_memories=false -c memories.generate_memories=false --no-alt-screen "
+      }
+    ],
+    "shell": false,
+    "web": false,
+    "apps": false,
+    "plugins": false,
+    "foreign_mcp": false
+  },
+  "cleanup": {
+    "normal_codex_windows_remaining": 0,
+    "normal_codex_wsl_remaining": 0,
+    "explicit_codex_windows_remaining": 0,
+    "explicit_codex_wsl_remaining": 0,
+    "explicit_hermes_windows_remaining": 0,
+    "explicit_hermes_wsl_remaining": 0,
+    "all_owned_windows_remaining": 0,
+    "all_nonce_wsl_remaining": 0,
+    "run_root_removed_by_finalizer": true
+  },
+  "captures": [
+    "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-w2-01-evidence-1EVQN2\\01-director-bovada-codex.png",
+    "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-w2-01-evidence-1EVQN2\\02-director-task-delivered.png",
+    "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-w2-01-evidence-1EVQN2\\03-codex-result-returned.png"
+  ]
+}
