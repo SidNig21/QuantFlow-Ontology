@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "codex/wo-w2-01-codex-admission",
-    "commit": "93abd397",
+    "commit": "3ddd1a54",
     "generatedAt": "2026-09-16",
     "filesScanned": 436,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "afa8f40cfc122bdb"
+    "fingerprint": "5da5e8ae2a1bc503"
   },
   "stats": {
     "live": 108,
@@ -1450,7 +1450,7 @@
       "id": "2:collab-electron/src/main::index",
       "layer": 2,
       "name": "main/index.ts",
-      "kb": 72.3,
+      "kb": 72.5,
       "x": -1.24,
       "z": 0.45,
       "status": "ok",
@@ -1461,7 +1461,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/index.ts",
-          "kb": 72.3,
+          "kb": 72.5,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 3,
@@ -3567,7 +3567,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1034.7,
+      "kb": 1036.1,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3678,7 +3678,7 @@
         },
         {
           "path": "qa/gates/windows-dock-species.ts",
-          "kb": 25.7,
+          "kb": 27.1,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 1,
@@ -57318,27 +57318,27 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1398,
+          "line": 1401,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1526,
+          "line": 1529,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1531,
+          "line": 1534,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1571,
+          "line": 1574,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1616,
+          "line": 1619,
           "kind": "direct"
         }
       ],
@@ -57363,17 +57363,17 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1527,
+          "line": 1530,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1572,
+          "line": 1575,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1643,
+          "line": 1646,
           "kind": "direct"
         },
         {
@@ -60842,12 +60842,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "c4e8c05c",
-      "generatedAt": "2026-09-15"
+      "commit": "93abd397",
+      "generatedAt": "2026-09-16"
     },
     "to": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "93abd397",
+      "commit": "3ddd1a54",
       "generatedAt": "2026-09-16"
     },
     "verdict": "better",

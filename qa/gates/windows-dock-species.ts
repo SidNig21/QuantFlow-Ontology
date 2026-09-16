@@ -37,11 +37,8 @@ import {
 const DIRECTOR_ID = "hermes-research-director";
 const CODEX_ID = "codex-worker";
 const HERMES_WORKER_ID = "hermes-worker";
-const TASK_TITLE = "Inspect current UFC market events";
-const TASK_DESCRIPTION =
-  "Use only the QuantFlow ontology MCP. Call qf_market_event_query once with sport ufc for current UFC market events, report the exact result through QuantFlow, and do not use shell, web, apps, or foreign tools.";
-const TASK_INSTRUCTION =
-  "Start this Task now. Use only the QuantFlow ontology MCP. Call qf_market_event_query exactly once with sport ufc for current UFC market events. Report the exact tool result, then end with a separate QF_TASK_COMPLETE line. Do not call send_result. Do not use shell, web, apps, or foreign tools.";
+const RESEARCH_OBJECTIVE =
+  "Use the Codex Market Researcher to inspect the current UFC market events from Bovada Live Markets. Summarize two event names using only QuantFlow governed market data, then have Codex return the result to you through the shared investigation.";
 const LIVE_TIMEOUT_MS = 180_000;
 
 type Seat = {
@@ -49,6 +46,8 @@ type Seat = {
   ptySessionId: string;
   seatCapability: string;
 };
+
+type ParticipantSession = Pick<Seat, "sessionId">;
 
 type Launch = {
   child: ChildProcess;
@@ -206,11 +205,7 @@ async function sessionOutput(run: Launch, sessionId: string): Promise<string> {
   return String(terminal.output ?? "");
 }
 
-function occurrenceCount(text: string, needle: string): number {
-  return text.split(needle).length - 1;
-}
-
-async function waitForCanvasSeat(run: Launch, seat: Seat, definitionId: string): Promise<void> {
+async function waitForCanvasSeat(run: Launch, seat: ParticipantSession, definitionId: string): Promise<void> {
   await waitFor(`${definitionId} Canvas terminal attachment`, async () => {
     const state = await evaluate<{ tileCount: number; webviewCount: number; status: string; width: number; height: number }>(run, `(() => {
       const tiles = [...document.querySelectorAll('.canvas-tile[data-session-id="${seat.sessionId}"]')];
@@ -247,32 +242,84 @@ function sessionStatus(run: Launch, sessionId: string): string | null {
   });
 }
 
+function latestDefinitionSession(run: Launch, definitionId: string): { sessionId: string; status: string } | null {
+  return withDb(run.kernelDb, (db) => {
+    const row = db.query(`SELECT s.id, s.status FROM agent_session s
+      JOIN links l ON l.from_id = s.id AND l.kind = 'spawned_from'
+      WHERE l.to_id = ? ORDER BY s.created_at DESC LIMIT 1`).get(definitionId) as { id?: string; status?: string } | null;
+    return row?.id && row.status ? { sessionId: row.id, status: row.status } : null;
+  });
+}
+
+async function startDirectorInquiry(run: Launch): Promise<void> {
+  await evaluate(run, `(() => {
+    const input = document.querySelector('#dock-question-input');
+    const technique = document.querySelector('#dock-technique-version');
+    const submit = document.querySelector('#dock-question-submit');
+    if (!(input instanceof HTMLTextAreaElement)) throw new Error('Dock inquiry input missing');
+    if (!(technique instanceof HTMLSelectElement)) throw new Error('Dock Technique selector missing');
+    if (!(submit instanceof HTMLButtonElement)) throw new Error('Dock submit missing');
+    const option = [...technique.options].find((candidate) => candidate.value);
+    if (!option) throw new Error('Dock has no governed Technique');
+    input.value = ${JSON.stringify(RESEARCH_OBJECTIVE)};
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    technique.value = option.value;
+    technique.dispatchEvent(new Event('change', { bubbles: true }));
+    submit.click();
+    return true;
+  })()`);
+  await waitFor("normal Start inquiry admission", async () => {
+    return await evaluate<boolean>(run, `(() => document.querySelector('#dock-question-status')?.textContent?.includes('Research Director running') ?? false)()`)
+      ? true
+      : null;
+  }, 30_000);
+}
+
 function exactTask(run: Launch, directorId: string, workerId: string): { id: string; status: string; description: string } | null {
   return withDb(run.kernelDb, (db) => {
-    const rows = db.query("SELECT id, status, description FROM task WHERE title = ? ORDER BY created_at").all(TASK_TITLE) as Array<{ id: string; status: string; description: string }>;
+    const rows = db.query(`SELECT t.id, t.status, t.description FROM task t
+      JOIN links delegated ON delegated.from_id = t.id AND delegated.kind = 'delegated_by' AND delegated.to_id = ?
+      JOIN links assigned ON assigned.from_id = t.id AND assigned.kind = 'assigned_to' AND assigned.to_id = ?
+      ORDER BY t.created_at`).all(directorId, workerId) as Array<{ id: string; status: string; description: string }>;
     if (rows.length === 0) return null;
     assert(rows.length === 1, `expected one exact Task, got ${rows.length}`);
     const task = rows[0]!;
-    const links = db.query("SELECT kind, to_id FROM links WHERE from_id = ? AND kind IN ('delegated_by','assigned_to') ORDER BY kind").all(task.id) as Array<{ kind: string; to_id: string }>;
-    assert(links.some((link) => link.kind === "delegated_by" && link.to_id === directorId), "Task is not delegated by the exact Director");
-    assert(links.some((link) => link.kind === "assigned_to" && link.to_id === workerId), "Task is not assigned to the exact Codex seat");
+    assert(task.description.includes("qf_market_event_query"), "Director Task did not require the governed market read");
+    assert(task.description.includes("send_result"), "Director Task did not require the governed result return");
     return task;
   });
 }
 
-function producedTrajectory(run: Launch, sessionId: string): { id: string; storage_ref: string } | null {
+function producedReadTrajectory(run: Launch, sessionId: string): { id: string; storage_ref: string; payload: Record<string, unknown> } | null {
   return withDb(run.kernelDb, (db) => {
     const rows = db.query(`SELECT a.id, a.storage_ref FROM artifact a
       JOIN links l ON l.to_id = a.id
       WHERE a.kind = 'trajectory' AND l.kind = 'produces' AND l.from_id = ?
       ORDER BY a.created_at`).all(sessionId) as Array<{ id: string; storage_ref: string }>;
-    if (rows.length === 0) return null;
-    assert(rows.length === 1, `Codex produced ${rows.length} trajectory Artifacts; expected exactly one`);
-    return rows[0]!;
+    for (const row of rows) {
+      if (!existsSync(row.storage_ref)) continue;
+      const payload = JSON.parse(readFileSync(row.storage_ref, "utf8")) as Record<string, unknown>;
+      if (payload.tool === "qf_market_event_query") return { ...row, payload };
+    }
+    return null;
   });
 }
 
-function verifyAdmission(run: Launch, seat: Seat, definitionId: string): void {
+function completedResultArtifact(run: Launch, taskId: string, workerSessionId: string): { id: string; storage_ref: string } | null {
+  return withDb(run.kernelDb, (db) => {
+    const event = db.query("SELECT payload FROM events WHERE type = 'task.completed' AND object_id = ? ORDER BY rowid DESC LIMIT 1").get(taskId) as { payload?: string } | null;
+    if (!event?.payload) return null;
+    const payload = JSON.parse(event.payload) as { input?: { result_artifact_id?: unknown } };
+    const artifactId = payload.input?.result_artifact_id;
+    if (typeof artifactId !== "string" || !artifactId) return null;
+    const artifact = db.query(`SELECT a.id, a.storage_ref FROM artifact a
+      JOIN links l ON l.to_id = a.id AND l.kind = 'produces' AND l.from_id = ?
+      WHERE a.id = ? AND a.kind = 'trajectory'`).get(workerSessionId, artifactId) as { id: string; storage_ref: string } | null;
+    return artifact ?? null;
+  });
+}
+
+function verifyAdmission(run: Launch, seat: ParticipantSession, definitionId: string): void {
   withDb(run.kernelDb, (db) => {
     const session = db.query("SELECT status, label FROM agent_session WHERE id = ?").get(seat.sessionId) as { status?: string; label?: string } | null;
     assert(session?.status === "running", `${definitionId} Kernel session is not running`);
@@ -303,74 +350,6 @@ async function expectRefusal(label: string, action: () => Promise<unknown>, frag
   console.log(`windows-dock-species: FALSIFY RED ${label}`);
 }
 
-async function createAndDeliverTask(run: Launch, director: Seat, codex: Seat): Promise<{ id: string; status: string; description: string }> {
-  await evaluate(run, `(() => {
-    const tile = document.querySelector('.canvas-tile[data-session-id="${director.sessionId}"]');
-    if (!(tile instanceof HTMLElement)) throw new Error('Director tile missing');
-    const open = tile.querySelector('.task-create-button');
-    if (!(open instanceof HTMLButtonElement)) throw new Error('Create Task button missing');
-    open.click();
-    const title = tile.querySelector('.task-title');
-    const description = tile.querySelector('.task-description');
-    const assignee = tile.querySelector('.task-assignee');
-    const form = tile.querySelector('.task-create-form');
-    const create = form?.querySelector('button[type="submit"]');
-    if (!(title instanceof HTMLInputElement) || !(description instanceof HTMLTextAreaElement) || !(assignee instanceof HTMLSelectElement) || !(form instanceof HTMLFormElement) || !(create instanceof HTMLButtonElement)) throw new Error('Task form missing');
-    title.value = ${JSON.stringify(TASK_TITLE)};
-    title.dispatchEvent(new Event('input', { bubbles: true }));
-    description.value = ${JSON.stringify(TASK_DESCRIPTION)};
-    description.dispatchEvent(new Event('input', { bubbles: true }));
-    assignee.value = ${JSON.stringify(codex.sessionId)};
-    assignee.dispatchEvent(new Event('change', { bubbles: true }));
-    create.click();
-    return true;
-  })()`);
-  const task = await waitFor("exact Canvas Task", () => exactTask(run, director.sessionId, codex.sessionId), 20_000);
-
-  await waitFor("Codex Task controls", async () => {
-    return await evaluate<boolean>(run, `(() => Boolean(document.querySelector('.canvas-tile[data-session-id="${codex.sessionId}"] .task-action')))()`)
-      ? true
-      : null;
-  }, 15_000);
-  await evaluate(run, `(() => {
-    const tile = document.querySelector('.canvas-tile[data-session-id="${codex.sessionId}"]');
-    const redirect = [...(tile?.querySelectorAll('button') ?? [])].find((button) => button.textContent?.trim() === 'Redirect');
-    if (!(redirect instanceof HTMLButtonElement)) throw new Error('Redirect button missing');
-    redirect.click();
-    const input = tile?.querySelector('.task-steering-input');
-    const form = tile?.querySelector('.task-steering-form');
-    const submit = form?.querySelector('button[type="submit"]');
-    if (!(input instanceof HTMLTextAreaElement) || !(form instanceof HTMLFormElement) || !(submit instanceof HTMLButtonElement)) throw new Error('Redirect form missing');
-    input.value = ${JSON.stringify(TASK_INSTRUCTION)};
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-    submit.click();
-    return true;
-  })()`);
-  await waitFor("exact Task delivery", async () => {
-    return await evaluate<boolean>(run, `(() => {
-      const tile = document.querySelector('.canvas-tile[data-session-id="${codex.sessionId}"]');
-      return [...(tile?.querySelectorAll('.task-history-fact') ?? [])].some((row) => row.dataset.kind === 'task.steering_delivery' && row.dataset.outcome === 'delivered');
-    })()`)
-      ? true
-      : null;
-  }, 20_000);
-  return task;
-}
-
-async function cancelTask(run: Launch, codex: Seat, taskId: string): Promise<void> {
-  await evaluate(run, `(() => {
-    const tile = document.querySelector('.canvas-tile[data-session-id="${codex.sessionId}"]');
-    const cancel = tile?.querySelector('.task-action-cancel');
-    if (!(cancel instanceof HTMLButtonElement)) throw new Error('Cancel Task button missing');
-    cancel.click();
-    return true;
-  })()`);
-  await waitFor("Task cancellation", () => withDb(run.kernelDb, (db) => {
-    const row = db.query("SELECT status FROM task WHERE id = ?").get(taskId) as { status?: string } | null;
-    return row?.status === "cancelled" ? true : null;
-  }), 15_000);
-}
-
 async function normalExit(run: Launch, seat: Seat): Promise<void> {
   await evaluate(run, `(() => {
     window.shellApi.ptyWrite(${JSON.stringify(seat.ptySessionId)}, '\\u0003');
@@ -380,7 +359,7 @@ async function normalExit(run: Launch, seat: Seat): Promise<void> {
   await waitFor("normal Codex exit", () => sessionStatus(run, seat.sessionId) === "closed" ? true : null, 20_000);
 }
 
-async function closeTile(run: Launch, seat: Seat): Promise<void> {
+async function closeTile(run: Launch, seat: ParticipantSession): Promise<void> {
   await evaluate(run, `(() => {
     const head = document.querySelector('.canvas-tile[data-session-id="${seat.sessionId}"] .gl-tile__head');
     if (!(head instanceof HTMLButtonElement)) throw new Error('participant close control missing');
@@ -421,66 +400,105 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
     run = await launch(packageRoot, runTemp);
     const packageHash = createHash("sha256").update(readFileSync(join(packageRoot, "QuantFlow.exe"))).digest("hex");
 
-    const director = await spawnSeat(run, DIRECTOR_ID);
-    const codex = await spawnSeat(run, CODEX_ID);
-    codexSeat = codex;
+    await startDirectorInquiry(run);
+    const director = await waitFor("Director recruited from normal Start inquiry", () => {
+      const session = latestDefinitionSession(run!, DIRECTOR_ID);
+      return session?.status === "running" ? session : null;
+    });
+    const codex = await waitFor("Director-recruited Codex worker", () => {
+      const session = latestDefinitionSession(run!, CODEX_ID);
+      return session?.status === "running" ? session : null;
+    });
     verifyAdmission(run, director, DIRECTOR_ID);
     verifyAdmission(run, codex, CODEX_ID);
     await waitForCanvasSeat(run, director, DIRECTOR_ID);
     await waitForCanvasSeat(run, codex, CODEX_ID);
-    await captureEvidence(run, "01-codex-ready.png");
-    const codexTools = await listTools(run, codex);
+    await waitFor("Director-opened Bovada capability surface", async () => {
+      return await evaluate<boolean>(run!, `(() => {
+        const tile = document.querySelector('.canvas-tile[data-tile-id="capability:bovada-live-markets"]');
+        return Boolean(tile?.querySelector('.market-desk-surface'));
+      })()`)
+        ? true
+        : null;
+    }, 30_000);
+    await captureEvidence(run, "01-director-bovada-codex.png");
+
+    const task = await waitFor("Director-created exact Codex Task", () => exactTask(run!, director.sessionId, codex.sessionId));
+    await captureEvidence(run, "02-director-task-delivered.png");
+    const trajectory = await waitFor("real Codex market read trajectory", () => producedReadTrajectory(run!, codex.sessionId));
+    assert((trajectory.payload.arguments as Record<string, unknown> | undefined)?.sport === "ufc", "Codex market read did not query UFC");
+    assert(Array.isArray(trajectory.payload.result), "Codex market read did not return the real result array");
+    assert(trajectory.payload.session_id === codex.sessionId && trajectory.payload.role === "worker", "trajectory identity does not match Codex worker");
+
+    const completedTask = await waitFor("Codex governed result completion", () => {
+      const current = exactTask(run!, director.sessionId, codex.sessionId);
+      return current?.status === "done" ? current : null;
+    });
+    assert(completedTask.id === task.id, "a different Task completed");
+    const resultArtifact = await waitFor("Kernel-published Codex result Artifact", () => completedResultArtifact(run!, task.id, codex.sessionId));
+    assert(existsSync(resultArtifact.storage_ref) && statSync(resultArtifact.storage_ref).size > 0, "Codex result Artifact payload is missing");
+    const resultPayload = JSON.parse(readFileSync(resultArtifact.storage_ref, "utf8")) as Record<string, unknown>;
+    assert(resultPayload.contract === "qf.collaboration.v1" && resultPayload.kind === "result", "Codex result Artifact is not the collaboration result contract");
+    assert(resultPayload.task_id === task.id, "Codex result Artifact names a different Task");
+    assert(resultPayload.from_session_id === codex.sessionId && resultPayload.to_session_id === director.sessionId, "Codex result Artifact has incorrect participant lineage");
+    assert(Array.isArray(resultPayload.cited_market_ids) && resultPayload.cited_market_ids.length >= 2, "Codex result did not cite two governed market objects");
+    assert(Array.isArray(resultPayload.read_trajectory_artifact_ids) && resultPayload.read_trajectory_artifact_ids.includes(trajectory.id), "Codex result does not derive from its governed read");
+
+    const terminalText = await waitFor("real Codex completed answer", async () => {
+      const output = await sessionOutput(run!, codex.sessionId);
+      return output.includes(String(resultArtifact.id).slice(0, 12)) ? output : null;
+    });
+    assert(terminalText.includes("gpt-5.6-sol"), "real Codex model identity was not visible in its terminal");
+    assert(!terminalText.includes("approval policy is never"), "Codex market read was blocked by MCP approval policy");
+    await waitFor("result notification delivered to Director", async () => {
+      const output = await sessionOutput(run!, director.sessionId);
+      return output.includes(`QuantFlow RESULT for task=${task.id}`) ? true : null;
+    });
+    await waitFor("returned Artifact visible on Canvas", async () => {
+      return await evaluate<boolean>(run!, `(() => [...document.querySelectorAll('.canvas-tile[data-tile-type="artifact"]')].some((tile) => tile.textContent?.includes('Artifact')))()`)
+        ? true
+        : null;
+    });
+    await captureEvidence(run, "03-codex-result-returned.png");
+    console.log(`windows-dock-species: FALSIFY GREEN Director task=${task.id} read=${trajectory.id} result=${resultArtifact.id}`);
+
+    // Capability equivalence and revocation are checked on a fresh Codex seat
+    // after the Director-led product scenario has completed.
+    await closeTile(run, codex);
+    const codexProof = await spawnSeat(run, CODEX_ID);
+    codexSeat = codexProof;
+    verifyAdmission(run, codexProof, CODEX_ID);
+    await waitForCanvasSeat(run, codexProof, CODEX_ID);
+    const codexTools = await listTools(run, codexProof);
     assert(codexTools.includes("qf_market_event_query"), "Codex worker is missing market event query");
     assert(!codexTools.includes("qf_agent_definition_query"), "Codex worker received desk.orchestrate tools");
     assert(!codexTools.some((name) => name.includes("evaluation")), "Codex worker received research.evaluate tools");
 
     await expectRefusal("wrong seat capability denied", () => rpcCall(run!.endpoint, "qf.ontology.list_tools", {
-      seat_capability: `${codex.seatCapability}-wrong`,
-      session_id: codex.sessionId,
+      seat_capability: `${codexProof.seatCapability}-wrong`,
+      session_id: codexProof.sessionId,
       role: "worker",
       kernel_db: run!.kernelDb,
     }), "live seat capability is invalid");
     await expectRefusal("wrong role denied", () => rpcCall(run!.endpoint, "qf.ontology.list_tools", {
-      seat_capability: codex.seatCapability,
-      session_id: codex.sessionId,
+      seat_capability: codexProof.seatCapability,
+      session_id: codexProof.sessionId,
       role: "critic",
       kernel_db: run!.kernelDb,
     }), "live seat capability is invalid");
     await expectRefusal("worker desk tool denied", () => rpcCall(run!.endpoint, "qf.ontology.call_tool", {
-      seat_capability: codex.seatCapability,
-      session_id: codex.sessionId,
+      seat_capability: codexProof.seatCapability,
+      session_id: codexProof.sessionId,
       role: "worker",
       kernel_db: run!.kernelDb,
       name: "qf_agent_definition_query",
       arguments: { limit: 1 },
     }), "capability grant denied");
 
-    const task = await createAndDeliverTask(run, director, codex);
-    await captureEvidence(run, "02-codex-task-delivered.png");
-    const trajectory = await waitFor("real Codex market read trajectory", () => producedTrajectory(run!, codex.sessionId));
-    assert(existsSync(trajectory.storage_ref) && statSync(trajectory.storage_ref).size > 0, "Codex trajectory payload is missing");
-    const payload = JSON.parse(readFileSync(trajectory.storage_ref, "utf8")) as Record<string, unknown>;
-    assert(payload.tool === "qf_market_event_query", `Codex called unexpected tool ${String(payload.tool)}`);
-    assert((payload.arguments as Record<string, unknown> | undefined)?.sport === "ufc", "Codex market read did not query UFC");
-    assert(Array.isArray(payload.result), "Codex market read did not return the real result array");
-    assert(payload.session_id === codex.sessionId && payload.role === "worker", "trajectory identity does not match Codex worker");
-
-    const terminalText = await waitFor("real Codex final answer", async () => {
-      const output = await sessionOutput(run!, codex.sessionId);
-      // The Task instruction appears once in the terminal. A second occurrence
-      // proves the live model returned the requested completion line after its read.
-      return occurrenceCount(output, "QF_TASK_COMPLETE") >= 2 ? output : null;
-    });
-    assert(terminalText.includes("gpt-5.6-sol"), "real Codex model identity was not visible in its terminal");
-    assert(!terminalText.includes("approval policy is never"), "Codex market read was blocked by MCP approval policy");
-    await captureEvidence(run, "03-codex-result.png");
-    console.log(`windows-dock-species: FALSIFY GREEN Codex task=${task.id} trajectory=${trajectory.id}`);
-
-    await cancelTask(run, codex, task.id);
-    await normalExit(run, codex);
+    await normalExit(run, codexProof);
     await expectRefusal("closed Codex capability revoked", () => rpcCall(run!.endpoint, "qf.ontology.list_tools", {
-      seat_capability: codex.seatCapability,
-      session_id: codex.sessionId,
+      seat_capability: codexProof.seatCapability,
+      session_id: codexProof.sessionId,
       role: "worker",
       kernel_db: run!.kernelDb,
     }), "live seat capability is invalid");
@@ -508,7 +526,8 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
         WHERE l.to_id = ? ORDER BY s.created_at DESC LIMIT 1`).get(CODEX_ID) as { id?: string; status?: string } | null);
       console.error(`windows-dock-species: codex-session=${JSON.stringify(codexSession)}`);
       if (codexSession?.id) {
-        const events = withDb(run.kernelDb, (db) => db.query("SELECT type, payload FROM events WHERE object_type = 'agent_session' AND object_id = ? ORDER BY rowid DESC LIMIT 5").all(codexSession.id));
+        const failedCodexSessionId = codexSession.id;
+        const events = withDb(run.kernelDb, (db) => db.query("SELECT type, payload FROM events WHERE object_type = 'agent_session' AND object_id = ? ORDER BY rowid DESC LIMIT 5").all(failedCodexSessionId));
         console.error(`windows-dock-species: codex-events=${JSON.stringify(events)}`);
       }
       try {
