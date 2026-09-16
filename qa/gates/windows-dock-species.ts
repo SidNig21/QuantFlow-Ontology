@@ -169,6 +169,31 @@ async function evaluate<T>(run: Launch, expression: string): Promise<T> {
   return await rpcCall(run.endpoint, "app.ui.evaluate", { expression }, 15_000) as T;
 }
 
+async function waitForCanvasSeat(run: Launch, seat: Seat, definitionId: string): Promise<void> {
+  await waitFor(`${definitionId} Canvas terminal attachment`, async () => {
+    const state = await evaluate<{ tileCount: number; webviewCount: number; status: string; width: number; height: number }>(run, `(() => {
+      const tiles = [...document.querySelectorAll('.canvas-tile[data-session-id="${seat.sessionId}"]')];
+      const tile = tiles[0];
+      const webviews = tile ? [...tile.querySelectorAll('webview')] : [];
+      const rect = webviews[0]?.getBoundingClientRect();
+      return {
+        tileCount: tiles.length,
+        webviewCount: webviews.length,
+        status: tile?.dataset.agentStatus ?? '',
+        width: rect?.width ?? 0,
+        height: rect?.height ?? 0,
+      };
+    })()`);
+    return state.tileCount === 1
+      && state.webviewCount === 1
+      && state.status === "TUI attached"
+      && state.width > 100
+      && state.height > 100
+      ? true
+      : null;
+  }, 20_000);
+}
+
 function withDb<T>(path: string, read: (db: Database) => T): T {
   const db = new Database(path, { readonly: true });
   try { return read(db); } finally { db.close(); }
@@ -361,6 +386,8 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
     codexSeat = codex;
     verifyAdmission(run, director, DIRECTOR_ID);
     verifyAdmission(run, codex, CODEX_ID);
+    await waitForCanvasSeat(run, director, DIRECTOR_ID);
+    await waitForCanvasSeat(run, codex, CODEX_ID);
     const codexTools = await listTools(run, codex);
     assert(codexTools.includes("qf_market_event_query"), "Codex worker is missing market event query");
     assert(!codexTools.includes("qf_agent_definition_query"), "Codex worker received desk.orchestrate tools");
