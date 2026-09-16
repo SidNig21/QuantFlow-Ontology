@@ -733,6 +733,14 @@ export function createTileManager({
 
 		const nativeTui = result.surface === "native_tui";
 		tile.type = nativeTui ? "term" : "session";
+		if (nativeTui) {
+			// Dock launches begin as compact pending cards. Once the real terminal
+			// attaches, adopt the shared Participant terminal size instead of
+			// carrying that placeholder geometry into the working Canvas.
+			const terminalSize = defaultSize("term");
+			tile.width = terminalSize.width;
+			tile.height = terminalSize.height;
+		}
 		tile.sessionId = result.sessionId;
 		tile.definitionId = result.definitionId || tile.definitionId;
 		tile.role = result.role || tile.role;
@@ -747,6 +755,13 @@ export function createTileManager({
 		if (tile.definitionId) dom.container.dataset.definitionId = tile.definitionId;
 		dom.container.dataset.sessionId = tile.sessionId;
 		if (tile.role) dom.container.dataset.agentRole = tile.role;
+		positionTile(
+			dom.container,
+			tile,
+			viewportState.panX,
+			viewportState.panY,
+			viewportState.zoom,
+		);
 		dom.contentArea.replaceChildren(dom.contentOverlay);
 		if (nativeTui) {
 			dom.container.classList.add("agent-cli-tile");
@@ -762,6 +777,7 @@ export function createTileManager({
 			updateTileTitle(dom, tile);
 			spawnSessionWebview(tile);
 		}
+		onReposition?.();
 		saveCanvasImmediate();
 		return tile;
 	}
