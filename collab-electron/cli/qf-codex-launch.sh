@@ -24,7 +24,7 @@ esac
 # Codex merges CLI table overrides with the operator's config. Define QuantFlow's
 # required servers, then disable the ambient servers observed in the supported
 # Codex installation without reading or changing the operator's config.
-mcp_config="mcp_servers={quantflow-collaboration={command='node.exe',args=['$bridge_path'],required=true},quantflow-ontology={command='node.exe',args=['$ontology_path'],required=true}}"
+mcp_config="mcp_servers={quantflow-collaboration={command='node.exe',args=['$bridge_path'],required=true,default_tools_approval_mode='approve'},quantflow-ontology={command='node.exe',args=['$ontology_path'],required=true,default_tools_approval_mode='approve'}}"
 
 printf '\nQF_LAUNCH_READY %s\n\nQF_LAUNCH_COMMIT %s\n' \
   "$QF_LAUNCH_READY_NONCE" "$QF_LAUNCH_READY_NONCE"
