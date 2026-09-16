@@ -459,7 +459,7 @@ export async function runWindowsDockSpeciesGate(): Promise<{ ok: boolean }> {
     assert(!terminalText.includes("approval policy is never"), "Codex market read was blocked by MCP approval policy");
     await waitFor("result notification delivered to Director", async () => {
       const output = await sessionOutput(run!, director.sessionId);
-      return output.includes(`QuantFlow RESULT for task=${task.id}`) ? true : null;
+      return output.includes(`QuantFlow RESULT for ${task.id} from worker`) ? true : null;
     });
     await waitFor("returned Artifact visible on Canvas", async () => {
       return await evaluate<boolean>(run!, `(() => [...document.querySelectorAll('.canvas-tile[data-tile-type="artifact"]')].some((tile) => tile.textContent?.includes('Artifact')))()`)
