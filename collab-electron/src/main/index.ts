@@ -1666,7 +1666,14 @@ app.whenReady().then(async () => {
       }
       const text = question.trim();
       const strategyId = input.strategy_id;
-      if (typeof strategyId !== "string" || strategyId.trim() !== strategyId || !kernelListStrategyVersions().some((row) => row.strategy_id === strategyId)) {
+      const datasetId = typeof input.dataset_id === "string" ? input.dataset_id : undefined;
+      const technique = typeof strategyId === "string"
+        ? kernelListStrategyVersions().find((row) => row.strategy_id === strategyId)
+        : undefined;
+      if (
+        (strategyId !== undefined && (typeof strategyId !== "string" || !technique || strategyId.trim() !== strategyId))
+        || (datasetId !== undefined && !technique)
+      ) {
         throw new Error("TECHNIQUE COVERAGE REFUSED");
       }
       const missionId =
@@ -1695,7 +1702,7 @@ app.whenReady().then(async () => {
       );
       const hypothesisId = kernelOpenHypothesisForQuestion(
         text,
-        typeof input.dataset_id === "string" ? input.dataset_id : undefined,
+        datasetId,
       );
       const result = await admitAndStartSession(definitionId, {
         missionActivation: activationInstruction,
@@ -1704,7 +1711,7 @@ app.whenReady().then(async () => {
         },
         onStarted: projectStartedSession,
       });
-        bindResearchHypothesis(result.sessionId, hypothesisId, strategyId);
+        bindResearchHypothesis(result.sessionId, hypothesisId, typeof strategyId === "string" ? strategyId : undefined);
       return {
         missionId,
         hypothesisId,

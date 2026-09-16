@@ -400,10 +400,14 @@ export function registerKernelHandlers(): void {
         }
         const text = question.trim();
         const strategyId = args?.strategyId;
+        const datasetId = args?.datasetId;
         const technique = typeof strategyId === "string"
           ? kernelListStrategyVersions().find((row) => row.strategy_id === strategyId)
           : undefined;
-        if (!technique || typeof strategyId !== "string" || strategyId.trim() !== strategyId) {
+        if (
+          (strategyId !== undefined && (!technique || strategyId.trim() !== strategyId))
+          || (typeof datasetId === "string" && !technique)
+        ) {
           throw new Error("TECHNIQUE COVERAGE REFUSED");
         }
         const missionId = process.env.QF_R17_GATE === "1" ? "mission-r17-gate" : `mission-${crypto.randomUUID()}`;
@@ -430,7 +434,7 @@ export function registerKernelHandlers(): void {
         if (process.env.QF_UI_PROOF === "1") {
           console.info("qf-ui-proof kernel_command=create_mission");
         }
-        const hypothesisId = kernelOpenHypothesisForQuestion(text, args?.datasetId);
+        const hypothesisId = kernelOpenHypothesisForQuestion(text, datasetId);
         const result = await admitAndStartSession(definitionId, {
           missionActivation: activationInstruction,
           beforeActivation: (sessionId) => bindMissionToDirectorSession(missionId, sessionId),
