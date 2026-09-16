@@ -18,7 +18,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   buildWindowsPackage,
@@ -135,6 +135,12 @@ async function launch(packageRoot: string, runRoot: string): Promise<Launch> {
     ui: { terminalTarget: "auto" },
   }, null, 2));
   const env = isolatedEnvironment(runRoot, kernelDb, artifactRoot);
+  // The app's Kernel, artifacts, Electron profile, logs, and peer bus remain
+  // isolated by the explicit paths below. Native participant seats still open
+  // in the same operator-owned working directory as the shipped product. A
+  // synthetic temp home makes real Codex stop at its workspace trust prompt,
+  // which measures a different launch than the one QuantFlow actually ships.
+  env.USERPROFILE = homedir();
   env.QF_APP_ROOT = appRoot;
   env.QF_APP_DIR = appDir;
   env.QF_PEER_BUS_DB = join(storeRoot, "peer-bus.db");
