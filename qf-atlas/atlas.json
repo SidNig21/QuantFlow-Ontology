@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "codex/wo-w2-01-codex-admission",
-    "commit": "3ee42435",
+    "commit": "e7b96e3b",
     "generatedAt": "2026-09-16",
     "filesScanned": 436,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -60842,12 +60842,12 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "4845406b",
+      "commit": "3ee42435",
       "generatedAt": "2026-09-16"
     },
     "to": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "3ee42435",
+      "commit": "e7b96e3b",
       "generatedAt": "2026-09-16"
     },
     "verdict": "better",
