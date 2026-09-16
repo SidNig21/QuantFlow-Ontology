@@ -16,7 +16,17 @@ mock.module("./peer-delivery", () => ({
 
 mock.module("./kernel", () => ({
   getArtifactRoot: () => "",
-  kernelGetLinks: () => [],
+  kernelGetLinks: (id: string, options?: { kind?: string }) => {
+    if (options?.kind !== "assigned_to") return [];
+    return taskAssignments
+      .filter((task) => task.assignedToSessionId === id)
+      .map((task) => ({
+        id: `assigned-${String(task.taskId)}`,
+        kind: "assigned_to",
+        from_id: String(task.taskId),
+        to_id: id,
+      }));
+  },
   kernelListAgentDefinitions: () => [...definitions.values()],
   kernelListAgentSessions: () => [...sessions.values()],
   kernelListTaskAssignments: () => taskAssignments,
@@ -294,6 +304,31 @@ describe("agent-host native-TUI lifecycle admission", () => {
     expect(tasks.get(taskId)?.status).toBe("open");
     expect(taskAssignments.find((task) => task.taskId === taskId)?.assignedToSessionId).toBe(id);
     expect(kernelCommands).toEqual([{ command: "fail_agent_session", input: { session_id: id, reason: "app_terminated" } }]);
+    taskAssignments.splice(0, taskAssignments.length);
+  });
+
+  test("runtime exit fails an unfinished Task owner and releases the dead seat", async () => {
+    const id = "runtime-exit-open-owner";
+    const taskId = "runtime-exit-unfinished-task";
+    await admitSession(id);
+    tasks.set(taskId, { id: taskId, status: "open", title: "Interrupted research" });
+    taskAssignments.push({ taskId, status: "open", assignedToSessionId: id, delegatedBySessionId: "director" });
+    kernelCommands.length = 0;
+    const before = teardownCalls;
+
+    const { handleNativeTuiPtyExit, hasLiveAgentSession } = await import("./agent-host");
+    handleNativeTuiPtyExit(id);
+    await Promise.resolve();
+
+    expect(teardownCalls).toBe(before + 1);
+    expect(hasLiveAgentSession(id)).toBe(false);
+    expect(roles.get("orchestrator")).toBeUndefined();
+    expect(sessions.get(id)?.status).toBe("failed");
+    expect(tasks.get(taskId)?.status).toBe("open");
+    expect(kernelCommands).toEqual([{
+      command: "fail_agent_session",
+      input: { session_id: id, reason: "provider_stream_interrupted" },
+    }]);
     taskAssignments.splice(0, taskAssignments.length);
   });
 

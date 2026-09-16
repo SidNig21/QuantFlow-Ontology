@@ -927,14 +927,35 @@ export async function disposeAgentHost(): Promise<void> {
   // that follow this bounded wait.
   await awaitRuntimeTeardownsForShutdown(teardowns);
 }
-installNativeTuiPtyExitHook((sessionId) => {
+export function handleNativeTuiPtyExit(sessionId: string): void {
   const assignedOpenTask = kernelGetLinks(sessionId, { kind: "assigned_to" })
     .some((link) => link.to_id === sessionId && kernelGetObject("task", link.from_id)?.status === "open");
-  if (kernelGetObject("agent_session", sessionId)?.status === "failed" && assignedOpenTask) {
+  const status = String(kernelGetObject("agent_session", sessionId)?.status ?? "");
+  if (assignedOpenTask && !["failed", "cancelled", "closed"].includes(status)) {
+    kernelExecute(
+      "fail_agent_session",
+      { session_id: sessionId, reason: "provider_stream_interrupted" },
+      newTrace(),
+    );
+  }
+  if (assignedOpenTask) {
+    const entry = live.get(sessionId);
+    if (entry?.kind === "native_tui") {
+      const teardown = nativeTuiTeardowns.begin(
+        sessionId,
+        entry as NativeTuiLive,
+        undefined,
+        true,
+      );
+      entry.unsub?.();
+      void teardown.catch(() => {});
+    }
     live.delete(sessionId);
     nativeTuiPeerDeliveryBySession.delete(sessionId);
     for (const listener of doneListeners) listener(sessionId, { status: "failed", text: "" });
     return;
   }
   closeAgentSessionRow(sessionId);
-});
+}
+
+installNativeTuiPtyExitHook(handleNativeTuiPtyExit);
