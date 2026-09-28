@@ -1,6 +1,6 @@
 # WO-W2-01 — Admit Codex as a real QuantFlow participant
 
-status: BUILDING — founder directed implementation in the real app; standalone hidden D0 loop ended
+status: DONE — independent SOL verifier passed the immutable candidate; founder accepted it for merge and W2-02 rotation on 2026-09-27
 assignee: root architect — founder ended the delegated probe loop and directed immediate real-app implementation; any later delegated Builder or Verifier uses `gpt-5.6-sol`
 depends: WO-W1-03 accepted at candidate `665ddcd2783a9e218cb5095b51943d026d17f70a`
 
