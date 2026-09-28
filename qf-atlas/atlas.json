@@ -1,11 +1,11 @@
 {
   "meta": {
-    "branch": "codex/wo-w2-01-codex-admission",
-    "commit": "e7b96e3b",
-    "generatedAt": "2026-09-16",
+    "branch": "codex/wo-w2-02-collaborative-inquiry",
+    "commit": "93ea9493",
+    "generatedAt": "2026-09-28",
     "filesScanned": 436,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "41454c6177c519c4"
+    "fingerprint": "97ed10f7826d9da5"
   },
   "stats": {
     "live": 108,
@@ -6219,7 +6219,7 @@
       "id": "2:residue",
       "layer": 2,
       "name": "47 small modules*",
-      "kb": 120.4,
+      "kb": 120.3,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6299,16 +6299,6 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/scripts/package-lib/runtime-staging.ts",
-          "kb": 4.7,
-          "spawns": 1,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "collab-electron/src/main/integrations.ts",
           "kb": 4.7,
           "spawns": 1,
@@ -6324,6 +6314,16 @@
           "spawns": 3,
           "spawnsLive": 1,
           "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "collab-electron/scripts/package-lib/runtime-staging.ts",
+          "kb": 4.6,
+          "spawns": 1,
+          "spawnsLive": 0,
+          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -60842,13 +60842,13 @@
   "diffVsHead": {
     "from": {
       "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "3ee42435",
+      "commit": "e7b96e3b",
       "generatedAt": "2026-09-16"
     },
     "to": {
-      "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "e7b96e3b",
-      "generatedAt": "2026-09-16"
+      "branch": "codex/wo-w2-02-collaborative-inquiry",
+      "commit": "93ea9493",
+      "generatedAt": "2026-09-28"
     },
     "verdict": "better",
     "why": "37 improvement(s), nothing added or hidden",
