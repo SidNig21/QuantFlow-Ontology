@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `codex/wo-w2-02-collaborative-inquiry @ fc9819c7` on 2026-09-29 by
+> Generated from `codex/wo-w2-02-collaborative-inquiry @ 4dd7adcf` on 2026-09-29 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
