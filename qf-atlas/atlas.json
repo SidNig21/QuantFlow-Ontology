@@ -1,7 +1,7 @@
 {
   "meta": {
-    "branch": "codex/roadmap-founder-clarity",
-    "commit": "82e9ebdb",
+    "branch": "codex/roadmap-dock-edge-stack",
+    "commit": "4d4e9193",
     "generatedAt": "2026-09-29",
     "filesScanned": 436,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -60841,13 +60841,13 @@
   ],
   "diffVsHead": {
     "from": {
-      "branch": "codex/wo-w2-02-collaborative-inquiry",
-      "commit": "67fc2d3f",
+      "branch": "codex/roadmap-founder-clarity",
+      "commit": "82e9ebdb",
       "generatedAt": "2026-09-29"
     },
     "to": {
-      "branch": "codex/roadmap-founder-clarity",
-      "commit": "82e9ebdb",
+      "branch": "codex/roadmap-dock-edge-stack",
+      "commit": "4d4e9193",
       "generatedAt": "2026-09-29"
     },
     "verdict": "better",

@@ -56,6 +56,52 @@ turn several confident agents into evidence. Ryan makes every real-world decisio
    Dock. These are future capabilities, not parallel orders or this week's build. Each enters only
    when `NEXT.md` opens a concrete, usable slice.
 
+## Dock Edge Stack — the tools behind the research
+
+QuantFlow's potential advantage is the **composition**, not an impressive catalog. A live Quote,
+time-bounded history, calculation, researcher, and independent Critic must refer to the same
+question, evidence, result version, and objection. Later, a forecast, scenario, and official outcome
+can join that record. Ryan and the LLMs can question, compare, revise, and learn from it on the
+Canvas instead of exchanging plausible prose across disconnected tools. The Kernel preserves the
+identities and time boundaries underneath.
+
+**Status key:** **Accepted now** means only the bounded UFC job in its receipt is proved.
+**W2-02** is the one open order; it expands collaboration and the evidence-table surface over the
+existing Dock, without admitting a new provider. **Later analytical** is destination inventory,
+not an installed card, a scheduled build, or a claim of predictive edge. Today's Lab contains an
+exact method and local execution, but neither has a separate Method or Compute Dock card.
+
+| Class | Product-facing Dock entry | Status | Decision contribution and Canvas surface | Implementation or candidate |
+|---|---|---|---|---|
+| Participant | **Research Director** | Accepted now; fuller coordination in W2-02 | Frames the inquiry, recruits authorized help, and explains the decision and its limits; Director tile with assignment and progress. | Hermes is the accepted runtime. |
+| Participant | **Market Researcher** | Accepted now for bounded Hermes/Codex work; question, answer, and revision in W2-02 | Investigates an exact market and evidence set; participant tile with Task, cited result, and response to criticism. | Hermes and Codex CLI are admitted for their accepted paths. |
+| Participant | **Independent Critic** | Accepted now for bounded review; fresh cross-runtime second round in W2-02 | Tries to break a frozen result before it can support a conclusion; Critic tile and visible objection/Evaluation. | Hermes is the accepted Critic runtime. |
+| Participant | **Specialist or additional runtime** | Later analytical | Performs a narrow extraction, procedure, or second opinion only if it beats a simpler approach; participant tile only when it truly holds a seat. | Claude is a later adapter candidate; [Unsloth](https://docs.unsloth.ai/basics/tutorial) could train a narrow local model, but is not itself a Participant. |
+| Data | **Bovada Live Markets** | Accepted now for bounded UFC market capture; other prop families later | Supplies exact offered selection, price, event identity, observation time, and availability; market/Quote surface. | Current Bovada capability remains the primary live-market source. |
+| Data | **UFC Historical Evidence** | Accepted now; shared selected rows in W2-02 | Supplies bounded official pre-event history and coverage, not a matchup probability; evidence table and Inspect source detail. | Current official-UFC capability. |
+| Data | **Football Evidence** | Later analytical | Connects one offered NFL player prop to source-timed player, team, game, and participation records; prop and evidence table with missingness. | [nflverse](https://nflverse.nflverse.com/) is a candidate subject to pregame availability and rights; PFF remains rights-gated. |
+| Data | **Outcome and Price History** | Later analytical | Supplies official settlement, corrections/voids, and qualifying closing Quotes for the entire screened cohort; claim-to-result timeline. | Official result/price capture first; [The Odds API](https://the-odds-api.com/liveapi/guides/v4/) is only a possible comparison/history source where its coverage, cost, and rights fit, never an assumed Bovada replacement. |
+| Data | **Film, Transcripts, and Documents** | Later analytical | Lets a participant challenge a specific play or cite an exact page; time-linked clip, transcript, document excerpt, and citation surfaces. | [Whisper](https://github.com/openai/whisper) and [Docling](https://docling-project.github.io/docling/usage/) are candidate processors; video detectors need labeled reference cases and measured error. |
+| Tool | **Research Lab and Shared Evidence Table** | Transparent descriptive calculation accepted now; interactive table in W2-02 | Shows values, units, coverage, cutoff, and missingness; Ryan can sort, filter, select, compare, and ask about the same exact row a participant sees. W2-02 view controls do not change scientific inputs. | Current Research Lab first; [DuckDB](https://duckdb.org/docs/current/guides/file_formats/query_parquet) is a later bulk-query candidate, not another truth store. |
+| Tool | **Outcome Review** | Later analytical | Links frozen claims, WATCH/PASS decisions, abstentions, and failures to later results; scores forecasts only when their target and outcome match. Retrospective and full-cohort table. | Built only when a prospective claim-to-result job exists. |
+| Tool | **Prediction Bench** | Later analytical | Estimates one defined pre-event target or reports unavailable; shows baseline, market comparison, calibration, error, and coverage. | [statsmodels](https://www.statsmodels.org/stable/user-guide.html) or [scikit-learn](https://scikit-learn.org/stable/modules/calibration.html) are baseline candidates, not preselected models. |
+| Tool | **Scenario and Combination Lab** | Later analytical | Tests assumptions, dependence, and up to four selections against actual eligibility and combined terms; scenario controls, sensitivity, and rejected combinations. | Transparent simulation/simple search first; [OR-Tools](https://developers.google.com/optimization/introduction) only if a real constraint-search job earns it. |
+| Method | **Forecast and validation methods** | Later analytical; no separate Method Dock card is accepted today | Defines target, cutoff, time-ordered holdout, calibration, missing-data and abstention rules; assumptions and version visible beside results. | Reusable Techniques are promoted from evaluated work, not required before research. |
+| Method | **Research policy** | Later analytical | Chooses the next permitted source, check, or Run under a budget; shows proposed action, reason, and limit, never a stake or wager instruction. | Simple scripted/search baselines before [PufferLib](https://github.com/pufferai/pufferlib) or any learned policy. |
+| Compute | **Bounded analytical compute** | Later analytical as a separate Dock entry; today's Lab already runs locally | Runs an admitted calculation with progress, resource/failure state, and a linked result; it does not become a second record of truth. | Local capacity first; a remote provider remains unselected until a measured job needs it. |
+
+In a mature NFL prop inquiry, the Director could combine the current Bovada quote, permitted
+pre-game football evidence, a tested forecast, and a Critic's objection on one Canvas. If Ryan then
+explores a multi-leg idea, the Combination Lab must check dependence and actual offered terms. The
+later result feeds Outcome Review, including a PASS or no-candidate decision. **This is a future
+workflow illustration, not W2-02 acceptance.**
+
+**An edge is measured, not installed.** Compare frozen forecasts and decisions with outcomes,
+calibration, forecast error, and qualifying closing-line value against simple baselines. Count all
+screened candidates, abstentions, missing data, and failures. More tools or more agreeing LLMs do
+not establish an edge. Every later Dock entry needs a real research job, permitted inputs, a role
+grant, a useful Canvas surface, and independent acceptance before it enters the critical path.
+
 ---
 
 The rest of this file preserves the evidence and detailed route for builders. It does not add an
