@@ -4,7 +4,7 @@
 >
 > **Do not re-sweep the library.** All 203 non-search URLs were fetched, evidence-quoted, and tiered on 2026-07-17; correlated to doctrine phases on 2026-07-22. Two indexes already exist — start from them, never from the raw list.
 >
-> Source of truth for *direction* is [`DOCTRINE.md`](DOCTRINE.md), including its later amendments. This file is reference: it explains where ideas came from and what remains on the shelf. Its numbered doctrine phases, R-rungs, old Vault paths, and vendor conclusions are historical indexing—not current route or build authority. The current route is Waves 1–3 in `docs/plans/OFFICIAL-ROADMAP.md`; UFC is the first proving ground; a named tool enters work only when a current order has a real product consumer.
+> Source of truth for *direction* is [`DOCTRINE.md`](DOCTRINE.md), including its later amendments. This file is reference: it explains where ideas came from and what remains on the shelf. Its numbered doctrine phases, R-rungs, old Vault paths, and vendor conclusions are historical indexing—not current route or build authority. The [current route](plans/OFFICIAL-ROADMAP.md) extends from the accepted UFC/Codex desk through measured personal sports analytics; UFC is the first proving ground. A named tool enters work only when a current order has a real product consumer. Dated "current" claims below belong to the old research probe, not the 2026-09-28 product checkpoint.
 
 ## Where the depth lives
 
@@ -75,7 +75,7 @@ Probed at source: `agentos-sdk.dev/docs/architecture` (read in full — it 403s 
 
 | Layer | Probed fact | Bucket |
 |---|---|---|
-| **Cargo agents** — Pi, plus "Claude Code, Codex, and OpenCode" (v0.2) | CLI agents wrapped by adapters (`@agentos-software/*`), sessions streamed as ACP events | **External CLI inventory, not shipped built-in Dock runtimes.** They remain user-owned or future adapter candidates; the current built-in runtime is Hermes. agentOS is evidence they speak ACP, not the thing that grants them |
+| **Cargo agents** — Pi, plus "Claude Code, Codex, and OpenCode" (v0.2) | CLI agents wrapped by adapters (`@agentos-software/*`), sessions streamed as ACP events | **Historical agentOS probe, not product status.** QuantFlow independently admitted Codex for its bounded W2-01 path; Pi, Claude, and OpenCode do not inherit that admission. agentOS is neither Kernel nor QuantFlow host. |
 | **Rivet Actor layer** (`@rivet-dev/agentos`) | Wraps the VM; workflows where each `ctx.step()` is "recorded, retried, and resumed independently"; cron; sleep/wake persistence | **Underlayer.** The durable-execution engine — ROADMAP debt #17. Trigger: the first orchestrator run that dies mid-flight and cannot resume |
 | **VM + kernel layer** | Agents run in "fully virtualized Linux VMs" (userspace: WebAssembly + V8 isolates, not Docker/Firecracker); "no real host filesystem, no real host network socket, no real host process" | **Not a floor — a row.** It is an isolation boundary, not a spawner replacement. Absorbed, if ever needed, as an `execution_environment` kind |
 

@@ -1,16 +1,16 @@
 # INSTITUTION-CONTRACTS.md — the seams every participant and capability must honor
 
 status: APPROVED — INSTITUTION CONTRACTS; architecture authority, not build authority
-revised: 2026-09-13 (founder-requested domain clarification; communication, continuation, and Codex-first scope)
-evidence boundary: accepted history and candidate source are distinguished in `OFFICIAL-ROADMAP.md` §1; this revision is not product acceptance
+revised: 2026-09-28 (accepted Codex handoff; prospective outcome and predictive-strength boundary)
+evidence boundary: accepted W1-03 and W2-01, open W2-02, and planned later work are distinguished in `OFFICIAL-ROADMAP.md` §1; this revision is not product acceptance
 build authority: none — `docs/orders/NEXT.md` remains the only order authority (DOCTRINE A9)
 owns: Participant Contract · Capability Contract · Agent Operating Contract · evidence and computation laws · role versus runtime · provenance · admission lifecycle · runtime-neutrality exit condition
-does not own: sequence and packages → [Official Roadmap](OFFICIAL-ROADMAP.md); surface floor and grammar → [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md); inventory → non-authoritative Vault research `03-DOCK-CAPABILITY-RATIONALIZATION.md`
+does not own: sequence and packages → [Official Roadmap](OFFICIAL-ROADMAP.md); surface floor and grammar → [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md); candidate equipment → [non-authoritative Capability Registry](../proposals/CAPABILITY-REGISTRY.md)
 
 > **This file authorizes nothing.** Every statement carries one tag: **PROVEN** (gate or receipt
 > on `main`), **PARTIAL** (exists but narrower than the sentence), **PLANNED** (intent, no
 > bytes), **UNVERIFIED** (asserted, not checked here). Clauses without a tag are contract
-> obligations the roadmap's IC-0 and PB-0 packages must turn into gates.
+> obligations the roadmap's delivery orders must turn into gates.
 
 ---
 
@@ -27,15 +27,16 @@ under a participant (§4).
 ## 1. Participant Contract
 
 A participant is a process holding a governed seat that performs Kernel actions on a Mission's
-behalf. Today exactly one species exists: Hermes (**PROVEN** — `dock-production-inventory`,
-`hermes-production-inference`).
+behalf. Hermes and Codex have accepted bounded production paths; W2-01 proves one real Codex
+Director-led Task/result handoff, not every clause below. Claude is not admitted.
 
 ### 1.1 Accepted foundation evidence
 
-The receipts below concern the versions and paths they tested. They are not a fresh guarantee that every
-control remains reachable in the current candidate. In particular, source inspection found that the
-participant renderer skips task controls; the [roadmap status](OFFICIAL-ROADMAP.md#1-current-evidence-and-its-limits)
-records that gap without discarding the accepted underlying Task semantics.
+The receipts below concern the versions and paths they tested, not universal proof for every role or
+runtime. [W1-03 acceptance](../orders/evidence/w1-03/ACCEPTANCE.md) and
+[W2-01 acceptance](../orders/evidence/WO-W2-01/ACCEPTANCE.md) extend the foundation table for their
+exact normal-app paths. The [roadmap status](OFFICIAL-ROADMAP.md#1-current-evidence-and-its-limits)
+records what remains unaccepted.
 
 | Guarantee | Where it lives on `main` |
 |---|---|
@@ -69,8 +70,9 @@ envelope when the Task is decision-bearing; exact input `dataset` ids with as-of
 predecessor artifact ids. Exploration does not fabricate a Technique merely to populate the envelope.
 Nothing it did not need. Participants do not share one transcript, merged context window, or hidden chain
 of thought. Recorded contributions and unresolved questions may be added as the work develops; separate
-contexts do not require one fixed packet for an entire investigation. (**PARTIAL** — candidate W1-03 has
-exact decision input scopes; a general communication and context-delivery contract remains unproved.)
+contexts do not require one fixed packet for an entire investigation. (**PARTIAL** — W1-03 has
+accepted exact decision input scopes, and W2-01 has one accepted cross-runtime Task/result path;
+general question/revision context delivery remains unproved.)
 
 **P4 — Discover, read, publish.** A participant discovers and invokes authorized equipment through the
 governed capability interface and reads shared truth through generated ontology tools. Durable output
@@ -113,7 +115,8 @@ occur when a runtime requires it, provided QuantFlow cannot read or retain the s
 an implementation inconvenience. Corroboration or criticism counts only when the exact producer,
 participant definition, runtime species, Task inputs, method/data fence, and reviewed Artifact remain
 attributable. Two seats repeating one supplied reasoning transcript are one opinion with two receipts, not
-independent work. (**PLANNED** for heterogeneous runtimes; same-species self-review refusal is **PROVEN**.)
+independent work. (**PARTIAL** — Codex admission and a cross-runtime handoff are accepted;
+heterogeneous criticism/revision remain open. Same-session self-review refusal is **PROVEN**.)
 
 ### 1.3 Role semantics versus runtime provenance
 
@@ -175,8 +178,10 @@ for versioned review; **PLANNED** for the complete conversational revision loop.
 questions, exact dependencies, and sufficient permitted context for a successor. Stopping a runtime,
 cancelling a Task, replacing its owner, closing a view, and closing the app are distinct operations. A late
 obsolete result remains attributable when preserved but cannot complete someone else's assignment or
-silently replace the current Report. (**PARTIAL** — Task, lifecycle, and publication guards exist;
-complete heterogeneous continuation is unproved.)
+silently replace the current Report. Process state, durable work state, and Canvas view state remain
+distinct: a runtime may be dead, its Artifact alive, and its tile closed while the investigation remains
+retrievable. (**PARTIAL** — Task, lifecycle, and publication guards exist; complete heterogeneous
+continuation is unproved.)
 
 **P18 — Bounded concurrent work.** Independent Tasks may run concurrently within declared resource and
 permission limits. Dependent work names the exact predecessor version and distinguishes waiting for
@@ -223,7 +228,7 @@ parameters; seed where applicable; canonical serialization or numerical toleranc
 same result hash. A stochastic capability declares itself stochastic, preserves seed/configuration and
 distributional output, and makes no byte-identical replay promise. Non-deterministic *reasoning* is a
 participant act recorded as interpretation over the deterministic artifact. (**PROVEN** for run
-semantics; **PARTIAL** as a general capability contract. W1-02 and the W1-03 candidate record bounded
+semantics; **PARTIAL** as a general capability contract. W1-02 and accepted W1-03 record bounded
 calculation identity, inputs, and environment; arbitrary stochastic capabilities remain unproved.)
 
 **C3 — Outcome-level contract.** Every admitted capability declares: kind; identity/version; readiness;
@@ -231,6 +236,10 @@ prerequisites; authorization; inputs; outputs; provenance; bounded invocation; d
 claim; external side effects; retry/cancel/timeout/unknown-completion behaviour; cost/quota/rights where
 relevant; Artifact/Run binding when durable output exists; cleanup and failure reporting. (**PLANNED**;
 partially present in `species/hermes/dock-profiles.json` for groups only.)
+For an executable skill or package, admission also identifies source, publisher, version/checksum,
+declared scripts, filesystem/network scope, trust/update state, and the host boundary that actually
+enforces those limits. A risk label in the Dock is information, not enforcement. This extension is
+**PLANNED** until a real executable-skill consumer needs it.
 
 **C4 — Role grant, not global install.** Adding a capability grants it to nobody until a definition names
 the group. (**PROVEN**.)
@@ -264,7 +273,7 @@ required by its proved live-market calculation through the Research Lab and bind
 selected Technique when one exists. A calculation becomes a reusable Technique only after evaluated work
 earns that promotion. This is a contract on existing capability output, not a semantic-layer service,
 database, Ontology subsystem, or architecture phase. (**PARTIAL** — W1-02 accepted a descriptive UFC
-calculation; W1-03 adds candidate market-comparison definitions. Neither establishes a predictive model.)
+calculation; W1-03 accepted its bounded market comparison. Neither establishes a predictive model.)
 
 **C10 — Dataset and corpus purpose.** Every admitted Dataset or corpus declares exactly which purpose it
 serves in the invoking boundary: **EVIDENCE** (facts about the researched world), **TRAINING** (examples
@@ -301,7 +310,23 @@ predictive models, simulations, combination research, and trained policies state
 need suitable evaluations. Exact lineage and a supporting Critic do not establish calibration, a joint
 probability model, or profit. Missing probabilities remain unavailable; unsupported dependence assumptions
 block quantitative combination claims. Evidence, training, and held-out evaluation stay separated.
+Evaluation retains the evidence and criteria it judged; its confidence or dimension scores cannot be
+collapsed into one universal truth score. Later predictive scoring uses the original forecast and full
+eligible cohort, not the Critic's approval as a proxy. Keep three questions separately assessable:
+**was the research/evidence valid, did the participant/runtime behave reliably, and did the sports
+model predict well on held-out or later cases?** Passing one does not answer the others.
 (**PARTIAL** for existing unavailable-probability enforcement; **PLANNED** for later models and training.)
+
+**C15 — Later outcomes test predictions without rewriting earlier judgments.** Freeze the forecast,
+target/selection identity, evidence cutoff, market terms, model version, and all screened alternatives
+before the event. Later attach official outcome/settlement, correction, and qualifying close (or its
+unavailability) through exact Kernel relationships. Score the full eligible cohort, including misses,
+abstentions, missing coverage, and multiple tested candidates. A Critic Evaluation judges whether the
+work followed its evidence/method contract; it is not retrospective proof that the probability was
+correct. A revision or changed price may create a new current judgment but cannot silently replace the
+original point-in-time claim. QuantFlow may rank or reject selections and combinations, but it never
+chooses a stake or executes a bet or trade. (**PLANNED**; existing Outcome and Quote vocabulary does
+not by itself prove a working prospective score loop.)
 
 ---
 
@@ -341,23 +366,23 @@ Behavioural obligations bound into prompts and manifests, not the schema. **PLAN
 
 ---
 
-## 5. Runtime-neutrality exit condition (PB-0 target; Proof B falsifier)
+## 5. Runtime-neutrality exit condition (W2-01 accepted path; PB-3 remainder)
 
-**Current state: not demonstrated.** The old `ab40524d` coupling inventory is historical source evidence,
-not a current repair checklist. At candidate `a552cd13`, Kernel second-opinion eligibility already uses
-role and capability checks, and market participant selection has a shared helper. Mission activation
-still names `hermes-worker`; Director discovery remains narrow; Dock bootstrap and runtime hosting retain
-Hermes-specific assumptions. The production profiles still provide only Hermes. See the
-[current source inventory](OFFICIAL-ROADMAP.md#1-current-evidence-and-its-limits) before estimating or
-repeating generalization work. These observations do not constitute a fresh F1 gate result.
+**Current state: one bounded path accepted, full contract not demonstrated.**
+[W2-01 acceptance](../orders/evidence/WO-W2-01/ACCEPTANCE.md) proves that the Hermes Director can
+recruit Codex, give it a real UFC research Task with permitted tools, receive its exact result, and stop
+owned processes. W2-02 remains open for a material cross-runtime question, answer, criticized revision,
+new Evaluation, and common evidence table. PB-3 remains the future conformance/replacement order. Older
+coupling inventories and candidate-specific claims are history, not a present repair checklist. Inspect
+current source and the accepted receipt before changing a seam.
 
-**PB-0 makes the institutional boundary independent of runtime brand while preserving Hermes**, then
-Wave 2 admits Codex through the same Participant Contract. Ryan confirmed on 2026-09-13 that the first
-product requires Hermes + Codex; Claude Code follows afterward. First-product exit requires real
-cross-runtime communication, exact handoff, independent criticism, a meaningful second round, an
-interactive analytical surface, and steering/replacement through one institution. The later Claude
-adapter must satisfy that same contract, but a three-runtime demonstration does not block the first
-product.
+The exit condition is one **QuantFlow Participant Contract** with runtime-specific adapters. Launch,
+readiness, terminal transport, credential inheritance, model selection, and process cleanup may differ;
+role, Task, grants, evidence access, Artifact, Evaluation, steering, replacement, history, and Canvas
+grammar do not. A live process or model label alone is not readiness: the exact assigned seat must be
+able to receive its Task and required permitted tools, or show a startup failure while preserving queued
+work. If a runtime cannot satisfy a capability, its limitation is declared, not faked. Ryan confirmed
+Hermes + Codex for the first milestone; Claude follows through the same boundary afterward.
 
 **F1 — Zero species branches in institutional code.** Species ids appear only under `species/<id>/`, the
 adapter registry, and provenance fields — never in Kernel, Canvas, Dock, Mission-activation, or grant
@@ -372,7 +397,7 @@ Report cites it by role.
 **F5 — Replacement without truth loss.** Kill any non-Director species mid-task; lifecycle truth closes it;
 reassign;
 Mission completes; nothing orphaned.
-**F6 — Declaration-led admission.** After PB-0, admitting each new species touches only its
+**F6 — Declaration-led admission.** After PB-3 proves the common boundary, admitting each new species touches only its
 `species/<id>/` adapter/manifest/resources, the adapter registry, and bounded packaging declarations—not
 Kernel, role, Task, Artifact, Evaluation, Dock, or Canvas semantics. Paste `git diff --stat`.
 
@@ -383,7 +408,7 @@ question/answer, revision, and founder-control behavior in [Demo B](DEMO-SPEC.md
 
 ## 6. Not here
 
-No Technique catalogue, bundle inventory, or vendor list (the Vault `03` inventory is non-authoritative
+No Technique catalogue, bundle inventory, or vendor list (the [Capability Registry](../proposals/CAPABILITY-REGISTRY.md) is non-authoritative
 research); no schema changes (the roadmap
 names the package owning any new field: licence class, budget, Decision Set artifact kind, provenance
 fields); no surface floor ([Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md) §H owns PS-0); no build authority.

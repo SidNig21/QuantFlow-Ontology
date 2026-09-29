@@ -1,8 +1,8 @@
 # First-class product demonstration contract
 
 status: APPROVED — product demonstration contract; not build authority
-revised: 2026-09-13 (founder-requested domain clarification; Hermes + Codex and an actual second round)
-owns: what the first useful and collaborative demonstrations must prove
+revised: 2026-09-28 (accepted first paths; later personal analytics proof added)
+owns: what the first useful, collaborative, and mature analytical demonstrations must prove
 does not own: build sequence → `OFFICIAL-ROADMAP.md`; surface grammar → `PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md`; seams → `INSTITUTION-CONTRACTS.md`
 
 A first-class demonstration uses the normal packaged Windows app. A stranger should understand what Ryan
@@ -10,10 +10,10 @@ did and what QuantFlow concluded without an explanation of SQLite, gates, ids, r
 runtime plumbing. A fixture, pre-seeded store, internal RPC path, scripted movie, or hidden synthetic
 participant cannot satisfy the live claim.
 
-This document defines intended product demonstrations. It does not report that they have passed or
-automatically amend the open W1-03 order. The [roadmap](OFFICIAL-ROADMAP.md) owns the first-product boundary
-and current evidence; [CONTEXT.md](../../CONTEXT.md) owns the terms. Later analytical and learning
-capabilities have their own useful jobs and evaluations; their absence does not move this first finish line.
+This document defines intended product demonstrations. W1-03 accepted Demo A's bounded UFC path;
+W2-01 accepted only the first Codex handoff within Demo B. It does not report that Demo B or C has
+passed or amend the open W2-02 order. The [roadmap](OFFICIAL-ROADMAP.md) owns status and sequence;
+[CONTEXT.md](../../CONTEXT.md) owns terms. Later analytics do not move Demo B's first-desk finish line.
 
 ## Demo A — one useful UFC investigation
 
@@ -110,6 +110,33 @@ Two terminals exchanging text without recorded work cannot satisfy Demo B. Equal
 usable communication, a meaningful second round, and founder control cannot satisfy it. No specific UI
 layout or message technology is mandated by this story.
 
+## Demo C — the measured personal sports-analytics product
+
+Demo C is the later destination, **not a W2-02 acceptance expansion**. Across real prospective cases,
+Ryan asks the Director about a current UFC or NFL prop. The Director composes permitted data, the
+Research Lab, a tested Prediction Bench, a Researcher, and an independent Critic from the Dock. The
+Canvas shows the exact point-in-time rows, simple comparator, forecast or honest unavailable state,
+price, uncertainty, strongest objection, and CANDIDATE/WATCH/PASS reason. Ryan can change a supported
+assumption and see a new attributable Run rather than a silently edited answer.
+
+After results arrive, Outcome Review connects the frozen forecasts and all screened candidates to
+official outcomes, qualifying closes or missing-close reasons, voids, corrections, and abstentions. It
+shows calibration/error and comparison with simpler baselines over the declared eligible cohort. One
+miss and one no-candidate decision remain visible. A Critic's earlier approval is shown as a check on
+process/evidence, not a claim that the forecast won.
+
+For one real supported player-prop family, a scenario or up-to-four-leg combination is displayed only
+with justified dependence and actual offered eligibility/combined terms. An unpriced or inadequately
+modeled combination stays explicitly unavailable. Film, documents, specialists, RL, and remote compute
+join only for a named job with their own reference check; they are not required to make a weak forecast
+look sophisticated. Ryan chooses whether and how much to bet outside QuantFlow. The app provides no
+stake or execution control.
+
+The demonstration fails if it selects winning examples after the fact, treats later data as a pre-event
+feature, equates an LLM's confidence with a calibrated probability, hides rejected candidates, assumes
+independent legs without evidence, invents a combined quote, or claims a profitable edge from one case.
+An honest measured result may be that the current method does not beat the simple baseline.
+
 ## Rejection conditions
 
 - another Canvas, Mission world, Focus mode, History mode, or Full Lineage world is required;
@@ -130,6 +157,5 @@ layout or message technology is mandated by this story.
 - a presenter must explain internals to make the result understandable;
 - any stake, bankroll, wager placement, or execution control appears.
 
-Demo A and Demo B prove a real, attributable personal research product and a defensible technical product
-demonstration. They do not prove profitability, commercial demand, licensing, broad release readiness, or
-investor demand.
+Demo A and Demo B prove the first attributable personal research desk. Demo C tests the later analytical
+product. None by itself proves profitability or an edge outside the evaluated cohort.

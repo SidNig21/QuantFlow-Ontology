@@ -8,7 +8,7 @@ product
 
 ## Users
 
-QuantFlow is built first for one expert operator, Ryan, working on one Windows
+QuantFlow is built for one operator, Ryan, working on one Windows
 Canvas. The ready Hermes Research Director is his primary colleague and default
 coordinator, but Ryan may also address another governed participant or open a
 capability directly. He watches distinct runtimes work from the same bounded
@@ -26,11 +26,12 @@ opened work visible and steerable. Inspect reveals depth without becoming a
 second world. The Kernel remains the sole source of truth. QuantFlow never
 places a bet or trade.
 
-The first complete institutional journey remains in flight, not present
-behaviour. It uses real point-in-time UFC evidence to test a founder inquiry
-without requiring a named Technique; NFL follows through the same architecture.
-Recall and every learning loop remain downstream of independently evaluated,
-source-timed work.
+The first real UFC research/review/retrieval journey is accepted, and the first
+Director-to-Codex research handoff is accepted. The material question, answer,
+revision, second independent review, and shared evidence table are the open
+W2-02 order. A tested predictive probability, forward outcome score, and
+correlation-aware parlay analysis are still future work. UFC proves the desk;
+NFL player props are the next domain. Ryan chooses any stake outside the app.
 
 ## Brand Personality
 

@@ -1,8 +1,8 @@
 {
   "meta": {
     "branch": "codex/wo-w2-02-collaborative-inquiry",
-    "commit": "93ea9493",
-    "generatedAt": "2026-09-28",
+    "commit": "fc9819c7",
+    "generatedAt": "2026-09-29",
     "filesScanned": 436,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
     "fingerprint": "97ed10f7826d9da5"
@@ -60841,14 +60841,14 @@
   ],
   "diffVsHead": {
     "from": {
-      "branch": "codex/wo-w2-01-codex-admission",
-      "commit": "e7b96e3b",
-      "generatedAt": "2026-09-16"
-    },
-    "to": {
       "branch": "codex/wo-w2-02-collaborative-inquiry",
       "commit": "93ea9493",
       "generatedAt": "2026-09-28"
+    },
+    "to": {
+      "branch": "codex/wo-w2-02-collaborative-inquiry",
+      "commit": "fc9819c7",
+      "generatedAt": "2026-09-29"
     },
     "verdict": "better",
     "why": "37 improvement(s), nothing added or hidden",

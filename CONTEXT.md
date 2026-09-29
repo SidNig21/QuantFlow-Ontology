@@ -242,6 +242,12 @@ _Avoid_: betting ticket, automatic execution, every historical answer
 A simple explicit model against which a more elaborate prediction can be compared. Its probabilities require evaluation on cases it did not learn from, using the information available at the relevant time.
 _Avoid_: bookmaker price alone, language-model confidence, validated edge
 
+**Sports forecast**:
+A frozen, pre-event estimate for one precisely defined sporting outcome or prop, with a model version,
+information cutoff, and settlement rule. A participant may explain it, but the participant's prose
+confidence is not the forecast probability.
+_Avoid_: general lean, post-event explanation, price-implied probability by default
+
 **Scenario simulation**:
 Repeated evaluation of possible outcomes under stated assumptions and a defined model. More simulated outcomes reduce sampling noise but do not establish that the assumptions or model are correct.
 _Avoid_: proof by volume, prediction without assumptions
@@ -266,6 +272,18 @@ _Avoid_: realized profit, universal edge score
 The relationship between predicted probabilities and observed frequencies across suitable evaluated cases. One correct prediction or one confident participant does not establish calibration.
 _Avoid_: hit rate, confidence, agreement
 
+**Screened cohort**:
+All eligible opportunities a declared research method considered during a defined period, including
+rejected selections, abstentions, missing evidence, and failed attempts. It prevents a report of only
+chosen or winning cases from masquerading as model performance.
+_Avoid_: selected winners, published Reports only, denominator chosen after results
+
+**Outcome review**:
+The later comparison of a frozen pre-event claim or forecast with a properly identified official result,
+settlement, and qualifying closing Quote when available. It measures what happened without rewriting the
+earlier evidence, Critic judgment, or market terms.
+_Avoid_: Critic approval, hindsight correction of a forecast, missing means loss
+
 ## Continuation and improvement
 
 **Operator Season**:
@@ -287,6 +305,12 @@ _Avoid_: retrieval, proof of improvement, synthetic sporting truth
 **Research policy**:
 A versioned rule for choosing research actions, such as which evidence to request next under a budget. A learned policy is evaluated for its defined research job and never gains permission to place wagers or trades.
 _Avoid_: trading executor, unrestricted agent autonomy, model confidence
+
+**Selection policy**:
+A versioned rule for ranking, rejecting, or grouping researched market selections under declared
+uncertainty and current eligibility. It can recommend no candidate; Ryan alone decides any stake outside
+QuantFlow. A learned policy requires a trustworthy environment and comparison with simpler search.
+_Avoid_: bankroll allocator, bet slip, wager execution, quota to fill
 
 **Method promotion**:
 Retaining a method or policy for broader reuse after suitable repeated evaluation. Promotion states the jobs and limits justified by evidence and remains reversible when later results warrant it.

@@ -538,6 +538,26 @@ real UFC markets because they are current and personally useful to the founder; 
 market on the same architecture. Any named fight, fighter, provider event id, or proposition is acceptance
 evidence, never a production constant or product identity.
 
+### A12 · Personal analytical product; outcomes and no stake policy (founder-stated 2026-09-28)
+
+Ryan is building QuantFlow for his own use as a first-class sports-betting **research and advisory**
+product. A credible product does more than preserve and independently review a claim: it freezes the
+pre-event claim, model/price/evidence cutoff and the complete screened cohort, then links official later
+results and qualifying closing prices to evaluate predictions, misses, abstentions, and method changes.
+An independent Critic assesses the work's evidence and process; only suitable later cases test forecast
+accuracy. The full route from the accepted UFC desk through collaboration, scientific controls,
+point-in-time predictive baselines, NFL player props, combination analysis, source-linked richer evidence,
+and evaluated learning lives in the [Official Roadmap](plans/OFFICIAL-ROADMAP.md). The Vaults are research
+input, never a second route or product-status authority.
+
+This amendment supersedes A10's claim that a PufferLib policy allocates **stakes** and any historical
+text that makes bet/trade execution, bankroll allocation, or a commercial pilot a QuantFlow goal.
+QuantFlow may compare, rank, reject, or group selections under measured uncertainty and actual offered
+terms. Ryan chooses any stake outside the app; QuantFlow never places a bet or trade. RL, time-series,
+fine-tuning, and remote compute remain candidate methods for specifically evaluated jobs, not mandatory
+steps or sources of authority. A12 does not itself open an implementation order; A9 and `NEXT.md` still
+govern builds.
+
 ## Sources
 - [[00 - The Integration Question]] — verdict: borrow doctrine, don't build on platform
 - [[05 - DevX SuperRepo & Agent Development]] — local embedded ontology, ontology-as-code, schema-drift-as-lint, worktrees

@@ -1,13 +1,13 @@
 # OFFICIAL-ROADMAP.md — from Golden to a useful live-market research desk, real collaboration, and repeated founder use
 
 status: APPROVED — OFFICIAL PRODUCT PROGRAM; not build authority
-revised: 2026-09-13 (founder-requested domain clarification; Hermes + Codex first, Claude afterward)
-source checkpoint: accepted local `main` @ `f55a783a`; unaccepted W1-03 product candidate `a552cd13`; no live product acceptance in this revision
+revised: 2026-09-28 (accepted W1/W2-01 checkpoint; full personal sports-research destination and analytical route)
+source checkpoint: accepted `main` @ `6f6cda0921b2d0510a65c9b26118d76e44d45e30`; W2-02 is the one open order; later analytical capability is planned, not accepted
 build authority: `docs/orders/NEXT.md` only (DOCTRINE A9). This file names the route; `NEXT.md` opens each door.
-owns: product sequence · dependencies · Proof A / Proof B · Founder Survival · Operator Season · maturity outcomes · open decisions by timing · stop conditions
-does not own: contract clauses → [Institution Contracts](INSTITUTION-CONTRACTS.md); surface grammar → [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md); demo scripts → [Demo Spec](DEMO-SPEC.md); capability inventory → non-authoritative Vault research `03-DOCK-CAPABILITY-RATIONALIZATION.md`
+owns: current evidence · whole-product destination · ordered dependencies · Proof A / Proof B · analytical and learning program · operator outcomes · stop conditions
+does not own: contract clauses → [Institution Contracts](INSTITUTION-CONTRACTS.md); surface grammar → [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md); demo scripts → [Demo Spec](DEMO-SPEC.md); candidate equipment → [Capability Registry](../proposals/CAPABILITY-REGISTRY.md)
 supersedes on approval: the R18–R25 route in `docs/history/plans/INSTITUTIONAL-BUILD-PLAN.md`, the rung sequence after R17 in `docs/history/orders/GOLDEN-RUN.md`, and DOCTRINE Part V — all preserved as history of the pre-Golden plan
-founder context: 2026-09-13 Founder Review and Fresh-Thread Handoff; direct request to clarify the full domain; direct confirmation of Hermes + Codex first with Claude afterward. The handoff supplies context, not build authority.
+founder context: 2026-09-13 Founder Review and Fresh-Thread Handoff; later direct clarification of personal sports analytics, full-product roadmap, and 2026-09-28 no-stake decision. Vault material supplies research, not build authority.
 
 > **This file authorizes nothing.** Post-Golden Authority Normalization is accepted history. `NEXT.md` opens exactly one vertical delivery order. The first order begins with a bounded live-input decision door and continues directly into working product when a viable path is proved; it is not another planning rung.
 
@@ -15,10 +15,10 @@ founder context: 2026-09-13 Founder Review and Fresh-Thread Handoff; direct requ
 
 ## 1. Current evidence and its limits
 
-This is a dated source checkpoint, not a live dashboard. On 2026-09-13 the checkout was
-`codex/wo-w1-03-one-canvas` at `a552cd13a5e8c12c3270bf599d8da33c46391dde`, with no reported changes before
-this documentation work. Local `main` and the last-fetched `origin/main` ref were both
-`f55a783a96486b836a7cde5a65b76ee17cd87f09`; no fetch was performed. W1-03 remained open.
+This is a dated source checkpoint, not a live dashboard. On 2026-09-28, the current branch was
+`codex/wo-w2-02-collaborative-inquiry` at `fc9819c764e39ffac3a134b447fd29c01a9b4835`, two
+documentation commits ahead of accepted local `main` at `6f6cda09`. `NEXT.md` names W2-02 as the
+only open product order. This revision changes the route and definitions; it does not implement W2-02.
 
 **Accepted** means a recorded decision about the exact tested version. **Candidate implementation** means
 code exists but the required product behavior is not accepted. **Planned** means intended capability.
@@ -29,25 +29,18 @@ Tests using controlled inputs prove their exercised boundaries, not real provide
 | Windows app and shared record | Accepted Golden/Foundation history exists. Kernel-owned Tasks, Artifacts, Evaluation, publication, and lifecycle are real foundations; current schema inventory comes from the [generated ontology](../../qf-kernel-schema/golden/ONTOLOGY.md), not cached counts here. |
 | Live market desk | [W1-01 acceptance](../orders/evidence/w1-01/ACCEPTANCE.md) establishes real Bovada UFC acquisition and investigation entry. Its old alternate-world UI is historical behavior, superseded by the one-Canvas direction. |
 | Historical evidence and calculation | [W1-02 acceptance](../orders/evidence/w1-02/ACCEPTANCE.md) establishes bounded official UFC history and a descriptive calculation. It does not establish a predictive matchup probability. |
-| Complete UFC research/review | Candidate code covers larger menus, exact evidence, worker output, Critic, and publication. [W1-03 repair evidence](../orders/evidence/w1-03/saved-database-red-20260908.md) explicitly leaves the combined live path unaccepted. |
-| Director capability use | [Role tools](../../collab-electron/src/main/ontology-role-tools.ts) and [activation instructions](../../collab-electron/src/main/mission-activation.ts) prescribe narrow participant recruitment/delegation. [Market analysis](../../collab-electron/src/main/market-analysis.ts) is a richer application action; general Director discovery/invocation is not established. |
-| Communication | [Task/result gateway](../../collab-electron/src/main/collaboration-gateway.ts) records work and notifies recipients. [Peer delivery](../../collab-electron/src/main/peer-delivery.ts) uses a TUI input bridge. General questions, answers, acknowledged delivery, and cross-runtime continuation remain unproved. |
-| Control and revision | Task steering and revision machinery exists. [Participant rendering](../../collab-electron/src/windows/shell/src/task-composition.js) skips its controls when a participant view is present; [Dock Inspect](../../collab-electron/src/windows/shell/src/dock.js) displays facts without those steering controls. This is a source-observed reachability gap, not a live UI measurement. |
-| Independent criticism | Exact review/publication boundaries exist, but the [continuation](../../collab-electron/src/main/index.ts) closes the researcher before starting the critic. A useful question/answer/revision loop remains to be demonstrated. |
-| Different runtimes | [Production profiles](../../species/hermes/dock-profiles.json) are Hermes. [Critic eligibility](../../packages/qf-kernel/src/execute.ts) already uses role/capability checks, so the older Hermes-only Kernel finding is stale. Other hosting/discovery assumptions remain; Codex admission is planned. |
-| Analytical surfaces and models | [Current comparison](../../packages/qf-kernel/src/deterministic-execution.ts) explicitly reports unavailable matchup probability. Interactive evidence analysis, predictive baselines, joint models, simulation, video measurement, and trained specialists remain future capability work. |
-| Lifecycle and retrieval | Candidate repairs and limited native shutdown evidence exist. The combined current research/review, unfinished-work shutdown, clean reopen, and deliberate retrieval still require packaged proof. |
+| Complete UFC research/review | [W1-03 acceptance](../orders/evidence/w1-03/ACCEPTANCE.md) proves a real packaged Bovada → official UFC history → Hermes Researcher → independent Critic → INCONCLUSIVE/WATCH decision → close/reopen/retrieval path. It does not prove a calibrated probability or available submission quote. |
+| Director and Codex | [W2-01 acceptance](../orders/evidence/WO-W2-01/ACCEPTANCE.md) proves a real Director → Bovada → Codex → Director Task/result handoff, permitted tool surface, refusals, and cleanup. It does not prove the later question/answer/revision loop or general runtime conformance. |
+| Communication and revision | The [open W2-02 order](../orders/active/WO-W2-02-REAL-COLLABORATIVE-INQUIRY.md) requires a material exact question, evidence-backed answer, Codex revision, fresh independent Critic, and saved relationships. Existing Task/review machinery is substrate, not acceptance of that journey. |
+| Interactive analysis | W2-02 also requires a real selectable/filterable evidence table that Director, Codex, and Ryan can refer to by exact row/version. Scientific population or parameter changes and consequent new Runs are later work. |
+| Runtime conformance and replacement | Codex admission is accepted for one path. PB-3's species-neutral conformance, mid-task replacement, and failure recovery are not yet accepted. Claude admission follows later. |
+| Predictive and retrospective analytics | The [current deterministic comparison](../../packages/qf-kernel/src/deterministic-execution.ts) reports unavailable matchup probability. No accepted predictive baseline, point-in-time backtest, calibration, outcome-link/scoring cohort, CLV loop, or joint parlay model exists. |
+| Further Dock capabilities | Bovada Live Markets, bounded UFC Historical Evidence, and Research Lab serve the accepted UFC path. NFL, richer sports history, film, documents, model bench, scenario/combination lab, trained specialists, and standalone Method/Compute entries are candidate jobs, not working product claims. |
 
-The source investigation ran eight focused test files: **36 passed, 0 failed, 630 assertions** covering
-communication boundaries, ontology access, the synthetic expanded-menu decision/review path, participant
-rendering, and one-Canvas projections. No app launch, provider call, release qualification, or acceptance
-was performed in that investigation. Those checks also demonstrate why green tests alone cannot close a
-product gap: the participant-rendering test explicitly expects the omitted task controls.
-
-Before the next live acceptance, update the fixed Fiorot–Grasso requirement and corresponding live gate
-selection together under the applicable order/test-repair authority. Preserve the historical case as a
-regression; use a currently offered supported UFC inquiry for positive live proof. This documentation
-clarification does not itself change that active order or its executable gate.
+Those acceptance receipts are bounded. A live, independently reviewed descriptive UFC conclusion and one
+cross-runtime handoff are real product behavior. Neither is evidence of model accuracy, edge, useful
+combination selection, or repeatable performance. The current order and its own acceptance evidence,
+not an older roadmap observation, determine the next implementation check.
 
 ## 2. Product definition
 
@@ -91,7 +84,7 @@ justified in the implementing order.
 | Technique | optional versioned, hashed reusable research method promoted from evaluated work | `strategy` (spec artifact, family, version) |
 | Participant | a process holding a governed seat | `agent_definition` → `agent_session` |
 | Role | institutional identity of a seat | `agent_definition.role` |
-| Runtime species | the adapter a participant runs on (Hermes today) | manifest `adapter.id`; provenance, not semantics |
+| Runtime species | the adapter a participant runs on (Hermes and Codex admitted for bounded roles today) | manifest `adapter.id`; provenance, not semantics |
 | Capability | governed Data / Tool / Method / Compute a role may use | produces `dataset` / `quote` / `run` / `artifact`; grant = `capability_group` |
 | Bundle | Dock-visible packaging of one capability | *none yet* (governance metadata; `tool` object available when persistence is needed) |
 | Task | one exact unit of work | `task` |
@@ -111,29 +104,36 @@ Added by this program:
 10. **No production capability without a real research consumer.** The Dock may describe governed inventory, but nothing enters a delivery's critical path until a current founder job needs it; nothing enters production because it is impressive.
 11. **Docs, gates, and receipts are not the capability.** A package closes only when the operator runs the thing in the normal app.
 12. **Runtime species and provider do not define institutional semantics.** They remain inspectable provenance bound to the exact participant and execution.
-13. **Adding to the institution never adds to the grammar.** New things enter through an existing Dock class and tile family, or they are misclassified.
+13. **Add capability without fragmenting the product.** Start with the existing five Dock classes,
+    common tile behavior, and Kernel contracts. A new table, chart, clip, or scenario view may need a
+    purpose-built interior; it does not thereby require a new Canvas, truth store, or Participant class.
+    A genuinely new top-level class requires a demonstrated job and deliberate decision.
 
 ## 6. Critical path
 
 ```
 GOLDEN + POST-GOLDEN FOUNDATION — COMPLETE (closed, untouched)
    ↓
-WAVE 1 — FIRST USEFUL MARKET DESK
+WAVE 1 — FIRST USEFUL MARKET DESK — ACCEPTED
   live-input door → one current Bovada market class → trustworthy history → transparent calculation
   → independent criticism → research assessment → CANDIDATE/WATCH/PASS when offered
   → one Canvas workspace → clean reopen + deliberate retrieval/tracking
    ↓
-WAVE 2 — FIRST COLLABORATIVE PRODUCT
-  generalize remaining runtime assumptions → Hermes + Codex through one contract
-  → questions/answers + exact handoff + independent criticism + meaningful revision
-  → interactive analytical work + Director/user steering + dependable continuation
+WAVE 2 — FIRST COLLABORATIVE PRODUCT — IN PROGRESS
+  W2-01 Codex handoff ACCEPTED → W2-02 question/answer/revision/evidence table OPEN
+  → PB-3 shared conformance, steering, replacement, failure recovery PLANNED
    ↓
-FIRST USABLE FOUNDER PRODUCT — packaged and demonstrated
+FIRST USABLE PERSONAL RESEARCH DESK — packaged and demonstrated, still not a validated predictor
    ↓
-WAVE 3 — MEASURE, EXPAND, AND IMPROVE
-  repeated live use → outcomes/CLV/calibration/baselines → multi-sport/Dock expansion
-  → Claude and later capabilities by useful job → simulations/film/specialists when justified
-  → evaluated methods and policies → continuing reliability and product improvement
+ANALYTICAL PRODUCT — scientific table controls → point-in-time data/target contract
+  → simple predictive baseline → prospective outcome and price scoring → NFL player-prop lane
+  → conditional/joint simulation and quoted combination research
+   ↓
+EVIDENCE + LEARNING EXPANSION — source-linked film/documents when useful
+  → forecast challengers, trained specialists, research policies, bounded compute when earned
+   ↓
+MATURE PERSONAL DESK — repeated real decisions with honest abstention and measured improvement
+  → continued reliability, recovery, visual quality, and new governed capabilities
 ```
 
 ### 6.1 Post-Golden Authority Normalization — COMPLETE
@@ -152,17 +152,21 @@ Accepted Foundation history already present in the `6340d78f` baseline. It:
 
 Exit: accepted and closed. Do not reopen it as Wave-1 work.
 
-### 6.2 Wave-1 live-input decision door (formerly FM-0)
+### 6.2 Wave-1 live-input decision door (formerly FM-0; delivered)
 
 A bounded first deliverable inside the opening product order, not a separate audit, rung, or founder decision ceremony. It proves one real current Bovada UFC event/market with reliable fighter identities, both sides and prices, event time, provider identity, local observation time, and an honest freshness statement; then proves one trustworthy historical UFC path whose inputs can be reconstructed before the event cutoff. UFC is the locked first proving ground because it is active and Ryan has substantial resolved betting history to contribute. That personal history may become governed evidence only when its event, market, price, cutoff, and official outcome identities can be reconstructed; it is not accepted as truth merely because Ryan supplied it. NFL remains the next expansion market and an existing regression seam, not a fallback for Proof A.
 
-This door also identifies the smallest transparent calculation that the available UFC evidence can honestly support. It does **not** require Ryan to invent or select a named Technique. Exploration begins without one; before any conclusion can influence CANDIDATE/WATCH/PASS, the exact formula, inputs, version, cutoff, missing-data behavior, and limitations become an immutable Run envelope. If the UFC live or historical path fails inside the timebox, stop with the exact missing dependency. Never switch sports to rescue the first-product claim and never substitute fixtures on the live claim.
+The delivered door identified the smallest transparent calculation the available UFC evidence could
+honestly support. It did **not** require Ryan to invent or select a named Technique. The accepted path
+reported unavailable matchup probability rather than manufacturing it. This remains the rule for later
+targets: record formula, inputs, version, cutoff, missing-data behavior, and limits; do not substitute
+fixtures or another sport to rescue a live claim.
 
 ### 6.3 Minimum IC-0
 
 The minimum Participant and Capability boundaries needed by the live slice ship with that slice and are exercised on the existing Hermes path. They are not standalone process work. Full runtime-neutral conformance remains Wave 2.
 
-### 6.4 Proof-A ingredients
+### 6.4 Proof-A ingredients (historical delivery map, not new orders)
 
 FM labels are **dependency units, not mandatory mini-rungs**; compose adjacent units that share one causal product boundary; do not recreate Golden ceremony.
 
@@ -175,33 +179,43 @@ FM labels are **dependency units, not mandatory mini-rungs**; compose adjacent u
 | **PS-0 floor** | [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md) §H behavioural floor | normal-app founder check |
 | **FM-5 Interpretation + attack** | Researcher interprets the deterministic artifact; Critic evaluation names ≥ 1 material attack | governed-review extension |
 | **FM-6 Lineage & Inspect** | From Decision Set to every input's bundle, as-of, hash | UI oracle |
-| **FM-7 Close/reopen + backup** | Close reaches zero owned processes; cold open shows only the Director; deliberate retrieval returns the exact prior institutional work; in-app backup/restore has a receipt | packaged relaunch gate |
+| **FM-7 Close/reopen** | Close reaches zero owned processes; cold open shows only the Director; deliberate retrieval returns the exact prior institutional work. Backup/restore maturity remains a later reliability requirement (§6.14). | packaged relaunch gate |
 | **FM-8 Golden Mission regression corpus** | One real Mission recorded as deterministic regression fixture; live path stays the claim | fixture + one live pass |
 
 Recommended composition (architect decision): FM-1+FM-2 "evidence + computation"; FM-3+FM-4 "Director + decision"; FM-5+FM-6 "attack + lineage"; FM-7+FM-8 "survive + regress".
 
-### 6.5 Proof A — useful live Bovada investigation
+### 6.5 Proof A — useful live Bovada investigation (accepted bounded path)
 
 **Proves:** Ryan opens the normal Windows app, talks to the Director or opens a current Bovada market, and starts one bounded investigation without first inventing a Technique. Real current and trustworthy historical evidence plus a transparent reproducible calculation test the claim. An independent Critic attacks the exact result. QuantFlow gives a supported/challenged/inconclusive research assessment and, only for a currently offered Bovada expression and price, a CANDIDATE/WATCH/PASS actionability judgment. Exact work remains deliberately retrievable after a clean reopen; no wager is invented or placed. All participants may be Hermes profiles; that does not satisfy Proof B.
 
 **Minimum Proof-A Dock:** Participants — Research Director, one Evidence/Market Researcher, Independent Critic. Data — Bovada Live Markets and the selected sport's Historical Evidence. Tools/Compute — one Research Lab capable of the proved calculation. Method — optional; show a named Technique only if evaluated work has earned one. Literature/Browser Evidence remains optional when the investigation requires it.
 
-**Acceptance:** independent verifier runs the Mission in the packaged app with real provider contact and pinned corpus; every decision-bearing metric satisfies C9 and every admitted Dataset/corpus satisfies C10; `participant-contract`, `capability-contract`, replay gate green with bait; Founder-Proven exit (Closure Addendum): founder completes it once unassisted from a fresh install; [Demo Spec](DEMO-SPEC.md) Demo A rejection conditions absent; product-surface acceptance per [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md) §H; screenshots preserved in the receipt.
+**Accepted evidence:** the [W1-03 receipt](../orders/evidence/w1-03/ACCEPTANCE.md) records the exact
+packaged live case, independent verifier, sources, worker/Critic/Decision lineage, UI capture,
+clean close, Director-only reopen, and deliberate retrieval. It is not evidence that every broader
+contract clause or later backup, predictive, and calibration feature has passed. Those have their
+own consumers and proof below.
 
-**Outside Proof A:** second runtime; more than one completed sport/market class; stake logic; AlphaEvolve, PufferLib, TimesFM, Multivariate Forecast Engine; recall/learning.
+**Outside Proof A:** second runtime; more than one completed sport/market class; predictive, recall,
+and learning capability. Stake sizing and execution are outside QuantFlow altogether.
 
-### 6.6 Founder Survival lane (parallel, never blocking)
+### 6.6 Founder Survival lane (continuing product hygiene)
 
-Operator-visible fixes that keep the founder using the product while Proof A builds (first-run desk, tile task titles, backup control, provider-unreachable sentence). Ships inside the nearest unit boundary, never as its own order. ≤ 10% of active work.
+Operator-visible fixes that keep Ryan using the product (first-run clarity, readable task titles,
+backup control, provider-unreachable sentence) ship with the feature they protect or as a scoped
+reliability order when the defect blocks use. They do not replace a working analytical capability.
 
-### 6.7 PB-0 — generalize Hermes-specific institutional seams
+### 6.7 PB-0 / W2-01 — admit Codex without making the product a Hermes special case
 
-**Current:** a runtime-neutral product has not been demonstrated. Use the candidate evidence in §1 and
-[Institution Contracts](INSTITUTION-CONTRACTS.md) §5. Some earlier coupling findings are already repaired;
-do not rebuild those seams from an old list. Remaining work must be tied to actual admission, capability
-use, communication, or control behavior required by the first Codex consumer.
+**Current:** W2-01 accepted one real Codex admission and Director-led handoff while preserving Hermes.
+It proves that bounded institutional path, not every behavior in the common Participant Contract.
+Use the accepted receipt in §1 and [Institution Contracts](INSTITUTION-CONTRACTS.md) §5. Repair any
+remaining species coupling only when an actual W2-02 or PB-3 consumer exposes it.
 
-**PB-0 outcome:** role semantics not keyed to Hermes ids; critic eligibility role/capability-based; Mission activation does not name Hermes profiles; tool grants derive from role/capability policy, not species literals; Dock validation accepts certified Participant manifests through a shared contract; agent hosting delegates only transport-specific behaviour to an adapter; peer delivery targets governed role/session identity; packaging admits declared runtime resources without embedding institutional semantics; **Hermes still works unchanged in meaning**; F1 green with bait; **no second runtime is added to prove PB-0**. PB-0 changes product bytes and therefore re-anchors the Golden receipt fingerprint by order.
+**Remaining outcome:** one assignment, grant, evidence read, publication, question, criticism, revision,
+steering, replacement, and close/retrieve contract works for each admitted role regardless of the
+runtime adapter. Runtime-specific startup, readiness, terminal transport, credentials, and process
+cleanup stay in the adapter. Any limitation that a runtime cannot meet is visible instead of simulated.
 
 ### 6.8 Proof B — real heterogeneous collaboration
 
@@ -212,12 +226,11 @@ and one meaningful follow-up or revision changes or substantiates the work. Ryan
 stop, replace, compare, and request another opinion without durable truth loss. The initial Critic
 assessment remains independent; later discussion remains attributable. Private contexts stay separate.
 
-**Sequence after PB-0:** admit Codex through its runtime-specific adapter and bounded probes (PB-1);
-complete the real collaborative inquiry including an interactive evidence table/chart and second round
-(PB-2); exercise the shared conformance boundary and replacement behavior (PB-3, F1–F6). Build the
-analytical surface with the inquiry that consumes it, not as a disconnected later demonstration. Avoid
-new general services, a workflow language, or an all-runtime framework unless a measured requirement
-cannot be met through the existing owners.
+**Sequence:** W2-01 / PB-1 accepted Codex's first real Task/result path. W2-02 / PB-2 is the one open
+order for exact material question/answer, challenged revision, fresh independent evaluation, and the
+evidence table. PB-3 then tests shared conformance and replacement (F1–F6), including real startup,
+readiness, Stop, and mid-task runtime loss. Build each surface with the inquiry that consumes it.
+Avoid a new general service or workflow language without a measured need.
 
 **Founder scope confirmation, 2026-09-13:** Hermes + Codex first; Claude Code afterward. This supersedes
 the previous three-runtime first-product/Wave-2 exit requirement. It preserves the goal of later Claude
@@ -245,80 +258,205 @@ normal packaged Windows app and independently accepted against the named candida
 
 This is a finish line for the first personal product, not a claim of profitability, broad release
 readiness, a mature predictive system, or completion of every later capability. The broader product
-remains the research program in §6.9–6.12 and the full experience in the
+remains the research program in §6.9–6.14 and the full experience in the
 [surface companion](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md#k-the-full-research-capability-model).
 
-The immediate development target remains finishing the open W1-03 loop. Its next observation starts with
-Ryan's normal request and checks the known Director/control gaps as well as analysis, criticism, and
-retrieval. The scoped correction batch follows observed blockers. Communication beyond that order, Codex
-admission, and the analytical surface require their own named implementation scope. No percentage or date
-estimate of overall completion is implied by this dependency sequence.
+The immediate implementation target is the [open W2-02 order](../orders/active/WO-W2-02-REAL-COLLABORATIVE-INQUIRY.md).
+PB-3 follows only after that candidate is accepted and `NEXT.md` opens it. The fuller analytical
+product in §6.9–6.14 is the destination, not a claim that the first desk already predicts props. No
+percentage or date estimate of overall completion is implied by this sequence.
 
-### 6.9 Operator Season
+### 6.9 Operator Season — close the claim-to-result loop
 
-The accepted investigation loop runs repeatedly on real upcoming events by Ryan as operator. Record
-earlier Quotes and conclusions, reported operator choices where relevant, qualifying closes or explicit
-close-unavailable reasons, official outcomes, corrections, coverage, failures, and abstentions. These
-support calibration where predictions exist, CLV under a named definition, and comparison with simpler
-baselines. No placement action or edge claim follows merely from collection. Closing/outcome capture
-belongs to this measurement capability; a separate W1-04 exists only if an authorized order needs it.
+This is a product capability, not a ceremony or a count of successful screenshots. Preserve the frozen
+pre-event inquiry, any offered selection/market terms, evidence cutoff, model version and probability **if one
+exists**, research assessment, market judgment, and all screened alternatives, including WATCH, PASS,
+and no-candidate cases. After the event, attach a separately sourced official result or settlement,
+void/correction state, and a qualifying closing Quote or an explicit reason no close was available.
+The later result never rewrites what was known at the earlier cutoff, and a Critic's process judgment
+never becomes a score of predictive correctness merely because it approved the evidence chain.
 
-### 6.10 Product Surface Maturity / External Pilot Readiness
+The Canvas gives Ryan a retrospective view from original claim → source/result → earlier judgment →
+later outcome, plus the full candidate cohort and reasons for abstention. Aggregate views count missing
+coverage, failures, invalid cases, screening attempts, and changed or retired models, not just picked
+winners. A price change refreshes price-dependent actionability; a corrected source identifies affected
+Runs; a revised finding supersedes the old current conclusion without erasing it. Define CLV, hit rate,
+calibration, and forecast error only where their required observations exist. Ryan may optionally record
+his own actions for personal review, but QuantFlow neither chooses a stake nor executes anything.
 
-Every slice must already be understandable and operable in the normal app. After Operator Season, repeated evidence may authorize deeper typography, density, accessibility, performance, visual consistency, onboarding, and external-pilot refinement. This is the bridge from a first-class personal research product to broader show-readiness; it is not permission to ship confusing or broken surfaces earlier.
+**Proof:** a prospective UFC inquiry is frozen before its cutoff; a real later result and qualifying
+close (or explicit unavailability) link to that exact claim and selection; a wrong identity or after-cutoff
+input is rejected; the UI shows both an unsuccessful candidate and an abstention. Outcome collection may
+start before a predictive model exists. Probability scoring waits for actual evaluated forecasts.
 
-### 6.11 Evidence-led institution maturity
+### 6.10 Scientific Research Lab — work on the same evidence as the agents
 
-Repeated use guides richer evidence acquisition, honest single-outcome predictive baselines, conditional
-and joint models, and scenario/combination research. Each method needs its own suitable evaluation;
-finishing Operator Season does not automatically validate it. Video/transcript research and a specialist
-model enter when a defined job and available reference evidence justify them.
+W2-02's table is the first shared, inspectable surface, not the whole analytical workbench. The next
+consumer can change the evidence population, time boundary, calculation parameter, or model assumption
+and produce a **new attributable Run and result**. It shows the old and new inputs/results side by side,
+the reason for invalidation, and whether fresh criticism is required. Sorting, pagination, and cosmetic
+layout changes remain view-only; they do not publish a new finding. A participant answering about a
+selected row uses the exact version Ryan sees. A UI-only control does not automatically become an
+agent-callable capability; decision-bearing changes still go through one governed action boundary.
 
-Later learning distinguishes reusable procedures from model weights, and sporting prediction objectives
-from coordination efficiency. Techniques, specialist models, and research policies require held-out
-evaluation, explicit limits, attributable revisions, and controlled promotion or rollback. Named
-technologies such as PufferLib or AlphaEvolve remain candidate implementations, not capability claims or
-automatic dependencies. No training run confers betting or trading authority.
+Bulk historical series may be queried with a suitable analytical engine such as DuckDB and columnar
+files, but those bytes are versioned inputs or rebuildable computation aids. The Kernel owns Dataset,
+Run, Artifact, permission, and lineage truth. A table or notebook cache never becomes an alternative
+record of decisions. A named Research Lab job must work from the Dock for both Ryan and an authorized
+participant, with the same input checks and result identity.
 
-**Recall law:** semantic retrieval may discover candidate prior Missions, Artifacts, Evaluations,
-Techniques, and outcomes. Before retrieved material influences current authority, exact Ontology queries
-verify identity, lineage, Technique version, evidence timing, Evaluation status, and whether the
-conclusion is current, superseded, or historical. Search finds candidates for context; Kernel/Ontology
-establishes truth. Search indexes remain derived, replaceable projections.
+**Proof:** Ryan changes a real supported population/assumption, obtains a different traceable Run and
+result, asks Codex or Hermes about it, and sees the prior review no longer treated as approval of the
+new result. A sort-only control leaves institutional truth unchanged.
 
-### 6.12 Domain expansion
+### 6.11 Predictive program — earn one probability before adding complexity
 
-NFL is the next sport after the useful UFC proof. It brings its own permitted evidence, event and market
-interpretation, and appropriate analytical methods through the same Kernel, Dock classes, Canvas grammar,
-and collaboration rules. Later sports or markets require an explicit useful job and evaluation; generic
-names alone do not prove that their market shapes are already supported. Claude Code and later runtimes
-similarly join through the common Participant contract after the first Hermes/Codex product.
+The program begins with a **specific future target**, not a model brand: one exact UFC outcome/prop,
+selection identity, prediction cutoff, settlement rule, and available pre-event features. First build a
+licensed/permitted, reproducible point-in-time corpus with identity resolution, missingness, source
+versions, and training/evaluation separation. If enough usable historical rows do not exist for the
+target, report that limit and choose a defensible narrower target; do not relabel post-event data as
+pre-event evidence or manufacture a probability.
 
-### 6.13 Fundability evidence boundary
+| Step | Runnable result Ryan receives | Evidence required before the next step |
+|---|---|---|
+| **Prediction Bench 1: simple baseline** | One pre-event probability or honest unavailable state, its target/population/time fence, comparison with simpler reference predictions and observed Bovada price | Time-ordered held-out evaluation; calibration and proper scoring; errors and subgroup coverage; exact model/data version. A career rate or market-implied price is a comparator, not hidden ground truth. |
+| **Forward score** | New upcoming cases forecast before the event and later linked to official outcomes and eligible closes | At least a declared prospective cohort with wins, misses, abstentions, missing prices, and model changes visible. No claim of edge from a selected winning example. |
+| **Challenger models** | Conditional, hierarchical, or time-varying forecast shown beside the simple baseline | Improve a declared metric on untouched chronological/forward cases and remain useful under coverage, calibration, and stability checks. Time-series forecasting is a challenger for a defined temporal target, not a default answer. |
+| **Scenario Lab** | An inspectable distribution when Ryan changes a supported condition | Method assumptions, sensitivity, uncertainty, and a measured reference check. Simulation draws do not repair a bad source model. |
 
-Proof A + Proof B produce a **first-class show-ready technical/product demonstration**: coherent, real, attributable, technically defensible, product-legible, honest about what is unproven. They do not prove market demand, investor readiness, profitability, licensing, or release readiness. External demand, data economics, pricing, and investor evidence are later and separate.
+A language model may explain or challenge the forecast; its verbal confidence is not the numeric sports
+model. A trained local language model (for example, via Unsloth) is a different instrument from a
+statistical probability model. The latter earns a prop forecast through data and held-out scoring, not
+because the former was fine-tuned. A new method is promoted only within the job and data range it
+actually passed. An adverse forward result may demote it.
+
+### 6.12 NFL, player props, and combination research
+
+NFL is the next domain consumer of the same institution, because Ryan wants concrete player-prop work,
+not an all-sports label. Start with **one available Bovada player-prop family and its settlement rules**.
+Its market identity, player/team/game identity, quote timing, permitted game/participation data, injury
+or lineup uncertainty, and later official result must be reproducible as of the prediction cutoff.
+Public sources such as nflverse are candidates, subject to timing, coverage, licence, and actual
+pre-game availability. Restricted data such as PFF is not admitted merely because a website or personal
+subscription exists. Apply the same baseline, Critic, forward-score, and abstention rules as UFC.
+
+Then QuantFlow can research the user's example of **up to four legs**, favoring player props when the
+evidence supports them. This is an analysis limit, not a weekly quota or stake rule. A Selection Desk
+first ranks or rejects single legs with uncertainty and current price; a Combination Lab then models
+dependence between those outcomes, tests simulated/joint probabilities against held-out cases, and
+uses **actual current Bovada eligibility and combined terms** where obtainable. It cannot infer an
+offered same-game parlay price by multiplying separate odds. If correlation, eligibility, settlement,
+or quoted terms are unknown, it shows WATCH/PASS or an explicitly limited scenario instead of a
+quantitative edge. It may conclude that no combination is justified that week.
+
+**Proof:** one real NFL prop receives a traceable pre-game forecast and later score; a second case
+abstains for a named data or availability reason; one eligible quoted multi-leg candidate shows the
+joint assumption, sensitivity, and Critic challenge; a correlated but unpriced combination is not
+presented as an actionable offer. Ryan chooses any stake outside QuantFlow.
+
+### 6.13 Richer evidence, specialists, research policies, and compute
+
+These are explicit expansion lanes, not prerequisites for the first baseline or things to install at
+once. Every Dock entry still needs a specific consumer, permissions, source/artefact identity, useful
+Canvas surface, failure/cleanup owner, and independent evaluation.
+
+| Lane | What it could add | Promotion condition |
+|---|---|---|
+| **Film and transcript evidence** | Source-linked clips/transcripts for a disputed technique, pressure, participation, or player-prop feature; later detection/tracking only when reference labels exist | Ryan and a second participant can revisit exact moments; measured extraction error and uncertainty; no detector output treated as truth by default. |
+| **Documents and research library** | Versioned methods, papers, scouting notes, and rights-aware retrieval linked to specific claims | Exact citation/page, source fitness, date, and distinction between context and sporting evidence; external text never changes grants. |
+| **Specialist model** | A tuned assistant for a narrow extraction, procedure, or critique job | Held-out comparison against the untuned assistant and simpler procedure, leakage audit, versioned rollback. Training is not evidence of sports-probability calibration. |
+| **Research policy / RL** | Learn which permitted source, check, or analysis to request next under time/cost constraints; a selection-search policy is possible only after a trustworthy simulator and benchmark exist | Explicit environment/reward, random/scripted/search baselines, held-out replay and forward checks, proxy-gaming/abstention tests, reversible promotion. PufferLib is a candidate implementation, not the product definition. No stake sizing or execution. |
+| **Compute and additional runtimes** | Bounded local or remote analytical jobs and later Claude/future participants | Measured capacity need; declared resource/cost/side-effect limits; receipt/reconciliation on interruption; same role and Task/Artifact semantics for new participants. |
+
+For a later RL research-policy experiment, the environment must expose only information available at
+the decision time: evidence quality/coverage, current Quotes, model uncertainty, and remaining
+research budget. Permitted actions may request another governed source or Run, inspect a challenge,
+rank/reject a candidate, abstain, or stop. Define the reward from proper forecast scores, calibration,
+eligible price comparison, evidence quality, and research cost; test whether it merely exploits a proxy
+or leaked future result. Keep a market-selection policy distinct from a policy that improves participant
+coordination. This is a **research** environment, never a stake allocator or execution simulator that
+silently promotes a policy to real-world authority.
+
+**Recall law:** search may discover candidate prior Missions, Artifacts, Evaluations, Techniques, and
+outcomes. Before recalled material influences a current judgment, exact Kernel queries verify identity,
+lineage, evidence cutoff, method version, review status, and whether it is current or superseded. Search
+indexes are derived projections, not a second truth store. Each later capability must improve a named
+research job against a simpler alternative; novelty alone does not earn a Dock card.
+
+### 6.14 Mature personal-product finish line
+
+QuantFlow is useful to Ryan when the normal Windows app can repeatedly perform this full path:
+
+```
+Ryan's question → Director composes governed Dock work → source-timed evidence and analytical Run
+→ exact participant contributions and independent challenge → reviewed forecast or honest abstention
+→ current Bovada price/eligibility comparison → single or limited combination research
+→ Ryan decides outside the app → later official outcome/close → scored cohort and model revision
+→ clean shutdown and deliberate retrieval of the full history
+```
+
+The product is personal, but the quality bar is high: legible and attractive Canvas/Dock/Inspect,
+responsive interaction, sensible density and accessibility, reproducible calculations, prompt failure
+diagnosis, backup/restore, no hidden duplicate processes, no lost completed work, and measured resource
+use. Soak, repeated open/close, runtime churn, provider failures, corruption/disk-full recovery, Safe
+Mode, and Emergency Stop need bounded real checks where they threaten this path. Reliability work is
+tied to the user journey it protects, not a parallel process program. A new sport, tool, model, or
+participant enters through the same contracts and surface grammar rather than a new application world.
+
+**Completion evidence:** Ryan uses the desk prospectively across enough real cases to see the full
+screened cohort, calibration and error versus simple baselines, closing-price comparisons when eligible,
+abstentions, corrections, and the history behind a specific recommendation. The record may show no
+measured edge; that is a truthful analytical outcome, not a product failure to conceal. QuantFlow remains
+research/advice only, chooses no stake, and never places a bet or trade.
 
 ## 7. Stop conditions
 
-Stop and return to the founder only if: the bounded input door proves UFC cannot supply the required real evidence without a credential, founder-supplied source record, or external access decision; any unit requires a second truth store; any unit passes only with a fixture on the live path; a real safety/authority conflict appears; the same semantic assertion fails twice after repair; or working software exposes a genuinely founder-only product choice. Do not stop for naming, ceremony, optional Technique selection, or implementation choices the architect can make from evidence.
+Stop and return to the founder only if a real data-rights, payment, or external-access decision is
+required; an intended behavior conflicts with the research-only/no-stake boundary; a unit requires a
+second truth store or passes only with a fixture on its live claim; a genuine safety/authority conflict
+appears; the same semantic assertion fails twice after repair; or working software exposes a founder-only
+product choice. When a chosen sports target lacks sufficient permitted point-in-time data, retain the
+failed attempt and propose the narrowest viable target under the same product goal. Do not stop for
+naming, ceremony, optional Technique selection, or routine implementation choices.
 
 ## 8. Open decisions by timing
 
-**Already settled by the founder:** this corrected product model and continuous execution through the three delivery waves; Golden remains closed.
-**The Wave-1 input door decides from evidence:** the exact UFC market subset, trustworthy historical path, and smallest honest calculation described in §6.2. The first sport is no longer an open decision.
-**Confirmed 2026-09-13:** Hermes + Codex define the first collaboration milestone; Claude Code follows.
-**After Proof A:** the exact remaining PB-0 work and Codex adapter plan; communication/steering delivery;
-the analytical surface consumed by that inquiry; untrusted-CLI boundaries; Operator Season criteria.
-**After real history:** §6.11–6.13.
-Architect-settled (not founder questions): document ownership, contract wording, PB-0 placement, surface operating model, participant/capability distinction, compute/model placement, normalization shape, cadence. The Vault founder decision pack is non-authoritative research input; decisions that open or close work land in Git under the normal `NEXT.md`/order protocol.
+**Settled by the founder:** one Canvas, Director-led but direct use allowed, UFC first and NFL next,
+Hermes + Codex before Claude, personal-use sports research, and **analysis of selections/combinations
+without stake recommendations or execution** (2026-09-28). W1-03 and W2-01 are accepted; W2-02 is open.
+**Choose at each analytical order from evidence:** exact target/market family, lawful data source and
+point-in-time availability, baseline, evaluation horizon, missing-data/abstention rule, and the smallest
+working Canvas surface. If a vendor, paid feed, restricted source, or remote compute becomes necessary,
+present its concrete job and cost/rights tradeoff to Ryan before adoption.
+**Do not treat as settled:** a profitable edge, a particular statistical model, a time-series/RL method,
+PFF rights, provider stability, enough UFC/NFL rows for a prop, or an offered combination quote.
+The Vaults supply research leads, not product status or build authority.
 
 ## 9. Development operating model
 
-One vertical operator-visible outcome at a time; adjacent dependency units combined on one causal boundary; one product writer at a time; proof proportional to semantic risk; real path for product claims, deterministic fixtures for regression; independent verification for institutional laws and final candidates; exact evidence reuse when bytes and meaning are unchanged; founder-visible packaged checkpoint within five active working days; two failed attempts on one symptom → classify the layer and stop; no parallel product orders; docs, gates, receipts never count as the capability; no process documentation as deliverable. Roadmap packages are dependency units, not mini-Goldens.
+One vertical operator-visible outcome at a time; adjacent dependencies combined on one causal boundary;
+one product writer at a time; proof proportional to semantic risk; real path for product claims and
+deterministic fixtures for regression; independent verification of institutional laws and final
+candidates; exact evidence reuse when meaning/bytes are unchanged; founder-visible packaged checkpoints;
+two failed attempts on one symptom → classify the layer and stop. No parallel product orders. Documents,
+gates, and receipts never count as the capability. The four-hour unit is an **effort estimate** attached
+to a scoped order, not a completion percentage or countdown for untested future modeling work.
+
+**Keep the repository's truth small.** Change this one approved roadmap when the long-range route or
+accepted status changes; change `NEXT.md` only to open or close the one current implementation order;
+keep its exact acceptance receipt with that order. Update `CONTEXT.md` only when a domain term truly
+changes, and the contracts/surface companion only when their rule changes. Put exploration, vendor
+links, discarded paths, and dated conversations in Obsidian with source/date and uncertainty; promote
+only verified decisions into the relevant living repo document. A new document needs a distinct owner
+and a real reader; otherwise edit the existing one. Preserve old material as history, but never let a
+Vault title such as FINAL or CANONICAL override current repo authority.
 
 ## 10. Authority boundary
 
-**APPROVED — OFFICIAL ROADMAP 2026-09-03**
+**APPROVED route; 2026-09-28 alignment revision.** This roadmap describes the destination and
+dependencies. Only `docs/orders/NEXT.md` authorizes implementation. Planned milestones and named
+candidate tools are not claims of installed or accepted capability.
 
 - Approval: the founder writes `APPROVED — OFFICIAL ROADMAP <date>` under this line, or it stays a candidate.
 - `NEXT.md` opens one concise vertical order at a time, beginning with the real live-market opportunity desk; the bounded input door is Deliverable 0 of that order.

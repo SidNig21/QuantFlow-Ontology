@@ -1,7 +1,7 @@
 # Product Surface and Workflow Architecture
 
 status: APPROVED — product-surface authority companion; not build authority
-revised: 2026-09-13 (founder-requested domain clarification; full product intent and active collaboration)
+revised: 2026-09-28 (accepted W1/W2-01 floor; full analytical and outcome-feedback destination)
 owns: founder operating model · full research experience · Dock grammar · Canvas and tile grammar · participant presentation · PS-0 acceptance
 does not own: build sequence → `OFFICIAL-ROADMAP.md`; institutional seams → `INSTITUTION-CONTRACTS.md`; implementation orders → `docs/orders/NEXT.md`
 
@@ -81,16 +81,18 @@ adding a glossary term does not automatically require a new stored object type.
 
 ## B. Current product gap
 
-The accepted market/evidence foundations and the unaccepted one-Canvas candidate must be distinguished.
+The accepted W1-03 UFC investigation and W2-01 Codex handoff must be distinguished from the unbuilt
+W2-02 collaboration/table and later predictive program.
 The [roadmap](OFFICIAL-ROADMAP.md#1-current-evidence-and-its-limits) owns the dated status and source references.
 Earlier screenshots exposed object-card flooding, alternate worlds, unreadable layouts, and stale
 restoration. Those observations explain the correction; they do not establish the appearance of a later
 package that has not been observed.
 
-The 2026-09-13 source investigation found narrower Director tools than this operating model requires, a
-researcher-to-critic sequence that closes the researcher, and participant rendering that bypasses existing
-steering controls. These are concrete gaps between the intended experience and candidate code. They require
-normal packaged observation and scoped repair, not a claim that writing this document implemented them.
+Those older candidate observations explain repairs made during Wave 1 and Codex admission; they are not a
+current defect list. The [accepted receipts](OFFICIAL-ROADMAP.md#1-current-evidence-and-its-limits)
+and the [open W2-02 order](../orders/active/WO-W2-02-REAL-COLLABORATIVE-INQUIRY.md) now define the
+floor and the next observable gap. No accepted probability model, scored outcome cohort, or defensible
+combination-analysis journey exists yet.
 
 ## C. Surface responsibilities
 
@@ -179,6 +181,25 @@ Hermes, Claude Code, or Codex in an ordinary terminal does not make it a QuantFl
 Not everything in the Dock is an agent. Implementation libraries and model brands stay behind the product
 capability. Inspect may reveal that a Football Quant Lab uses DuckDB or that a participant used a particular
 provider/model; the Dock leads with the job Ryan can employ.
+Catalog entries show their actual readiness and, when unavailable, the missing setup, permission,
+data, or capacity condition. An agent-recruited seat identifies who recruited it, for what work, and
+which governed capability it can use; the Active list focuses a real Canvas surface rather than
+becoming a second history graveyard.
+
+An example future desk makes the roles concrete. **Current** means an accepted bounded path; **candidate**
+means a job to build and prove, not an installed card. Entries appear together only when the inquiry
+needs them. The Director coordinates; the Kernel binds every result to the same investigation.
+
+| Dock entry | Class / state | Contribution to one research workflow |
+|---|---|---|
+| Research Director · Hermes | Participant / current | Understands Ryan's question, recruits authorized help, assigns and reports work. |
+| Market Researcher · Codex or Hermes; independent Critic · Hermes | Participants / current bounded roles | Researcher produces cited work; Critic attacks the exact result. W2-02 must prove their further question, answer, revision, and fresh review. |
+| Bovada Live Markets · UFC Historical Evidence · Research Lab | Data / Data / Tool, current bounded UFC path | Supply actual offered prices, official history, and a transparent descriptive calculation. |
+| Interactive Evidence Table | Tool view / W2-02 open | Lets Ryan and participants refer to the same versioned row; its first filter/sort is a view, not a new probability model. |
+| Outcome Review · Prediction Bench | Tool/Method candidates | Link frozen forecasts to later results and closes; train/compare honest baseline probabilities on point-in-time cases. |
+| Football Evidence · Scenario Lab · Combination Lab | Data/Tool candidates | Support one NFL player prop, vary justified assumptions, and research dependence plus actual quoted multi-leg terms. |
+| Film and Transcript Evidence · Document Research | Data/Tool candidates | Supply inspectable moments and cited passages when a claim needs them; derived measurements retain uncertainty. |
+| Local Specialist · Research Policy · Bounded Compute | Participant or Tool/Method/Compute candidates according to the job | Improve a defined procedure, choose research actions under limits, or run work that exceeds local capacity only after comparison and admission. A trained model does not automatically become a Participant. |
 
 ## E. Canvas and tile grammar
 
@@ -211,6 +232,9 @@ questions and therefore stay in Inspect.
 Raw Task, Run, Artifact, Evaluation, and Report cards are not default families. When one must become a
 working surface for comparison or intervention, it uses a compact purpose-specific summary and disappears
 when Ryan closes it; the durable record remains in the Kernel.
+All produced Artifacts remain discoverable from the selected investigation in Inspect. Ryan or the
+Director promotes only a useful result to a working Canvas surface, with its producer, Task, and review
+standing visible; promotion does not duplicate or move its Kernel truth.
 
 ### Size, layout, and density
 
@@ -220,6 +244,8 @@ when Ryan closes it; the durable record remains in the Kernel.
   Inspect rather than growing across the Canvas.
 - TIDY arranges only currently visible surfaces, preserves readable scale, avoids overlap, and never fits
   hidden or distant historical objects into the camera calculation.
+- Automatic layout respects tiles Ryan deliberately positioned; TIDY may rearrange only by an explicit
+  user action and does not repeatedly fight manual placement.
 - Closing a tile removes it from the current desk without deleting Kernel truth.
 - No hidden tile inventory remains mounted merely because the Kernel contains those objects.
 
@@ -326,6 +352,9 @@ The normal interface must make these operations distinguishable:
 
 The app shows whether direction was recorded, delivered, and acted on. An uncertain delivery or remote
 cancellation stays uncertain. Repeated submission must not silently duplicate consequential work.
+When the Director needs Ryan to choose a target, accept a source limitation, or promote a method, show
+the exact options and consequence on the selected work. Record the resulting direction and downstream
+Task; do not bury a human decision inside a terminal transcript or silently choose for him.
 
 ## G. Founder workflow
 
@@ -382,10 +411,12 @@ owns the observable demonstration.
 
 ### Wave 3 — measured, extensible, learning, first-class product
 
-The same surface records prices, decisions, closes, outcomes, calibration, and method performance without
-becoming an analytics dump. A new sport, participant, or capability enters through the existing grammar.
-Evaluated methods may become Techniques. Installation, onboarding, recovery, performance, accessibility,
-and visual quality support repeated personal use.
+The same surface records prospective prices, decisions, closes, outcomes, rejected candidates,
+abstentions, calibration, and method performance without becoming an analytics dump. The useful path
+progresses from a shared evidence table to new assumption-controlled Runs, a scored single-outcome
+baseline, an NFL player-prop lane, and defensible scenario/combination work. A new sport, participant,
+or capability enters through the existing grammar. Evaluated methods may become Techniques.
+Installation, recovery, performance, accessibility, and visual quality support repeated personal use.
 
 ## I. Expansion law
 
@@ -441,10 +472,11 @@ explanation, but cannot masquerade as information available before it.
 
 ### K2. Manipulate useful analytical surfaces
 
-The first analytical surface should expose a real matchup evidence table and a transparent comparison
+W2-02's first analytical surface should expose a real matchup evidence table and a transparent comparison
 from admitted data. Ryan can filter, sort, inspect coverage, compare fighters or selections, and ask a
 participant about a selected row or result. The participant refers to the same underlying version Ryan
-is seeing. The surface must answer a research question even when no predictive probability is available.
+is seeing. This first surface answers a descriptive question even when no predictive probability is
+available; its view controls do not yet constitute the full scientific assumption editor.
 
 Later surfaces may include charts, distributions, scenario controls, sensitivity views, model
 comparisons, documents, transcripts, and time-linked video. Their interiors suit their job; their common
@@ -454,6 +486,12 @@ Changing presentation alone does not create new research. Changing a filter that
 used in a conclusion, changing a model assumption, or rerunning a calculation does. Such work gets an
 attributable new execution and result. The view must distinguish a local exploratory preview from an
 adopted, reviewed conclusion. Sorting a table cannot silently change which Report is current.
+View-only refresh and pagination need not appear in the participant's tool catalog. A control that can
+alter a decision-bearing result must use the same governed capability boundary as an agent invocation.
+Automation should remove clerical data-moving work while keeping consequential analytical choices
+visible: exclusions, time cutoffs, target definition, missing rows, model changes, and losing cases.
+Ryan should be able to notice leakage or overfitting from the surface rather than trusting a hidden
+backtest that merely prints a favorable score.
 
 ### K3. Calculate, predict, and compare
 
@@ -461,11 +499,13 @@ Descriptive calculations answer what the admitted evidence contains. Predictive 
 specified future outcome. Those are different claims: a market-implied probability, career win fraction,
 or agent confidence cannot silently become a calibrated matchup probability.
 
-Start predictive work with an explicit baseline, a clear target, and a chronological or otherwise
-appropriate held-out evaluation. Record inputs, assumptions, uncertainty, limitations, and comparisons
-against simpler alternatives. A more complex model earns adoption through measured performance and
-usefulness, including failures and abstentions. The Critic can challenge the definition, evidence,
-assumptions, calculation, and conclusion independently.
+Start predictive work with one exact target/selection/settlement rule and a point-in-time feature table.
+Give Ryan a simple baseline before a time-series, hierarchical, or learned challenger. Test on later
+held-out cases, show calibration and proper forecast error, track data gaps and abstentions, and compare
+with simpler alternatives. A more complex model earns adoption only through measured improvement and
+usefulness outside its training cases. The Critic challenges definition, evidence, assumptions,
+calculation, and conclusion independently; later outcomes score the forecast separately. A language
+model that explains the result is not the sports-probability model merely by calling itself a model.
 
 ### K4. Simulate scenarios and research combinations
 
@@ -475,10 +515,13 @@ assumptions varied, the outcomes modeled, and uncertainty. Additional draws cann
 or a wrong model.
 
 Combination research considers multiple selections together, including same-event and cross-event
-parlays. It needs actual market eligibility, observed combined terms where required, dependence between
-outcomes, and a defensible joint model. Multiplying single-selection probabilities is justified only
-when the independence assumption is supported. Unsupported combinations remain unavailable or limited
-research; QuantFlow never fills a bet slip, chooses a stake, or places a wager.
+parlays. The user's example is at most four legs, with a preference for player props; it is a research
+constraint, not a quota to fill. The surface first shows why each leg passed or failed its single-outcome
+check. It then shows actual market eligibility and combined terms where available, outcome dependence,
+joint-model uncertainty, and what would overturn the comparison. Multiplying single-selection
+probabilities is justified only when independence is supported. Unsupported or unquoted combinations
+remain unavailable or limited research; QuantFlow may recommend no candidate. It never fills a bet
+slip, chooses a stake, or places a wager.
 
 These capabilities follow honest single-outcome baselines and suitable conditional or joint modeling.
 The product should make that dependency understandable rather than exposing attractive controls that
@@ -498,19 +541,24 @@ workspace or a new participant for every processing step.
 
 ### K6. Learn from repeated work
 
-Operator Season records what QuantFlow observed and concluded before the event, what Ryan later reports
-choosing, qualifying closing prices when available, official outcomes, and relevant corrections. Missing
-closes carry reasons. Results include coverage, calibration where probabilities exist, CLV under a stated
-definition, and comparison with simpler baselines. A correct refusal proves the refusal behavior; useful
-research still has to be demonstrated.
+Operator Season records **every screened candidate**, not only the interesting winners: what QuantFlow
+observed and concluded before the event, what Ryan optionally reports choosing, qualifying closing
+prices when available, official outcomes, corrections, failures, and abstentions. Each later fact links
+to the frozen earlier claim without rewriting it. Missing closes carry reasons. Results include coverage,
+calibration where probabilities exist, CLV under a stated definition, forecast error, attempted-selection
+count, and comparison with simpler baselines. An independent Critic can verify reasoning and evidence;
+only a later cohort can assess predictive usefulness. A correct refusal proves the refusal behavior;
+useful research still has to be demonstrated.
 
 Improvement has distinct forms. Recall reuses existing knowledge. Method promotion retains a procedure
 supported by repeated evaluation. Specialist-model training changes a model for a defined job.
 Reinforcement learning changes a research policy using an explicit reward and evaluation environment.
 These must not be described as interchangeable or as automatic self-improvement.
 
-Research policies may learn which evidence to acquire or which analysis to run under a budget. Market
-prediction quality and coordination efficiency have different objectives and must be measured separately.
+Research policies may learn which evidence to acquire or which analysis to run under a budget. A later
+selection-search policy can rank or reject candidate legs only after a credible environment and simple
+search baseline exist; it never determines stakes. Market prediction quality and coordination efficiency
+have different objectives and must be measured separately.
 Training cannot approve its own evaluation, consume future outcomes as past knowledge, or grant new
 permissions. Revisions remain attributable and reversible. Promotion of owned models or policies needs
 the applicable independent evaluation and operator authority before wider use.
@@ -522,11 +570,22 @@ questions, dependencies, and enough context for another participant to continue.
 provider capacity, cost, memory, CPU/GPU availability, and concurrency. Waiting for capacity is a visible
 state; opening more tiles does not create more capacity.
 
+The selected participant shows the actual waiting layer in founder language: starting its runtime,
+connecting required tools, awaiting evidence, awaiting a person, running a calculation, publishing an
+Artifact, or failed. Inspect can expose runtime/model/adapter provenance, attempt timing, and a bounded
+timeline when diagnosing a delay; the Canvas need not stream every internal event. The Director
+coordinates questions so several high-attention participants do not interrogate Ryan at once. Routine
+independent collection can run concurrently within resource limits; consequential specification,
+clarification, and final judgment preserve Ryan's attention.
+
 The Director can report progress without copying every internal event. Retry, interruption, cancellation,
 and replacement preserve what actually happened. A remote job may remain submitted, running, completed,
 or of unknown status after local shutdown; the app must not report cancellation without acknowledgment.
 Local owned processes still end when QuantFlow closes. No background local research is implied by closing
 the app, and a remotely completed result is reconciled before it becomes current work.
+Multiple seats must queue or yield under real provider and machine limits rather than freezing the
+Canvas, losing tool results, or crossing session boundaries. Resource, duration, and credible cost
+estimates are visible at the relevant work; more open tiles are not proof of more simultaneous capacity.
 
 ### K8. Continue, recover, and expand
 
