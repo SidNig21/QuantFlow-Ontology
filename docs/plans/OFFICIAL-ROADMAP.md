@@ -1,17 +1,65 @@
-# OFFICIAL-ROADMAP.md — from Golden to a useful live-market research desk, real collaboration, and repeated founder use
+# QuantFlow — the product and the build route
 
-status: APPROVED — OFFICIAL PRODUCT PROGRAM; not build authority
-revised: 2026-09-28 (accepted W1/W2-01 checkpoint; full personal sports-research destination and analytical route)
-source checkpoint: accepted `main` @ `6f6cda0921b2d0510a65c9b26118d76e44d45e30`; W2-02 is the one open order; later analytical capability is planned, not accepted
-build authority: `docs/orders/NEXT.md` only (DOCTRINE A9). This file names the route; `NEXT.md` opens each door.
-owns: current evidence · whole-product destination · ordered dependencies · Proof A / Proof B · analytical and learning program · operator outcomes · stop conditions
-does not own: contract clauses → [Institution Contracts](INSTITUTION-CONTRACTS.md); surface grammar → [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md); demo scripts → [Demo Spec](DEMO-SPEC.md); candidate equipment → [Capability Registry](../proposals/CAPABILITY-REGISTRY.md)
-supersedes on approval: the R18–R25 route in `docs/history/plans/INSTITUTIONAL-BUILD-PLAN.md`, the rung sequence after R17 in `docs/history/orders/GOLDEN-RUN.md`, and DOCTRINE Part V — all preserved as history of the pre-Golden plan
-founder context: 2026-09-13 Founder Review and Fresh-Thread Handoff; later direct clarification of personal sports analytics, full-product roadmap, and 2026-09-28 no-stake decision. Vault material supplies research, not build authority.
+status: APPROVED PRODUCT DIRECTION; this roadmap does not authorize implementation
+build authority: [`docs/orders/NEXT.md`](../orders/NEXT.md) alone opens one order at a time
 
-> **This file authorizes nothing.** Post-Golden Authority Normalization is accepted history. `NEXT.md` opens exactly one vertical delivery order. The first order begins with a bounded live-input decision door and continues directly into working product when a viable path is proved; it is not another planning rung.
+## QuantFlow in one page
+
+QuantFlow is **Ryan's personal research institution for sports decisions**. Ryan can ask a sports
+question or choose a current prop. The finished product turns that starting point into work he can
+see, challenge, and revisit: what was asked, what the sources showed at the time, what was calculated,
+who made each claim, what a Critic found, what changed after criticism, and why the current answer is
+what it is. UFC and NFL are proving grounds for this institution, not its identity.
+
+Four pillars make that one product:
+
+- **Director** is Ryan's primary research colleague. It understands the question, brings in the
+  right people and equipment, directs their work, and explains the result and unresolved issues.
+- **Dock** is the governed supply of participants, data, tools, methods, and compute. A participant
+  joins as a working colleague; data and equipment open useful surfaces or capabilities. Nothing
+  runs merely because it appears in the catalog.
+- **Canvas** is the one visible desk. Ryan sees and steers the participants, evidence, calculations,
+  objections, revisions, and useful results together. Inspect shows detail and prior work without
+  moving him into another workspace.
+- **Kernel / Ontology** is the durable shared record. It connects the exact question, assignments,
+  source times, evidence, calculations, versions, criticism, decisions, and later outcomes. Agents
+  may keep private conversations, but a terminal transcript or a Canvas tile is never the record
+  everyone else must trust.
+
+For a real prop, QuantFlow first says whether the research claim is supported, challenged, or
+inconclusive. If Bovada offers the exact selection at a current price, it separately says
+**CANDIDATE, WATCH, or PASS** and shows the reason. WATCH, PASS, or no candidate can be the useful
+answer. Later, the official result is attached to the frozen earlier work. QuantFlow can then count
+what it considered, including rejected ideas and missing evidence, and measure which methods actually
+held up. That learning loop is part of the destination; it is not a claim that today's app already
+predicts accurately or has a betting edge.
+
+QuantFlow is an **advisor**. It does not choose a stake, place a bet or trade, promise profit, or
+turn several confident agents into evidence. Ryan makes every real-world decision.
+
+## The path from here
+
+1. **Where we are:** The packaged app has an accepted live UFC research-and-review path and an
+   accepted Director-to-Codex handoff. Sustained cross-runtime dialogue, a challenged revision,
+   Ryan's shared interactive evidence table, general participant replacement, and predictive
+   accuracy are not yet accepted.
+2. **The only open order is W2-02:** In one normal Director-led UFC inquiry, Codex researches,
+   an independent Hermes Critic challenges the exact result, Director and Codex exchange a material
+   evidence question and answer, Codex revises, and a fresh Critic reviews that version. Ryan uses
+   the same evidence table, and the Kernel retains the whole exchange.
+3. **What earns the next door:** That full journey must work in the packaged Windows app, preserve
+   each exact version and relationship, stop its owned processes on close, pass the order's focused
+   checks, and receive independent acceptance. If it fails, W2-02 stays open. Only after acceptance
+   may `NEXT.md` open the planned participant conformance, replacement, and failure-recovery work.
+4. **Destination after that:** A reliable personal desk can later gain prospective outcome review,
+   scientific analysis controls, tested prediction, NFL props, combination research, and a richer
+   Dock. These are future capabilities, not parallel orders or this week's build. Each enters only
+   when `NEXT.md` opens a concrete, usable slice.
 
 ---
+
+The rest of this file preserves the evidence and detailed route for builders. It does not add an
+open order or turn a planned capability into an accepted one.
 
 ## 1. Current evidence and its limits
 
@@ -110,6 +158,9 @@ Added by this program:
     A genuinely new top-level class requires a demonstrated job and deliberate decision.
 
 ## 6. Critical path
+
+This is the detailed dependency reference. The founder-facing route is [The path from here](#the-path-from-here)
+above. Only W2-02 is open; the later stages do not authorize simultaneous work.
 
 ```
 GOLDEN + POST-GOLDEN FOUNDATION — COMPLETE (closed, untouched)
@@ -267,6 +318,10 @@ product in §6.9–6.14 is the destination, not a claim that the first desk alre
 percentage or date estimate of overall completion is implied by this sequence.
 
 ### 6.9 Operator Season — close the claim-to-result loop
+
+> **Destination, not current scope.** Sections 6.9–6.14 describe capabilities to earn through
+> later orders. They are not part of W2-02, and their descriptions are not claims that the app
+> already performs them.
 
 This is a product capability, not a ceremony or a count of successful screenshots. Preserve the frozen
 pre-event inquiry, any offered selection/market terms, evidence cutoff, model version and probability **if one
@@ -454,10 +509,15 @@ Vault title such as FINAL or CANONICAL override current repo authority.
 
 ## 10. Authority boundary
 
-**APPROVED route; 2026-09-28 alignment revision.** This roadmap describes the destination and
-dependencies. Only `docs/orders/NEXT.md` authorizes implementation. Planned milestones and named
-candidate tools are not claims of installed or accepted capability.
+**Approved route; accepted product-code checkpoint `6f6cda0921b2d0510a65c9b26118d76e44d45e30`.**
+This roadmap owns the destination, dependency order, and dated evidence limits. Only
+[`NEXT.md`](../orders/NEXT.md) authorizes implementation. The [Institution Contracts](INSTITUTION-CONTRACTS.md)
+own seam rules; [Product Surface and Workflow Architecture](PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md)
+owns workspace behavior; [Demo Spec](DEMO-SPEC.md) owns proof journeys; and the
+[Capability Registry](../proposals/CAPABILITY-REGISTRY.md) records candidate equipment.
 
-- Approval: the founder writes `APPROVED — OFFICIAL ROADMAP <date>` under this line, or it stays a candidate.
-- `NEXT.md` opens one concise vertical order at a time, beginning with the real live-market opportunity desk; the bounded input door is Deliverable 0 of that order.
-- Historical routes are preserved and not edited into agreement; they are history the moment this file is approved.
+The older R18–R25 route in `docs/history/plans/INSTITUTIONAL-BUILD-PLAN.md`, the post-R17 sequence
+in `docs/history/orders/GOLDEN-RUN.md`, and DOCTRINE Part V are superseded history. Founder Vault
+notes supplied research and later clarifications, including the 2026-09-28 no-stake decision; they
+are not build authority. Planned milestones and named tools are not claims of installed or accepted
+capability.
