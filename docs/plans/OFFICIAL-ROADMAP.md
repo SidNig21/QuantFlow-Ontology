@@ -15,10 +15,10 @@ founder context: 2026-09-13 Founder Review and Fresh-Thread Handoff; later direc
 
 ## 1. Current evidence and its limits
 
-This is a dated evidence checkpoint, not a live dashboard. The accepted W2-01 product code is on local
-`main` at `6f6cda0921b2d0510a65c9b26118d76e44d45e30`. The roadmap alignment is documentation
-work on the `codex/wo-w2-02-collaborative-inquiry` branch. `NEXT.md` names W2-02 as the only open
-product order; this document changes neither its implementation nor its acceptance state.
+This is a dated evidence checkpoint, not a live dashboard. W2-01 is the last accepted product-code
+checkpoint at `6f6cda0921b2d0510a65c9b26118d76e44d45e30`. This roadmap alignment changes
+documentation only. `NEXT.md` names W2-02 as the only open product order; this document changes
+neither its implementation nor its acceptance state.
 
 **Accepted** means a recorded decision about the exact tested version. **Candidate implementation** means
 code exists but the required product behavior is not accepted. **Planned** means intended capability.
