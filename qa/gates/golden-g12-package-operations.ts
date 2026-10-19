@@ -14,6 +14,7 @@ type Step = {
 export const G12_OPERATION_STEP_IDS = [
   "package-runtime-staging",
   "bovada-windows-durability",
+  "nfl-evidence",
   "sidecar-node-lifecycle",
   "installed-readiness-shutdown",
   "unpacked-readiness-shutdown",
@@ -30,6 +31,11 @@ const STEPS: readonly Step[] = [
     id: "bovada-windows-durability",
     cwd: REPO_ROOT,
     command: ["bun", "test", "tools/qf-bovada-football/src"],
+  },
+  {
+    id: "nfl-evidence",
+    cwd: REPO_ROOT,
+    command: ["bun", "test", "tools/qf-nfl-evidence/src"],
   },
   {
     id: "sidecar-node-lifecycle",

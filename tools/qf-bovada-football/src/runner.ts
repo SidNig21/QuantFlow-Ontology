@@ -121,6 +121,12 @@ export type BovadaFootballCaptureOptions = {
   signal?: AbortSignal;
   /** Electron injects the sole already-open Kernel write/read boundary. */
   kernel: BovadaKernelAccess;
+  /**
+   * Clock for the future-open check. Live capture leaves this unset and uses
+   * the published artifact time. Fixture proofs set it so an aged sample does
+   * not start failing once the wall clock passes the sample kickoffs.
+   */
+  now?: () => Date;
 };
 
 function stableJson(value: unknown): string {
@@ -563,7 +569,7 @@ export async function runBovadaFootballCapture(
     throw error;
   }
   const artifact = artifactState(published, artifactId, finalPath);
-  const observedAt = artifact.created_at;
+  const observedAt = options.now ? options.now().toISOString() : artifact.created_at;
   const selected = parseBovadaFootballResponse(bytes, observedAt);
   const traceId = TRACE_PREFIX + artifact.id;
   const venueOutcome = classifyVenue(options, access, artifact.id, observedAt, traceId);

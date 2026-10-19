@@ -44,6 +44,7 @@ import {
   buildWindowsPackage,
   collectOwnedPids,
   isolatedEnvironment,
+  pinIsolatedAppPaths,
   ownedProcessRows,
   processSnapshot,
   rpcCall,
@@ -145,6 +146,7 @@ async function canaryProof(): Promise<void> {
       artifactRoot,
       transport: fixedTransport,
       kernel: { execute, getObject, getLinks },
+      now: () => new Date("2026-08-01T12:00:00.000Z"),
     });
     assertCanariesAbsent(capturedRequest, "fixed request");
     const stored = JSON.stringify({
@@ -393,7 +395,7 @@ export async function runP14ALiveMeasurement(): Promise<{ ok: boolean }> {
     const cliSha = createHash("sha256").update(readFileSync(cliPath)).digest("hex");
     const env = isolatedEnvironment(root, kernelDb, artifactRoot);
     delete env.QF_DOCK_QA_MODE;
-    const endpointFile = join(env.USERPROFILE!, ".quantflow", "app", "socket-path");
+    const endpointFile = pinIsolatedAppPaths(env);
     const beforeProcesses = await processSnapshot();
     child = spawn(executable, ["--disable-gpu"], { cwd: packageRoot, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
     const appOutput: string[] = [];

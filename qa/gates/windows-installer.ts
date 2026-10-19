@@ -17,6 +17,7 @@ import { basename, join, resolve } from "node:path";
 import {
   collectOwnedPids,
   isolatedEnvironment,
+  pinIsolatedAppPaths,
   processSnapshot,
   rpcCall,
   terminateOwnedProcessTree,
@@ -157,7 +158,7 @@ async function launchInstalledArtifact(
   mkdirSync(artifactRoot, { recursive: true });
   const env = isolatedEnvironment(tempRoot, kernelDb, artifactRoot);
   delete env.QF_DOCK_QA_MODE;
-  const endpointFile = join(env.USERPROFILE!, ".quantflow", "app", "socket-path");
+  const endpointFile = pinIsolatedAppPaths(env);
   const before = await processSnapshot();
   const child = spawn(executable, ["--disable-gpu"], {
     cwd: installRoot,

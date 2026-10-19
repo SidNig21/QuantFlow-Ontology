@@ -15,6 +15,7 @@ import { join } from "node:path";
 import {
   buildWindowsPackage,
   isolatedEnvironment,
+  pinIsolatedAppPaths,
   processSnapshot,
   rpcCall,
   SHUTDOWN_TIMEOUT_MS,
@@ -71,7 +72,7 @@ async function launch(
   const env = isolatedEnvironment(runRoot, kernelDb, artifactRoot);
   env.QF_DOCK_QA_MODE = "1";
   env.QF_PEER_BUS_DB = busDb;
-  const endpointFile = join(env.USERPROFILE!, ".quantflow", "app", "socket-path");
+  const endpointFile = pinIsolatedAppPaths(env);
   const child = spawn(join(packageRoot, "QuantFlow.exe"), ["--disable-gpu"], {
     cwd: packageRoot,
     env,

@@ -163,6 +163,23 @@ export function isolatedEnvironment(root: string, kernelDb: string, artifactRoot
   return env;
 }
 
+/**
+ * Point a packaged launch at the temp profile the gate already watches.
+ * Both paths are set together so the app skips the legacy profile migration
+ * and writes socket-path under that root. This stays out of isolatedEnvironment
+ * because some gates set only one path after that helper returns.
+ */
+export function pinIsolatedAppPaths(env: NodeJS.ProcessEnv): string {
+  const home = env.USERPROFILE;
+  if (!home) throw new Error("isolated environment is missing USERPROFILE");
+  const appRoot = join(home, ".quantflow", "app");
+  const appDir = join(appRoot, "profile");
+  mkdirSync(appDir, { recursive: true });
+  env.QF_APP_ROOT = appRoot;
+  env.QF_APP_DIR = appDir;
+  return join(appRoot, "socket-path");
+}
+
 export function snapshotTree(root: string): TreeSnapshot {
   if (!existsSync(root)) {
     return { state: "absent", entries: 0, digest: "absent" };
@@ -456,7 +473,9 @@ export async function waitForReady(
   let lastError = "socket-path not written";
   while (Date.now() < deadline) {
     if (child.exitCode !== null) {
-      throw new Error(`application exited before readiness: ${lastError}`);
+      throw new Error(
+        `application exited before readiness: ${lastError}; exit=${child.exitCode}`,
+      );
     }
     if (existsSync(endpointFile)) {
       const endpoint = Bun.file(endpointFile).text().then((value) => value.trim());
@@ -709,7 +728,7 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
   const childEnv = isolatedEnvironment(tempRoot, kernelDb, artifactRoot);
   delete childEnv.QF_DOCK_QA_MODE;
   childEnv.QF_UI_PROOF = "1";
-  const endpointFile = join(childEnv.USERPROFILE!, ".quantflow", "app", "socket-path");
+  const endpointFile = pinIsolatedAppPaths(childEnv);
   const defaultStateRoot = join(homedir(), ".quantflow");
   const defaultBefore = snapshotTree(defaultStateRoot);
   const beforeProcesses = await processSnapshot();

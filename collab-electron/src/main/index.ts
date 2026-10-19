@@ -259,7 +259,12 @@ const ownsProfileInstance = acquireProfileInstance(app, {
   },
 });
 if (ownsProfileInstance) initializeLogger();
-else app.exit(0);
+else {
+  process.stderr.write(
+    "QuantFlow did not acquire the profile lock, so it is exiting before startup.\n",
+  );
+  app.exit(0);
+}
 
 // macOS apps launched from Finder don't inherit the user's shell
 // LANG, so child processes (tmux, shells) default to ASCII.
@@ -1971,6 +1976,8 @@ app.whenReady().then(async () => {
   }
   startupComplete = true;
 }).catch(async (error) => {
+  const detail = error instanceof Error ? error.stack ?? error.message : String(error);
+  process.stderr.write(`QuantFlow startup failed: ${detail}\n`);
   console.error("QuantFlow startup failed:", error);
   await shutdownBackgroundServices().catch(() => {});
   app.exit(1);
