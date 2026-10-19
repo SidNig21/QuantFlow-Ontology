@@ -17,6 +17,7 @@ import {
   BovadaTimeoutError,
   KernelClassificationError,
   BovadaSchemaError,
+  BovadaSelectionError,
   runBovadaFootballCapture,
   type BovadaFootballCaptureOptions,
   type BovadaKernelAccess,
@@ -26,6 +27,8 @@ import {
 const fixture = new Uint8Array(
   readFileSync(join(import.meta.dir, "fixtures", "nfl-snapshot.json")),
 );
+/** Same instant the parser tests use, which is before every fixture kickoff. */
+const FIXTURE_OBSERVED_AT = "2026-08-01T12:00:00.000Z";
 const roots: string[] = [];
 const databases: KernelDb[] = [];
 
@@ -105,6 +108,7 @@ function options(
       getLinks,
       ...kernel,
     },
+    now: () => new Date(FIXTURE_OBSERVED_AT),
   };
 }
 
@@ -123,6 +127,25 @@ function failingKernel(command: string, after = false): Partial<BovadaKernelAcce
 }
 
 describe("Bovada source-first Kernel runner", () => {
+  test("still rejects the fixture when every kickoff is already in the past", async () => {
+    const { db, root } = setup();
+    await expect(
+      runBovadaFootballCapture({
+        ...options(db, root, fixture),
+        now: () => new Date("2027-01-01T00:00:00.000Z"),
+      }),
+    ).rejects.toBeInstanceOf(BovadaSelectionError);
+    expect(counts(db)).toEqual({
+      artifact: 1,
+      venue: 0,
+      market_event: 0,
+      instrument: 0,
+      quote: 0,
+      links: 0,
+      events: 1,
+    });
+  });
+
   test("first capture publishes exact bytes and creates one complete graph", async () => {
     const { db, root } = setup();
     const receipt = await runBovadaFootballCapture(options(db, root, fixture));

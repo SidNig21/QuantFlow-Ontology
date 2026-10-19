@@ -15,6 +15,8 @@ import { join } from "node:path";
 import {
   buildWindowsPackage,
   isolatedEnvironment,
+  packagedLaunchDiagnostics,
+  pinIsolatedAppPaths,
   processSnapshot,
   rpcCall,
   SHUTDOWN_TIMEOUT_MS,
@@ -71,7 +73,7 @@ async function launch(
   const env = isolatedEnvironment(runRoot, kernelDb, artifactRoot);
   env.QF_DOCK_QA_MODE = "1";
   env.QF_PEER_BUS_DB = busDb;
-  const endpointFile = join(env.USERPROFILE!, ".quantflow", "app", "socket-path");
+  const endpointFile = pinIsolatedAppPaths(env);
   const child = spawn(join(packageRoot, "QuantFlow.exe"), ["--disable-gpu"], {
     cwd: packageRoot,
     env,
@@ -82,8 +84,13 @@ async function launch(
   child.stdout?.on("data", (chunk: Buffer) => { output += chunk.toString("utf8"); });
   child.stderr?.on("data", (chunk: Buffer) => { output += chunk.toString("utf8"); });
   assert(child.pid !== undefined, "packaged QuantFlow did not provide a PID");
-  const ready = await waitForReady(child, endpointFile);
-  return { child, endpoint: ready.endpoint, packageRoot, output: () => output };
+  try {
+    const ready = await waitForReady(child, endpointFile);
+    return { child, endpoint: ready.endpoint, packageRoot, output: () => output };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${message}\n${packagedLaunchDiagnostics(env)}\n${output.slice(-4_000)}`);
+  }
 }
 
 async function shutdown(run: Launch): Promise<void> {
@@ -186,7 +193,7 @@ export async function runWindowsGoldenRunGate(): Promise<{ ok: boolean }> {
   let first: Launch | null = null;
   let second: Launch | null = null;
   try {
-    const packageRoot = reusedPackageRoot ?? await buildWindowsPackage(packageTemp!);
+    const packageRoot = reusedPackageRoot ?? await buildWindowsPackage(packageTemp!, { qaMode: true });
     assert(existsSync(join(packageRoot, "QuantFlow.exe")), "Windows package root has no QuantFlow.exe");
     const storeRoot = join(runTemp, "stores");
     const kernelDb = join(storeRoot, "kernel.db");

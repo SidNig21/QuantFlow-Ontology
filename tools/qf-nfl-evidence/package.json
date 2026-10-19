@@ -1,0 +1,10 @@
+{
+  "name": "qf-nfl-evidence",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "bun test src",
+    "sample": "bun src/print-sample.ts"
+  }
+}

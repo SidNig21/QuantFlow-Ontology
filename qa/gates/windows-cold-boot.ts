@@ -22,6 +22,7 @@ import { createConnection } from "node:net";
 import {
   prepareRuntimeStaging,
   PRODUCTION_RUNTIME_FILES,
+  QA_RUNTIME_FILES,
 } from "../../collab-electron/scripts/package-lib/runtime-staging.ts";
 import { discoverDockProfileManifests } from
   "../../collab-electron/src/main/dock-profiles.ts";
@@ -161,6 +162,44 @@ export function isolatedEnvironment(root: string, kernelDb: string, artifactRoot
   };
   delete env.ELECTRON_RUN_AS_NODE;
   return env;
+}
+
+/**
+ * Point a packaged launch at the temp profile the gate already watches.
+ * Both paths are set together so the app skips the legacy profile migration
+ * and writes socket-path under that root. This stays out of isolatedEnvironment
+ * because some gates set only one path after that helper returns.
+ */
+export function pinIsolatedAppPaths(env: NodeJS.ProcessEnv): string {
+  const home = env.USERPROFILE;
+  if (!home) throw new Error("isolated environment is missing USERPROFILE");
+  const appRoot = join(home, ".quantflow", "app");
+  const appDir = join(appRoot, "profile");
+  mkdirSync(appDir, { recursive: true });
+  env.QF_APP_ROOT = appRoot;
+  env.QF_APP_DIR = appDir;
+  env.QF_STARTUP_ERROR_FILE = join(home, "startup-error.txt");
+  return join(appRoot, "socket-path");
+}
+
+/** Text the packaged app wrote when it died before the readiness file. */
+export function packagedLaunchDiagnostics(env: NodeJS.ProcessEnv): string {
+  const chunks: string[] = [];
+  const startup = env.QF_STARTUP_ERROR_FILE;
+  if (startup && existsSync(startup)) {
+    chunks.push(`startup-error:\n${readFileSync(startup, "utf8")}`);
+  } else {
+    chunks.push("startup-error: not written");
+  }
+  const logs = env.QF_APP_DIR ? join(env.QF_APP_DIR, "logs") : "";
+  if (logs && existsSync(logs)) {
+    for (const name of readdirSync(logs)) {
+      chunks.push(`log ${name}:\n${readFileSync(join(logs, name), "utf8").slice(-4_000)}`);
+    }
+  } else if (logs) {
+    chunks.push(`no logs at ${logs}`);
+  }
+  return chunks.join("\n");
 }
 
 export function snapshotTree(root: string): TreeSnapshot {
@@ -456,7 +495,9 @@ export async function waitForReady(
   let lastError = "socket-path not written";
   while (Date.now() < deadline) {
     if (child.exitCode !== null) {
-      throw new Error(`application exited before readiness: ${lastError}`);
+      throw new Error(
+        `application exited before readiness: ${lastError}; exit=${child.exitCode}`,
+      );
     }
     if (existsSync(endpointFile)) {
       const endpoint = Bun.file(endpointFile).text().then((value) => value.trim());
@@ -622,7 +663,11 @@ function assertShutdownReceipt(value: unknown): void {
   );
 }
 
-export async function buildWindowsPackage(tempRoot: string): Promise<string> {
+export async function buildWindowsPackage(
+  tempRoot: string,
+  options: { qaMode?: boolean } = {},
+): Promise<string> {
+  const qaMode = options.qaMode === true;
   const outputRoot = join(tempRoot, "dist");
   const buildEnv: NodeJS.ProcessEnv = {
     ...process.env,
@@ -630,11 +675,11 @@ export async function buildWindowsPackage(tempRoot: string): Promise<string> {
       ? process.env.NODE_OPTIONS
       : `${process.env.NODE_OPTIONS ?? ""} --max-old-space-size=8192`.trim(),
   };
-  console.log("windows-cold-boot: preparing runtime staging");
+  console.log(`windows-cold-boot: preparing runtime staging qaMode=${qaMode}`);
   prepareRuntimeStaging({
     stagingRoot: join(COLLAB_ROOT, ".package-staging"),
     repoRoot: REPO_ROOT,
-  });
+  }, { qaMode });
 
   const electronVite = packageBin("electron-vite", "electron-vite");
   const electronBuilder = packageBin("electron-builder", "electron-builder");
@@ -675,14 +720,17 @@ export async function buildWindowsPackage(tempRoot: string): Promise<string> {
   assert(existsSync(executable), `unpacked Windows executable missing: ${executable}`);
   const resourcesRoot = join(packageRoot, "resources");
   assert(existsSync(join(resourcesRoot, "app.asar")), "unpacked Windows app.asar missing");
-  for (const relativePath of PRODUCTION_RUNTIME_FILES) {
+  const runtimeFiles = qaMode ? QA_RUNTIME_FILES : PRODUCTION_RUNTIME_FILES;
+  for (const relativePath of runtimeFiles) {
     const path = join(resourcesRoot, relativePath);
     assert(existsSync(path) && statSync(path).size > 0, `Windows runtime resource missing or empty: ${relativePath}`);
   }
+  const discovery = { qaMode };
   const expectedManifests = discoverDockProfileManifests(
     join(COLLAB_ROOT, ".package-staging"),
+    discovery,
   );
-  const packagedManifests = discoverDockProfileManifests(resourcesRoot);
+  const packagedManifests = discoverDockProfileManifests(resourcesRoot, discovery);
   const expectedClosure = expectedManifests.map((manifest) => ({
     ref: manifest.manifestRef,
     adapterId: manifest.adapterId,
@@ -709,7 +757,7 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
   const childEnv = isolatedEnvironment(tempRoot, kernelDb, artifactRoot);
   delete childEnv.QF_DOCK_QA_MODE;
   childEnv.QF_UI_PROOF = "1";
-  const endpointFile = join(childEnv.USERPROFILE!, ".quantflow", "app", "socket-path");
+  const endpointFile = pinIsolatedAppPaths(childEnv);
   const defaultStateRoot = join(homedir(), ".quantflow");
   const defaultBefore = snapshotTree(defaultStateRoot);
   const beforeProcesses = await processSnapshot();
@@ -918,7 +966,7 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
     }
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(
-      `${message}\npackaged app log: ${join(tempRoot, "packaged-app.log")}\nshutdown requested: ${cleanShutdownRequested}`,
+      `${message}\n${packagedLaunchDiagnostics(childEnv)}\npackaged app log: ${join(tempRoot, "packaged-app.log")}\nshutdown requested: ${cleanShutdownRequested}`,
     );
   }
 }

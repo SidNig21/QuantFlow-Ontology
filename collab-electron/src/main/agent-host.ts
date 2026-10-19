@@ -355,6 +355,9 @@ export function getDockDefinitionAvailability(
     getDefaultWslDistro,
     resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
     guestCommand: runtime.metadata.command ?? adapterId,
+    // QF_HERMES_SYNTHETIC_TEST replaces the provider process. The distro
+    // check stays; a missing hermes binary must not hide the critic.
+    requireGuestCommand: process.env.QF_HERMES_SYNTHETIC_TEST !== "1",
   });
   if (diagnostic) return { available: false, adapterId, message: diagnostic.message };
 

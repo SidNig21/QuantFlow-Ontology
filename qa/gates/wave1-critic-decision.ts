@@ -97,6 +97,14 @@ function query(path: string, sql: string, ...args: string[]): Row[] {
     return db.query(sql).all(...args) as Row[];
   } finally { db.close(true); }
 }
+/** Read one task from a disposable saved snapshot. The copy is opened read-only. */
+export function readSavedSnapshotTask(path: string, taskId: string): { id: string; status: string } | null {
+  const rows = query(path, "SELECT id, status FROM task WHERE id=?", taskId);
+  const row = rows[0];
+  if (!row || typeof row.id !== "string" || typeof row.status !== "string") return null;
+  return { id: row.id, status: row.status };
+}
+
 /** Copy a consistent SQLite image, including committed WAL data, without opening the source for writes. */
 export function snapshotSavedKernel(source: string, destination: string): string {
   assert(resolve(source).toLowerCase() !== resolve(destination).toLowerCase() && !existsSync(destination), "saved snapshot must use a new isolated destination");
