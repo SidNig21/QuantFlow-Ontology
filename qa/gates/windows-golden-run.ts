@@ -193,7 +193,7 @@ export async function runWindowsGoldenRunGate(): Promise<{ ok: boolean }> {
   let first: Launch | null = null;
   let second: Launch | null = null;
   try {
-    const packageRoot = reusedPackageRoot ?? await buildWindowsPackage(packageTemp!);
+    const packageRoot = reusedPackageRoot ?? await buildWindowsPackage(packageTemp!, { qaMode: true });
     assert(existsSync(join(packageRoot, "QuantFlow.exe")), "Windows package root has no QuantFlow.exe");
     const storeRoot = join(runTemp, "stores");
     const kernelDb = join(storeRoot, "kernel.db");

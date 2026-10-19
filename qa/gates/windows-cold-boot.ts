@@ -22,6 +22,7 @@ import { createConnection } from "node:net";
 import {
   prepareRuntimeStaging,
   PRODUCTION_RUNTIME_FILES,
+  QA_RUNTIME_FILES,
 } from "../../collab-electron/scripts/package-lib/runtime-staging.ts";
 import { discoverDockProfileManifests } from
   "../../collab-electron/src/main/dock-profiles.ts";
@@ -662,7 +663,11 @@ function assertShutdownReceipt(value: unknown): void {
   );
 }
 
-export async function buildWindowsPackage(tempRoot: string): Promise<string> {
+export async function buildWindowsPackage(
+  tempRoot: string,
+  options: { qaMode?: boolean } = {},
+): Promise<string> {
+  const qaMode = options.qaMode === true;
   const outputRoot = join(tempRoot, "dist");
   const buildEnv: NodeJS.ProcessEnv = {
     ...process.env,
@@ -670,11 +675,11 @@ export async function buildWindowsPackage(tempRoot: string): Promise<string> {
       ? process.env.NODE_OPTIONS
       : `${process.env.NODE_OPTIONS ?? ""} --max-old-space-size=8192`.trim(),
   };
-  console.log("windows-cold-boot: preparing runtime staging");
+  console.log(`windows-cold-boot: preparing runtime staging qaMode=${qaMode}`);
   prepareRuntimeStaging({
     stagingRoot: join(COLLAB_ROOT, ".package-staging"),
     repoRoot: REPO_ROOT,
-  });
+  }, { qaMode });
 
   const electronVite = packageBin("electron-vite", "electron-vite");
   const electronBuilder = packageBin("electron-builder", "electron-builder");
@@ -715,14 +720,17 @@ export async function buildWindowsPackage(tempRoot: string): Promise<string> {
   assert(existsSync(executable), `unpacked Windows executable missing: ${executable}`);
   const resourcesRoot = join(packageRoot, "resources");
   assert(existsSync(join(resourcesRoot, "app.asar")), "unpacked Windows app.asar missing");
-  for (const relativePath of PRODUCTION_RUNTIME_FILES) {
+  const runtimeFiles = qaMode ? QA_RUNTIME_FILES : PRODUCTION_RUNTIME_FILES;
+  for (const relativePath of runtimeFiles) {
     const path = join(resourcesRoot, relativePath);
     assert(existsSync(path) && statSync(path).size > 0, `Windows runtime resource missing or empty: ${relativePath}`);
   }
+  const discovery = { qaMode };
   const expectedManifests = discoverDockProfileManifests(
     join(COLLAB_ROOT, ".package-staging"),
+    discovery,
   );
-  const packagedManifests = discoverDockProfileManifests(resourcesRoot);
+  const packagedManifests = discoverDockProfileManifests(resourcesRoot, discovery);
   const expectedClosure = expectedManifests.map((manifest) => ({
     ref: manifest.manifestRef,
     adapterId: manifest.adapterId,

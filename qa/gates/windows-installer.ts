@@ -9,10 +9,10 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
+  realpathSync,
   rmSync,
-  statSync,
+  writeFileSync,
 } from "node:fs";
-import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import {
   collectOwnedPids,
@@ -47,6 +47,51 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function tail(value: string, max = 8_000): string {
   return value.length <= max ? value : value.slice(-max);
+}
+
+function powershellLiteral(value: string): string {
+  return `'${value.replaceAll("'", "''")}'`;
+}
+
+function perUserWorkRoot(): string {
+  const localAppData = process.env.LOCALAPPDATA;
+  assert(typeof localAppData === "string" && localAppData.length > 0, "LOCALAPPDATA is unset");
+  return mkdtempSync(join(realpathSync(localAppData), "qf-windows-installer-"));
+}
+
+export function silentInstallScript(installer: string, installRoot: string, logPath: string): string {
+  const argumentsLine = `/S /currentuser /D=${installRoot}`;
+  return [
+    "$ErrorActionPreference = 'Stop'",
+    "$psi = New-Object System.Diagnostics.ProcessStartInfo",
+    `$psi.FileName = ${powershellLiteral(installer)}`,
+    `$psi.Arguments = ${powershellLiteral(argumentsLine)}`,
+    "$psi.UseShellExecute = $false",
+    "$psi.CreateNoWindow = $true",
+    `$psi.WorkingDirectory = ${powershellLiteral(installRoot)}`,
+    "$proc = [System.Diagnostics.Process]::Start($psi)",
+    "if ($null -eq $proc) { throw 'NSIS installer process did not start' }",
+    `if (-not $proc.WaitForExit(${INSTALLER_TIMEOUT_MS})) {`,
+    "  try { $proc.Kill() } catch {}",
+    `  Set-Content -LiteralPath ${powershellLiteral(logPath)} -Value 'TIMED_OUT'`,
+    "  exit 124",
+    "}",
+    "$code = $proc.ExitCode",
+    `Set-Content -LiteralPath ${powershellLiteral(logPath)} -Value ("EXIT=" + $code)`,
+    "exit $code",
+    "",
+  ].join("\r\n");
+}
+
+function installFailureDetail(installRoot: string, logPath: string): string {
+  const log = existsSync(logPath) ? readFileSync(logPath, "utf8").trim() : "missing";
+  let entries = "unreadable";
+  try {
+    entries = readdirSync(installRoot).join(",") || "(empty)";
+  } catch (error) {
+    entries = error instanceof Error ? error.message : String(error);
+  }
+  return `log=${log}; installRoot=${installRoot}; entries=${entries}`;
 }
 
 function runChildBounded(
@@ -236,16 +281,18 @@ export async function runWindowsInstallerGate(): Promise<{ ok: boolean }> {
     return { ok: false };
   }
 
-  const tempRoot = mkdtempSync(join(tmpdir(), "qf-windows-installer-"));
+  const tempRoot = perUserWorkRoot();
   const dist = join(COLLAB_ROOT, "dist");
   const manifest = packageManifest();
   try {
     console.log("windows-installer: packaging with a 10-minute deadline");
+    const packageEnv = { ...process.env };
+    delete packageEnv.QF_DOCK_QA_MODE;
     const packageResult = await runChildBounded(
       process.execPath,
       ["run", "package:unsigned"],
       COLLAB_ROOT,
-      { ...process.env },
+      packageEnv,
       PACKAGE_DEADLINE_MS,
     );
     if (packageResult.timedOut) {
@@ -277,20 +324,25 @@ export async function runWindowsInstallerGate(): Promise<{ ok: boolean }> {
     console.log(`windows-installer: Authenticode=${signature}`);
     console.log(`windows-installer: RELEASE-STATUS=${statusPath}`);
     const installRoot = join(tempRoot, "installed");
+    const scratch = join(tempRoot, "temp");
+    const installLog = join(tempRoot, "nsis-install-exit.txt");
+    const installScript = join(tempRoot, "silent-install.ps1");
     mkdirSync(installRoot, { recursive: true });
+    mkdirSync(scratch, { recursive: true });
+    writeFileSync(installScript, silentInstallScript(installer, installRoot, installLog), "utf8");
+    console.log(`windows-installer: installRoot=${installRoot}`);
     const installResult = await runChildBounded(
-      installer,
-      ["/S", "/currentuser", `/D=${installRoot}`],
+      "powershell.exe",
+      ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", installScript],
       tempRoot,
-      { ...process.env, TEMP: join(tempRoot, "temp"), TMP: join(tempRoot, "temp") },
-      INSTALLER_TIMEOUT_MS,
-      // NSIS treats a quoted /D= path as a different directory and returns
-      // Windows error 5. Pass the switch verbatim, and do not attach pipes
-      // to the GUI installer.
-      { windowsVerbatimArguments: true, captureOutput: false },
+      { ...process.env, TEMP: scratch, TMP: scratch },
+      INSTALLER_TIMEOUT_MS + 15_000,
     );
-    assert(!installResult.timedOut, "NSIS silent install timed out");
-    assert(installResult.code === 0, `NSIS silent install exited ${installResult.code}: ${tail(installResult.output)}`);
+    assert(!installResult.timedOut, `NSIS silent install timed out; ${installFailureDetail(installRoot, installLog)}`);
+    assert(
+      installResult.code === 0,
+      `NSIS silent install exited ${installResult.code}: ${tail(installResult.output)}; ${installFailureDetail(installRoot, installLog)}`,
+    );
     const installedExecutable = join(installRoot, "QuantFlow.exe");
     assert(existsSync(installedExecutable), `silent install did not produce ${installedExecutable}`);
     console.log(`windows-installer: installed-executable=${installedExecutable}`);
