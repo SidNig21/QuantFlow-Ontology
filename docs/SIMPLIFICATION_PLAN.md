@@ -320,6 +320,54 @@ A fine-tuned small language model, such as an Unsloth Qwen decision model, is al
 
 Play one stored simulation, play by play, and end on a box score. It reads the M2 artifact. It does not resimulate, does not retag, and does not become the product. Skip it if the card, the critic, the close, and the backtest are not already in use.
 
+## PufferLib / RL
+
+Park it. A plain Monte Carlo game sim is M2. Reinforcement learning is not on M0–M4.
+
+Nothing in the repo imports PufferLib, Gym, Gymnasium, or PPO, and no dependency lists them. There is no football simulator. The words that look like a training stack are reserved names and old plans.
+
+The only later use that fits this product: after M4, when the same sim has a real backtest, an optional layer may learn a **selection or pass policy** inside that sim. It may learn when to mark CANDIDATE versus PASS. It may not choose a stake, size a bet, or send one. PufferLib would be one library that layer could use. It is not the product, and it is not installed now. Agents learning to operate the desk stay parked for good.
+
+That matches the current roadmap (`docs/plans/OFFICIAL-ROADMAP.md` lines 90 and 470–479): a learned research policy comes only after a trustworthy simulator, and it does not size or place bets. An older doctrine sentence said a PufferLib policy would also allocate stakes (`docs/DOCTRINE.md` line 482). Amendment A12 (line 553, 28 Sep 2026) withdrew the stake claim. Do not build from the older sentence.
+
+**Clutter to take off the NFL reading route.** Leave the bytes. Do not delete the database tables; old files still open because those names exist. Do not rewrite `docs/DOCTRINE.md` as a side effect.
+
+| File | What it is |
+|---|---|
+| `docs/RESEARCH.md` lines 45–70 and 142 | The “RL shelf.” Aspirational. Names PufferLib, Gym, and OpenEnv as workloads nobody selected. |
+| `docs/proposals/CAPABILITY-REGISTRY.md` lines 93, 134–143, 169 | A catalog row and an “old RL shelf.” Aspirational. Says do not implement RL yet. |
+| `docs/DOCTRINE.md` lines 294–307, 353–357, 479–487, 553–558 | The ambition and the later correction. Law, not code. Read A12, not the stake sentence. |
+| `docs/plans/OFFICIAL-ROADMAP.md` lines 90, 470–479, 533 | Living plan. Already “later,” and already behind a simulator. |
+| `docs/plans/PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md` line 555 | One-line definition. Not a design to build. |
+| `docs/plans/DEMO-SPEC.md` line 130 | Says RL is not in the demo. |
+| `README.md` line 24 | Lists RL as later, not installed. |
+| `qf-kernel-schema/src/ontology/research.ts` lines 66–102, 208, 222–227 | Real tables with no trainer. `policy` and `environment` were reserved names (July 2026, names only). `run.kind` may be `training`. Nothing creates or runs a policy. |
+| `qf-kernel-schema/golden/ONTOLOGY.md` lines 87 and 96 | Generated copy of those two tables. |
+| `docs/history/plans/INSTITUTIONAL-BUILD-PLAN.md` lines 21, 45, 121 | Old route. “Learn the Market” via PufferLib. Already history. |
+| `docs/history/ladders/ROADMAP-2026-07-18.md` lines 219, 353 | Old phase P7. Already history. |
+| `docs/history/orders/WO-NORTHSTAR-1.md` lines 39–40, 113, 116, 189, 194, 215–221, 371 | Order that tried to make market RL a destination. History. |
+| `docs/history/orders/GOLDEN-RUN.md` line 192 | R22, the PufferLib rung. Never built. |
+| `docs/history/orders/AUTONOMY.md` lines 172–173 | “No RL unless a future order names it.” |
+| `docs/history/ONTOLOGY_SCHEMA-v0.2-superseded.md` lines 159, 178 | Superseded sketch: gym kind `rl_gym`, run kind `rl_training`. Those kinds are not in the live schema. |
+| `docs/history/evidence/wo-101/BUILD-REPORT.md` line 80 and `builder-report-d2-d5.md` lines 11, 139 | Receipt that the names were reserved and the links were not implemented. |
+| `docs/history/proposals/V2-SCOPE.md` lines 123, 135–136, 256, 487 | Scheduling note that RL should stay at the end of the ladder. |
+| `docs/DEBT.md` line 34 | Why RL’s rung number kept moving. Process note. |
+
+These history orders only mention RL to say the order must not build it: `WO-R15.md` 523, `WO-R16.md` 580, `WO-R17.md` 384, `WO-R18-GROUND.md` 721, `WO-R21-RECALL-DRAFT-2026-08-23.md` 302, `WO-RD-1.md` 313, `WO-RD-2.md` 332, `WO-RD-3.md` 248, `WO-R13-S1.md` 44 and 80, `WO-R13-S2.md` 56, `WO-R13-S3.md` 48, `WO-R13-S4.md` 54, `WO-R13-S5.md` 55, `WO-D1.md` 293, `WO-D2.md` 329, `WO-V2-2.md` 326, `WO-V2-3.md` 681, `WO-101.md` 92 and 98, `docs/orders/evidence/r14/VERIFICATION.md` 99, `docs/orders/evidence/r18/R18-SURGICAL-TABLE.md` 231, `docs/orders/active/WO-W2-02-REAL-COLLABORATIVE-INQUIRY.md` 281, `docs/history/ladders/SCOPES-2026-07-25.md` 87, 883, and 906. `WO-g2-glacier-tile.md` line 25 is CSS (`vertical-rl`), not learning.
+
+**Monte Carlo and “simulation” are a different, older idea.** They are not a game sim, and they are not RL.
+
+- `docs/history/ONTOLOGY_SCHEMA-v0.2-superseded.md` line 101: Monte Carlo over graded tickets (risk of ruin, drawdown). Aspirational bankroll math. Not built. Stake paths are off the product.
+- `docs/history/ladders/ROADMAP-2026-07-18.md` lines 233 and 313, `docs/history/BLUEPRINT-2026-07-18.md` line 15: “Monte Carlo bankroll” inside an old phase gate. Not built.
+- `docs/orders/evidence/r11b/VERIFICATION.md` line 33: a passing metric test that explicitly does **not** claim a Monte Carlo bankroll.
+- `CONTEXT.md` lines 118 and 251–252: the glossary allows a run to be a simulation, and defines a scenario simulation. Vocabulary only.
+- `docs/plans/OFFICIAL-ROADMAP.md` lines 88, 227, 427, and 448, `docs/plans/PRODUCT-SURFACE-AND-WORKFLOW-ARCHITECTURE.md` lines 51 and 510–512, `docs/plans/INSTITUTION-CONTRACTS.md` line 309, `docs/DOCTRINE.md` lines 163–166 and 533: a future scenario lab. The live run types are ingestion, feature build, backtest, analysis, and training. There is no `simulation` type and no simulator code.
+- `docs/proposals/CAPABILITY-REGISTRY.md` lines 89 and 212: scenario lab and a market-simulation library (`MarS`). Catalog only.
+- `collab-electron/packages/components/src/WorkspaceGraph/forceGraph.ts` (the `simulation` object) and `ForceDirectedGraph.tsx` line 110: a diagram layout from the old Collaborator graph. Not sports.
+- Test comments that say “simulate” (`sidecar/client.test.ts` line 227, `tmux.test.ts` lines 210 and 225, and several history orders) mean “pretend this failure happened.”
+
+**“Policy” and “environment” are mostly not RL.** A case-insensitive search hits about 826 `policy` lines in 168 files and about 313 `environment` lines in 152 files. Almost all of that is ordinary English, a process environment variable, or a rule (“creation policy,” “transition policy”). The RL nouns are the two schema objects above. `execution_environment` (`qf-kernel-schema/src/ontology/agent.ts` lines 147–165, used in `packages/qf-kernel/src/deterministic-execution.ts`) means “this calculation ran on this machine.” It is real, and it is not a gym.
+
 ## What to delete or archive
 
 Archive means: take it off the route you load when building NFL, keep the bytes until a milestone has replaced the behavior, then delete in a separate change. Do not bulk-delete from the atlas. Several of its “unused” wires are easy to misread.
@@ -331,8 +379,8 @@ Archive means: take it off the route you load when building NFL, keep the bytes 
 - UFC as the default sport path: `tools/qf-ufc-history/`, the UFC-only capture branch, fight-winner menu checks. Keep until you no longer want that demo, then archive.
 - `collab-electron/` Collaborator leftovers: workspace graph, wiki editor, file-tree nav, git replay, `packages/collab-canvas-skill/`, and home-directory skill installers in `integrations.ts`.
 - `tools/qf-vault-projection/`, `tools/qf-proof-agent/`, `qf-atlas/` as a required end-of-task step.
-- Roadmap rows for film, learned betting policy, and remote compute.
-- Schema types `policy` and `environment` on the hot path. Leave them in the dictionary so old databases still open; do not build the card on them.
+- Roadmap rows for film, learned betting policy, and remote compute. The PufferLib / RL shelf above is the same pile: `docs/RESEARCH.md`, the RL rows in `docs/proposals/CAPABILITY-REGISTRY.md`, and the history files named there.
+- Schema types `policy` and `environment` on the hot path. Leave them in the dictionary so old databases still open; do not build the card on them. Do not add PufferLib, Gym, or PPO.
 
 **Keep until the new card has replaced them**
 
@@ -381,6 +429,6 @@ The first simulator is allowed to be crude, and it must say it is unchecked. The
 
 Parlays follow your construction rules (one leg per game, or a short same-game block, no repeated player). They do not wait for a correlation model. The report should say the legs are not independent.
 
-The language model stays behind the statistical model, and the replay stays behind both. Neither one is a research result.
+The language model stays behind the statistical model, and the replay stays behind both. Neither one is a research result. PufferLib stays behind the calibrated sim as well. The repo never contained that library; the Monte Carlo game sim is the thing to build, and a learned pass/selection rule is optional only after that sim has been checked.
 
 This plan did not re-run tests, did not watch the example video frame by frame, and did not change product code.
