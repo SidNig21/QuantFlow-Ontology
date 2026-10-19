@@ -177,7 +177,28 @@ export function pinIsolatedAppPaths(env: NodeJS.ProcessEnv): string {
   mkdirSync(appDir, { recursive: true });
   env.QF_APP_ROOT = appRoot;
   env.QF_APP_DIR = appDir;
+  env.QF_STARTUP_ERROR_FILE = join(home, "startup-error.txt");
   return join(appRoot, "socket-path");
+}
+
+/** Text the packaged app wrote when it died before the readiness file. */
+export function packagedLaunchDiagnostics(env: NodeJS.ProcessEnv): string {
+  const chunks: string[] = [];
+  const startup = env.QF_STARTUP_ERROR_FILE;
+  if (startup && existsSync(startup)) {
+    chunks.push(`startup-error:\n${readFileSync(startup, "utf8")}`);
+  } else {
+    chunks.push("startup-error: not written");
+  }
+  const logs = env.QF_APP_DIR ? join(env.QF_APP_DIR, "logs") : "";
+  if (logs && existsSync(logs)) {
+    for (const name of readdirSync(logs)) {
+      chunks.push(`log ${name}:\n${readFileSync(join(logs, name), "utf8").slice(-4_000)}`);
+    }
+  } else if (logs) {
+    chunks.push(`no logs at ${logs}`);
+  }
+  return chunks.join("\n");
 }
 
 export function snapshotTree(root: string): TreeSnapshot {
@@ -937,7 +958,7 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
     }
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(
-      `${message}\npackaged app log: ${join(tempRoot, "packaged-app.log")}\nshutdown requested: ${cleanShutdownRequested}`,
+      `${message}\n${packagedLaunchDiagnostics(childEnv)}\npackaged app log: ${join(tempRoot, "packaged-app.log")}\nshutdown requested: ${cleanShutdownRequested}`,
     );
   }
 }

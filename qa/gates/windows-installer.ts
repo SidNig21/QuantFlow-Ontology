@@ -17,6 +17,7 @@ import { basename, join, resolve } from "node:path";
 import {
   collectOwnedPids,
   isolatedEnvironment,
+  packagedLaunchDiagnostics,
   pinIsolatedAppPaths,
   processSnapshot,
   rpcCall,
@@ -54,13 +55,16 @@ function runChildBounded(
   cwd: string,
   env: NodeJS.ProcessEnv,
   timeoutMs: number,
+  spawnOptions?: { windowsVerbatimArguments?: boolean; captureOutput?: boolean },
 ): Promise<{ code: number; output: string; timedOut: boolean }> {
   return new Promise((resolveResult, reject) => {
+    const captureOutput = spawnOptions?.captureOutput !== false;
     const child = spawn(command, [...args], {
       cwd,
       env,
       windowsHide: true,
-      stdio: ["ignore", "pipe", "pipe"],
+      windowsVerbatimArguments: spawnOptions?.windowsVerbatimArguments === true,
+      stdio: captureOutput ? ["ignore", "pipe", "pipe"] : "ignore",
     });
     let output = "";
     child.stdout?.on("data", (chunk: Buffer) => { output += chunk.toString("utf8"); });
@@ -221,7 +225,7 @@ async function launchInstalledArtifact(
     }
     throw new Error(
       `${error instanceof Error ? error.message : String(error)}; ` +
-        `shutdownRequested=${shutdownRequested}; installed-app-log=${tail(output)}`,
+        `shutdownRequested=${shutdownRequested}; installed-app-log=${tail(output)}\n${packagedLaunchDiagnostics(env)}`,
     );
   }
 }
@@ -276,10 +280,14 @@ export async function runWindowsInstallerGate(): Promise<{ ok: boolean }> {
     mkdirSync(installRoot, { recursive: true });
     const installResult = await runChildBounded(
       installer,
-      ["/S", `/D=${installRoot}`],
+      ["/S", "/currentuser", `/D=${installRoot}`],
       tempRoot,
       { ...process.env, TEMP: join(tempRoot, "temp"), TMP: join(tempRoot, "temp") },
       INSTALLER_TIMEOUT_MS,
+      // NSIS treats a quoted /D= path as a different directory and returns
+      // Windows error 5. Pass the switch verbatim, and do not attach pipes
+      // to the GUI installer.
+      { windowsVerbatimArguments: true, captureOutput: false },
     );
     assert(!installResult.timedOut, "NSIS silent install timed out");
     assert(installResult.code === 0, `NSIS silent install exited ${installResult.code}: ${tail(installResult.output)}`);

@@ -17,7 +17,7 @@ import {
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { fromCollabFileUrl } from "@collab/shared/collab-file-url";
 import {
@@ -239,6 +239,24 @@ function peerIdentityForSession(sessionId: string): { sessionId: string; role: s
   return requirePeerSessionRole(sessionId, role);
 }
 
+function recordStartupFailure(error: unknown): void {
+  const detail = error instanceof Error ? error.stack ?? error.message : String(error);
+  const target = process.env.QF_STARTUP_ERROR_FILE;
+  if (target) {
+    try {
+      mkdirSync(dirname(target), { recursive: true });
+      writeFileSync(target, detail, "utf8");
+    } catch {
+      // The readiness gate still reports the process exit code.
+    }
+  }
+  try {
+    process.stderr.write(`QuantFlow startup failed: ${detail}\n`);
+  } catch {
+    // A packaged Windows GUI build does not keep a live stderr pipe.
+  }
+}
+
 const electronUserData = join(QF_APP_DIR, "electron");
 // Capture Electron's legacy default before selecting the QF profile. On the
 // one first-boot path where the final directory is absent, Electron's current
@@ -260,8 +278,8 @@ const ownsProfileInstance = acquireProfileInstance(app, {
 });
 if (ownsProfileInstance) initializeLogger();
 else {
-  process.stderr.write(
-    "QuantFlow did not acquire the profile lock, so it is exiting before startup.\n",
+  recordStartupFailure(
+    "QuantFlow did not acquire the profile lock, so it is exiting before startup.",
   );
   app.exit(0);
 }
@@ -273,6 +291,7 @@ if (!process.env.LANG || !process.env.LANG.includes("UTF-8")) {
 }
 
 process.on("uncaughtException", (error) => {
+  recordStartupFailure(error);
   trackEvent("app_crash", {
     type: "uncaughtException",
     message: error.message,
@@ -1976,8 +1995,7 @@ app.whenReady().then(async () => {
   }
   startupComplete = true;
 }).catch(async (error) => {
-  const detail = error instanceof Error ? error.stack ?? error.message : String(error);
-  process.stderr.write(`QuantFlow startup failed: ${detail}\n`);
+  recordStartupFailure(error);
   console.error("QuantFlow startup failed:", error);
   await shutdownBackgroundServices().catch(() => {});
   app.exit(1);

@@ -15,6 +15,7 @@ import { join } from "node:path";
 import {
   buildWindowsPackage,
   isolatedEnvironment,
+  packagedLaunchDiagnostics,
   pinIsolatedAppPaths,
   processSnapshot,
   rpcCall,
@@ -83,8 +84,13 @@ async function launch(
   child.stdout?.on("data", (chunk: Buffer) => { output += chunk.toString("utf8"); });
   child.stderr?.on("data", (chunk: Buffer) => { output += chunk.toString("utf8"); });
   assert(child.pid !== undefined, "packaged QuantFlow did not provide a PID");
-  const ready = await waitForReady(child, endpointFile);
-  return { child, endpoint: ready.endpoint, packageRoot, output: () => output };
+  try {
+    const ready = await waitForReady(child, endpointFile);
+    return { child, endpoint: ready.endpoint, packageRoot, output: () => output };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${message}\n${packagedLaunchDiagnostics(env)}\n${output.slice(-4_000)}`);
+  }
 }
 
 async function shutdown(run: Launch): Promise<void> {
