@@ -14,33 +14,5 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Provide a WSL distro for the Hermes lifecycle check
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Continue"
-          Write-Host "wsl status:"
-          & wsl.exe --status
-          $list = (& wsl.exe -l -q | Out-String) -replace [char]0, ""
-          Write-Host "wsl distros: [$($list.Trim())]"
-          $names = @($list -split "\r?\n" | ForEach-Object { $_.Trim() } | Where-Object {
-            $_ -and $_ -notmatch "no installed|Windows Subsystem"
-          })
-          if ($names.Count -eq 0) {
-            Write-Host "No WSL distro is installed. Installing Ubuntu so the Hermes check can use its real WSL launch."
-            & wsl.exe --install -d Ubuntu --web-download --no-launch
-            Write-Host "wsl --install exit=$LASTEXITCODE"
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          }
-          & wsl.exe -e bash -lc "echo wsl-ready"
-          if ($LASTEXITCODE -ne 0) {
-            $launchers = @(Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WindowsApps" -Filter "ubuntu*.exe" -ErrorAction SilentlyContinue)
-            $launchers | ForEach-Object { Write-Host "launcher=$($_.FullName)" }
-            if ($launchers.Count -eq 0) { exit $LASTEXITCODE }
-            & $launchers[0].FullName install --root
-            Write-Host "ubuntu install --root exit=$LASTEXITCODE"
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            & wsl.exe -e bash -lc "echo wsl-ready"
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          }
       - name: Native Windows release verification
         run: bun qa/verify-release.ts

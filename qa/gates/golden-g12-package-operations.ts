@@ -70,6 +70,47 @@ function sha256(value: string): string {
   return createHash("sha256").update(value).digest("hex").toUpperCase();
 }
 
+function wslBashReady(): boolean {
+  const probe = Bun.spawnSync(["wsl.exe", "-e", "bash", "-lc", "echo wsl-ready"], {
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const output = `${new TextDecoder().decode(probe.stdout)}\n${new TextDecoder().decode(probe.stderr)}`;
+  return probe.exitCode === 0 && output.includes("wsl-ready");
+}
+
+function ensureHermesWslDistro(): void {
+  if (wslBashReady()) {
+    console.log("golden-g12-package-operations: wsl-ready");
+    return;
+  }
+  console.log("golden-g12-package-operations: no WSL distro; installing Ubuntu for the Hermes launch");
+  const script = [
+    "$ErrorActionPreference = 'Continue'",
+    "& wsl.exe --install -d Ubuntu --web-download --no-launch",
+    "Write-Host \"wsl-install-exit=$LASTEXITCODE\"",
+    "if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }",
+    "& wsl.exe -e bash -lc 'echo wsl-ready'",
+    "if ($LASTEXITCODE -eq 0) { exit 0 }",
+    "$launchers = @(Get-ChildItem \"$env:LOCALAPPDATA\\Microsoft\\WindowsApps\" -Filter 'ubuntu*.exe' -ErrorAction SilentlyContinue)",
+    "$launchers | ForEach-Object { Write-Host \"launcher=$($_.FullName)\" }",
+    "if ($launchers.Count -eq 0) { exit 1 }",
+    "& $launchers[0].FullName install --root",
+    "Write-Host \"ubuntu-root-exit=$LASTEXITCODE\"",
+    "if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }",
+    "& wsl.exe -e bash -lc 'echo wsl-ready'",
+    "exit $LASTEXITCODE",
+  ].join("\r\n");
+  const install = Bun.spawnSync(
+    ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script],
+    { stdout: "inherit", stderr: "inherit" },
+  );
+  if (install.exitCode !== 0 || !wslBashReady()) {
+    throw new Error(`Ubuntu WSL install exited ${install.exitCode}; Hermes still requires an installed distro`);
+  }
+  console.log("golden-g12-package-operations: wsl-ready");
+}
+
 async function runStep(step: Step, env: NodeJS.ProcessEnv): Promise<{
   id: string;
   command: string;
@@ -128,6 +169,14 @@ export async function runGoldenG12PackageOperationsGate(): Promise<{ ok: boolean
       console.log(`golden-g12-package-operations: step=${step.id}`);
       if (step.id === "packaged-hermes-lifecycle") {
         env.QF_G12_HERMES_LIFECYCLE = "1";
+        try {
+          ensureHermesWslDistro();
+        } catch (error) {
+          console.error(
+            `golden-g12-package-operations: FAIL step=${step.id} ${error instanceof Error ? error.message : String(error)}`,
+          );
+          return { ok: false };
+        }
       }
       const result = await runStep(step, env);
       receipt.steps.push(result);
