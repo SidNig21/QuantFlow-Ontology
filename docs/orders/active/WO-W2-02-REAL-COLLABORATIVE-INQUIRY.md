@@ -1,6 +1,6 @@
 # WO-W2-02 — Complete one real collaborative inquiry and second round
 
-status: OPEN — founder accepted WO-W2-01 and authorized this order on 2026-09-27
+status: PARKED — replaced as the active priority by the football report route on 2026-10-19. Founder authorized this UFC order on 2026-09-27; it was not built.
 assignee: builder — every delegated Reader, Builder, and Verifier uses `gpt-5.6-sol`; only the root architect uses Astra
 depends: founder acceptance and merge of WO-W2-01 candidate `6f6cda0921b2d0510a65c9b26118d76e44d45e30`
 expected effort: 2.5 units (10 hours) with a 1-unit contingency if the existing revision path cannot consume Codex without a contract repair
