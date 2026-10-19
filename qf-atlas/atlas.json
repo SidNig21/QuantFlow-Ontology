@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "cursor/simplification-plan-f38d",
-    "commit": "30e3e2d8",
+    "commit": "308d136c",
     "generatedAt": "2026-10-19",
     "filesScanned": 438,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "2efde7e859240003"
+    "fingerprint": "3acbf8a380de8de7"
   },
   "stats": {
     "live": 108,
@@ -3111,7 +3111,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1058.3,
+      "kb": 1058.7,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3132,7 +3132,7 @@
         },
         {
           "path": "qa/gates/wave1-critic-decision.ts",
-          "kb": 64.7,
+          "kb": 65.1,
           "spawns": 2,
           "spawnsLive": 1,
           "writes": 4,
@@ -61031,12 +61031,12 @@
   "diffVsHead": {
     "from": {
       "branch": "cursor/simplification-plan-f38d",
-      "commit": "168e48d6",
+      "commit": "30e3e2d8",
       "generatedAt": "2026-10-19"
     },
     "to": {
       "branch": "cursor/simplification-plan-f38d",
-      "commit": "30e3e2d8",
+      "commit": "308d136c",
       "generatedAt": "2026-10-19"
     },
     "verdict": "better",

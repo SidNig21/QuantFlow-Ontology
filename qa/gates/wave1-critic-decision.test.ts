@@ -4,9 +4,8 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { deflateSync } from "node:zlib";
 import { createHash } from "node:crypto";
-import { Database } from "bun:sqlite";
 import { closeKernel, execute, openKernel } from "../../packages/qf-kernel/src/index.ts";
-import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, parseLastSendResultRefusal, remainingProofProcesses, sanitizeLiveFailureError, snapshotSavedKernel, validateLiveDecisionProof, validateSavedResumeProof, validateUiCaptureReceipt, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
+import { buildLiveFailureDiagnostic, cleanupDisposableProofRoot, DEFAULT_WAVE1_ACCEPTANCE_CASE, observeLiveFailure, parseHermesModelIdentity, parseLastSendResultRefusal, readSavedSnapshotTask, remainingProofProcesses, sanitizeLiveFailureError, snapshotSavedKernel, validateLiveDecisionProof, validateSavedResumeProof, validateUiCaptureReceipt, WORKER_TO_CRITIC_ADMISSION_TIMEOUT_MS, CRITIC_PUBLICATION_OBSERVER_TIMEOUT_MS, type LiveFailureDiagnostic } from "./wave1-critic-decision.ts";
 import { processIdentityKey, type ProcessInfo } from "./windows-cold-boot.ts";
 
 function png(width = 1, height = 1): Buffer {
@@ -196,9 +195,7 @@ test("real Kernel WAL snapshot preserves committed work and observer distinguish
     execute(db, "create_task", { task_id: "task-1", title: "Analyze requested expression", description: "Compare every exact offered selection for independent review.", assignee_session_id: "worker-1" }, { ...trace, actor_session_id: "director-1" });
     const snapshotPath = join(root, "saved-copy.sqlite");
     expect(snapshotSavedKernel(dbPath, snapshotPath)).toMatch(/^[a-f0-9]{64}$/);
-    const copy = new Database(snapshotPath, { readonly: true });
-    try { expect(copy.query("SELECT id,status FROM task WHERE id='task-1'").get()).toEqual({ id: "task-1", status: "open" }); }
-    finally { copy.close(true); }
+    expect(readSavedSnapshotTask(snapshotPath, "task-1")).toEqual({ id: "task-1", status: "open" });
     expect(() => snapshotSavedKernel(dbPath, dbPath)).toThrow(/isolated/);
     expect(() => snapshotSavedKernel(dbPath, snapshotPath)).toThrow(/isolated/);
   } finally {
