@@ -4,6 +4,7 @@
  */
 import { execFileSync, spawn, type ChildProcess } from "node:child_process";
 import {
+  copyFileSync,
   existsSync,
   mkdtempSync,
   mkdirSync,
@@ -13,7 +14,7 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import {
   collectOwnedPids,
   isolatedEnvironment,
@@ -68,7 +69,7 @@ export function silentInstallScript(installer: string, installRoot: string, logP
     `$psi.Arguments = ${powershellLiteral(argumentsLine)}`,
     "$psi.UseShellExecute = $false",
     "$psi.CreateNoWindow = $true",
-    `$psi.WorkingDirectory = ${powershellLiteral(installRoot)}`,
+    `$psi.WorkingDirectory = ${powershellLiteral(dirname(installer))}`,
     "$proc = [System.Diagnostics.Process]::Start($psi)",
     "if ($null -eq $proc) { throw 'NSIS installer process did not start' }",
     `if (-not $proc.WaitForExit(${INSTALLER_TIMEOUT_MS})) {`,
@@ -327,17 +328,27 @@ export async function runWindowsInstallerGate(): Promise<{ ok: boolean }> {
     const scratch = join(tempRoot, "temp");
     const installLog = join(tempRoot, "nsis-install-exit.txt");
     const installScript = join(tempRoot, "silent-install.ps1");
-    mkdirSync(installRoot, { recursive: true });
+    const launchedInstaller = join(tempRoot, "QuantFlowSetup.exe");
     mkdirSync(scratch, { recursive: true });
-    writeFileSync(installScript, silentInstallScript(installer, installRoot, installLog), "utf8");
+    copyFileSync(installer, launchedInstaller);
+    writeFileSync(installScript, silentInstallScript(launchedInstaller, installRoot, installLog), "utf8");
     console.log(`windows-installer: installRoot=${installRoot}`);
-    const installResult = await runChildBounded(
-      "powershell.exe",
-      ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", installScript],
-      tempRoot,
-      { ...process.env, TEMP: scratch, TMP: scratch },
-      INSTALLER_TIMEOUT_MS + 15_000,
-    );
+    let installResult = { code: 1, output: "", timedOut: false };
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      rmSync(installRoot, { recursive: true, force: true });
+      mkdirSync(installRoot, { recursive: true });
+      console.log(`windows-installer: attempt=${attempt}`);
+      installResult = await runChildBounded(
+        "powershell.exe",
+        ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", installScript],
+        tempRoot,
+        { ...process.env, TEMP: scratch, TMP: scratch },
+        INSTALLER_TIMEOUT_MS + 15_000,
+      );
+      if (installResult.timedOut) break;
+      if (installResult.code === 0 && existsSync(join(installRoot, "QuantFlow.exe"))) break;
+      console.log(`windows-installer: attempt=${attempt} failed ${installFailureDetail(installRoot, installLog)}`);
+    }
     assert(!installResult.timedOut, `NSIS silent install timed out; ${installFailureDetail(installRoot, installLog)}`);
     assert(
       installResult.code === 0,

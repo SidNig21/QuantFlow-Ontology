@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "cursor/simplification-plan-f38d",
-    "commit": "f0bc5df0",
+    "commit": "168e48d6",
     "generatedAt": "2026-10-19",
     "filesScanned": 438,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "634dbc0b48e8317a"
+    "fingerprint": "be57b932fb450953"
   },
   "stats": {
     "live": 108,
@@ -3111,7 +3111,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1057.6,
+      "kb": 1058.3,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3328,21 +3328,21 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/golden-phase3-requalification.ts",
-          "kb": 16.2,
-          "spawns": 1,
-          "spawnsLive": 0,
-          "writes": 5,
+          "path": "qa/gates/windows-installer.ts",
+          "kb": 16.9,
+          "spawns": 4,
+          "spawnsLive": 2,
+          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
         },
         {
-          "path": "qa/gates/windows-installer.ts",
+          "path": "qa/gates/golden-phase3-requalification.ts",
           "kb": 16.2,
-          "spawns": 4,
-          "spawnsLive": 2,
-          "writes": 1,
+          "spawns": 1,
+          "spawnsLive": 0,
+          "writes": 5,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -61031,12 +61031,12 @@
   "diffVsHead": {
     "from": {
       "branch": "cursor/simplification-plan-f38d",
-      "commit": "dd15aeaa",
+      "commit": "f0bc5df0",
       "generatedAt": "2026-10-19"
     },
     "to": {
       "branch": "cursor/simplification-plan-f38d",
-      "commit": "f0bc5df0",
+      "commit": "168e48d6",
       "generatedAt": "2026-10-19"
     },
     "verdict": "better",
