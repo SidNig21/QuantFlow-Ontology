@@ -158,6 +158,11 @@ export function classifyWslNativeTuiPrerequisites(options: {
   getWslDistroVersion?: (distro: string) => number | null;
   guestCommand?: string;
   probeGuestCommand?: WslGuestCommandProbe;
+  /**
+   * The packaged synthetic harness replaces the Hermes binary and still needs
+   * a real WSL2 distro. Production seats keep the binary probe.
+   */
+  requireGuestCommand?: boolean;
 }): WslPrerequisiteDiagnostic | null {
   const platform = options.platform ?? process.platform;
   if (platform !== "win32") {
@@ -197,6 +202,7 @@ export function classifyWslNativeTuiPrerequisites(options: {
           "Convert it to WSL2 and retry.",
       };
     }
+    if (options.requireGuestCommand === false) return null;
     probeStage = "guest";
     (options.probeGuestCommand ?? probeWslGuestCommand)(
       resolvedTarget,

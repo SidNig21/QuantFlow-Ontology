@@ -1557,6 +1557,12 @@ app.whenReady().then(async () => {
               mainWindow?.webContents.send("qf:dock:invalidate");
               mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
             } catch (error) {
+              const detail = error instanceof Error ? error.stack ?? error.message : String(error);
+              try {
+                process.stderr.write(`research continuation failed: ${detail}\n`);
+              } catch {
+                // A packaged Windows GUI may not keep a live stderr pipe.
+              }
               console.error("research continuation failed", error);
               closeTaskCoordinatorIfIdle(change.taskId, change.coordinatorSessionId);
             }

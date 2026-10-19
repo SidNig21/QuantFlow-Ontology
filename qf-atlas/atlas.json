@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "cursor/simplification-plan-f38d",
-    "commit": "168e48d6",
+    "commit": "30e3e2d8",
     "generatedAt": "2026-10-19",
     "filesScanned": 438,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "be57b932fb450953"
+    "fingerprint": "2efde7e859240003"
   },
   "stats": {
     "live": 108,
@@ -979,7 +979,7 @@
       "id": "2:collab-electron/src/main::agent",
       "layer": 2,
       "name": "agent*",
-      "kb": 35.3,
+      "kb": 35.5,
       "x": -2.03,
       "z": 1.69,
       "status": "ok",
@@ -990,7 +990,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/agent-host.ts",
-          "kb": 30.8,
+          "kb": 31,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1027,7 +1027,7 @@
       "id": "2:collab-electron/src/main::terminal",
       "layer": 2,
       "name": "terminal-target.ts",
-      "kb": 11.6,
+      "kb": 11.8,
       "x": -3.88,
       "z": 0.8,
       "status": "ok",
@@ -1038,7 +1038,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/terminal-target.ts",
-          "kb": 11.6,
+          "kb": 11.8,
           "spawns": 3,
           "spawnsLive": 0,
           "writes": 0,
@@ -1480,7 +1480,7 @@
       "id": "2:collab-electron/src/main::index",
       "layer": 2,
       "name": "main/index.ts",
-      "kb": 73.4,
+      "kb": 73.7,
       "x": -1.24,
       "z": 0.45,
       "status": "ok",
@@ -1491,7 +1491,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/index.ts",
-          "kb": 73.4,
+          "kb": 73.7,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 4,
@@ -11600,9 +11600,9 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports startPrecreatedNativeTuiSession() at line 552",
-            "exports cancelAgentSession() at line 779",
-            "exports closeAgentSessionRow() at line 837"
+            "exports startPrecreatedNativeTuiSession() at line 555",
+            "exports cancelAgentSession() at line 782",
+            "exports closeAgentSessionRow() at line 840"
           ],
           "strong": [],
           "weight": "weak"
@@ -11641,7 +11641,7 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports admitAndStartSession() at line 475"
+            "exports admitAndStartSession() at line 478"
           ],
           "strong": [],
           "weight": "weak"
@@ -57527,7 +57527,7 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1597,
+          "line": 1603,
           "kind": "direct"
         }
       ],
@@ -57562,12 +57562,12 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1598,
+          "line": 1604,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1669,
+          "line": 1675,
           "kind": "direct"
         }
       ],
@@ -61031,12 +61031,12 @@
   "diffVsHead": {
     "from": {
       "branch": "cursor/simplification-plan-f38d",
-      "commit": "f0bc5df0",
+      "commit": "168e48d6",
       "generatedAt": "2026-10-19"
     },
     "to": {
       "branch": "cursor/simplification-plan-f38d",
-      "commit": "168e48d6",
+      "commit": "30e3e2d8",
       "generatedAt": "2026-10-19"
     },
     "verdict": "better",

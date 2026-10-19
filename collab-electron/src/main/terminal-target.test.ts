@@ -108,6 +108,33 @@ describe("WSL terminal targets", () => {
     })?.code).toBe("wsl1-distro");
   });
 
+  test("synthetic harness admits a WSL2 distro without the Hermes binary", () => {
+    expect(classifyWslNativeTuiPrerequisites({
+      platform: "win32",
+      homeDir: "C:\\Users\\tester",
+      terminalTarget: "wsl:Ubuntu",
+      cwdHostPath: "C:\\Users\\tester",
+      getDefaultWslDistro: () => "Ubuntu",
+      getWslDistroVersion: () => 2,
+      resolveWslCommand: () => "wsl.exe",
+      guestCommand: "hermes",
+      requireGuestCommand: false,
+      probeGuestCommand: () => {
+        throw new Error("command not found");
+      },
+    })).toBeNull();
+    expect(classifyWslNativeTuiPrerequisites({
+      platform: "win32",
+      homeDir: "C:\\Users\\tester",
+      terminalTarget: "wsl:Ubuntu",
+      cwdHostPath: "C:\\Users\\tester",
+      getDefaultWslDistro: () => "Ubuntu",
+      getWslDistroVersion: () => 1,
+      resolveWslCommand: () => "wsl.exe",
+      requireGuestCommand: false,
+    })?.code).toBe("wsl1-distro");
+  });
+
   test("classifies missing Hermes inside the selected WSL2 distro", () => {
     expect(classifyWslNativeTuiPrerequisites({
       platform: "win32",

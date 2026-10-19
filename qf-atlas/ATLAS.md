@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `cursor/simplification-plan-f38d @ 168e48d6` on 2026-10-19 by
+> Generated from `cursor/simplification-plan-f38d @ 30e3e2d8` on 2026-10-19 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -500,7 +500,7 @@ discovered from the AST.
 
 - **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 577
-- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 552
+- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 555
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 455
 - `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 868
 
