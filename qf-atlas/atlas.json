@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "cursor/simplification-plan-f38d",
-    "commit": "dd15aeaa",
+    "commit": "f0bc5df0",
     "generatedAt": "2026-10-19",
     "filesScanned": 438,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "de267f58d3151688"
+    "fingerprint": "634dbc0b48e8317a"
   },
   "stats": {
     "live": 108,
@@ -3111,11 +3111,11 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 1055.6,
+      "kb": 1057.6,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 105,
+      "spawns": 107,
       "writes": 59,
       "dml": 19,
       "executes": 55,
@@ -3547,6 +3547,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/golden-g12-package-operations.ts",
+          "kb": 6.6,
+          "spawns": 4,
+          "spawnsLive": 1,
+          "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/observe-door.ts",
           "kb": 6.3,
           "spawns": 0,
@@ -3602,16 +3612,6 @@
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/golden-g12-package-operations.ts",
-          "kb": 4.6,
-          "spawns": 2,
-          "spawnsLive": 1,
-          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -61031,12 +61031,12 @@
   "diffVsHead": {
     "from": {
       "branch": "cursor/simplification-plan-f38d",
-      "commit": "73428b33",
+      "commit": "dd15aeaa",
       "generatedAt": "2026-10-19"
     },
     "to": {
       "branch": "cursor/simplification-plan-f38d",
-      "commit": "dd15aeaa",
+      "commit": "f0bc5df0",
       "generatedAt": "2026-10-19"
     },
     "verdict": "better",
